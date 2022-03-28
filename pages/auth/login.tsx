@@ -19,6 +19,7 @@ export default function login(){
         e.preventDefault();
         let data: ApiLoginReturnValues|null = await fetcher<ApiLoginReturnValues>("/api/auth/login", "POST", {name:name, password:password}).catch(()=>null);
         if(data == null){setError(true);} else {
+            console.log(data);
             localStorage.setItem("session_jwt", data.jwt);
             router.push("/");
         }
