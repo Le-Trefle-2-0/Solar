@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@tailwind screens;
+@tailwind templating;
+
+html{
+  font-size: 20px;
+}
+body{
+  font-size: .8rem;
+  margin: 0;
+}
+
+@layer components {
+  .btn{
+    @apply bg-trefle-green;
+  }
+}
