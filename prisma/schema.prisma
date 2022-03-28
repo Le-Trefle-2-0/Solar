@@ -1,11 +1,146 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model account_calendar_event {
+  account_id        BigInt
+  calendar_event_id BigInt
+  accounts          accounts        @relation(fields: [account_id], references: [id], onUpdate: Restrict, map: "account_calendar_event_ibfk_1")
+  calendar_events   calendar_events @relation(fields: [calendar_event_id], references: [id], onUpdate: Restrict, map: "account_calendar_event_ibfk_2")
+
+  @@id([account_id, calendar_event_id])
+  @@index([calendar_event_id], map: "calendar_event_id")
+}
+
+model account_listen {
+  account_id BigInt
+  listen_id  BigInt
+  accounts   accounts @relation(fields: [account_id], references: [id], onUpdate: Restrict, map: "account_listen_ibfk_1")
+  listens    listens  @relation(fields: [listen_id], references: [id], onUpdate: Restrict, map: "account_listen_ibfk_2")
+
+  @@id([account_id, listen_id])
+  @@index([listen_id], map: "listen_id")
+}
+
+model accounts {
+  id                     BigInt                   @id @default(autoincrement())
+  name                   String                   @unique(map: "name") @db.VarChar(192)
+  password               String                   @db.VarChar(192)
+  tel                    String?                  @db.VarChar(20)
+  role_id                BigInt
+  roles                  roles                    @relation(fields: [role_id], references: [id], onUpdate: Restrict, map: "accounts_ibfk_1")
+  account_calendar_event account_calendar_event[]
+  account_listen         account_listen[]
+  calendar_events        calendar_events[]
+  event_messages         event_messages[]
+  messages               messages[]
+
+  @@index([role_id], map: "role_id")
+}
+
+model calendar_event_message {
+  calendar_event_id BigInt
+  event_message_id  BigInt
+  calendar_events   calendar_events @relation(fields: [calendar_event_id], references: [id], onUpdate: Restrict, map: "calendar_event_message_ibfk_1")
+  event_messages    event_messages  @relation(fields: [event_message_id], references: [id], onUpdate: Restrict, map: "calendar_event_message_ibfk_2")
+
+  @@id([calendar_event_id, event_message_id])
+  @@index([event_message_id], map: "event_message_id")
+}
+
+model calendar_event_role_needed {
+  role_id           BigInt
+  calendar_event_id BigInt
+  number            Int
+  calendar_events   calendar_events @relation(fields: [calendar_event_id], references: [id], onUpdate: Restrict, map: "calendar_event_role_needed_ibfk_2")
+  roles             roles           @relation(fields: [role_id], references: [id], onUpdate: Restrict, map: "calendar_event_role_needed_ibfk_1")
+
+  @@id([role_id, calendar_event_id])
+  @@index([calendar_event_id], map: "calendar_event_id")
+}
+
+model calendar_events {
+  id                         BigInt                       @id @default(autoincrement())
+  subject                    String                       @db.VarChar(192)
+  date_start                 DateTime                     @db.Date
+  date_end                   DateTime?                    @db.Date
+  daily_time_start           DateTime                     @db.Time(0)
+  daily_time_end             DateTime                     @db.Time(0)
+  creator_id                 BigInt
+  accounts                   accounts                     @relation(fields: [creator_id], references: [id], onUpdate: Restrict, map: "calendar_events_ibfk_1")
+  account_calendar_event     account_calendar_event[]
+  calendar_event_message     calendar_event_message[]
+  calendar_event_role_needed calendar_event_role_needed[]
+
+  @@index([creator_id], map: "creator_id")
+}
+
+model event_messages {
+  id                     BigInt                   @id @default(autoincrement())
+  content_encrypted      String                   @db.Text
+  is_double_encrypted    Boolean                  @default(dbgenerated("b'0'")) @db.Bit(1)
+  account_id             BigInt
+  accounts               accounts                 @relation(fields: [account_id], references: [id], onUpdate: Restrict, map: "event_messages_ibfk_1")
+  calendar_event_message calendar_event_message[]
+
+  @@index([account_id], map: "account_id")
+}
+
+model listen_message {
+  listen_id  BigInt
+  message_id BigInt
+  listens    listens  @relation(fields: [listen_id], references: [id], onUpdate: Restrict, map: "listen_message_ibfk_1")
+  messages   messages @relation(fields: [message_id], references: [id], onUpdate: Restrict, map: "listen_message_ibfk_2")
+
+  @@id([listen_id, message_id])
+  @@index([message_id], map: "message_id")
+}
+
+model listen_status {
+  id      BigInt    @id @default(autoincrement())
+  name    String    @unique(map: "name") @db.VarChar(192)
+  label   String    @db.VarChar(192)
+  listens listens[]
+}
+
+model listens {
+  id                                    BigInt           @id @default(autoincrement())
+  user_discord_id_encrypted             String           @db.VarChar(192)
+  user_age_encrypted                    String           @db.VarChar(192)
+  main_subject_encrypted                String           @db.Text
+  date_time_start                       DateTime         @db.DateTime(0)
+  volunteer_notes_encrypted             String?          @db.Text
+  volunteer_main_observations_encrypted String?          @db.Text
+  is_user_minor                         Boolean          @db.Bit(1)
+  listen_status_id                      BigInt
+  listen_status                         listen_status    @relation(fields: [listen_status_id], references: [id], onUpdate: Restrict, map: "listens_ibfk_1")
+  account_listen                        account_listen[]
+  listen_message                        listen_message[]
+
+  @@index([listen_status_id], map: "listen_status_id")
+}
+
+model messages {
+  id                        BigInt           @id @default(autoincrement())
+  content_encrypted         String           @db.Text
+  is_double_encrypted       Boolean          @default(dbgenerated("b'0'")) @db.Bit(1)
+  discord_message_encrypted String           @db.Text
+  account_id                BigInt
+  accounts                  accounts         @relation(fields: [account_id], references: [id], onUpdate: Restrict, map: "messages_ibfk_1")
+  listen_message            listen_message[]
+
+  @@index([account_id], map: "account_id")
+}
+
+model roles {
+  id                         BigInt                       @id @default(autoincrement())
+  name                       String                       @unique(map: "name") @db.VarChar(192)
+  label                      String                       @db.VarChar(192)
+  accounts                   accounts[]
+  calendar_event_role_needed calendar_event_role_needed[]
 }

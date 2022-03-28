@@ -6,9 +6,7 @@ import AuthenticatedLayout from "../src/layouts/authenticated-layout";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <AuthenticatedLayout>
-      <Component {...pageProps} />
-    </AuthenticatedLayout>
+    <Component {...pageProps} />
   );
 }
 export default MyApp

@@ -4,16 +4,21 @@
 @tailwind screens;
 @tailwind templating;
 
-html{
-  font-size: 20px;
-}
 body{
-  font-size: .8rem;
-  margin: 0;
+  @apply m-0 absolute inset-0;
+  &>div#__next{
+    @apply w-full h-full block relative;
+  }
 }
 
 @layer components {
-  .btn{
-    @apply bg-trefle-green;
+  @import "./components/button.scss";
+  @import "./components/input.scss";
+
+  h1{
+    @apply text-4xl font-bold;
+  }
+  h2{
+    @apply text-3xl font-medium;
   }
 }

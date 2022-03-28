@@ -6,11 +6,21 @@
     "start": "next start",
     "type-check": "tsc"
   },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+  },
   "dependencies": {
+    "@prisma/client": "^3.11.1",
+    "@types/jsonwebtoken": "^8.5.8",
+    "jsonwebtoken": "^8.5.1",
     "next": "latest",
+    "next-connect": "^0.12.2",
+    "next-joi": "^2.2.1",
+    "query-string": "^7.1.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "sass": "^1.45.0"
+    "sass": "^1.45.0",
+    "swr": "^1.2.2"
   },
   "devDependencies": {
     "@fullhuman/postcss-purgecss": "^4.1.3",
@@ -21,6 +31,7 @@
     "postcss": "^8.4.12",
     "postcss-preset-env": "^7.0.2",
     "prisma": "^3.11.1",
+    "stylelint-config-recommended": "^7.0.0",
     "tailwindcss": "^3.0.23",
     "typescript": "4.0"
   }
