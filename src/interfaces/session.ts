@@ -1,0 +1,12 @@
+import { accounts, roles } from "@prisma/client";
+
+export default interface session{
+    jwt: string , 
+    user: sessionAccountWithRoles
+}
+
+export type sessionAccountWithRoles = sessionAccount & {roles: roles, password?:string};
+
+export interface sessionAccount extends  Omit<accounts, 'password'> {
+    password?:string
+}

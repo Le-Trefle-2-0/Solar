@@ -1,3 +1,6 @@
 input.field{
-    @apply rounded-lg border-2 border-trefle-soft-black py-2 px-6 w-full block;
+    @apply rounded-lg border border-trefle-soft-black py-2 px-6 w-full block outline-none transition;
+    &:focus{
+        @apply border-trefle-green;
+    }
 }

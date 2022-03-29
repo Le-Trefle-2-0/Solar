@@ -4,6 +4,7 @@ import connect from "next-connect";
 import validator from "../../../src/middlewares/validator";
 import Joi from "joi";
 import { sign } from "jsonwebtoken";
+import session, { sessionAccountWithRoles } from "../../../src/interfaces/session";
 
 const schema = Joi.object({
   name: Joi.string().required(),
@@ -21,18 +22,17 @@ export default connect().post(validator({body: schema}), async (req, res) => {
     include: {
       roles: true
     }
-  });
+  }) as sessionAccountWithRoles ;
   if(acc){
-    let accAny: any = acc;
-    delete accAny.password;
+    delete acc.password;
     res.status(200).send({
-      user: accAny,
       jwt: sign(
-        accAny,
+        acc,
         process.env.JWT_SECRET || "secret",
         {expiresIn: "1d"}
-      )
-    });
+      ),
+      user: acc
+    } as session);
   }else{
     res.status(401).send("invalid credentials")
   }

@@ -1,0 +1,26 @@
+table{
+    @apply w-full;
+    td, th{
+        @apply p-3 text-left font-medium;
+    }
+    thead tr th{
+        @apply bg-trefle-green text-white;
+        &:first-child{
+            @apply rounded-l-4;
+        }
+        &:last-child{
+            @apply rounded-r-4;
+        }
+    }
+    tbody tr.odd{
+        td{
+            @apply bg-trefle-ulight-green;
+            &:first-child{
+                @apply rounded-l-4;
+            }
+            &:last-child{
+                @apply rounded-r-4;
+            }
+        }
+    }
+}

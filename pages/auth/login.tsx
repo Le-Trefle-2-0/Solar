@@ -1,4 +1,4 @@
-import { accounts } from "@prisma/client";
+import { accounts, roles } from "@prisma/client";
 import { useRouter } from "next/router";
 import { FormEventHandler, useState } from "react";
 import LoginLayout from "../../src/layouts/login-layout";
@@ -6,7 +6,7 @@ import fetcher from "../../src/utils/fetcher";
 
 interface ApiLoginReturnValues{
     jwt: string,
-    user: accounts
+    user: accounts & {roles: roles}
 }
 
 export default function login(){
@@ -17,9 +17,9 @@ export default function login(){
 
     async function handleLogin(e: React.SyntheticEvent){
         e.preventDefault();
-        let data: ApiLoginReturnValues|null = await fetcher<ApiLoginReturnValues>("/api/auth/login", "POST", {name:name, password:password}).catch(()=>null);
-        if(data == null){setError(true);} else {
-            console.log(data);
+        if(name == "" || password == "") {setError(true); return;}
+        let data = await fetcher<ApiLoginReturnValues>("/api/auth/login", "POST", {name:name, password:password}).catch(()=>null);
+        if(data == null || !data.jwt){setError(true);} else {
             localStorage.setItem("session_jwt", data.jwt);
             router.push("/");
         }

@@ -25,5 +25,13 @@ import * as crypto from "crypto";
       {name:"commented", label: "Commentée" },
     ]
   })
+  
+  await prisma.listens.createMany({
+    data: [
+      {user_discord_id_encrypted: "AB", user_age_encrypted: "CD", main_subject_encrypted: "EF", date_time_start: new Date().toDateString(), is_user_minor: false, listen_status_id:2},
+      {user_discord_id_encrypted: "GH", user_age_encrypted: "IJ", main_subject_encrypted: "KL", date_time_start: new Date().toDateString(), is_user_minor: false, listen_status_id:1},
+    ]
+  })
+  
   prisma.$disconnect();
 })()

@@ -1,0 +1,42 @@
+nav.sidebar{
+    @apply bg-trefle-light-green min-w-62.5 h-full flex flex-col overflow-hidden relative;
+    &:before{
+        content: "";
+        @apply block w-2.5 drop-shadow-nav bg-white absolute top-0 bottom-0 right-0 transform translate-x-full;
+    }
+    div.sidebar-logo{
+        @apply w-24 mt-6 mx-auto;
+    }
+    h4.sidebar-title{
+        @apply text-center mt-2;
+    }
+    div.sidebar-links-wrapper{
+        @apply flex-1 flex flex-col justify-center items-end;
+        div.sidebar-link{
+            @apply text-trefle-soft-black w-9/10 bg-transparent rounded-l-3 px-5 py-2 font-semibold relative cursor-pointer transition my-1;
+            &:before, &:after{
+                content: "";
+                @apply w-2.5 h-5 block absolute right-0 shadow-transparent transition;
+            }
+            &:before{
+                @apply top-0 transform -translate-y-full;
+                border-radius: 0 0 9rem 0;
+                box-shadow: 0 .625rem 0 0 var(--tw-shadow-color);
+            }
+            &:after{
+                @apply bottom-0 transform translate-y-full;
+                border-radius: 0 9rem 0 0;
+                box-shadow: 0 -.625rem 0 0 var(--tw-shadow-color);
+            }
+            &:hover{
+                @apply text-trefle-green;
+            }
+            &.active{
+                @apply bg-trefle-fake-white drop-shadow-nav;
+                &:before, &:after{
+                    @apply shadow-trefle-fake-white;
+                }
+            }
+        }
+    }
+}

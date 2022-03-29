@@ -10,9 +10,15 @@
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.1.1",
+    "@fortawesome/free-regular-svg-icons": "^6.1.1",
+    "@fortawesome/free-solid-svg-icons": "^6.1.1",
+    "@fortawesome/react-fontawesome": "^0.1.18",
+    "@joi/date": "^2.1.0",
     "@prisma/client": "^3.11.1",
     "@types/jsonwebtoken": "^8.5.8",
     "jsonwebtoken": "^8.5.1",
+    "moment": "^2.29.1",
     "next": "latest",
     "next-connect": "^0.12.2",
     "next-joi": "^2.2.1",

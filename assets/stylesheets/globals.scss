@@ -5,7 +5,7 @@
 @tailwind templating;
 
 body{
-  @apply m-0 absolute inset-0;
+  @apply m-0 absolute inset-0 bg-trefle-fake-white;
   &>div#__next{
     @apply w-full h-full block relative;
   }
@@ -14,11 +14,13 @@ body{
 @layer components {
   @import "./components/button.scss";
   @import "./components/input.scss";
+  @import "./components/nav.scss";
+  @import "./components/table.scss";
 
-  h1{
-    @apply text-4xl font-bold;
-  }
-  h2{
-    @apply text-3xl font-medium;
-  }
+  h1{@apply text-4xl font-bold;}
+  h2{@apply text-3xl font-medium;}
+  h3{@apply text-2xl font-medium;}
+  h4{@apply text-xl font-medium;}
+  h5{@apply text-lg font-bold;}
+  h6{@apply text-base font-bold;}
 }
