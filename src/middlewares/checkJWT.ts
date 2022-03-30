@@ -3,6 +3,8 @@ import { JwtPayload, verify } from "jsonwebtoken";
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextRequest } from "next/server";
 import session, { sessionAccountWithRoles } from "../interfaces/session";
+import prisma_instance from "../utils/prisma_instance";
+import PrismaInstance from "../utils/prisma_instance";
 
 export type NextApiRequestWithUser = NextApiRequest & {session: session};
 
@@ -13,8 +15,7 @@ export default async function checkJWT(req: NextApiRequestWithUser, res: NextApi
     try{
         const jwtPayload: JwtPayload | string = verify(jwt, process.env.JWT_SECRET || "secret");
         if(jwtPayload && typeof jwtPayload != "string"){
-            const prisma = new PrismaClient();
-            let user = await prisma.accounts.findFirst({
+            let user = await prisma_instance.accounts.findFirst({
                 where:{id: jwtPayload.id},
                 include:{roles: true}
             }) as sessionAccountWithRoles;

@@ -21,15 +21,16 @@ export default async function fetcher<T>(url: string, method?:string, body?: any
   }
   let data = await fetch(url, options)
     .catch(e=>{
-      if(e.status == 401){
-        SessionStorage.session = null;
-        localStorage.removeItem("session_jwt");
-        useRouter().push("/auth/login")
-      }
-      throw new Error(e)
+      throw new Error(e);
     })
     .then(
       (res) => {
+        if(res.status == 401){
+          SessionStorage.session = null;
+          localStorage.removeItem("session_jwt");
+          window.location.href = '/auth/login';
+          return null;
+        }
         if(res.headers.get('content-type')?.includes('application/json')){
           return res.json()
         } else {

@@ -1,21 +1,18 @@
 import useSWR from "swr";
-import { fetcherAuth } from "../src/utils/fetcher";
-import AuthenticatedLayout from "../src/layouts/authenticated-layout";
-import React, { useEffect, useState } from "react";
-import { listens } from "@prisma/client";
-import JoiDate from "@joi/date";
+import { fetcherAuth } from "../../src/utils/fetcher";
+import AuthenticatedLayout from "../../src/layouts/authenticated-layout";
+import React from "react";
 import moment from "moment"
-import { NextRequest, NextResponse } from "next/server";
-import { getListens } from "./api/listens";
-import { ListenWithStatus } from "../src/interfaces/listens";
+import { ListenWithStatus } from "../../src/interfaces/listens";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faAngleRight } from "@fortawesome/free-solid-svg-icons";
+import { useRouter } from "next/router";
 
-interface ListensPageProps{
-  listensSSR: ListenWithStatus[]
-}
-
-export default function Listens({listensSSR} : ListensPageProps){
+export default function Listens(){
+  const router = useRouter();
   const listensSwr = useSWR<ListenWithStatus[]|null>("/api/listens?not_done=true", fetcherAuth);
-  const listens = listensSwr.data || listensSSR;
+  const listens = listensSwr.data || [];
+
   return (
     <AuthenticatedLayout>
       <table>
@@ -35,7 +32,9 @@ export default function Listens({listensSSR} : ListensPageProps){
               <td>{l.is_user_minor ? "mineur" : "majeur"}</td>
               <td>{moment(l.date_time_start).format("DD/MM/YYYY HH:mm")}</td>
               <td>{l.listen_status.label}</td>
-              <td>action</td>
+              <td className="flex justify-end">
+                <button className="btn" onClick={()=>router.push(`/listens/${l.id}`)}>Go <FontAwesomeIcon icon={faAngleRight} className="text-sm"/></button>
+              </td>
             </tr>
           )) : (
             <tr>
@@ -46,8 +45,4 @@ export default function Listens({listensSSR} : ListensPageProps){
       </table>
     </AuthenticatedLayout>
   );
-}
-
-export async function getServerSideProps(req: NextRequest, res: NextResponse){
-  return {props: {listensSSR: JSON.parse(JSON.stringify(await getListens({NOT:{listen_status:{name:"commented"}}}))) as ListenWithStatus[]}};
 }

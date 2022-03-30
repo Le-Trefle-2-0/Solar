@@ -5,12 +5,13 @@ import validator from "../../../src/middlewares/validator";
 import { promises } from "dns"; 
 import { ListenWithStatus } from "../../../src/interfaces/listens";
 import { filterSchema, postSchema } from "../../../src/schemas/listensSchemas";
+import PrismaInstance from "../../../src/utils/prisma_instance";
+import prisma_instance from "../../../src/utils/prisma_instance";
 
 
 export function getListens(filter?:Prisma.listensWhereInput) : Promise<ListenWithStatus[]> {
-  const prisma = new PrismaClient();
-  return prisma.listens.findMany({include:{listen_status:true}, where: filter}).then((v)=>{
-    prisma.$disconnect(); return v as ListenWithStatus[];
+  return prisma_instance.listens.findMany({include:{listen_status:true}, where: filter}).then((v)=>{
+    return v as ListenWithStatus[];
   });
 }
 
@@ -26,8 +27,6 @@ export default connect().get(checkJWT, validator(filterSchema), async (req, res)
 })
 .post(checkJWT, validator({body: postSchema}), async (req: NextApiRequestWithUser, res) => {
   req.body.date_time_start = new Date(req.body.date_time_start);
-  const prisma = new PrismaClient();
-  await prisma.listens.create({data: req.body});
+  await prisma_instance.listens.create({data: req.body});
   res.status(201).send(req.body);
-  prisma.$disconnect();
 })

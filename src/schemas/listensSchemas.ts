@@ -19,5 +19,6 @@ export const putSchema = Joi.object({
     listen_status_id: Joi.number()
 });
 export const filterSchema = Joi.object({
+    id: Joi.number(),
     not_done: Joi.boolean()
 });
