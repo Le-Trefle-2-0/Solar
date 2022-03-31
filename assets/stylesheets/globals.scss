@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 @tailwind screens;
-@tailwind templating;
 
 body{
   @apply m-0 absolute inset-0 bg-trefle-fake-white;
@@ -10,6 +9,8 @@ body{
     @apply w-full h-full block relative;
   }
 }
+
+@import "./components/calendar.scss";
 
 @layer components {
   @import "./components/button.scss";

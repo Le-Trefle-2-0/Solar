@@ -1,0 +1,39 @@
+.fc {
+	font-family: sans-serif;
+	.fc-header-toolbar.fc-toolbar{
+		&.fc-toolbar-ltr{
+            @apply bg-trefle-light-green border-2 border-trefle-soft-black box-border rounded-t-3 font-normal mb-0;
+            .fc-toolbar-chunk{
+                &:first-child, &:last-child{
+                    @apply flex-1;
+                }
+                button.fc-button{
+                    @apply bg-transparent w-full text-left border-0;
+                    &:hover{
+                        @apply text-trefle-green;
+                    }
+                }
+                &:last-child button.fc-button{
+                    @apply text-right;
+                }
+                &:nth-child(2){
+                    @apply uppercase font-medium;
+                }
+            }
+        }
+	}
+    table, td, th{
+        @apply border-trefle-soft-black;
+    }
+    table{
+        @apply border-collapse;
+        thead tr th{
+            @apply rounded-none bg-trefle-ulight-blue text-trefle-soft-black;
+        }
+        td{
+            .fc-daygrid-day-top{
+                @apply flex-row;
+            }
+        }
+    }
+}

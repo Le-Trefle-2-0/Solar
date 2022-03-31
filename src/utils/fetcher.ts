@@ -1,7 +1,8 @@
+import { getCookie, removeCookies, setCookies } from "cookies-next";
 import { useRouter } from "next/router";
 import { Exception } from "sass";
+import session from "../interfaces/session";
 import { parseParams } from "./helper";
-import SessionStorage from "./session_storage";
 
 export default async function fetcher<T>(url: string, method?:string, body?: any, query?: any, authenticated?:boolean) : Promise<T|null>  {
   let options = {
@@ -14,9 +15,14 @@ export default async function fetcher<T>(url: string, method?:string, body?: any
   }
   if(query != undefined) url += parseParams(query);
   if(!!authenticated){
-    const session = SessionStorage.session;
-    let jwt = session?.jwt || localStorage.getItem("session_jwt");
-    if(!jwt) return null;
+    let sesRaw = getCookie("session");
+    let ses: session | undefined;
+    if(sesRaw != undefined && typeof sesRaw != "boolean") ses = JSON.parse(sesRaw);
+    let jwt = ses?.jwt;
+    if(!jwt) {
+      window.location.href = '/auth/login';
+      return null;
+    }
     options.headers["Authorization"] = `Bearer ${jwt}`;
   }
   let data = await fetch(url, options)
@@ -26,8 +32,7 @@ export default async function fetcher<T>(url: string, method?:string, body?: any
     .then(
       (res) => {
         if(res.status == 401){
-          SessionStorage.session = null;
-          localStorage.removeItem("session_jwt");
+          removeCookies("session");
           window.location.href = '/auth/login';
           return null;
         }

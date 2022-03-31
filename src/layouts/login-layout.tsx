@@ -13,7 +13,7 @@ export default function LoginLayout({children} : React.PropsWithChildren<any>){
                     {children}
                 </div>
                 <div className="w-48 ml-20">
-                    <Image src={logo} />    
+                    <Image src={logo} />
                 </div>
             </div>
         </div>

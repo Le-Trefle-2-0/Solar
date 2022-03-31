@@ -1,7 +1,10 @@
 .btn{
-    @apply bg-trefle-green text-white py-2 px-5 rounded-lg block transition cursor-pointer;
+    @apply bg-trefle-green text-white py-2 px-5 rounded-lg block transition cursor-pointer border-2 border-trefle-green;
+    &.outlined{
+        @apply bg-transparent text-trefle-green;
+    }
     &:hover{
-        @apply bg-trefle-hover-green;
+        @apply bg-trefle-hover-green border-trefle-hover-green text-white;
         &:active{
             @apply bg-trefle-green;
         }

@@ -1,10 +1,11 @@
+import { NextApiRequest, NextApiResponse } from 'next';
 import { NextResponse, NextRequest } from 'next/server';
-import checkJWT from '../src/middlewares/checkJWT';
+import checkJWT, { getSessionFromJWT } from '../src/middlewares/checkJWT';
 
-export async function middleware(req: NextRequest, res: NextRequest) {
+export async function middleware(req: NextApiRequest & NextRequest, res: NextApiResponse & NextResponse) {
   const { href, pathname } = req.nextUrl
-  if (pathname == '/') {
-    return NextResponse.redirect(href + 'listens');
+  switch(pathname) {
+    case "/": return NextResponse.redirect(href + 'listens');
   }
   return NextResponse.next()
 }

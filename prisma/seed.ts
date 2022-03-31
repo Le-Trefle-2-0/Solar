@@ -6,6 +6,7 @@ import prisma_instance from "../src/utils/prisma_instance";
   await prisma_instance.roles.createMany({
     data: [
       {name:"admin", label: "Admin"},
+      {name:"bot", label:"Bot"},
       {name:"be", label:"Bénévole"},
       {name:"be_ref", label:"Bénévole Référent"},
     ]

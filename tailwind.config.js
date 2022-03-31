@@ -28,6 +28,7 @@ module.exports = {
         "3": ".75rem",
         "2": ".5rem",
         "1": ".25rem",
+        "0": "0rem"
       },
       minWidth: {...minMawWidthHeightValues},
       maxWidth: {...minMawWidthHeightValues},

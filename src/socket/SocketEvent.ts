@@ -1,17 +1,21 @@
 import { Socket } from "socket.io";
-import MessageEncryptService from "../utils/message_encrypt_service";
+import { IoData } from "../../pages/api/socket";
+import session from "../interfaces/session";
+import SocketAuth, { BotSession, ClientType, SessionType } from "./ServerActions/SocketAuth";
+import SocketMessage from "./ServerActions/SocketMessage";
 
-type EnumEventCallback = {key: string, cb: (socket: Socket, ...args:any) => any};
+type EnumEventCallback = (socket: Socket, ...args:any) => any;
 
-export class ServerEvents {
-    static encrypt: EnumEventCallback = {key: "encrypt", cb: (socket, data) => {socket.emit("text", MessageEncryptService.encrypt(data))}};
-    static decrypt: EnumEventCallback = {key: "decrypt", cb: (socket, data) => {socket.emit("text", MessageEncryptService.decrypt(data))}};
+export class ServerEventCallbacks {
+    static login: EnumEventCallback = (socket: Socket, ioData: IoData, session: session | BotSession, sessionType: SessionType, id:number, clientType: ClientType, ...args: any) => SocketAuth.register(socket, ioData, session, sessionType, id, clientType, ...args);
+    static disconnect: EnumEventCallback = (socket: Socket, ioData: IoData) => SocketAuth.removeSession(socket, ioData);
+    static get_history: EnumEventCallback = (socket: Socket, ioData: IoData) => SocketMessage.getHistory(socket, ioData);
 }
 
 export default class SocketEvent{
     private constructor(){}
-    static dispatchEvent(socket: Socket, eventName: string, ...args:any) : void{
-        if(Object.keys(ServerEvents).includes(eventName)) (Object.entries(ServerEvents).find(e=>e[0] == eventName)![1] as EnumEventCallback).cb(socket, ...args);
+    static dispatchEvent(socket: Socket, eventName: string, ioData: IoData, ...args:any) : void{
+        if(Object.keys(ServerEventCallbacks).includes(eventName)) (Object.entries(ServerEventCallbacks).find(e=>e[0] == eventName)![1] as EnumEventCallback)(socket, ioData, ...args);
         return;
     }
 }

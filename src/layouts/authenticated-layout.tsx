@@ -1,10 +1,10 @@
+import { getCookie } from "cookies-next";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import useSWR from "swr";
 import Nav from "../components/sidebar";
 import session from "../interfaces/session";
 import { fetcherAuth } from "../utils/fetcher";
-import SessionStorage from "../utils/session_storage";
 
 export default function  AuthenticatedLayout({children} : React.PropsWithChildren<any>){
   const router = useRouter();
@@ -12,16 +12,12 @@ export default function  AuthenticatedLayout({children} : React.PropsWithChildre
   
   useEffect(()=>{
     (async()=>{
-      if(SessionStorage.session == null){
-        let session = await fetcherAuth<session>("/api/auth/check");
-
-        if(session && typeof session != "string") {
-          SessionStorage.session = session;
-          setMessage(null);
-        } else {
-          setMessage("Redirection")
-          router.push("/auth/login");
-        }
+      let sesRaw = getCookie("session");
+      let ses: session | undefined;
+      if(sesRaw != undefined && typeof sesRaw != "boolean") ses = JSON.parse(sesRaw);
+      if(!ses){
+        setMessage("Redirection")
+        router.push("/auth/login");
       } else {
         setMessage(null);
       }
@@ -33,7 +29,7 @@ export default function  AuthenticatedLayout({children} : React.PropsWithChildre
   return(
     <div className="flex h-full relative items-stretch">
       <Nav/>
-      <div className="flex-1 p-8">
+      <div className="flex-1 p-8 overflow-auto">
         {children}
       </div>
     </div>
