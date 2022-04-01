@@ -14,6 +14,8 @@ export default async function checkJWT(req: NextApiRequestWithUser, res: NextApi
     if(!session){
         res.status(401).send("Unauthorized");
     } else {
+        session.user.is_admin = ["admin"].includes(session.user.roles.name);
+        session.user.is_ref = ["admin", "be_ref", "bot"].includes(session.user.roles.name);
         req.session = session;
     }
     next()

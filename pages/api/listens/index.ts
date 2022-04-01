@@ -9,8 +9,8 @@ import PrismaInstance from "../../../src/utils/prisma_instance";
 import prisma_instance from "../../../src/utils/prisma_instance";
 
 
-export function getListens(filter?:Prisma.listensWhereInput) : Promise<ListenWithStatus[]> {
-  return prisma_instance.listens.findMany({include:{listen_status:true}, where: filter}).then((v)=>{
+export function getListens(filter?:Prisma.listensWhereInput, includes?: Prisma.listensInclude ) : Promise<ListenWithStatus[]> {
+  return prisma_instance.listens.findMany({include:includes, where: filter, orderBy: includes?.account_listen ? {account_listen: {_count: "asc"}} : undefined }).then((v)=>{
     return v as ListenWithStatus[];
   });
 }
@@ -23,7 +23,10 @@ export default connect().get(checkJWT, validator(filterSchema), async (req, res)
       }
     }
   } as Prisma.listensWhereInput;
-  res.status(200).send(await getListens(filter));
+  res.status(200).send(await getListens(
+    filter,
+    req.query.with_users ? { account_listen: { include: { accounts: true } }, listen_status: true } : { listen_status: true }
+  ));
 })
 .post(checkJWT, validator({body: postSchema}), async (req: NextApiRequestWithUser, res) => {
   req.body.date_time_start = new Date(req.body.date_time_start);

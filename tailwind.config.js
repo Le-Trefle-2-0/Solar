@@ -1,6 +1,7 @@
 minMawWidthHeightValues = {
   "200": "50rem",
   "62.5": "15.625rem",
+  "8/10": "80%",
 };
 
 module.exports = {
@@ -41,7 +42,11 @@ module.exports = {
     },
   },
   variants: {
-    extend: {},
+    extend: {
+    },
+    scrollbar: ['rounded']
   },
-  plugins: [],
+  plugins: [
+    require("tailwind-scrollbar")
+  ],
 }

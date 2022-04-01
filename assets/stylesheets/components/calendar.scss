@@ -23,7 +23,7 @@
         }
 	}
     table, td, th{
-        @apply border-trefle-soft-black;
+        @apply border-trefle-soft-black #{!important};
     }
     table{
         @apply border-collapse;
@@ -31,9 +31,17 @@
             @apply rounded-none bg-trefle-ulight-blue text-trefle-soft-black;
         }
         td{
+            &.fc-day-other{
+                @apply bg-trefle-ulight-green;
+            }
             .fc-daygrid-day-top{
                 @apply flex-row;
             }
         }
+    }
+}
+.modal.calendar  {
+    .fc-media-screen{
+        @apply mr-5 ml-5;
     }
 }

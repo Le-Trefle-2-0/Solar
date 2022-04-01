@@ -11,6 +11,7 @@ body{
 }
 
 @import "./components/calendar.scss";
+@import "./components/emoji_picker.scss";
 
 @layer components {
   @import "./components/button.scss";

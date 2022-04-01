@@ -2,6 +2,7 @@ import { getCookie, removeCookies, setCookies } from "cookies-next";
 import { useRouter } from "next/router";
 import { Exception } from "sass";
 import session from "../interfaces/session";
+import getSession from "./get_session";
 import { parseParams } from "./helper";
 
 export default async function fetcher<T>(url: string, method?:string, body?: any, query?: any, authenticated?:boolean) : Promise<T|null>  {
@@ -15,9 +16,7 @@ export default async function fetcher<T>(url: string, method?:string, body?: any
   }
   if(query != undefined) url += parseParams(query);
   if(!!authenticated){
-    let sesRaw = getCookie("session");
-    let ses: session | undefined;
-    if(sesRaw != undefined && typeof sesRaw != "boolean") ses = JSON.parse(sesRaw);
+    let ses = getSession();
     let jwt = ses?.jwt;
     if(!jwt) {
       window.location.href = '/auth/login';

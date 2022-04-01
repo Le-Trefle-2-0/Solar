@@ -6,7 +6,7 @@ import { ClientEvents } from "../Enums";
 
 export type SessionType = "eventChat" | "listenChat";
 export type ClientType = "bot" | "app";
-export type BotSession = {jwt: string, discordId: string}
+export type BotSession = session & {discordId: string};
 export type SocketAuthSession = {
     socket_id: string,
     id:number,

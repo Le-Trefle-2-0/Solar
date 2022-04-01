@@ -1,5 +1,6 @@
 import { accounts, roles } from "@prisma/client";
 import { getCookie, setCookies } from "cookies-next";
+import { Session } from "inspector";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import session from "../../src/interfaces/session";
@@ -17,6 +18,8 @@ export default function login(){
         if(name == "" || password == "") {setError(true); return;}
         let data = await fetcher<session>("/api/auth/login", "POST", {name:name, password:password}).catch(()=>null);
         if(data == null || !data.jwt){setError(true);} else {
+            data.user.is_admin = ["admin"].includes(data.user.roles.name);
+            data.user.is_ref = ["admin", "be_ref", "bot"].includes(data.user.roles.name);
             setCookies("session", data);
             router.push("/");
         }

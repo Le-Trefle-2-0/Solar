@@ -1,5 +1,6 @@
 import Prisma, {PrismaClient} from "@prisma/client";
 import * as crypto from "crypto";
+import MessageEncryptService from "../src/utils/message_encrypt_service";
 import prisma_instance from "../src/utils/prisma_instance";
 
 (async()=>{
@@ -14,7 +15,8 @@ import prisma_instance from "../src/utils/prisma_instance";
   await prisma_instance.accounts.createMany({
     data: [
       //Evidement, il ne faut pas utiliser ce compte en prod
-      {name:"admin", password: crypto.createHash("sha512").update("VDnITtW2tTTUmqO1cUDt&pVZ!sbJSdEe3V2gqMMp").digest("base64"), role_id: 1, tel: "0123456789" }
+      {name:"admin", password: crypto.createHash("sha512").update("VDnITtW2tTTUmqO1cUDt&pVZ!sbJSdEe3V2gqMMp").digest("base64"), role_id: 1, tel: "0123456789" },
+      {name:"bot", password: crypto.createHash("sha512").update("8Aw9$ueTcQ7H17eXf8apY1Xu29gK9U#a8gj!W&Nd").digest("base64"), role_id: 2, tel: "" }
     ]
   })
   await prisma_instance.listen_status.createMany({
@@ -28,8 +30,10 @@ import prisma_instance from "../src/utils/prisma_instance";
   
   await prisma_instance.listens.createMany({
     data: [
-      {user_discord_id_encrypted: "AB", user_age_encrypted: "CD", main_subject_encrypted: "EF", date_time_start: new Date().toDateString(), is_user_minor: false, listen_status_id:2},
-      {user_discord_id_encrypted: "GH", user_age_encrypted: "IJ", main_subject_encrypted: "KL", date_time_start: new Date().toDateString(), is_user_minor: false, listen_status_id:1},
+      {user_discord_id_encrypted: MessageEncryptService.encrypt("1234"), user_age_encrypted: MessageEncryptService.encrypt("majeur"), main_subject_encrypted: MessageEncryptService.encrypt("problème santé"), date_time_start: new Date().toISOString(), is_user_minor: false, listen_status_id:2},
+      {user_discord_id_encrypted: MessageEncryptService.encrypt("1234"), user_age_encrypted: MessageEncryptService.encrypt("mineur"), main_subject_encrypted: MessageEncryptService.encrypt("problème santé 2"), date_time_start: new Date().toISOString(), is_user_minor: true, listen_status_id:1},
+      {user_discord_id_encrypted: MessageEncryptService.encrypt("1234"), user_age_encrypted: MessageEncryptService.encrypt("mineur"), main_subject_encrypted: MessageEncryptService.encrypt("problème santé 2"), date_time_start: new Date().toISOString(), is_user_minor: true, listen_status_id:3},
+      {user_discord_id_encrypted: MessageEncryptService.encrypt("1234"), user_age_encrypted: MessageEncryptService.encrypt("mineur"), main_subject_encrypted: MessageEncryptService.encrypt("problème santé 2"), date_time_start: new Date().toISOString(), is_user_minor: true, listen_status_id:4},
     ]
   })
 
@@ -37,10 +41,10 @@ import prisma_instance from "../src/utils/prisma_instance";
     data: [
       {
         subject: "test",
-        date_start: new Date().toDateString(),
+        date_start: new Date().toISOString(),
         date_end: null,
-        daily_time_start: new Date().toDateString(),
-        daily_time_end: new Date().toDateString(),
+        daily_time_start: new Date().toISOString(),
+        daily_time_end: new Date().toISOString(),
         creator_id: 1
       },
   ]

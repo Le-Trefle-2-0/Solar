@@ -20,5 +20,6 @@ export const putSchema = Joi.object({
 });
 export const filterSchema = Joi.object({
     id: Joi.number(),
-    not_done: Joi.boolean()
+    not_done: Joi.boolean(),
+    with_users: Joi.boolean()
 });

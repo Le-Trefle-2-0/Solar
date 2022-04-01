@@ -5,6 +5,7 @@ import useSWR from "swr";
 import Nav from "../components/sidebar";
 import session from "../interfaces/session";
 import { fetcherAuth } from "../utils/fetcher";
+import getSession from "../utils/get_session";
 
 export default function  AuthenticatedLayout({children} : React.PropsWithChildren<any>){
   const router = useRouter();
@@ -12,9 +13,7 @@ export default function  AuthenticatedLayout({children} : React.PropsWithChildre
   
   useEffect(()=>{
     (async()=>{
-      let sesRaw = getCookie("session");
-      let ses: session | undefined;
-      if(sesRaw != undefined && typeof sesRaw != "boolean") ses = JSON.parse(sesRaw);
+      let ses = getSession();
       if(!ses){
         setMessage("Redirection")
         router.push("/auth/login");

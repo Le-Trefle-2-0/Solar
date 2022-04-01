@@ -13,7 +13,7 @@ export default function NavLink({text, icon, path} : NavLinkProps){
   return (
     <div 
       className={`sidebar-link ${router.pathname.startsWith(path) ? "active" : ""}`}
-      onClick={()=>{if(!router.pathname.startsWith(path)) router.push(path)}}
+      onClick={()=>{if(router.pathname != path) router.push(path)}}
     >
       <FontAwesomeIcon icon={icon} className="mr-3"/>
       {text}

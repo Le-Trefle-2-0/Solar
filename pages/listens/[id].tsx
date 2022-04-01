@@ -1,16 +1,19 @@
 import useSWR from "swr";
 import { fetcherAuth } from "../../src/utils/fetcher";
 import AuthenticatedLayout from "../../src/layouts/authenticated-layout";
-import React, { useEffect, useState } from "react";
-import { ListenWithStatus } from "../../src/interfaces/listens";
+import React, { LegacyRef, useEffect, useRef, useState } from "react";
+import { ListenWithStatusAndAccounts } from "../../src/interfaces/listens";
 import { useRouter } from "next/router";
 import { io, Socket } from "socket.io-client";
 import { getCookie } from "cookies-next";
 import session from "../../src/interfaces/session";
 import { ClientType, SessionType } from "../../src/socket/ServerActions/SocketAuth";
 import { ClientEvents, ServerEvents } from "../../src/socket/Enums";
-
-let socket: Socket;
+import 'emoji-mart/css/emoji-mart.css'
+import ChatInput from "../../src/components/chat_input";
+import { messages } from "@prisma/client";
+import ChatBubble from "../../src/components/chat_bubble";
+import getSession from "../../src/utils/get_session";
 
 enum SocketState{
   unauthenticated,
@@ -20,10 +23,17 @@ enum SocketState{
   loaded
 }
 
+type listenMessage = (messages & { accounts: { id: bigint; name: string; }; });
+
 export default function Listens(){
   const router = useRouter();
-  const listenSwr = useSWR<ListenWithStatus|null>(`/api/listens/${router.query.id}?not_done=true`, fetcherAuth);
+  const listenSwr = useSWR<ListenWithStatusAndAccounts|null>(router.query.id?`/api/listens/${router.query.id}?not_done=true&with_users=true`:null, fetcherAuth);
   const [socketState, setSocketState] = useState<SocketState>(SocketState.deactivated);
+  const [messages, setMessages] = useState<listenMessage[] | null>(null);
+  const session = useRef(getSession());
+  const [socket, setSocket] = useState<Socket>();
+  const messagesRef = useRef(messages);
+  const messagesContainerRef = useRef<HTMLDivElement>();
 
   if(listenSwr.data && socketState == SocketState.deactivated){
     setSocketState(SocketState.loading);
@@ -39,17 +49,33 @@ export default function Listens(){
         let sesRaw = getCookie("session");
         let ses: session | undefined;
         if(sesRaw != undefined && typeof sesRaw != "boolean") ses = JSON.parse(sesRaw);
-        socket = io();
-        socket.on("connect", ()=>{
-          socket.emit(ServerEvents.login, ses, "listenChat" as SessionType, listen.id, "app" as ClientType)
+        let socket = io();
+        socket?.on("connect", ()=>{
+          socket?.emit(ServerEvents.login, ses, "listenChat" as SessionType, listen.id, "app" as ClientType)
         });
-        socket.on(ClientEvents.auth_invalid, ()=>{setSocketState(SocketState.error)})
-        socket.on(ClientEvents.auth_refused, ()=>{setSocketState(SocketState.unauthenticated)})
-        socket.on(ClientEvents.auth_accepted, ()=>{setSocketState(SocketState.loaded); socket.emit(ServerEvents.get_history);})
-        socket.on(ClientEvents.history, (data)=>{console.log(data)})
+        socket?.on(ClientEvents.auth_invalid, ()=>{setSocketState(SocketState.error)})
+        socket?.on(ClientEvents.auth_refused, ()=>{setSocketState(SocketState.unauthenticated)})
+        socket?.on(ClientEvents.auth_accepted, ()=>{setSocketState(SocketState.loaded); socket?.emit(ServerEvents.get_history);})
+        socket?.on(ClientEvents.history, (data)=>{setMessages(data);messagesContainerRef.current?.scrollIntoView({});})
+        socket?.on(ClientEvents.new_message, (data: listenMessage)=>{addMessage(data)})
+        setSocket(socket);
       })()
     }
   }, [socketState]);
+
+
+  useEffect(()=>{
+    messagesRef.current = messages;
+  }, [messages]);
+
+  function addMessage(data: listenMessage){
+    setMessages([...messagesRef.current || [], data]);
+    messagesContainerRef.current?.scrollIntoView({ behavior: "smooth" });
+  }
+
+  function submitText(text: string){
+    socket?.emit(ServerEvents.send_message,encodeURIComponent(text))
+  }
 
   return (
     <AuthenticatedLayout>
@@ -60,13 +86,21 @@ export default function Listens(){
           : (socketState == SocketState.error ? "Une erreur s'est produite, essayez de recherger la page, ou contactez un administrateur":""))
         }</div>
       :
-        <div className="flex items-center justify-between mb-8">
-          <h2>ÉCOUTE #{listen?.id}</h2>
-          <div className="flex">
-            <button className="btn outlined" onClick={() => router.back()}>Retour a la liste</button>
-            <button className="btn ml-4" onClick={() => router.back()}>Fermer l'écoute</button>
+        <div className="flex flex-col h-full w-full">
+          <div className="flex items-center justify-between mb-8">
+            <h2>ÉCOUTE #{listen?.id}</h2>
+            <div className="flex">
+              <button className="btn outlined" onClick={() => router.back()}>Retour a la liste</button>
+              <button className="btn ml-4" onClick={() => router.back()}>Fermer l'écoute</button>
+            </div>
           </div>
+          <div className="flex-1 overflow-auto scrollbar scrollbar-thin scrollbar-track-transparent scrollbar-thumb-trefle-green pb-5 -mr-5 pr-5">
+            { messages ? messages.map((m)=><ChatBubble key={"message_"+m.id} text={decodeURIComponent(m.content_encrypted)} author={m.accounts.name} is_me={m.accounts.id == session.current?.user.id}/>) : null}
+            <div ref={messagesContainerRef as LegacyRef<HTMLDivElement>} />
+          </div>
+          <ChatInput onSubmitText={submitText}/>
         </div>
+
       }
     </AuthenticatedLayout>
   );

@@ -1,0 +1,29 @@
+section.emoji-mart{
+    @apply border-trefle-green;
+    div.emoji-mart-bar{
+        &:first-child{
+            @apply bg-trefle-ulight-green border-trefle-green text-trefle-green;
+            .emoji-mart-anchors svg, .emoji-mart-anchors img{
+                @apply mx-auto;
+            }
+            .emoji-mart-anchor:hover,.emoji-mart-anchor:focus,.emoji-mart-anchor{
+                @apply text-trefle-soft-black #{!important};
+                &.emoji-mart-anchor-selected{
+                    @apply text-trefle-green #{!important};
+                    span.emoji-mart-anchor-bar{
+                        @apply bg-trefle-green #{!important};
+                    }
+                }
+            }
+        }
+        &:last-child{
+            @apply hidden;
+        }
+    }
+    .emoji-mart-scroll{
+        @apply scrollbar scrollbar-thin scrollbar-track-transparent scrollbar-thumb-trefle-green;
+    }
+    .emoji-mart-category .emoji-mart-emoji span{
+        @apply inline-flex justify-center items-center cursor-pointer #{!important};
+    }
+}

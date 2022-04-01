@@ -3,7 +3,7 @@ import { Server,  ServerOptions } from 'socket.io'
 import http from "http";
 import SocketEvent from "../../src/socket/SocketEvent";
 import session from "../../src/interfaces/session";
-import { BotSession, ClientType, SessionType } from "../../src/socket/ServerActions/SocketAuth";
+import socketAuth, { BotSession, ClientType, SessionType } from "../../src/socket/ServerActions/SocketAuth";
 import io_data from "../../src/utils/io_data";
 
 type NextApiResponseWithSocket = NextApiResponse & {socket: {server: (Partial<ServerOptions> | http.Server | number) & { io: Server, ioData: IoData } }};
@@ -33,6 +33,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponseWithSoc
             socket.onAny((eventName, ...args) => {
                 SocketEvent.dispatchEvent(socket, eventName, io_data, ...args);
             });
+            socket.on("disconnect", () => socketAuth.removeSession(socket, io_data))
         })
     }
     res.end()

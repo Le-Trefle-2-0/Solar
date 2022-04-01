@@ -6,6 +6,7 @@ import validator from "../../../src/middlewares/validator";
 import { filterSchema, putSchema } from "../../../src/schemas/listensSchemas";
 import PrismaInstance from "../../../src/utils/prisma_instance";
 import prisma_instance from "../../../src/utils/prisma_instance";
+import { setQuery } from "../../../src/utils/helper";
 
 export default connect().get(checkJWT, validator({query: filterSchema}), async (req, res) => {
     let filter = {
@@ -14,10 +15,11 @@ export default connect().get(checkJWT, validator({query: filterSchema}), async (
             listen_status: {
                 name: req.query.not_done ? "commented" : ""
             }
-        }
+        },
     } as Prisma.listensWhereInput;
     res.status(200).send(await prisma_instance.listens.findFirst({
-        where: filter
+        where: filter,
+        include: req.query.with_users ? { account_listen: { include: { accounts: true } }, listen_status: true } : { listen_status: true}
     }));
 })
 .put(checkJWT, validator({body: putSchema}), async (req, res) => {
