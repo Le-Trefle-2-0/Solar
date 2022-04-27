@@ -15,8 +15,10 @@ import prisma_instance from "../src/utils/prisma_instance";
   await prisma_instance.accounts.createMany({
     data: [
       //Evidement, il ne faut pas utiliser ce compte en prod
-      {name:"admin", password: crypto.createHash("sha512").update("VDnITtW2tTTUmqO1cUDt&pVZ!sbJSdEe3V2gqMMp").digest("base64"), role_id: 1, tel: "0123456789" },
-      {name:"bot", password: crypto.createHash("sha512").update("8Aw9$ueTcQ7H17eXf8apY1Xu29gK9U#a8gj!W&Nd").digest("base64"), role_id: 2, tel: "" }
+      {name:"admin", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 1, tel: "0123456789" },
+      {name:"be", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 3, tel: "0123456789" },
+      {name:"be_ref", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 4, tel: "0123456789" },
+      {name:"bot", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 2, tel: "" }
     ]
   })
   await prisma_instance.listen_status.createMany({

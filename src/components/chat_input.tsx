@@ -26,7 +26,9 @@ export default function ChatInput({onSubmitText}: ChatInputProps){
 
     function onSubmitTextLoc(text: string){
         setText("");
-        onSubmitText(text);
+        if(text.trim() == "") return;
+        setCaretPosition(0);
+        onSubmitText(text.trim());
     }
 
     return(
@@ -40,6 +42,12 @@ export default function ChatInput({onSubmitText}: ChatInputProps){
                 onChange={({currentTarget: {value}})=>{setText(value);}}
                 value={text}
                 style={text != "" ? {height: "2.5rem"} : undefined}
+                onKeyPress={(e)=>{
+                    if(e.key == "Enter" && !e.shiftKey) {
+                        onSubmitTextLoc(text);
+                        e.preventDefault()
+                    }
+                }}
             ></textarea>
             <div className="relative flex items-center px-3" ref={pickerRef as LegacyRef<HTMLDivElement>}>
             <button className="rounded-1 cursor-pointer hover:text-trefle-green transition" onClick={()=> setShowPicker(true)}>

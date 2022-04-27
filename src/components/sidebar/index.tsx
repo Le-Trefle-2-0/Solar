@@ -12,7 +12,7 @@ export default function Nav(){
       <div className="sidebar-links-wrapper">
         <NavLink text="Écoutes" icon={faMessage} path="/listens"/>
         <NavLink text="Planning" icon={faCalendarAlt} path="/calendar"/>
-        <NavLink text="Chat de permanence" icon={faAlignLeft} path="/chat"/>
+        <NavLink text="Chat de permanence" icon={faAlignLeft} path="/globalChat"/>
       </div>
     </nav>
   );

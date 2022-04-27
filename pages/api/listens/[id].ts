@@ -15,7 +15,7 @@ export default connect().get(checkJWT, validator({query: filterSchema}), async (
             listen_status: {
                 name: req.query.not_done ? "commented" : ""
             }
-        },
+        }
     } as Prisma.listensWhereInput;
     res.status(200).send(await prisma_instance.listens.findFirst({
         where: filter,
@@ -32,7 +32,6 @@ export default connect().get(checkJWT, validator({query: filterSchema}), async (
     res.status(204).send(req.body);
 })
 .delete(checkJWT, async (req, res) => {
-    const prisma = new PrismaClient();
     await prisma_instance.listens.delete({
         where: {
             id: parseInt(req.query.id as string)

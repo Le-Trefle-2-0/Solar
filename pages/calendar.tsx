@@ -15,7 +15,10 @@ export default function calendar(){
   const [value, onChange] = useState(new Date());
   const [showModal, setShowModal] = useState<string|false>(false)
   const calendarSwr = useSWR<CalendarEvent[]|null>("/api/calendar", fetcherAuth);
+
+  //todo split CalendarEvent per day
   const calendar: CalendarEvent[] = calendarSwr.data || [];
+  
   const router = useRouter();
   const [modalRef, hasClickedOutsideModal] = useClickOutside();
   
@@ -34,7 +37,7 @@ export default function calendar(){
         <FullCalendar
           plugins={[dayGridPlugin, interactionPlugin]}
           initialView="dayGridMonth"
-          events={calendar.map( c => ({title: c.subject, date: c.date_start/*, url: '/api/calendar/' + c.id*/} as EventInput)) as EventSourceInput}
+          events={calendar.map( c => ({title: c.subject, date: c.date_start} as EventInput)) as EventSourceInput}
           contentHeight={"40rem"}
           headerToolbar={
             {
@@ -66,8 +69,8 @@ export default function calendar(){
       </div>
       {showModal?(
       <>
-      <div ref={modalRef as LegacyRef<HTMLDivElement>} className="calendar modal justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
-        <div className="relative p-4 w-full max-w-2xl h-full md:h-auto">
+      <div className="calendar modal justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+        <div ref={modalRef as LegacyRef<HTMLDivElement>} className="relative p-4 w-full max-w-2xl h-full md:h-auto">
           {/*content*/}
           <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
             {/*header*/}
@@ -90,6 +93,7 @@ export default function calendar(){
                 plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                 initialView="timeGridDay"
                 initialDate={showModal}
+                events={calendar.map( c => ({title: c.subject, date: c.date_start, end: c.daily_time_end, start: c.daily_time_start} as EventInput)) as EventSourceInput}
                 headerToolbar={
                   {
                     left: 'prev',

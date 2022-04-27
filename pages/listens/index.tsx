@@ -35,7 +35,7 @@ export default function Listens(){
           </tr>
         </thead>
         <tbody>
-          { listens && listens.length > 0 ? listens.map((l,k)=>(
+          { listens != null && listens.length > 0 ? listens.map((l,k)=>(
             <tr key={"listen" + l.id} className={`${k%2 == 1 ? "odd":""} ${l.account_listen.length<=0 ? "text-red-500" : ""}`}>
               <td>{l.id}</td>
               <td>{l.is_user_minor ? "mineur" : "majeur"}</td>

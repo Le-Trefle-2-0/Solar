@@ -14,14 +14,8 @@ import ChatInput from "../../src/components/chat_input";
 import { messages } from "@prisma/client";
 import ChatBubble from "../../src/components/chat_bubble";
 import getSession from "../../src/utils/get_session";
+import { SocketState } from "../../src/interfaces/socketState";
 
-enum SocketState{
-  unauthenticated,
-  deactivated,
-  loading,
-  error,
-  loaded
-}
 
 type listenMessage = (messages & { accounts: { id: bigint; name: string; }; });
 
@@ -43,7 +37,7 @@ export default function Listens(){
 
   useEffect(()=>{
     if(socketState == SocketState.unauthenticated) {router.push("/auth/login");}
-    if(socketState == SocketState.loading && listen){
+    if(socketState == SocketState.loading && listen  != null ){
       (async()=>{
         await fetch("/api/socket");
         let sesRaw = getCookie("session");
@@ -94,7 +88,7 @@ export default function Listens(){
               <button className="btn ml-4" onClick={() => router.back()}>Fermer l'écoute</button>
             </div>
           </div>
-          <div className="flex-1 overflow-auto scrollbar scrollbar-thin scrollbar-track-transparent scrollbar-thumb-trefle-green pb-5 -mr-5 pr-5">
+          <div className="flex-1 overflow-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-trefle-green pb-5 -mr-5 pr-5">
             { messages ? messages.map((m)=><ChatBubble key={"message_"+m.id} text={decodeURIComponent(m.content_encrypted)} author={m.accounts.name} is_me={m.accounts.id == session.current?.user.id}/>) : null}
             <div ref={messagesContainerRef as LegacyRef<HTMLDivElement>} />
           </div>
