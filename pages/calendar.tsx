@@ -1,4 +1,4 @@
-import { LegacyRef, useEffect, useState } from "react";
+import { LegacyRef, useEffect, useRef, useState } from "react";
 import useSWR from "swr";
 import { fetcherAuth } from "../src/utils/fetcher";
 import { CalendarEvent } from '../src/interfaces/calendar';
@@ -10,26 +10,47 @@ import { useRouter } from "next/router";
 import interactionPlugin from "@fullcalendar/interaction"
 import timeGridPlugin from '@fullcalendar/timegrid';
 import { useClickOutside } from "react-click-outside-hook";
+import { start } from "repl";
 
+function addDays(date: Date, days: number) {
+  let result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
+}
+function setHour(date: Date, other: Date) {
+  date.setHours(other.getHours());
+  date.setMinutes(other.getMinutes());
+  return date;
+}
 export default function calendar(){
   const [value, onChange] = useState(new Date());
-  const [showModal, setShowModal] = useState<string|false>(false)
+  const [showModal, setShowModal] = useState<boolean>(false)
   const calendarSwr = useSWR<CalendarEvent[]|null>("/api/calendar", fetcherAuth);
 
-  //todo split CalendarEvent per day
   const calendar: CalendarEvent[] = calendarSwr.data || [];
-  
+  const newCalendarItems: CalendarEvent[] = [];
+
+  const calendarRef = useRef<FullCalendar>(new FullCalendar({}));
+
+  for (const calendarItem of calendar){
+    let dateStart = new Date(calendarItem.date_start);
+    dateStart = setHour(dateStart, new Date(calendarItem.daily_time_start));
+    if(calendarItem.date_end == null){
+      let dateEnd = new Date(calendarItem.date_start);
+      dateEnd = setHour(dateEnd, new Date(calendarItem.daily_time_start));
+      newCalendarItems.push({...calendarItem, date_start: dateStart, date_end: dateEnd,});
+      continue;
+    }
+    let dateEnd = new Date(calendarItem.date_end);
+    dateEnd = setHour(dateEnd, new Date(calendarItem.daily_time_end));
+    for(let i=0; i<=Math.floor((dateEnd.getTime() - dateStart.getTime()) / (1000 * 3600 * 24)); i++){
+      newCalendarItems.push({...calendarItem, date_start: addDays(dateStart, i), date_end: setHour(addDays(dateStart, i), dateEnd)})
+    }
+  }
+
   const router = useRouter();
-  const [modalRef, hasClickedOutsideModal] = useClickOutside();
   
 
-  //onClickOutside(() => setShowModal(false));
-  useEffect(()=>{
-    if(hasClickedOutsideModal){
-      setShowModal(false)
-    }
-  }, [hasClickedOutsideModal]);
-  
   return (
     <AuthenticatedLayout>
       <div>
@@ -37,7 +58,7 @@ export default function calendar(){
         <FullCalendar
           plugins={[dayGridPlugin, interactionPlugin]}
           initialView="dayGridMonth"
-          events={calendar.map( c => ({title: c.subject, date: c.date_start} as EventInput)) as EventSourceInput}
+          events={newCalendarItems.map( c => ({title: c.subject,date: c.date_start,start: c.date_start,end: c.date_end} as EventInput)) as EventSourceInput}
           contentHeight={"40rem"}
           headerToolbar={
             {
@@ -62,38 +83,37 @@ export default function calendar(){
           // }
           dateClick={
             (e)=>{
-              setShowModal(e.dateStr);
+              setShowModal(true);
+              calendarRef.current.getApi().gotoDate(e.dateStr)
             }
           }
         />
       </div>
-      {showModal?(
-      <>
-      <div className="calendar modal justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
-        <div ref={modalRef as LegacyRef<HTMLDivElement>} className="relative p-4 w-full max-w-2xl h-full md:h-auto">
+      <div className={"calendar modal justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none max-h-full pointer-events-none transition-all " + (showModal? "opacity-100 " : "opacity-0")}>
+        <div className={"relative w-full max-w-2xl h-full md:h-auto max-h-full transform transition-all " + (showModal? "pointer-events-auto translate-y-0" : "translate-y-16")}>
           {/*content*/}
-          <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+          <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none m-4 h-200">
             {/*header*/}
             <div className="flex items-start justify-between p-5 border-b border-solid border-slate-200 rounded-t">
-              <h3 className="text-1xl font-semibold">
-              S’INSCRIRE A UNE PERMANENCE
+              <h3 className="text-1xl font-semibold text-trefle-soft-black">
+                S’INSCRIRE A UNE PERMANENCE
               </h3>
               <button
-                className="p-1 ml-auto bg-transparent border-0 text-black opacity-5 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
+                className="p-1 ml-auto bg-transparent border-0 text-trefle-soft-black float-right text-3xl leading-3 font-semibold outline-none focus:outline-none"
                 onClick={() => setShowModal(false)}
               >
-                <span className="bg-transparent text-black opacity-5 h-6 w-6 text-2xl block outline-none focus:outline-none">
-                  ×
-                </span>
+                ×
               </button>
             </div>
             {/*body*/}
             <div className="relative flex-auto">
               <FullCalendar
+                ref={calendarRef}
+                height={"100%"}
                 plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                 initialView="timeGridDay"
-                initialDate={showModal}
-                events={calendar.map( c => ({title: c.subject, date: c.date_start, end: c.daily_time_end, start: c.daily_time_start} as EventInput)) as EventSourceInput}
+                allDaySlot={false}
+                events={newCalendarItems.map( c => ({title: c.subject,date: c.date_start,start: c.date_start,end: c.date_end} as EventInput)) as EventSourceInput}
                 headerToolbar={
                   {
                     left: 'prev',
@@ -108,9 +128,7 @@ export default function calendar(){
           </div>
         </div>
       </div>
-      <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
-    </>
-      ) : null}
+      <div className={"fixed inset-0 z-40 bg-black transition-all " + (showModal? "opacity-25" : "opacity-0 pointer-events-none")} onClick={(_)=>{setShowModal(false)}}></div>
     </AuthenticatedLayout>
   );
 

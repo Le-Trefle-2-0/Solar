@@ -16,6 +16,19 @@ export default connect().get(checkJWT, async (req, res) => {
     }));
 })
 .put(checkJWT, validator({body: putSchema}), async (req, res) => {
+
+    let allDateBody = [
+        'date_start',
+        'date_end',
+        'daily_time_start',
+        'daily_time_end'
+    ];
+
+    for(const dateBody of allDateBody){
+        if(req.body[dateBody])
+            req.body[dateBody] = new Date(req.body[dateBody]);
+    }
+   
     await prisma_instance.calendar_events.update({
         where: {
             id: parseInt(req.query.id as string)
