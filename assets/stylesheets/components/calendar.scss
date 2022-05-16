@@ -62,9 +62,59 @@
             border-bottom: 0 !important;
         }
     }
-}
-.modal.calendar  {
-    .fc-media-screen{
-        @apply mr-5 ml-5;
+    .fc-timegrid{
+        table.fc-scrollgrid{
+            scrollbar-color: transparent theme("colors.trefle-soft-black");
+            scrollbar-width: thin;
+            ::-webkit-scrollbar {
+                width: .25rem;
+            }
+            ::-webkit-scrollbar-track {
+                background: transparent;
+            }
+            ::-webkit-scrollbar-thumb {
+                border-radius: .125rem;
+                background: theme("colors.trefle-soft-black");
+            }
+            thead{
+                @apply hidden;
+            }
+            @apply border-2 rounded-b-4 overflow-hidden border-trefle-soft-black;
+            tbody tr td{
+                div.fc-timegrid-body{
+                    @apply w-full #{"!important"};
+                    div.fc-timegrid-slots{
+                        &>table{
+                            @apply w-full #{"!important"};
+                            tbody{
+                                tr{
+                                    td.fc-timegrid-slot{
+                                        &.fc-timegrid-slot-label{
+                                            @apply border-r-2 border-r-trefle-soft-black border-t-0 border-b-0 bg-trefle-fake-white;
+                                            &>div{
+                                                @apply transform -translate-y-1/2 font-bold;
+                                            }
+                                        }
+                                        &.fc-timegrid-slot-lane{
+                                            &:not(.fc-timegrid-slot-minor){
+                                                @apply border-t border-t-trefle-soft-black border-dotted
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    div.fc-timegrid-cols{
+                        &>table{
+                            @apply w-full #{"!important"};
+                            .fc-timegrid-event{
+                                @apply shadow-none #{"!important"};
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

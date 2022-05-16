@@ -1,14 +1,28 @@
 import connect from "next-connect";
+import { CalendarEventWithRolesNeededAndRolesFilled } from "../../../src/interfaces/calendar";
 import checkJWT, { NextApiRequestWithUser } from "../../../src/middlewares/checkJWT";
 import validator from "../../../src/middlewares/validator";
  import { postSchema } from "../../../src/schemas/calendarSchemas";
 import prisma_instance from "../../../src/utils/prisma_instance";
 
 
-export function getCalendar() {
-  return prisma_instance.calendar_events.findMany().then((v)=>{
-    return v;
-  });
+export async function getCalendar() {
+  return await prisma_instance.calendar_events.findMany({
+    include:{
+      account_calendar_event: {select: {
+        accounts: {
+          select: {
+            roles: true
+          }
+        }
+      }},
+      calendar_event_role_needed: {
+        include: {
+          roles: true
+        }
+      }
+    }
+  }) as CalendarEventWithRolesNeededAndRolesFilled[];
 }
 
 export default connect().get(checkJWT, async (req, res) => {
