@@ -1,9 +1,9 @@
 import { LegacyRef, useEffect, useRef, useState } from "react";
 import useSWR from "swr";
+import FullCalendar, {EventInput, EventSourceInput} from "@fullcalendar/react";
 import { fetcherAuth } from "../src/utils/fetcher";
 import { CalendarEvent } from '../src/interfaces/calendar';
-import FullCalendar, { EventInput, EventSourceInput } from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid'
+import dayGridPlugin from '@fullcalendar/daygrid';
 import AuthenticatedLayout from '../src/layouts/authenticated-layout';
 import Modal from '../src/components/modal';
 import { useRouter } from "next/router";
