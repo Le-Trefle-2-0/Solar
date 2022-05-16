@@ -1,12 +1,15 @@
-import JoiBase from "joi";
-import JoiDate from "@joi/date";
-const Joi = JoiBase.extend(JoiDate);
+import {object, string, date, number, setLocale } from "yup";
+import moment from "moment";
+import { fr } from 'yup-locales';
+setLocale(fr);
 
-export const postSchema = Joi.object({
-    account_id: Joi.number(),
-    calendar_event_id: Joi.number(),
+
+export const postSchema = object({
+    account_id: number().required(),
+    calendar_event_id: number().required(),
 });
-export const putSchema = Joi.object({
-    account_id: Joi.number(),
-    calendar_event_id: Joi.number(),
+
+export const putSchema = object({
+    account_id: number(),
+    calendar_event_id: number(),
 });

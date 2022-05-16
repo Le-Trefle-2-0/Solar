@@ -22,7 +22,9 @@ export default function Listens(){
 
   return (
     <AuthenticatedLayout>
-      <h2 className="mb-8">ÉCOUTES</h2>
+    <div className="flex items-center mb-8 justify-between">
+      <h2 className="">ÉCOUTES</h2>
+    </div>
       <table>
         <thead> 
           <tr>

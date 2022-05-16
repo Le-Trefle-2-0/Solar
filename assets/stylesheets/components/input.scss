@@ -3,6 +3,9 @@ input.field{
     &:focus{
         @apply border-trefle-green;
     }
+    &.error{
+        @apply border-red-500;
+    }
 }
 textarea.message-input{
     @apply outline-none w-full py-2 px-4 bg-transparent resize-none scrollbar scrollbar-track-transparent scrollbar-thumb-trefle-green scrollbar-thin flex items-center;

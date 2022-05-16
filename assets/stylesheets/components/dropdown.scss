@@ -1,0 +1,16 @@
+div.dropdown{
+    @apply relative;
+    div.dropdown-toggler{
+        @apply cursor-pointer;
+    }
+    div.dropdown-content{
+        @apply absolute bg-white drop-shadow-base rounded-3 p-4 opacity-0 pointer-events-none transition;
+        &.show{
+            @apply opacity-100 pointer-events-auto;
+        }
+    }
+    &.dropdown-left>div.dropdown-content{@apply left-0;}
+    &.dropdown-right>div.dropdown-content{@apply right-0;}
+    &.dropdown-top>div.dropdown-content{@apply bottom-full;}
+    &.dropdown-bottom>div.dropdown-content{@apply top-full;}
+}

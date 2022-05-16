@@ -1,10 +1,9 @@
 import connect from "next-connect";
 import checkJWT from "../../../src/middlewares/checkJWT";
 import {Prisma, PrismaClient} from "@prisma/client";
-import Joi from "joi";
-import validator from "../../../src/middlewares/validator";
 import { putSchema } from "../../../src/schemas/calendarSchemas";
 import prisma_instance from "../../../src/utils/prisma_instance";
+import checkSchema from "../../../src/middlewares/checkSchema";
 
 export default connect().get(checkJWT, async (req, res) => {
     let filter = {
@@ -15,7 +14,7 @@ export default connect().get(checkJWT, async (req, res) => {
         where: filter
     }));
 })
-.put(checkJWT, validator({body: putSchema}), async (req, res) => {
+.put(checkJWT, checkSchema({body: putSchema}), async (req, res) => {
 
     let allDateBody = [
         'date_start',

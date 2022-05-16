@@ -18,6 +18,8 @@ body{
   @import "./components/input.scss";
   @import "./components/nav.scss";
   @import "./components/table.scss";
+  @import "./components/modal.scss";
+  @import "./components/dropdown.scss";
 
   h1{@apply text-4xl font-bold;}
   h2{@apply text-3xl font-medium;}

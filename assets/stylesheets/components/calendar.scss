@@ -1,4 +1,5 @@
 .fc {
+    @apply h-full;
 	font-family: sans-serif;
 	.fc-header-toolbar.fc-toolbar{
 		&.fc-toolbar-ltr{
@@ -23,11 +24,15 @@
         }
 	}
     .fc-daygrid{
+        &:after{
+            content: "";
+            @apply absolute inset-0 border-2 border-trefle-soft-black rounded-b-4;
+        }
         &>table, &>table td, &>table th{
             @apply border-trefle-soft-black border-2 #{!important};
         }
         &>table{
-            @apply border-collapse;
+            @apply border-collapse rounded-b-4 overflow-hidden;
             thead tr th{
                 @apply rounded-none bg-trefle-ulight-blue text-trefle-soft-black font-bold;
             }
@@ -48,6 +53,12 @@
                         a{
                             @apply h-7 w-7 rounded-full bg-trefle-green text-white flex justify-center items-center text-sm;
                         }
+                    }
+                }
+                div.fc-daygrid-body{
+                    @apply h-full;
+                    &>table{
+                        @apply h-full #{"!important"};
                     }
                 }
             }
@@ -110,6 +121,9 @@
                             @apply w-full #{"!important"};
                             .fc-timegrid-event{
                                 @apply shadow-none #{"!important"};
+                            }
+                            &>tbody>tr>td.fc-day-today{
+                                @apply bg-transparent;
                             }
                         }
                     }

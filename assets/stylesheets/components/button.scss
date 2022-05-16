@@ -9,4 +9,22 @@
             @apply bg-trefle-green;
         }
     }
+    &.white{
+        @apply bg-white text-trefle-soft-black border-white;
+        &:hover{
+            @apply bg-trefle-fake-white border-trefle-fake-white;
+            &:active{
+                @apply bg-white border-white;
+            }
+        }
+    }
+    &.fake-white{
+        @apply bg-trefle-fake-white border-trefle-fake-white text-trefle-soft-black;
+        &:hover{
+            @apply bg-white border-white;
+            &:active{
+                @apply bg-white border-white;
+            }
+        }
+    }
 }

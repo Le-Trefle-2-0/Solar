@@ -1,4 +1,4 @@
-import { event_messages, listen_message } from ".prisma/client";
+import { event_messages, listen_message } from "@prisma/client";
 import { useRouter } from "next/router";
 import { LegacyRef, useContext, useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io";

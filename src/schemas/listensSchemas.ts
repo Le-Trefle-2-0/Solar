@@ -1,25 +1,28 @@
-import JoiBase from "joi";
-import JoiDate from "@joi/date";
-const Joi = JoiBase.extend(JoiDate);
+import {object, string, date, number, setLocale, bool } from "yup";
+import moment from "moment";
+import { fr } from 'yup-locales';
+import yupFormattedDate from "../utils/yupFormattedDate";
+setLocale(fr);
 
-export const postSchema = Joi.object({
-    user_discord_id_encrypted: Joi.string(),
-    user_age_encrypted: Joi.string(),
-    main_subject_encrypted: Joi.string(),
-    date_time_start: Joi.date().format("YYYY-MM-DD HH:mm:ss").required(),
-    is_user_minor: Joi.bool().required(),
-    listen_status_id: Joi.number().required()
+
+export const postSchema = object({
+    user_discord_id_encrypted: string(),
+    user_age_encrypted: string(),
+    main_subject_encrypted: string(),
+    date_time_start: yupFormattedDate(),
+    is_user_minor: bool().required(),
+    listen_status_id: number().required()
 });
-export const putSchema = Joi.object({
-    user_discord_id_encrypted: Joi.string(),
-    user_age_encrypted: Joi.string(),
-    main_subject_encrypted: Joi.string(),
-    date_time_start: Joi.date(),
-    is_user_minor: Joi.bool(),
-    listen_status_id: Joi.number()
+export const putSchema = object({
+    user_discord_id_encrypted: string(),
+    user_age_encrypted: string(),
+    main_subject_encrypted: string(),
+    date_time_start: date(),
+    is_user_minor: bool(),
+    listen_status_id: number()
 });
-export const filterSchema = Joi.object({
-    id: Joi.number(),
-    not_done: Joi.boolean(),
-    with_users: Joi.boolean()
+export const filterSchema = object({
+    id: number(),
+    not_done: bool(),
+    with_users: bool()
 });
