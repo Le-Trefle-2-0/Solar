@@ -1,3 +1,4 @@
-import { calendar_events } from "@prisma/client";
+import { calendar_events, calendar_event_role_needed, roles } from "@prisma/client";
 
 export type CalendarEvent = calendar_events;
+export type CalendarEventWithRolesNeededAndRolesFilled = calendar_events & {account_calendar_event:{accounts:{roles: roles}}[], calendar_event_role_needed: (calendar_event_role_needed & {roles: roles})[]};

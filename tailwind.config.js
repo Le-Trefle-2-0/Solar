@@ -1,4 +1,5 @@
 minMawWidthHeightValues = {
+  "280": "70rem",
   "200": "50rem",
   "62.5": "15.625rem",
   "8/10": "80%",
