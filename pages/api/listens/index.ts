@@ -13,7 +13,22 @@ export function getListens(filter?:Prisma.listensWhereInput, includes?: Prisma.l
   });
 }
 
-export default connect().get(checkJWT, checkSchema({query: filterSchema}), async (req, res) => {
+/*
+rappel: events sont lies a des user. les écoutes ont 4 états: en attente, démarrée, fermée, commentée
+bénévole, récupère toutes les écoutes qui lui sont attribuées sauf celles commentées
+bénévole ref, récupère toutes les écoutes de tous les utilisateurs ayant rejoint la même permanence que lui mis à part les écoutes fermées / commentées
+admin, comme le bénévole référent
+bot, peut avoir toutes les écoutes en cours sans distinctions ouvertes
+
+getActualEvents(event_id) a ajouter dans events/index
+démarche exemple pour le bénévole référent getActualEvent(user.id)
+users.getAll({with:{event:{id:actualEvent.id}}}) listens uniquement ouvertes
+
+*/
+
+export default connect().get(checkJWT, checkSchema({query: filterSchema}), async (req: NextApiRequestWithUser, res) => {
+  console.log(req.session.user.roles.label)
+  
   let filter = {
     NOT: {
       listen_status: {

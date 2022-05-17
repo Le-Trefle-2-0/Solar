@@ -1,12 +1,46 @@
-input.field{
-    @apply rounded-lg border border-trefle-soft-black py-2 px-6 w-full block outline-none transition;
-    &:focus{
-        @apply border-trefle-green;
+.field{
+    &:not(.react-select){ 
+        @apply rounded-lg border border-trefle-soft-black py-2 px-6 w-full block outline-none transition;
+        &:focus{
+            @apply border-trefle-green;
+        }
+        &.error{
+            @apply border-red-500;
+        }
     }
-    &.error{
-        @apply border-red-500;
+    &.react-select{
+        &>div.react-select__control{
+            @apply rounded-lg border border-trefle-soft-black py-1 pl-6 pr-3.5 w-full flex outline-none transition shadow-none;
+            div.react-select__value-container{
+                @apply pl-0 py-0;
+            }
+            div.react-select__indicators{
+                span.react-select__indicator-separator{
+                    @apply bg-trefle-soft-black;
+                }
+                div.react-select__indicator{
+                    @apply text-trefle-soft-black -my-px;
+                }
+            }
+            &.react-select__control--is-focused{
+                @apply border-trefle-green;
+                div.react-select__indicators{
+                    span.react-select__indicator-separator{
+                        @apply bg-trefle-green;
+                    }
+                    div.react-select__indicator{
+                        @apply text-trefle-green;
+                    }
+                }
+            }
+        }   
+        &.error{
+            &>div.react-select__control{
+                @apply border-red-500;
+            }
+        }
     }
 }
 textarea.message-input{
-    @apply outline-none w-full py-2 px-4 bg-transparent resize-none scrollbar scrollbar-track-transparent scrollbar-thumb-trefle-green scrollbar-thin flex items-center;
+    @apply outline-none w-full py-2 px-4 bg-transparent resize-none scrollbar-track-transparent scrollbar-thumb-trefle-green scrollbar-thin flex items-center;
 }

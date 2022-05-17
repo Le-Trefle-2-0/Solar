@@ -100,10 +100,11 @@
                             tbody{
                                 tr{
                                     td.fc-timegrid-slot{
+                                        @apply  h-14;
                                         &.fc-timegrid-slot-label{
                                             @apply border-r-2 border-r-trefle-soft-black border-t-0 border-b-0 bg-trefle-fake-white;
                                             &>div{
-                                                @apply transform -translate-y-1/2 font-bold;
+                                                @apply transform -translate-y-1/2 font-bold h-full flex items-center;
                                             }
                                         }
                                         &.fc-timegrid-slot-lane{

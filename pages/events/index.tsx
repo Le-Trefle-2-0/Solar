@@ -13,6 +13,7 @@ import AuthenticatedLayout from "../../src/layouts/authenticated-layout";
 import Modal from "../../src/components/modal";
 import session from "../../src/interfaces/session";
 import { getCookie } from "cookies-next";
+import moment from "moment";
 
 function addDays(date: Date, days: number) {
   let result = new Date(date);
@@ -35,16 +36,16 @@ export default function calendar(){
   const calendarRef = useRef<FullCalendar>(new FullCalendar({}));
 
   for (const calendarItem of calendar){
-    let dateStart = new Date(calendarItem.date_start);
-    dateStart = setHour(dateStart, new Date(calendarItem.daily_time_start));
+    let dateStart = moment(calendarItem.date_start).toDate();
+    dateStart = setHour(dateStart, moment((calendarItem.daily_time_start as any).replace("Z",""), "YYYY-MM-DDTHH:mm:ss.SSS", true).toDate());
     if(calendarItem.date_end == null){
       let dateEnd = new Date(calendarItem.date_start);
-      dateEnd = setHour(dateEnd, new Date(calendarItem.daily_time_start));
+      dateEnd = setHour(dateEnd, moment((calendarItem.daily_time_end as any).replace("Z",""), "YYYY-MM-DDTHH:mm:ss.SSS", true).toDate());
       newCalendarItems.push({...calendarItem, date_start: dateStart, date_end: dateEnd,});
       continue;
     }
     let dateEnd = new Date(calendarItem.date_end);
-    dateEnd = setHour(dateEnd, new Date(calendarItem.daily_time_end));
+    dateEnd = setHour(dateEnd, moment((calendarItem.daily_time_end as any).replace("Z",""), "YYYY-MM-DDTHH:mm:ss.SSS", true).toDate());
     for(let i=0; i<=Math.floor((dateEnd.getTime() - dateStart.getTime()) / (1000 * 3600 * 24)); i++){
       newCalendarItems.push({...calendarItem, date_start: addDays(dateStart, i), date_end: setHour(addDays(dateStart, i), dateEnd)})
     }
@@ -98,7 +99,10 @@ export default function calendar(){
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           initialView="timeGridDay"
           allDaySlot={false}
-          events={newCalendarItems.map( c => ({title: c.subject,date: c.date_start,start: c.date_start,end: c.date_end, extendedProps: {calendar_event: c}, color: "#00000000", borderColor: "#00000000"} as EventInput)) as EventSourceInput}
+          eventOverlap={false}
+          selectOverlap={false}
+          slotEventOverlap={false}
+          events={newCalendarItems.map( c => ({title: c.subject,date: c.date_start,start: c.date_start,end: c.date_end, extendedProps: {calendar_event: c}, color: "#00000000", borderColor: "#00000000", overlap: false} as EventInput)) as EventSourceInput}
           headerToolbar={
             {
               left: 'prev',

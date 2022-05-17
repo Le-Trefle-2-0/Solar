@@ -1,4 +1,4 @@
-import {object, string, date, number, setLocale } from "yup";
+import {object, string, date, number, setLocale, array } from "yup";
 import moment from "moment";
 import { fr } from 'yup-locales';
 import yupFormattedDate from "../utils/yupFormattedDate";
@@ -11,6 +11,10 @@ export const postSchema = object({
     daily_time_start: yupFormattedDate().required(),
     daily_time_end: yupFormattedDate().required(),
     creator_id: number(),
+    needed_roles: array().of(object({
+        role_id: number(),
+        number: number()
+    })).nullable(),
 });
 export const putSchema = object({
     subject: string(),
@@ -19,4 +23,8 @@ export const putSchema = object({
     daily_time_start: date().transform((date)=>moment(date, "HH:mm:ss", true).toDate()),
     daily_time_end: date().transform((date)=>moment(date, "HH:mm:ss", true).toDate()),
     creator_id: number(),
+    needed_roles: array().of(object({
+        role_id: number(),
+        number: number()
+    })).nullable(),
 });
