@@ -1,11 +1,9 @@
 import connect from "next-connect";
-import checkJWT from "../../../src/middlewares/checkJWT";
+import checkJWT from "../../../../src/middlewares/checkJWT";
 import {Prisma, PrismaClient} from "@prisma/client";
-import { filterSchema, putSchema } from "../../../src/schemas/listensSchemas";
-import PrismaInstance from "../../../src/utils/prisma_instance";
-import prisma_instance from "../../../src/utils/prisma_instance";
-import { setQuery } from "../../../src/utils/helper";
-import checkSchema from "../../../src/middlewares/checkSchema";
+import { filterSchema, putSchema } from "../../../../src/schemas/listensSchemas";
+import prisma_instance from "../../../../src/utils/prisma_instance";
+import checkSchema from "../../../../src/middlewares/checkSchema";
 
 export default connect().get(checkJWT, checkSchema({query: filterSchema}), async (req, res) => {
     let filter = {

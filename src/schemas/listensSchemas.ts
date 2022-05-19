@@ -1,4 +1,4 @@
-import {object, string, date, number, setLocale, bool } from "yup";
+import {object, string, date, number, setLocale, bool, array } from "yup";
 import moment from "moment";
 import { fr } from 'yup-locales';
 import yupFormattedDate from "../utils/yupFormattedDate";
@@ -25,4 +25,7 @@ export const filterSchema = object({
     id: number(),
     not_done: bool(),
     with_users: bool()
+});
+export const assignSchema = object({
+    account_ids: array().of(number()),
 });

@@ -5,8 +5,6 @@ import React, { LegacyRef, useEffect, useRef, useState } from "react";
 import { ListenWithStatusAndAccounts } from "../../src/interfaces/listens";
 import { useRouter } from "next/router";
 import { io, Socket } from "socket.io-client";
-import { getCookie } from "cookies-next";
-import session from "../../src/interfaces/session";
 import { ClientType, SessionType } from "../../src/socket/ServerActions/SocketAuth";
 import { ClientEvents, ServerEvents } from "../../src/socket/Enums";
 import 'emoji-mart/css/emoji-mart.css'
@@ -40,12 +38,9 @@ export default function Listens(){
     if(socketState == SocketState.loading && listen  != null ){
       (async()=>{
         await fetch("/api/socket");
-        let sesRaw = getCookie("session");
-        let ses: session | undefined;
-        if(sesRaw != undefined && typeof sesRaw != "boolean") ses = JSON.parse(sesRaw);
         let socket = io();
         socket?.on("connect", ()=>{
-          socket?.emit(ServerEvents.login, ses, "listenChat" as SessionType, listen.id, "app" as ClientType)
+          socket?.emit(ServerEvents.login, session.current, "listenChat" as SessionType, listen.id, "app" as ClientType)
         });
         socket?.on(ClientEvents.auth_invalid, ()=>{setSocketState(SocketState.error)})
         socket?.on(ClientEvents.auth_refused, ()=>{setSocketState(SocketState.unauthenticated)})

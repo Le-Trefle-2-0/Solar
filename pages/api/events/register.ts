@@ -33,7 +33,7 @@ export default connect()
     
 
     if(calendar_event == null || account == null){
-        res.status(401).send('Event does not exist');
+        res.status(422).send('Event does not exist');
     }
   await prisma_instance.account_calendar_event.create({data: req.body});
   res.status(201).send(req.body);

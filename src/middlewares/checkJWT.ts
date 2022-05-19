@@ -1,11 +1,8 @@
-import { PrismaClient } from "@prisma/client";
 import { getCookie } from "cookies-next";
 import { JwtPayload, verify } from "jsonwebtoken";
 import { NextApiRequest, NextApiResponse } from "next";
-import { NextRequest, NextResponse } from "next/server";
 import session, { sessionAccountWithRoles } from "../interfaces/session";
 import prisma_instance from "../utils/prisma_instance";
-import PrismaInstance from "../utils/prisma_instance";
 
 export type NextApiRequestWithUser = NextApiRequest & {session: session};
 

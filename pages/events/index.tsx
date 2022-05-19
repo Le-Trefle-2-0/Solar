@@ -1,19 +1,16 @@
-import { LegacyRef, useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import useSWR from "swr";
 import FullCalendar, {EventInput, EventSourceInput} from "@fullcalendar/react";
 import dayGridPlugin from '@fullcalendar/daygrid';
 import { useRouter } from "next/router";
 import interactionPlugin from "@fullcalendar/interaction"
 import timeGridPlugin from '@fullcalendar/timegrid';
-import { useClickOutside } from "react-click-outside-hook";
-import { start } from "repl";
 import { fetcherAuth } from "../../src/utils/fetcher";
-import { CalendarEvent, CalendarEventWithRolesNeededAndRolesFilled } from "../../src/interfaces/calendar";
+import { CalendarEventWithRolesNeededAndRolesFilled } from "../../src/interfaces/calendar";
 import AuthenticatedLayout from "../../src/layouts/authenticated-layout";
 import Modal from "../../src/components/modal";
-import session from "../../src/interfaces/session";
-import { getCookie } from "cookies-next";
 import moment from "moment";
+import getSession from "../../src/utils/get_session";
 
 function addDays(date: Date, days: number) {
   let result = new Date(date);
@@ -29,6 +26,8 @@ export default function calendar(){
   const [value, onChange] = useState(new Date());
   const [showModal, setShowModal] = useState<boolean>(false)
   const calendarSwr = useSWR<CalendarEventWithRolesNeededAndRolesFilled[]|null>("/api/events", fetcherAuth);
+  const router = useRouter();
+  const session =  useRef(getSession());
 
   const calendar: CalendarEventWithRolesNeededAndRolesFilled[] = calendarSwr.data || [];
   const newCalendarItems: CalendarEventWithRolesNeededAndRolesFilled[] = [];
@@ -50,17 +49,6 @@ export default function calendar(){
       newCalendarItems.push({...calendarItem, date_start: addDays(dateStart, i), date_end: setHour(addDays(dateStart, i), dateEnd)})
     }
   }
-
-  const router = useRouter();
-  let ses: session | undefined;
-  
-  useEffect(() => {
-    (async()=>{
-      let sesRaw = getCookie("session");
-      if(sesRaw != undefined && typeof sesRaw != "boolean") ses = JSON.parse(sesRaw);
-    })()
-  })
-  
 
   return (
     <AuthenticatedLayout>
@@ -158,15 +146,33 @@ export default function calendar(){
                   
                   <button className={`btn border-white hover:border-white text-white py-0.5 mt-1 ${bg} hover:bg-white hover:bg-opacity-30`} 
                     onClick={()=> {
-                      console.log({calendar_event_id: calendarEvent.id, account_id: ses?.user.id} as any)
+                      console.log({calendar_event_id: calendarEvent.id, account_id: session.current?.user.id} as any)
                       
                       fetch(`/events/register`, {
                         method: 'POST',
-                        body: {calendar_event_id: calendarEvent.id, account_id: ses?.user.id} as any
+                        body: {calendar_event_id: calendarEvent.id, account_id: session.current?.user.id} as any
                       });
                       return;
                     }}>Rejoindre</button>
+
+                    <button className={`btn border-white hover:border-white text-white py-0.5 mt-1 ${bg} hover:bg-white hover:bg-opacity-30`} 
+                    onClick={()=> {
+                      console.log({calendar_event_id: calendarEvent.id, account_id: session.current?.user.id} as any)
+                      router.push(`/events/` + calendarEvent.id)
+                      return;
+                    }}>Modifier</button>
+
+                    <button className={`btn border-white hover:border-white text-white py-0.5 mt-1 ${bg} hover:bg-white hover:bg-opacity-30`} 
+                    onClick={()=> {
+                      console.log({calendar_event_id: calendarEvent.id, account_id: session.current?.user.id} as any)
+                      
+                      fetch(`api/events/` + calendarEvent.id, {
+                        method: 'DELETE',
+                      });
+                      return;
+                    }}>Supprimer</button>
                 </div>
+                
               </div>
             )
           }}

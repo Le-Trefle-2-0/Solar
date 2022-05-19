@@ -5,21 +5,16 @@ import logo from "../../../assets/img/logo.png"
 import Dropdown, {DropdownDirection} from "../dropdown";
 import NavLink from "./sidebar-link";
 import session from "../../interfaces/session";
-import { getCookie, removeCookies, setCookies } from "cookies-next";
-import { useEffect, useState } from "react";
+import { removeCookies } from "cookies-next";
+import { useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import getSession from "../../utils/get_session";
 
 export default function Nav(){
   let [ses, setSes] = useState<session|undefined>()
   let router = useRouter();
-  
-  useEffect(() => {
-    (async()=>{
-      let sesRaw = getCookie("session");
-      if(sesRaw != undefined && typeof sesRaw != "boolean") setSes(JSON.parse(sesRaw));
-    })()
-  }, [])
+  const session =  useRef(getSession());
   
   return(
     <nav className="sidebar">
@@ -33,7 +28,7 @@ export default function Nav(){
       <div className="px-4 pb-6">
         <Dropdown toggler={
           <div className="font-medium px-4 py-2 rounded-2 hover:bg-trefle-green flex justify-between items-center">
-            {ses?.user?.name ?? "Déconnecté"}
+            {session.current?.user?.name ?? "Déconnecté"}
             <FontAwesomeIcon icon={faAngleUp}/>
           </div>
         }

@@ -3,21 +3,17 @@ import fetcher from "../../src/utils/fetcher";
 import AuthenticatedLayout from "../../src/layouts/authenticated-layout";
 import React, { useRef } from "react";
 import moment from "moment"
-import { ListenWithStatus, ListenWithStatusAndAccounts } from "../../src/interfaces/listens";
+import { ListenWithStatusAndAccounts } from "../../src/interfaces/listens";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleRight } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/router";
-import { NextRequest, NextResponse } from "next/server";
-import { getCookie } from "cookies-next";
-import session from "../../src/interfaces/session";
-import { NextApiRequest, NextApiResponse } from "next";
-import { getSessionFromJWT } from "../../src/middlewares/checkJWT";
 import getSession from "../../src/utils/get_session";
 
 export default function Listens(){
   const router = useRouter();
   const listensSwr = useSWR<ListenWithStatusAndAccounts[]|null>("/api/listens?not_done=true&with_users=true", fetcher);
-  const listens = listensSwr.data || [];
+  let listens = listensSwr.data || [];
+  if(typeof listensSwr.data == "string") listens = [];
   const session =  useRef(getSession());
 
   return (
@@ -37,7 +33,7 @@ export default function Listens(){
           </tr>
         </thead>
         <tbody>
-          { listens != null && listens.length > 0 ? listens.map((l,k)=>(
+          { !!listens && listens.length > 0 ? listens.map((l,k)=>(
             <tr key={"listen" + l.id} className={`${k%2 == 1 ? "odd":""} ${l.account_listen.length<=0 ? "text-red-500" : ""}`}>
               <td>{l.id}</td>
               <td>{l.is_user_minor ? "mineur" : "majeur"}</td>

@@ -1,6 +1,4 @@
-import { accounts, roles } from "@prisma/client";
-import { getCookie, setCookies } from "cookies-next";
-import { Session } from "inspector";
+import { setCookies } from "cookies-next";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import session from "../../src/interfaces/session";

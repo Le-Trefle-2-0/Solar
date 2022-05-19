@@ -1,7 +1,4 @@
-import { getCookie, removeCookies, setCookies } from "cookies-next";
-import { useRouter } from "next/router";
-import { Exception } from "sass";
-import session from "../interfaces/session";
+import { removeCookies } from "cookies-next";
 import getSession from "./get_session";
 import { parseParams } from "./helper";
 
@@ -15,6 +12,7 @@ export default async function fetcher<T>(url: string, method?:string, body?: any
     options.headers["Content-Type"] = `application/json`;
   }
   if(query != undefined) url += parseParams(query);
+  console.log(authenticated);
   if(!!authenticated){
     let ses = getSession();
     let jwt = ses?.jwt;
