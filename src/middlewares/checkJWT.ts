@@ -28,19 +28,18 @@ export async function getSessionFromJWT(req: NextApiRequest, res: NextApiRespons
     try{
         const jwtPayload: JwtPayload | string = verify(jwt, process.env.JWT_SECRET || "secret");
         if(jwtPayload && typeof jwtPayload != "string"){
-            if(!ses){
-                let user = await prisma_instance.accounts.findFirst({
-                    where:{id: jwtPayload.id},
-                    include:{roles: true}
-                }) as sessionAccountWithRoles;
-                delete user.password;
-                return {
-                    jwt: jwt,
-                    user: user
-                };
-            } else {
-                return ses;
-            }
+            let user = await prisma_instance.accounts.findFirst({
+                where:{id: jwtPayload.id},
+                include:{roles: true}
+            }) as sessionAccountWithRoles;
+            user.is_admin = ["admin"].includes(user.roles.name);
+            user.is_ref = ["admin", "be_ref"].includes(user.roles.name);
+            user.is_bot = ["bot"].includes(user.roles.name);
+            delete user.password;
+            return {
+                jwt: jwt,
+                user: user
+            };
         }
     } catch {}
     return null;

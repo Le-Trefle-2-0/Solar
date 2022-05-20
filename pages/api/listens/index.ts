@@ -29,7 +29,6 @@ users.getAll({with:{event:{id:actualEvent.id}}}) listens uniquement ouvertes
 */
 
 export default connect().get(checkJWT, checkSchema({query: filterSchema}), async (req: NextApiRequestWithUser, res) => {
-  console.log(req.session.user.roles.label)
   let todayDate = new Date();
   let hourTimeStamp = todayDate.getHours() * 60 * 60 * 1000 + todayDate.getMinutes() * 60 * 1000;
   let todayHour = new Date(hourTimeStamp)
@@ -38,8 +37,7 @@ export default connect().get(checkJWT, checkSchema({query: filterSchema}), async
   todayDate.setSeconds(0);
   todayDate.setMilliseconds(1);
   let yesterdayDate = new Date(todayDate);
-  yesterdayDate.setDate(yesterdayDate.getDate() - 1)
-  console.log(yesterdayDate);
+  yesterdayDate.setDate(yesterdayDate.getDate() - 1);
 
   let filter: Prisma.listensWhereInput = {
     NOT: {
@@ -75,8 +73,6 @@ export default connect().get(checkJWT, checkSchema({query: filterSchema}), async
       daily_time_end: {gte: todayHour},
     }
   })
-
-  console.log(calendarEventForUser?.id);
 
   switch(req.session.user.roles.name){
     case 'admin':case 'be_ref':
@@ -139,12 +135,10 @@ export default connect().get(checkJWT, checkSchema({query: filterSchema}), async
         }
       };
   }
-  console.log(filter);
   let listens = await getListens(
     filter,
     req.query.with_users ? {...include, listen_status: true } : { listen_status: true }
   )
-  console.log("l",listens);
   res.status(200).send(listens);
 })
 .post(checkJWT, checkSchema({body: postSchema}), async (req: NextApiRequestWithUser, res) => {

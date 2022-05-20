@@ -17,7 +17,8 @@ export default function login(){
         let data = await fetcher<session>("/api/auth/login", "POST", {name:name, password:password}).catch(()=>null);
         if(data == null || !data.jwt){setError(true);} else {
             data.user.is_admin = ["admin"].includes(data.user.roles.name);
-            data.user.is_ref = ["admin", "be_ref", "bot"].includes(data.user.roles.name);
+            data.user.is_ref = ["admin", "be_ref"].includes(data.user.roles.name);
+            data.user.is_bot = ["bot"].includes(data.user.roles.name);
             setCookies("session", data);
             router.push("/");
         }

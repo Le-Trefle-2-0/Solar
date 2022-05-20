@@ -18,12 +18,21 @@ interface needed_role{
 
 type FormProps = PropsWithChildren<{
     roles: roles[]|null,
-    event?: CalendarEventWithRolesNeededAndRolesFilled,
+    event?: CalendarEventWithRolesNeededAndRolesFilled | null,
+    onCancel?: () => void
 }>
 
-export default function EventsForm({roles, event}: FormProps){
-    const {register, handleSubmit, watch, formState: { errors }, control, setValue, getValues} = useForm({resolver: yupResolver(calendarPostSchema)});
+export default function EventsForm({roles, event, onCancel}: FormProps){
+    const {register, handleSubmit, watch, formState: { errors }, control, setValue} = useForm({resolver: yupResolver(calendarPostSchema), defaultValues: {
+        subject: event?.subject || '',
+        date_start: moment.utc(event?.date_start || undefined).format('YYYY-MM-DD'),
+        date_end: !! (event?.date_end) ? moment.utc(event?.date_end || undefined).format('YYYY/MM/DD') : undefined,
+        daily_time_start: moment.utc(event?.daily_time_start || undefined).format('HH:mm'),
+        daily_time_end: moment.utc(event?.daily_time_end || undefined).format('HH:mm'),
+        needed_roles: event?.calendar_event_role_needed.map(ernp=>({role_id: parseInt(ernp.role_id.toString()), number: ernp.number} as needed_role)) || []
+    }});
     const [showPostResult, setShowPostResult] = useState<boolean>(false)
+    const [loading, setLoading] = useState<boolean>(false)
     const [_roles, setRoles] = useState(roles || []);
     const router = useRouter();
     const rolesSelected: needed_role[] = watch("needed_roles");
@@ -37,61 +46,57 @@ export default function EventsForm({roles, event}: FormProps){
     }, [])
 
     const onSubmit = (data: any) => {
-        console.log("on send",data.date_start)
-        fetch(`/api/events`, {
-            method: 'POST',
+        setLoading(true);
+        fetch(`/api/events${event ? `/${event.id}` : "" }`, {
+            method: event? 'PUT' : 'POST',
             body: JSON.stringify(data)
           })
           .then(
             (res) => {
-              if(res.status == 201){
-                setShowPostResult(true);
-                setTimeout(() => {
-                    router.push(`/events`)
-                }, 2000)
-              }
+                if(res.ok){
+                    setShowPostResult(true);
+                    setTimeout(() => {
+                        onCancel?.call(undefined)
+                    }, 2000)
+                }
+            }).catch((e)=>{
+                //setError()
+                setLoading(false);
             });
     };
 
-    const onErrors = (errors: any) => {
-        console.log(getValues().date_start)
-    }
     return (
         <>
-            <form onSubmit={handleSubmit(onSubmit, onErrors)}>
+            {showPostResult && <div className="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">Évenement correctement {event !== null ? "modifié" : "ajouté"}</div>}
+            <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="mb-4">
                     <label> Sujet</label>
                     <input className={`field ${errors.subject?.message ? "error" : ""}`}
-                    type="text" {...register("subject")} 
-                    defaultValue={event?.subject || ''}/>
+                    type="text" {...register("subject")}/>
                     <div className="text-red-500">{errors.subject?.message}</div>
                 </div>
                 <div className="mb-4">
                     <label> Date de début de période</label>
                     <input className={`field ${errors.date_start?.message ? "error" : ""}`}
-                    type="date" {...register("date_start")} 
-                    defaultValue={moment(event?.date_start).format('YYYY-MM-DD')}/>
+                    type="date" {...register("date_start")}/>
                     <div className="text-red-500">{errors.date_start?.message}</div>
                 </div>
                 <div className="mb-4">
                     <label> Date de fin de période</label>
                     <input className={`field ${errors.date_end?.message ? "error" : ""}`}
-                    type="date" {...register("date_end")} 
-                    defaultValue={!! (event?.date_end) ? moment(event?.date_end).format('YYYY/MM/DD') : ''}/>
+                    type="date" {...register("date_end")}/>
                     <div className="text-red-500">{errors.date_end?.message}</div>
                 </div>
                 <div className="mb-4">
                     <label> Heure quotidienne de début</label>
                     <input className={`field ${errors.daily_time_start?.message ? "error" : ""}`}
-                    type="time" {...register("daily_time_start")}
-                    defaultValue={moment(event?.daily_time_start).format('HH:mm')}/>
+                    type="time" {...register("daily_time_start")}/>
                     <div className="text-red-500">{errors.daily_time_start?.message}</div>
                 </div>
                 <div className="mb-4">
                     <label> Heure quotidienne de fin</label>
                     <input className={`field ${errors.daily_time_end?.message ? "error" : ""}`}
-                    type="time" {...register("daily_time_end")}
-                    defaultValue={moment(event?.daily_time_end).format('HH:mm')}/>
+                    type="time" {...register("daily_time_end")}/>
                     <div className="text-red-500">{errors.daily_time_end?.message}</div>
                 </div>
                 <div className="mb-4">
@@ -103,26 +108,27 @@ export default function EventsForm({roles, event}: FormProps){
                             <Select
                                 ref={ref}
                                 options={_roles.map(r=>({label: r.label, value: r.id}))}
-                                defaultValue={value ? _roles.filter(r=>value.map((c: needed_role) => c.role_id).includes(r.id)).map(r=>({label: r.label, value: r.id})) : null}
+                                defaultValue={value ? _roles.filter(r=>value.map((c: needed_role) => c.role_id).includes(parseInt(r.id.toString()))).map(r=>({label: r.label, value: r.id})) : null}
                                 onChange={val => onChange(_roles.filter(r=>val.map(c => c.value).includes(r.id)).map(r=>({role_id: parseInt(r.id.toString()), number: 1} as needed_role)))}
                                 isMulti
-                                className={`field react-select ${errors.needed_roles?.message ? "error" : ""}`}
+                                className={`field react-select ${ !!errors.needed_roles?.length ? "error" : ""}`}
                                 classNamePrefix="react-select"
                                 placeholder="Sélectionnez..."
                             />
                         )}
-                        />
-                        <div className="text-red-500">{errors.needed_roles?.message}</div>
+                    />
+                    <div className="text-red-500">{errors.needed_roles?.[0]?.role_id?.message}</div>
+                    <div className="text-red-500">{errors.needed_roles?.[0]?.number?.message}</div>
                 </div>
                 {
                     rolesSelected ? 
-                        rolesSelected.map((n_role)=>{
+                        rolesSelected.map((n_role, index)=>{
                             let role = _roles.find(r=>r.id == BigInt(n_role.role_id))
                             if(!role) return;
                             return (
                                 <div key={role.id+"_role_selected"} className="mb-4">
                                     <label> Nombre de {role.label}</label>
-                                    <input className={`field ${errors.needed_roles?.message ? "error" : ""}`}
+                                    <input className={`field ${ errors.needed_roles?.[index]?.role_id?.message ? "error" : ""}`}
                                     type="number"
                                     defaultValue={n_role.number}
                                     onKeyUp={({currentTarget})=>{
@@ -131,16 +137,15 @@ export default function EventsForm({roles, event}: FormProps){
                                             setValue("needed_roles", rolesSelected.map(nr=>nr.role_id == n_role.role_id ? {...nr, number: value} as needed_role : nr))
                                         }catch{return;}
                                     }}/>
-                                    <div className="text-red-500">{errors.needed_roles?.message}</div>
+                                    <div className="text-red-500">{errors.needed_roles?.[index]?.role_id?.message}</div>
                                 </div>
-                                );
+                            );
                         })
                     : null
                 }
-                {errors.exampleRequired && <span>This field is required</span>}
                 <div className="flex justify-end">
-                    <input type="button" value="Annuler" className="btn fake-white mr-2" onClick={()=>router.back()}/>
-                    <input type="submit" value="Ajouter" className="btn"/>
+                    <input type="button" value="Annuler" className="btn fake-white mr-2" onClick={()=> {onCancel?.call(undefined)}}/>
+                    <input type="submit" value={`${event !== null ? "Modifier" : "Ajouter"}`} className={`btn ${loading ? "opacity-50 pointer-events-none" : ""}`}/>
                 </div>
             </form>
         </>

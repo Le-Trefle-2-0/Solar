@@ -1,33 +1,24 @@
 div.modal{
-    @apply justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none max-h-full pointer-events-none transition-all opacity-0;
-    div.modal-container{
-        @apply relative w-full max-w-2xl h-full md:h-auto max-h-full transform transition-all translate-y-16;
-        div.modal-content{
-            @apply border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none m-4 h-200;
-            div.modal-header{
-                @apply flex items-start justify-between p-5 border-b border-solid border-slate-200 rounded-t;
-                h3{
-                    @apply text-xl font-semibold text-trefle-soft-black;
-                }
-                dutrton.modal-close{
-                    @apply p-1 ml-auto bg-transparent border-0 text-trefle-soft-black float-right text-3xl leading-3 font-semibold outline-none;
-                }
+    @apply bg-black bg-opacity-50 fixed inset-0 z-50 outline-none max-h-full pointer-events-none transition-all opacity-0 w-full h-full py-16 overflow-y-auto overflow-x-hidden justify-center flex;
+    div.modal-content{
+        @apply border-0 rounded-lg max-w-2xl shadow-lg relative flex flex-col w-full bg-white outline-none transform transition-all translate-y-16 my-auto;
+        div.modal-header{
+            @apply flex items-start justify-between p-5 border-b border-solid border-slate-200 rounded-t;
+            h3{
+                @apply text-xl font-semibold text-trefle-soft-black;
             }
-            div.modal-body{
-                @apply relative flex-auto
+            dutrton.modal-close{
+                @apply p-1 ml-auto bg-transparent border-0 text-trefle-soft-black float-right text-3xl leading-3 font-semibold outline-none;
             }
         }
-    }
-    &~div.modal-backdrop{
-        @apply fixed inset-0 z-40 bg-black transition-all opacity-0 pointer-events-none;
+        div.modal-body{
+            @apply relative flex-auto grid;
+        }
     }
     &.show{
-        @apply opacity-100;
+        @apply opacity-100 pointer-events-auto;
         div.modal-content{
-            @apply pointer-events-auto translate-y-0;
-        }
-        &~div.modal-backdrop{
-            @apply opacity-25 pointer-events-auto;
+            @apply translate-y-0;
         }
     }
 }

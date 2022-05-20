@@ -12,7 +12,8 @@ export async function getCalendar() {
       account_calendar_event: {select: {
         accounts: {
           select: {
-            roles: true
+            roles: true,
+            id: true
           }
         }
       }},

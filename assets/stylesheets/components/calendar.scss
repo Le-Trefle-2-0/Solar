@@ -24,19 +24,22 @@
         }
 	}
     .fc-daygrid{
+        @apply rounded-b-4.25 overflow-hidden;
         &:after{
             content: "";
-            @apply absolute inset-0 border-2 border-trefle-soft-black rounded-b-4;
+            @apply absolute inset-0 shadow-trefle-soft-black rounded-b-4.25 z-10 pointer-events-none;
+            box-shadow: inset 0 0 0 2px var(--tw-shadow-color);
         }
         &>table, &>table td, &>table th{
             @apply border-trefle-soft-black border-2 #{!important};
         }
         &>table{
-            @apply border-collapse rounded-b-4 overflow-hidden;
+            @apply border-collapse rounded-b-4.25 overflow-hidden;
             thead tr th{
                 @apply rounded-none bg-trefle-ulight-blue text-trefle-soft-black font-bold;
             }
             td{
+                @apply relative;
                 .fc-daygrid-day-top{
                     @apply flex-row p-1;
                     a{
@@ -45,9 +48,19 @@
                 }
                 &.fc-day-other{
                     @apply bg-trefle-ulight-green;
+                    &:before{
+                        @apply absolute inset-0 shadow-trefle-soft-black;
+                        content: "";
+                        box-shadow: 0 0 0 2px var(--tw-shadow-color);
+                    }
                 }
                 &.fc-day-today{
                     @apply bg-trefle-fake-white;
+                    &:before{
+                        @apply absolute inset-0 shadow-trefle-soft-black;
+                        content: "";
+                        box-shadow: 0 0 0 2px var(--tw-shadow-color);
+                    }
                     .fc-daygrid-day-top{
                         @apply p-1;
                         a{
@@ -59,6 +72,22 @@
                     @apply h-full;
                     &>table{
                         @apply h-full #{"!important"};
+                    }
+                }
+            }
+            table.fc-scrollgrid-sync-table{
+                &>tbody{
+                    &>tr:last-of-type{
+                        &>td:first-of-type{
+                            &:before{
+                                @apply rounded-bl-4;
+                            }
+                        }
+                        &>td:last-of-type{
+                            &:before{
+                                @apply rounded-br-4;
+                            }
+                        }
                     }
                 }
             }

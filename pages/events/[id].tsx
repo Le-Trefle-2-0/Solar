@@ -6,7 +6,6 @@ import { useRouter } from "next/router";
 import 'emoji-mart/css/emoji-mart.css'
 import EventsForm from "../../src/components/form/events";
 import { roles } from "@prisma/client";
-import { ListenWithStatus } from "../../src/interfaces/listens";
 import { CalendarEventWithRolesNeededAndRolesFilled } from "../../src/interfaces/calendar";
 
 interface ServersideProps{

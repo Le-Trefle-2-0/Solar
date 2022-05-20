@@ -5,12 +5,19 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import { useRouter } from "next/router";
 import interactionPlugin from "@fullcalendar/interaction"
 import timeGridPlugin from '@fullcalendar/timegrid';
-import { fetcherAuth } from "../../src/utils/fetcher";
+import fetcher from "../../src/utils/fetcher";
 import { CalendarEventWithRolesNeededAndRolesFilled } from "../../src/interfaces/calendar";
 import AuthenticatedLayout from "../../src/layouts/authenticated-layout";
 import Modal from "../../src/components/modal";
 import moment from "moment";
 import getSession from "../../src/utils/get_session";
+import { roles } from "@prisma/client";
+import EventsForm from "../../src/components/form/events";
+import { getRoles } from "../api/roles";
+
+interface ServersideProps{
+  rolesSSR: roles[]
+}
 
 function addDays(date: Date, days: number) {
   let result = new Date(date);
@@ -22,10 +29,10 @@ function setHour(date: Date, other: Date) {
   date.setMinutes(other.getMinutes());
   return date;
 }
-export default function calendar(){
-  const [value, onChange] = useState(new Date());
+export default function calendar({rolesSSR} : ServersideProps){
   const [showModal, setShowModal] = useState<boolean>(false)
-  const calendarSwr = useSWR<CalendarEventWithRolesNeededAndRolesFilled[]|null>("/api/events", fetcherAuth);
+  const [selectedEventForEdit, setSelectedEventForEdit] = useState<CalendarEventWithRolesNeededAndRolesFilled|null>();
+  const calendarSwr = useSWR<CalendarEventWithRolesNeededAndRolesFilled[]|null>("/api/events", fetcher);
   const router = useRouter();
   const session =  useRef(getSession());
 
@@ -50,12 +57,14 @@ export default function calendar(){
     }
   }
 
+  let event: {}|undefined
+
   return (
     <AuthenticatedLayout>
       <div className="h-full flex flex-col">
         <div className="flex items-center mb-8 justify-between">
           <h2 className="">PLANNING</h2>
-          <button className="btn py-0.5 -my-1" onClick={()=>router.push(`/events/add`)}>Ajouter</button>
+          <button className="btn py-0.5 -my-1" onClick={()=>setSelectedEventForEdit(null)}>Ajouter</button>
         </div>
         <FullCalendar
           plugins={[dayGridPlugin, interactionPlugin]}
@@ -79,7 +88,7 @@ export default function calendar(){
           }
         />
       </div>
-      <Modal title="S’INSCRIRE A UNE PERMANENCE" isOpened={showModal} onClose={()=>setShowModal(false)}>
+      <Modal expand={true} title="S’INSCRIRE A UNE PERMANENCE" isOpened={showModal} onClose={()=>setShowModal(false)}>
         <div className="p-8 h-full">
         <FullCalendar
           ref={calendarRef}
@@ -103,15 +112,18 @@ export default function calendar(){
           eventContent={(event)=> {
             let calendarEvent: CalendarEventWithRolesNeededAndRolesFilled = event.event.extendedProps.calendar_event
             let nofill = true;
-            let isRegistered = false;
-            let filled = calendarEvent.calendar_event_role_needed.length == 0;
+            let joined = false;
+            let filled = true;
             let rolesFill : {role_label: string, role_id: bigint, count: number, needed: number}[] = []
+            
             for (let roleNeeded of calendarEvent.calendar_event_role_needed){
               let sameRoleCount = 0;
-              for(let {accounts: {roles}} of calendarEvent.account_calendar_event){
+              for(let {accounts: {roles, id}} of calendarEvent.account_calendar_event){
                 if(roles.id == roleNeeded.role_id) sameRoleCount ++;
+                if(id == session.current?.user.id) joined = true;
               }
               if(sameRoleCount != 0) nofill = false;
+              if(sameRoleCount < roleNeeded.number) filled = false;
               rolesFill.push({role_label: roleNeeded.roles.label, role_id: roleNeeded.roles.id, count: sameRoleCount, needed: roleNeeded.number})
             }
             let bg: string = "";
@@ -144,33 +156,33 @@ export default function calendar(){
                     : null
                   }
                   
-                  <button className={`btn border-white hover:border-white text-white py-0.5 mt-1 ${bg} hover:bg-white hover:bg-opacity-30`} 
-                    onClick={()=> {
-                      console.log({calendar_event_id: calendarEvent.id, account_id: session.current?.user.id} as any)
-                      
-                      fetch(`/events/register`, {
-                        method: 'POST',
-                        body: {calendar_event_id: calendarEvent.id, account_id: session.current?.user.id} as any
-                      });
-                      return;
-                    }}>Rejoindre</button>
+                  {
+                    !session.current?.user.is_bot ?
+                      <button className={`btn border-white hover:border-white text-white py-0.5 mt-1 ${bg} hover:bg-white hover:bg-opacity-30`} 
+                      onClick={()=> {
+                        fetch(`api/events/${calendarEvent.id}/register`, {method: joined ? "DELETE" : "POST"}).then((r)=>{if(r.ok){calendarSwr.mutate();}});
+                      }}>{joined ? "Quitter" : "Rejoindre"}</button>
+                    : null
+                  }
+                  {
+                    !session.current?.user.is_bot && session.current?.user.is_ref ? 
+                    <>
+                      <button className={`btn border-white hover:border-white text-white py-0.5 mt-1 ${bg} hover:bg-white hover:bg-opacity-30`} 
+                      onClick={()=> setSelectedEventForEdit(calendarEvent)}>
+                        Modifier
+                      </button>
 
-                    <button className={`btn border-white hover:border-white text-white py-0.5 mt-1 ${bg} hover:bg-white hover:bg-opacity-30`} 
-                    onClick={()=> {
-                      console.log({calendar_event_id: calendarEvent.id, account_id: session.current?.user.id} as any)
-                      router.push(`/events/` + calendarEvent.id)
-                      return;
-                    }}>Modifier</button>
-
-                    <button className={`btn border-white hover:border-white text-white py-0.5 mt-1 ${bg} hover:bg-white hover:bg-opacity-30`} 
-                    onClick={()=> {
-                      console.log({calendar_event_id: calendarEvent.id, account_id: session.current?.user.id} as any)
-                      
-                      fetch(`api/events/` + calendarEvent.id, {
-                        method: 'DELETE',
-                      });
-                      return;
-                    }}>Supprimer</button>
+                      <button className={`btn border-white hover:border-white text-white py-0.5 mt-1 ${bg} hover:bg-white hover:bg-opacity-30`} 
+                      onClick={()=> {
+                        if(confirm("Voulez-vous vraiment supprimer cette permanence?")){
+                          fetch(`api/events/` + calendarEvent.id, {method: 'DELETE'}).then((r)=>{if(r.ok){calendarSwr.mutate();}});
+                        }
+                      }}>
+                        Supprimer
+                      </button>
+                    </>
+                    : null
+                  }
                 </div>
                 
               </div>
@@ -179,6 +191,15 @@ export default function calendar(){
           />
         </div>
       </Modal>
+      <Modal title="Modifier une permanence" isOpened={selectedEventForEdit !== undefined} onClose={()=>setSelectedEventForEdit(undefined)}>
+        <div className="p-8">
+          <EventsForm key={Math.random()} roles={rolesSSR} event={selectedEventForEdit} onCancel={() => {setSelectedEventForEdit(undefined); calendarSwr.mutate();}}/>
+        </div>
+      </Modal>
     </AuthenticatedLayout>
   );
+}
+
+export async function getServerSideProps(){
+    return {props:{rolesSSR: JSON.parse(JSON.stringify(await getRoles()))} as ServersideProps}
 }

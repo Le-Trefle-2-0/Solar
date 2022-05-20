@@ -1,13 +1,14 @@
 import useSWR from "swr";
 import fetcher from "../../src/utils/fetcher";
 import AuthenticatedLayout from "../../src/layouts/authenticated-layout";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import moment from "moment"
 import { ListenWithStatusAndAccounts } from "../../src/interfaces/listens";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleRight } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/router";
 import getSession from "../../src/utils/get_session";
+import Modal from "../../src/components/modal";
 
 export default function Listens(){
   const router = useRouter();
@@ -15,6 +16,7 @@ export default function Listens(){
   let listens = listensSwr.data || [];
   if(typeof listensSwr.data == "string") listens = [];
   const session =  useRef(getSession());
+  let [selectedListenToAssign, setSelectedListenForAssign] = useState<ListenWithStatusAndAccounts>();
 
   return (
     <AuthenticatedLayout>
@@ -41,6 +43,9 @@ export default function Listens(){
               <td>{l.listen_status.label}</td>
               { session.current?.user.is_ref ? <td>{l.account_listen.length}</td> : null }
               <td className="flex justify-end">
+                {session.current?.user.is_ref ?
+                  <button className="btn py-0.5 -my-1 mr-2" onClick={()=>setSelectedListenForAssign(l)}>Assigner bénévoles</button>
+                : null}
                 <button className="btn py-0.5 -my-1" onClick={()=>router.push(`/listens/${l.id}`)}>Go <FontAwesomeIcon icon={faAngleRight} className="text-sm"/></button>
               </td>
             </tr>
@@ -51,6 +56,11 @@ export default function Listens(){
           )}
         </tbody>
       </table>
+      <Modal isOpened={selectedListenToAssign != undefined} title={`Assigner bénévole à l'écoute ${selectedListenToAssign?.id}`} onClose={()=>setSelectedListenForAssign(undefined)}>
+        <div className="p-8">
+          
+        </div>
+      </Modal>
     </AuthenticatedLayout>
   );
 }
