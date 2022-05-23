@@ -9,12 +9,20 @@ import { faAngleRight } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/router";
 import getSession from "../../src/utils/get_session";
 import Modal from "../../src/components/modal";
+import ListensForm from "../../src/components/form/listens";
+import { accounts } from "@prisma/client";
 
 export default function Listens(){
   const router = useRouter();
+
   const listensSwr = useSWR<ListenWithStatusAndAccounts[]|null>("/api/listens?not_done=true&with_users=true", fetcher);
   let listens = listensSwr.data || [];
   if(typeof listensSwr.data == "string") listens = [];
+
+  const accountsSwr = useSWR<accounts[]|null>("/api/accounts", fetcher);
+  let accounts = accountsSwr.data || [];
+  if(typeof accountsSwr.data == "string") accounts = [];
+
   const session =  useRef(getSession());
   let [selectedListenToAssign, setSelectedListenForAssign] = useState<ListenWithStatusAndAccounts>();
 
@@ -58,7 +66,7 @@ export default function Listens(){
       </table>
       <Modal isOpened={selectedListenToAssign != undefined} title={`Assigner bénévole à l'écoute ${selectedListenToAssign?.id}`} onClose={()=>setSelectedListenForAssign(undefined)}>
         <div className="p-8">
-          
+          <ListensForm accounts={accounts} listen={selectedListenToAssign}></ListensForm>
         </div>
       </Modal>
     </AuthenticatedLayout>

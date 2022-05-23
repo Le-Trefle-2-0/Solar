@@ -9,11 +9,10 @@ import { ClientType, SessionType } from "../../src/socket/ServerActions/SocketAu
 import { ClientEvents, ServerEvents } from "../../src/socket/Enums";
 import 'emoji-mart/css/emoji-mart.css'
 import ChatInput from "../../src/components/chat_input";
-import { messages } from "@prisma/client";
+import { messages, prisma } from "@prisma/client";
 import ChatBubble from "../../src/components/chat_bubble";
 import getSession from "../../src/utils/get_session";
 import { SocketState } from "../../src/interfaces/socketState";
-
 
 type listenMessage = (messages & { accounts: { id: bigint; name: string; }; });
 
@@ -35,6 +34,7 @@ export default function Listens(){
 
   useEffect(()=>{
     if(socketState == SocketState.unauthenticated) {router.push("/auth/login");}
+    if(listenSwr.data && listenSwr.data.listen_status.name == 'closed'){router.push("/listens");}
     if(socketState == SocketState.loading && listen  != null ){
       (async()=>{
         await fetch("/api/socket");
@@ -80,7 +80,12 @@ export default function Listens(){
             <h2>ÉCOUTE #{listen?.id}</h2>
             <div className="flex">
               <button className="btn outlined" onClick={() => router.back()}>Retour a la liste</button>
-              <button className="btn ml-4" onClick={() => router.back()}>Fermer l'écoute</button>
+              <button className="btn ml-4" onClick={async() =>{
+                fetch(`/api/listens/${listen?.id}`, {method: "PUT", body: JSON.stringify({listen_status_id: 3})}).then((r)=>{if(r.ok){listenSwr.mutate();}}).then(() => {
+                  router.back();
+                });
+                
+                }}>Fermer l'écoute</button>
             </div>
           </div>
           <div className="flex-1 overflow-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-trefle-green pb-5 -mr-5 pr-5">
