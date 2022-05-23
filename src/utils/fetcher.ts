@@ -12,7 +12,6 @@ export default async function fetcher<T>(url: string, method?:string, body?: any
     options.headers["Content-Type"] = `application/json`;
   }
   if(query != undefined) url += parseParams(query);
-  console.log(authenticated);
   if(!!authenticated){
     let ses = getSession();
     let jwt = ses?.jwt;

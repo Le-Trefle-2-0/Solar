@@ -8,6 +8,7 @@ type EnumEventCallback = (socket: Socket, ...args:any) => any;
 
 export class ServerEventCallbacks {
     static login: EnumEventCallback = (socket: Socket, ioData: IoData, session: session | BotSession, sessionType: SessionType, id:number, clientType: ClientType, ...args: any) => SocketAuth.register(socket, ioData, session, sessionType, id, clientType, ...args);
+    static logout: EnumEventCallback = (socket: Socket, ioData: IoData) => SocketAuth.removeSession(socket, ioData);
     static get_history: EnumEventCallback = (socket: Socket, ioData: IoData) => SocketMessage.getHistory(socket, ioData);
     static send_message: EnumEventCallback = (socket: Socket, ioData: IoData, message: string) => SocketMessage.sendMessage(socket, ioData, message);
 }

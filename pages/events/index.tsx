@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { memo, useContext, useRef, useState } from "react";
 import useSWR from "swr";
 import FullCalendar, {EventInput, EventSourceInput} from "@fullcalendar/react";
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -14,6 +14,7 @@ import getSession from "../../src/utils/get_session";
 import { roles } from "@prisma/client";
 import EventsForm from "../../src/components/form/events";
 import { getRoles } from "../api/roles";
+import Nav from "../../src/components/sidebar";
 
 interface ServersideProps{
   rolesSSR: roles[]
@@ -30,6 +31,16 @@ function setHour(date: Date, other: Date) {
   return date;
 }
 export default function calendar({rolesSSR} : ServersideProps){
+  return (
+    <AuthenticatedLayout>
+      <IsolatedPageMem rolesSSR={rolesSSR}/>
+    </AuthenticatedLayout>
+  );
+}
+
+const IsolatedPageMem = memo(IsolatedPage, ()=>false)
+
+function IsolatedPage({rolesSSR}: ServersideProps) {
   const [showModal, setShowModal] = useState<boolean>(false)
   const [selectedEventForEdit, setSelectedEventForEdit] = useState<CalendarEventWithRolesNeededAndRolesFilled|null>();
   const calendarSwr = useSWR<CalendarEventWithRolesNeededAndRolesFilled[]|null>("/api/events", fetcher);
@@ -59,8 +70,10 @@ export default function calendar({rolesSSR} : ServersideProps){
 
   let event: {}|undefined
 
+  console.log("ref")
+
   return (
-    <AuthenticatedLayout>
+    <>
       <div className="h-full flex flex-col">
         <div className="flex items-center mb-8 justify-between">
           <h2 className="">PLANNING</h2>
@@ -84,6 +97,12 @@ export default function calendar({rolesSSR} : ServersideProps){
             (e)=>{
               setShowModal(true);
               calendarRef.current.getApi().gotoDate(e.dateStr)
+            }
+          }
+          eventClick={
+            e=>{
+              setShowModal(true);
+              calendarRef.current.getApi().gotoDate(e.event.start)
             }
           }
         />
@@ -126,6 +145,12 @@ export default function calendar({rolesSSR} : ServersideProps){
               if(sameRoleCount < roleNeeded.number) filled = false;
               rolesFill.push({role_label: roleNeeded.roles.label, role_id: roleNeeded.roles.id, count: sameRoleCount, needed: roleNeeded.number})
             }
+            if(calendarEvent.calendar_event_role_needed.length == 0){
+              for(let {accounts: {id}} of calendarEvent.account_calendar_event){
+                if(id == session.current?.user.id) joined = true;
+              }
+            }
+
             let bg: string = "";
             if(filled){
               bg = "bg-trefle-green"
@@ -160,7 +185,10 @@ export default function calendar({rolesSSR} : ServersideProps){
                     !session.current?.user.is_bot ?
                       <button className={`btn border-white hover:border-white text-white py-0.5 mt-1 ${bg} hover:bg-white hover:bg-opacity-30`} 
                       onClick={()=> {
-                        fetch(`api/events/${calendarEvent.id}/register`, {method: joined ? "DELETE" : "POST"}).then((r)=>{if(r.ok){calendarSwr.mutate();}});
+                        fetch(`api/events/${calendarEvent.id}/register`, {method: joined ? "DELETE" : "POST"}).then((r)=>{
+                          if(r.ok){calendarSwr.mutate();
+                          if(document) document.dispatchEvent(new Event('eventContextNeedUpdate'))
+                        }});
                       }}>{joined ? "Quitter" : "Rejoindre"}</button>
                     : null
                   }
@@ -196,7 +224,7 @@ export default function calendar({rolesSSR} : ServersideProps){
           <EventsForm key={Math.random()} roles={rolesSSR} event={selectedEventForEdit} onCancel={() => {setSelectedEventForEdit(undefined); calendarSwr.mutate();}}/>
         </div>
       </Modal>
-    </AuthenticatedLayout>
+    </>
   );
 }
 

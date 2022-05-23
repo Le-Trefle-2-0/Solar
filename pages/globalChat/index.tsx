@@ -4,7 +4,7 @@ import { LegacyRef, useContext, useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io";
 import ChatBubble from "../../src/components/chat_bubble";
 import ChatInput from "../../src/components/chat_input";
-import { ReferenceGlobalChatContext } from "../../src/contexts/ReferenceGlobalCHatContext";
+import { ReferenceActualEventContext } from "../../src/contexts/ReferenceGlobalCHatContext";
 import { SocketState } from "../../src/interfaces/socketState";
 import AuthenticatedLayout from "../../src/layouts/authenticated-layout";
 import { ClientEvents, ServerEvents } from "../../src/socket/Enums";
@@ -14,22 +14,31 @@ import 'emoji-mart/css/emoji-mart.css'
 type eventMessage = (event_messages & { accounts: { id: bigint; name: string; }; });
 
 export default function globalChat() {
-    let {globalChatSocket, globalChatSocketState} = useContext( ReferenceGlobalChatContext );
+    let {globalChatSocket, globalChatSocketState} = useContext( ReferenceActualEventContext );
     let router = useRouter();
     const [messages, setMessages] = useState<eventMessage[] | null>(null);
     const session = useRef(getSession());
     const messagesRef = useRef(messages);
     const messagesContainerRef = useRef<HTMLDivElement>();
-    
+    let [socketState, setSocketState] = useState(globalChatSocketState.current);
+
     useEffect(()=>{
-        globalChatSocket?.emit(ServerEvents.get_history);
-        globalChatSocket?.on(ClientEvents.history, (data: eventMessage[])=>{setMessages(data);messagesContainerRef.current?.scrollIntoView({});})
-        globalChatSocket?.on(ClientEvents.new_message, (data: eventMessage)=>{addMessage(data)})
-        return () => {
-            globalChatSocket?.off(ClientEvents.history)
-            globalChatSocket?.off(ClientEvents.new_message)
-        }
+      if(document) document.addEventListener('eventContextUpdated', contextUpdated);
+      return ()=>{
+        if(document) document.removeEventListener('eventContextUpdated', contextUpdated);
+      }
     }, []);
+
+    function contextUpdated(){
+      setSocketState(globalChatSocketState.current)
+      globalChatSocket.current?.off(ClientEvents.history)
+      globalChatSocket.current?.off(ClientEvents.new_message)
+      globalChatSocket.current?.emit(ServerEvents.get_history);
+      globalChatSocket.current?.on(ClientEvents.history, (data: eventMessage[])=>{setMessages(data);messagesContainerRef.current?.scrollIntoView({});})
+      globalChatSocket.current?.on(ClientEvents.new_message, (data: eventMessage)=>{addMessage(data)})
+    }
+
+    useEffect(()=>{contextUpdated()});
 
     useEffect(()=>{
         messagesRef.current = messages;
@@ -41,15 +50,15 @@ export default function globalChat() {
     }
     
     function submitText(text: string){
-        globalChatSocket?.emit(ServerEvents.send_message,encodeURIComponent(text))
+        globalChatSocket.current?.emit(ServerEvents.send_message,encodeURIComponent(text))
     }
     return (
       <AuthenticatedLayout>
-        { globalChatSocketState != SocketState.loaded ? 
+        { socketState != SocketState.loaded ? 
           <div className="h-100 flex items-center justify-center">{
-            globalChatSocketState == SocketState.deactivated ? "Chargement de l'écoute" 
-            : (globalChatSocketState == SocketState.loading ? "Connexion à l'écoute" 
-            : (globalChatSocketState == SocketState.error ? "Une erreur s'est produite, essayez de recherger la page, ou contactez un administrateur":""))
+            socketState == SocketState.deactivated ? "Chargement de l'écoute" 
+            : (socketState == SocketState.loading ? "Connexion à l'écoute" 
+            : (socketState == SocketState.error ? "Une erreur s'est produite, essayez de recherger la page, ou contactez un administrateur":""))
           }</div>
         :
           <div className="flex flex-col h-full w-full">

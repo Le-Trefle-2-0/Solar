@@ -6,6 +6,7 @@ import { filterSchema, postSchema } from "../../../src/schemas/listensSchemas";
 import prisma_instance from "../../../src/utils/prisma_instance";
 import checkSchema from "../../../src/middlewares/checkSchema";
 import moment from "moment";
+import { getActiveEvent } from "../events/getActive";
 
 
 
@@ -29,15 +30,7 @@ users.getAll({with:{event:{id:actualEvent.id}}}) listens uniquement ouvertes
 */
 
 export default connect().get(checkJWT, checkSchema({query: filterSchema}), async (req: NextApiRequestWithUser, res) => {
-  let todayDate = new Date();
-  let hourTimeStamp = todayDate.getHours() * 60 * 60 * 1000 + todayDate.getMinutes() * 60 * 1000;
-  let todayHour = new Date(hourTimeStamp)
-  todayDate.setHours(- todayDate.getTimezoneOffset() / 60);
-  todayDate.setMinutes(0);
-  todayDate.setSeconds(0);
-  todayDate.setMilliseconds(1);
-  let yesterdayDate = new Date(todayDate);
-  yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+
 
   let filter: Prisma.listensWhereInput = {
     NOT: {
@@ -55,24 +48,7 @@ export default connect().get(checkJWT, checkSchema({query: filterSchema}), async
     }
   }
 
-  let calendarEventForUser = await prisma_instance.calendar_events.findFirst({
-    where:{
-      account_calendar_event:{
-        some:{
-          accounts:{
-            id: req.session.user.id
-          }
-        }
-      },
-      date_start: {lte: todayDate},
-      daily_time_start: {lte: todayHour},
-      OR:[
-        {date_start: {gte: yesterdayDate}},
-        {date_end: {gte: todayDate}}
-      ],
-      daily_time_end: {gte: todayHour},
-    }
-  })
+  let calendarEventForUser = await getActiveEvent(req.session.user.id);
 
   switch(req.session.user.roles.name){
     case 'admin':case 'be_ref':

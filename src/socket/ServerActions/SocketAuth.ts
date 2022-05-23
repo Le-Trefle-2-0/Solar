@@ -18,6 +18,7 @@ export type SocketAuthSession = {
 export default class socketAuth{
     private constructor(){}
     static register(socket: Socket, ioData: IoData, session: session | BotSession, sessionType: SessionType, id:number, clientType: ClientType, ...args: any){
+        this.removeSession(socket, ioData, false);
         if(!session) {socket.emit(ClientEvents.auth_refused); return;}
         let jwtSession: sessionAccountWithRoles;
         let jwtPayload;
@@ -82,8 +83,9 @@ export default class socketAuth{
         socket.emit(ClientEvents.auth_invalid);
         return null;
     }
-    static removeSession(socket: Socket, ioData: IoData) {
+    static removeSession(socket: Socket, ioData: IoData, withEmit = true) {
         ioData.eventSessions = ioData.eventSessions.filter(s=>s.socket_id != socket.id);
         ioData.listenSessions = ioData.listenSessions.filter(s=>s.socket_id != socket.id);
+        if(withEmit) socket.emit(ClientEvents.auth_removed);
     }
 }

@@ -1,12 +1,13 @@
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import Nav from "../components/sidebar";
 import getSession from "../utils/get_session";
 
 export default function  AuthenticatedLayout({children} : React.PropsWithChildren<any>){
   const router = useRouter();
   const [message, setMessage] = useState<string|null>("Vérification de l'authentification");
-  
+  //const childrenRef = useRef(children);
+
   useEffect(()=>{
     (async()=>{
       let ses = getSession();

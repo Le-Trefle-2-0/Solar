@@ -6,16 +6,32 @@ import Dropdown, {DropdownDirection} from "../dropdown";
 import NavLink from "./sidebar-link";
 import session from "../../interfaces/session";
 import { removeCookies } from "cookies-next";
-import { useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import getSession from "../../utils/get_session";
+import { ReferenceActualEventContext } from "../../contexts/ReferenceGlobalCHatContext";
+import { SocketState } from "../../interfaces/socketState";
+import { ClientEvents } from "../../socket/Enums";
 
 export default function Nav(){
   let [ses, setSes] = useState<session|undefined>()
   let router = useRouter();
   const session =  useRef(getSession());
+  let eventCtx = useContext(ReferenceActualEventContext);
+  let [showGlobalChatLink, setShowGlobalChatLink] = useState(eventCtx.globalChatSocketState.current != SocketState.deactivated);
+
+  useEffect(()=>{
+    if(document) document.addEventListener('eventContextUpdated', updateShowGlobalChatLink);
+    return ()=>{
+      if(document) document.removeEventListener('eventContextUpdated', updateShowGlobalChatLink);
+    }
+  }, []);
   
+  function updateShowGlobalChatLink(){
+    setShowGlobalChatLink(eventCtx.globalChatSocketState.current != SocketState.deactivated);
+  }
+
   return(
     <nav className="sidebar">
       <div className="sidebar-logo"><Image src={logo}/></div>
@@ -23,7 +39,9 @@ export default function Nav(){
       <div className="sidebar-links-wrapper">
         <NavLink text="Écoutes" icon={faMessage} path="/listens"/>
         <NavLink text="Planning" icon={faCalendarAlt} path="/events"/>
-        <NavLink text="Chat de permanence" icon={faAlignLeft} path="/globalChat"/>
+        {showGlobalChatLink ? 
+          <NavLink text="Chat de permanence" icon={faAlignLeft} path="/globalChat" socket={eventCtx.globalChatSocket.current} socketEvent={ClientEvents.new_message}/>
+        : null}
       </div>
       <div className="px-4 pb-6">
         <Dropdown toggler={
