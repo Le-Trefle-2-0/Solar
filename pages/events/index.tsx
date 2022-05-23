@@ -31,16 +31,6 @@ function setHour(date: Date, other: Date) {
   return date;
 }
 export default function calendar({rolesSSR} : ServersideProps){
-  return (
-    <AuthenticatedLayout>
-      <IsolatedPageMem rolesSSR={rolesSSR}/>
-    </AuthenticatedLayout>
-  );
-}
-
-const IsolatedPageMem = memo(IsolatedPage, ()=>false)
-
-function IsolatedPage({rolesSSR}: ServersideProps) {
   const [showModal, setShowModal] = useState<boolean>(false)
   const [selectedEventForEdit, setSelectedEventForEdit] = useState<CalendarEventWithRolesNeededAndRolesFilled|null>();
   const calendarSwr = useSWR<CalendarEventWithRolesNeededAndRolesFilled[]|null>("/api/events", fetcher);
@@ -67,13 +57,9 @@ function IsolatedPage({rolesSSR}: ServersideProps) {
       newCalendarItems.push({...calendarItem, date_start: addDays(dateStart, i), date_end: setHour(addDays(dateStart, i), dateEnd)})
     }
   }
-
-  let event: {}|undefined
-
-  console.log("ref")
-
+  
   return (
-    <>
+    <AuthenticatedLayout>
       <div className="h-full flex flex-col">
         <div className="flex items-center mb-8 justify-between">
           <h2 className="">PLANNING</h2>
@@ -224,7 +210,7 @@ function IsolatedPage({rolesSSR}: ServersideProps) {
           <EventsForm key={Math.random()} roles={rolesSSR} event={selectedEventForEdit} onCancel={() => {setSelectedEventForEdit(undefined); calendarSwr.mutate();}}/>
         </div>
       </Modal>
-    </>
+    </AuthenticatedLayout>
   );
 }
 
