@@ -1,7 +1,7 @@
 import useSWR from "swr";
 import fetcher from "../../src/utils/fetcher";
 import AuthenticatedLayout from "../../src/layouts/authenticated-layout";
-import React, { useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import moment from "moment"
 import { ListenWithStatusAndAccounts } from "../../src/interfaces/listens";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -10,7 +10,8 @@ import { useRouter } from "next/router";
 import getSession from "../../src/utils/get_session";
 import Modal from "../../src/components/modal";
 import ListensForm from "../../src/components/form/listens";
-import { accounts } from "@prisma/client";
+import { ReferenceActualEventContext } from "../../src/contexts/ReferenceGlobalCHatContext";
+import { calendar_events } from "@prisma/client";
 
 export default function Listens(){
   const router = useRouter();
@@ -19,9 +20,15 @@ export default function Listens(){
   let listens = listensSwr.data || [];
   if(typeof listensSwr.data == "string") listens = [];
 
-  const accountsSwr = useSWR<accounts[]|null>("/api/accounts", fetcher);
-  let accounts = accountsSwr.data || [];
-  if(typeof accountsSwr.data == "string") accounts = [];
+  let eventCtx = useContext(ReferenceActualEventContext);
+    let [event, setEvent] = useState<calendar_events>();
+    
+    useEffect(()=>{
+        if(document) document.addEventListener("eventContextUpdated", updateEvent)
+        return () => { if(document) document.removeEventListener("eventContextUpdated", updateEvent) }
+    }, []);
+
+    function updateEvent(){ setEvent(eventCtx.event.current)}
 
   const session =  useRef(getSession());
   let [selectedListenToAssign, setSelectedListenForAssign] = useState<ListenWithStatusAndAccounts>();
@@ -66,7 +73,7 @@ export default function Listens(){
       </table>
       <Modal isOpened={selectedListenToAssign != undefined} title={`Assigner bénévole à l'écoute ${selectedListenToAssign?.id}`} onClose={()=>setSelectedListenForAssign(undefined)}>
         <div className="p-8">
-          <ListensForm accounts={accounts} listen={selectedListenToAssign}></ListensForm>
+          <ListensForm listen={selectedListenToAssign} event={event}></ListensForm>
         </div>
       </Modal>
     </AuthenticatedLayout>

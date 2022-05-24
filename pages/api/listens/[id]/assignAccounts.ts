@@ -11,7 +11,7 @@ export default connect().put(checkJWT, checkSchema({body: assignSchema}), async 
     if(!["be_ref", "admin"].includes(req.session.user.roles.name)) {
         res.status(403).send("unauthorized");
         return;
-    }
+    }""
     await prisma_instance.listens.update({
         where: {id: parseInt(req.query.id as string)},
         data: {account_listen:{set: []}}
@@ -24,5 +24,5 @@ export default connect().put(checkJWT, checkSchema({body: assignSchema}), async 
             }
         }
     });
-    res.status(204).send(req.body);
+    res.status(204).send("done");
 })

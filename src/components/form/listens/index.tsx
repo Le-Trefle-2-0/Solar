@@ -1,78 +1,78 @@
-import { postSchema as calendarPostSchema } from "../../../../src/schemas/calendarSchemas";
 import { useForm, Controller } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup"
 import { useRouter } from "next/router";
-import { PropsWithChildren, useEffect, useState } from "react";
+import { useContext, PropsWithChildren, useEffect, useState } from "react";
 import Select from 'react-select';
-import { accounts, roles } from "@prisma/client";
-import moment from "moment";
-import {CalendarEvent, CalendarEventWithRolesNeededAndRolesFilled} from "../../../interfaces/calendar"
+import { accounts, calendar_events, roles } from "@prisma/client";
 import { ListenWithStatusAndAccounts } from "../../../interfaces/listens";
+import useSWR from "swr";
+import fetcher from "../../../../src/utils/fetcher";
+import { ReferenceActualEventContext } from "../../../contexts/ReferenceGlobalCHatContext";
+import { SocketState } from "../../../interfaces/socketState";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { assignSchema } from "../../../../src/schemas/listensSchemas";
 
 interface ServersideProps{
     accountsSSR: accounts[]
 }
 
-
 type FormProps = PropsWithChildren<{
-    accounts: accounts[]|null|undefined,
-    listen?: ListenWithStatusAndAccounts | null,
+    event?: calendar_events,
+    listen: ListenWithStatusAndAccounts | undefined
     onCancel?: () => void
 }>
 
-export default function ListensForm({accounts, listen, onCancel}: FormProps){
-    const {register, handleSubmit, formState: { errors }, control, setValue} = useForm();
+export default function ListensForm({event, listen, onCancel}: FormProps){
+    const {register, handleSubmit, formState: { errors }, control, setValue} = useForm({resolver: yupResolver(assignSchema), defaultValues:{
+        account_ids: listen?.account_listen.map(al=>(al.accounts.id))
+    }});
     const [showPostResult, setShowPostResult] = useState<boolean>(false)
     const [loading, setLoading] = useState<boolean>(false)
     const router = useRouter();
+    const accountsSwr = useSWR<accounts[]|null>(event?`/api/events/${event?.id}/getAccounts`:null, fetcher);
 
-    const onSubmit = (data: any) => {
+    let accounts = accountsSwr.data || [];
+    if(typeof accountsSwr.data == "string") accounts = [];
+    
+    const onSubmit = async (data: any) => {
         setLoading(true);
-        fetch(`/api/listens${listen ? `/${listen.id}/assignAccounts` : "" }`, {
-            method: listen? 'PUT' : 'POST',
-            body: JSON.stringify(data)
-          })
-          .then(
-            (res) => {
-                if(res.ok){
-                    setShowPostResult(true);
-                    setTimeout(() => {
-                        onCancel?.call(undefined)
-                    }, 2000)
-                }
-            }).catch((e)=>{
-                //setError()
-                setLoading(false);
-            });
+        let res = await fetcher<string>(`/api/listen/${listen?.id}/assignAccounts`, 'PUT', data).catch((e)=>{
+            //setError()
+            setLoading(false);
+        })
+        if(res){
+            setShowPostResult(true);
+            setTimeout(() => {
+                onCancel?.call(undefined)
+            }, 2000)
+        }
     };
-    console.log('accounts')
-    console.log(accounts)
 
     return (
         <>
-            {showPostResult && <div className="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">Évenement correctement {event !== null ? "modifié" : "ajouté"}</div>}
+            {showPostResult && <div className="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">Bénévole(s) correctement ajouté</div>}
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="mb-4">
-                    <label> Sujet</label>
+                    <label> Bénévoles</label>
                     <Controller
                         control={control}
-                        name="accounts"
+                        name="account_ids"
                         render={({ field: {onChange, value, ref} })=>(   
                             <Select
                                 ref={ref}
-                                options={accounts?.map(a=>({label: a.name, value: a.id}))}
+                                options={accounts?.map(a=>({label: a.name, value: parseInt(a.id.toString())}))}
+                                onChange={val => {onChange(val.map(v=>v.value))}}
+                                defaultValue={accounts?.filter(a=>value?.includes(a.id)).map(a=>({label: a.name, value: parseInt(a.id.toString())}))}
                                 isMulti
-                                className={`field react-select ${ !!errors.accounts?.length ? "error" : ""}`}
+                                className={`field react-select ${ !!errors.account_ids?.length ? "error" : ""}`}
                                 classNamePrefix="react-select"
                                 placeholder="Sélectionnez..."
                             />
                         )}
                     />
-                    <div className="text-red-500">{errors.subject?.message}</div>
                 </div>
                 <div className="flex justify-end">
                     <input type="button" value="Annuler" className="btn fake-white mr-2" onClick={()=> {onCancel?.call(undefined)}}/>
-                    <input type="submit" value={`${event !== null ? "Modifier" : "Ajouter"}`} className={`btn ${loading ? "opacity-50 pointer-events-none" : ""}`}/>
+                    <input type="submit" value={"Ajouter"} className={`btn ${loading ? "opacity-50 pointer-events-none" : ""}`}/>
                 </div>
             </form>
         </>
