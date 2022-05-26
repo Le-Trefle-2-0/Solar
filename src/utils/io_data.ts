@@ -11,7 +11,7 @@ declare global {
 let io_data: IoData;
 
 if (!global.io_data) {
-    console.log("[INFO] generating new Prisma instance")
+    console.log("[INFO] generating new Socket ioData instance")
     global.io_data = {eventSessions: [], listenSessions: []};
 }
 

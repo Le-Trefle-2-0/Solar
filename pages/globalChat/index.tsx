@@ -24,9 +24,9 @@ export default function globalChat() {
     let [eventState, setEventState] = useState(event.current);
 
     useEffect(()=>{
-      if(document) document.addEventListener('eventContextUpdated', contextUpdated);
+      if(typeof document !== 'undefined') document.addEventListener('eventContextUpdated', contextUpdated);
       return ()=>{
-        if(document) document.removeEventListener('eventContextUpdated', contextUpdated);
+        if(typeof document !== 'undefined') document.removeEventListener('eventContextUpdated', contextUpdated);
       }
     }, []);
 
@@ -66,10 +66,6 @@ export default function globalChat() {
           <div className="flex flex-col h-full w-full">
             <div className="flex items-center justify-between mb-8">
               <h2>Chat de la permanence {eventState?.id} ({eventState?.subject || "aucun sujet"})</h2>
-              <div className="flex">
-                <button className="btn outlined" onClick={() => router.back()}>Retour a la liste</button>
-                <button className="btn ml-4" onClick={() => router.back()}>Fermer l'écoute</button>
-              </div>
             </div>
             <div className="flex-1 overflow-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-trefle-green pb-5 -mr-5 pr-5">
               { messages ? messages.map((m)=><ChatBubble key={"message_"+m.id} text={decodeURIComponent(m.content_encrypted)} author={m.accounts.name} is_me={m.accounts.id == session.current?.user.id}/>) : null}

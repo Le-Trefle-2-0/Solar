@@ -81,11 +81,12 @@ export default function Listens(){
             <div className="flex">
               <button className="btn outlined" onClick={() => router.back()}>Retour a la liste</button>
               <button className="btn ml-4" onClick={async() =>{
-                fetch(`/api/listens/${listen?.id}`, {method: "PUT", body: JSON.stringify({listen_status_id: 3})}).then((r)=>{if(r.ok){listenSwr.mutate();}}).then(() => {
-                  router.back();
-                });
-                
-                }}>Fermer l'écoute</button>
+                if(confirm("Êtes-vous sur de vouloir fermer l'écoute?\nCette action est irréversible!")){
+                  fetch(`/api/listens/${listen?.id}`, {method: "PUT", body: JSON.stringify({listen_status_id: 3})}).then((r)=>{if(r.ok){listenSwr.mutate();}}).then(() => {
+                    router.back();
+                  });
+                }
+              }}>Fermer l'écoute</button>
             </div>
           </div>
           <div className="flex-1 overflow-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-trefle-green pb-5 -mr-5 pr-5">

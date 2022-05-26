@@ -41,7 +41,6 @@ export default class socketAuth{
             session = session as session || null;
             if(sessionType == "listenChat"){
                 ioData.listenSessions.push({socket_id: socket.id, id:id, session: session, client_type: clientType});
-                console.log("user connected!")
                 socket.emit(ClientEvents.auth_accepted);
             } else {
                 ioData.eventSessions.push({socket_id: socket.id, id:id, session: session});

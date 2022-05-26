@@ -1,5 +1,5 @@
 import { faCalendarAlt, faMessage } from "@fortawesome/free-regular-svg-icons";
-import { faAlignLeft, faAngleUp } from "@fortawesome/free-solid-svg-icons";
+import { faAlignLeft, faAngleUp, faBook, faUsers } from "@fortawesome/free-solid-svg-icons";
 import Image from "next/image";
 import logo from "../../../assets/img/logo.png"
 import Dropdown, {DropdownDirection} from "../dropdown";
@@ -22,9 +22,9 @@ export default function Nav(){
   let [showGlobalChatLink, setShowGlobalChatLink] = useState(eventCtx.globalChatSocketState.current != SocketState.deactivated);
 
   useEffect(()=>{
-    if(document) document.addEventListener('eventContextUpdated', updateShowGlobalChatLink);
+    if(typeof document !== 'undefined') document.addEventListener('eventContextUpdated', updateShowGlobalChatLink);
     return ()=>{
-      if(document) document.removeEventListener('eventContextUpdated', updateShowGlobalChatLink);
+      if(typeof document !== 'undefined') document.removeEventListener('eventContextUpdated', updateShowGlobalChatLink);
     }
   }, []);
   
@@ -39,9 +39,19 @@ export default function Nav(){
       <div className="sidebar-links-wrapper">
         <NavLink text="Écoutes" icon={faMessage} path="/listens"/>
         <NavLink text="Planning" icon={faCalendarAlt} path="/events"/>
-        {showGlobalChatLink ? 
-          <NavLink text="Chat de permanence" icon={faAlignLeft} path="/globalChat" socket={eventCtx.globalChatSocket.current} socketEvent={ClientEvents.new_message}/>
-        : null}
+        {
+          showGlobalChatLink ? 
+            <NavLink text="Chat de permanence" icon={faAlignLeft} path="/globalChat" socket={eventCtx.globalChatSocket.current} socketEvent={ClientEvents.new_message}/>
+          : null
+        }
+        {
+          session.current?.user.is_admin ? 
+            <>
+              <NavLink text="Comptes" icon={faUsers} path="/accounts"/>
+              <NavLink text="Transcripts" icon={faBook} path="/transcripts"/>
+            </>
+          : null
+        }
       </div>
       <div className="px-4 pb-6">
         <Dropdown toggler={

@@ -8,21 +8,16 @@ import { setQuery } from "../../../../src/utils/helper";
 import checkSchema from "../../../../src/middlewares/checkSchema";
 
 export default connect().put(checkJWT, checkSchema({body: assignSchema}), async (req: NextApiRequestWithUser, res) => {
-    if(!["be_ref", "admin"].includes(req.session.user.roles.name)) {
-        res.status(403).send("unauthorized");
+    let listenId = parseInt(req.query.id as string);
+    if(!req.session.user.is_ref) {
+        res.status(403).send("forbidden")
         return;
-    }""
-    await prisma_instance.listens.update({
-        where: {id: parseInt(req.query.id as string)},
-        data: {account_listen:{set: []}}
+    }
+    await prisma_instance.account_listen.deleteMany({
+        where: {listen_id: listenId},
     });
-    await prisma_instance.listens.update({
-        where: {id: parseInt(req.query.id as string)},
-        data: {
-            account_listen:{
-                connect: req.body.account_ids.map((id: number) => ({id: id}))
-            }
-        }
+    await prisma_instance.account_listen.createMany({
+        data: req.body.account_ids.map((id: number) => ({account_id: id, listen_id: listenId}))
     });
-    res.status(204).send("done");
+    res.status(204).end();
 })

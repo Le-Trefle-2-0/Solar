@@ -15,6 +15,7 @@ import { roles } from "@prisma/client";
 import EventsForm from "../../src/components/form/events";
 import { getRoles } from "../api/roles";
 import Nav from "../../src/components/sidebar";
+import { ReferenceActualEventContext } from "../../src/contexts/ReferenceGlobalCHatContext";
 
 interface ServersideProps{
   rolesSSR: roles[]
@@ -34,8 +35,8 @@ export default function calendar({rolesSSR} : ServersideProps){
   const [showModal, setShowModal] = useState<boolean>(false)
   const [selectedEventForEdit, setSelectedEventForEdit] = useState<CalendarEventWithRolesNeededAndRolesFilled|null>();
   const calendarSwr = useSWR<CalendarEventWithRolesNeededAndRolesFilled[]|null>("/api/events", fetcher);
-  const router = useRouter();
   const session =  useRef(getSession());
+  const activeEventCtx = useContext(ReferenceActualEventContext)
 
   const calendar: CalendarEventWithRolesNeededAndRolesFilled[] = calendarSwr.data || [];
   const newCalendarItems: CalendarEventWithRolesNeededAndRolesFilled[] = [];
@@ -63,7 +64,7 @@ export default function calendar({rolesSSR} : ServersideProps){
       <div className="h-full flex flex-col">
         <div className="flex items-center mb-8 justify-between">
           <h2 className="">PLANNING</h2>
-          <button className="btn py-0.5 -my-1" onClick={()=>setSelectedEventForEdit(null)}>Ajouter</button>
+          {session.current?.user.is_ref? <button className="btn py-0.5 -my-1" onClick={()=>setSelectedEventForEdit(null)}>Ajouter</button> : ''}
         </div>
         <FullCalendar
           plugins={[dayGridPlugin, interactionPlugin]}
@@ -173,7 +174,7 @@ export default function calendar({rolesSSR} : ServersideProps){
                       onClick={()=> {
                         fetch(`api/events/${calendarEvent.id}/register`, {method: joined ? "DELETE" : "POST"}).then((r)=>{
                           if(r.ok){calendarSwr.mutate();
-                          if(document) document.dispatchEvent(new Event('eventContextNeedUpdate'))
+                          activeEventCtx.update();
                         }});
                       }}>{joined ? "Quitter" : "Rejoindre"}</button>
                     : null
@@ -207,7 +208,7 @@ export default function calendar({rolesSSR} : ServersideProps){
       </Modal>
       <Modal title="Modifier une permanence" isOpened={selectedEventForEdit !== undefined} onClose={()=>setSelectedEventForEdit(undefined)}>
         <div className="p-8">
-          <EventsForm key={Math.random()} roles={rolesSSR} event={selectedEventForEdit} onCancel={() => {setSelectedEventForEdit(undefined); calendarSwr.mutate();}}/>
+          <EventsForm key={Math.random()} roles={rolesSSR} event={selectedEventForEdit} onCancel={() => setSelectedEventForEdit(undefined)} onSuccess={() => {setSelectedEventForEdit(undefined); calendarSwr.mutate(); activeEventCtx.update();}}/>
         </div>
       </Modal>
     </AuthenticatedLayout>

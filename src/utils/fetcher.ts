@@ -32,8 +32,9 @@ export default async function fetcher<T>(url: string, method?:string, body?: any
           window.location.href = '/auth/login';
           return null;
         }
+        if(res.status == 201 || res.status == 204) return true;
         if(res.headers.get('content-type')?.includes('application/json')){
-          return res.json()
+          return res.json();
         } else {
           return res.text();
         }

@@ -1,9 +1,9 @@
-import Prisma, {PrismaClient} from "@prisma/client";
 import * as crypto from "crypto";
 import MessageEncryptService from "../src/utils/message_encrypt_service";
 import prisma_instance from "../src/utils/prisma_instance";
 
-(async()=>{[]
+
+(async()=>{
   await prisma_instance.roles.createMany({
     data: [
       {name:"admin", label: "Admin"},

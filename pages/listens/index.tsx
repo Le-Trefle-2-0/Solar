@@ -10,28 +10,29 @@ import { useRouter } from "next/router";
 import getSession from "../../src/utils/get_session";
 import Modal from "../../src/components/modal";
 import ListensForm from "../../src/components/form/listens";
+import CommentsForm from "../../src/components/form/comments";
 import { ReferenceActualEventContext } from "../../src/contexts/ReferenceGlobalCHatContext";
 import { calendar_events } from "@prisma/client";
 
 export default function Listens(){
   const router = useRouter();
-
   const listensSwr = useSWR<ListenWithStatusAndAccounts[]|null>("/api/listens?not_done=true&with_users=true", fetcher);
+  const session =  useRef(getSession());
+  let eventCtx = useContext(ReferenceActualEventContext);
+  let [event, setEvent] = useState<calendar_events|undefined>(eventCtx.event.current);
+  let [selectedListenToAssign, setSelectedListenForAssign] = useState<ListenWithStatusAndAccounts>();
+  let [selectedListenToComment, setSelectedListenToComment] = useState<ListenWithStatusAndAccounts>();
+  
   let listens = listensSwr.data || [];
   if(typeof listensSwr.data == "string") listens = [];
-
-  let eventCtx = useContext(ReferenceActualEventContext);
-    let [event, setEvent] = useState<calendar_events>();
     
-    useEffect(()=>{
-        if(document) document.addEventListener("eventContextUpdated", updateEvent)
-        return () => { if(document) document.removeEventListener("eventContextUpdated", updateEvent) }
-    }, []);
+  useEffect(()=>{
+    if(typeof document !== 'undefined') document.addEventListener("eventContextUpdated", updateEvent)
+    return () => { if(typeof document !== 'undefined') document.removeEventListener("eventContextUpdated", updateEvent) }
+  }, []);
 
-    function updateEvent(){ setEvent(eventCtx.event.current)}
+  function updateEvent(){ setEvent(eventCtx.event.current)}
 
-  const session =  useRef(getSession());
-  let [selectedListenToAssign, setSelectedListenForAssign] = useState<ListenWithStatusAndAccounts>();
 
   return (
     <AuthenticatedLayout>
@@ -58,10 +59,12 @@ export default function Listens(){
               <td>{l.listen_status.label}</td>
               { session.current?.user.is_ref ? <td>{l.account_listen.length}</td> : null }
               <td className="flex justify-end">
-                {session.current?.user.is_ref ?
+                {session.current?.user.is_ref && event ?
                   <button className="btn py-0.5 -my-1 mr-2" onClick={()=>setSelectedListenForAssign(l)}>Assigner bénévoles</button>
                 : null}
-                <button className="btn py-0.5 -my-1" onClick={()=>router.push(`/listens/${l.id}`)}>Go <FontAwesomeIcon icon={faAngleRight} className="text-sm"/></button>
+                {l.listen_status.name !== 'closed'? <button className="btn py-0.5 -my-1" onClick={()=>router.push(`/listens/${l.id}`)}>Go <FontAwesomeIcon icon={faAngleRight} className="text-sm"/></button>
+                : !session.current?.user.is_bot? <button className="btn py-0.5 -my-1" onClick={()=>setSelectedListenToComment(l)}>Commenter l'écoute <FontAwesomeIcon icon={faAngleRight} className="text-sm"/></button> : ''}
+                
               </td>
             </tr>
           )) : (
@@ -71,11 +74,17 @@ export default function Listens(){
           )}
         </tbody>
       </table>
-      <Modal isOpened={selectedListenToAssign != undefined} title={`Assigner bénévole à l'écoute ${selectedListenToAssign?.id}`} onClose={()=>setSelectedListenForAssign(undefined)}>
+      <Modal isOpened={selectedListenToAssign !== undefined} title={`Assigner bénévole à l'écoute ${selectedListenToAssign?.id}`} onClose={()=>setSelectedListenForAssign(undefined)}>
         <div className="p-8">
-          <ListensForm listen={selectedListenToAssign} event={event}></ListensForm>
+          <ListensForm key={Math.random()} listen={selectedListenToAssign} event={event} onSuccess={()=>{setSelectedListenForAssign(undefined);listensSwr.mutate()}} onCancel={()=>setSelectedListenForAssign(undefined)}/>
         </div>
       </Modal>
+      <Modal isOpened={selectedListenToComment !== undefined} title={`Commenter l'écoute ${selectedListenToAssign?.id}`} onClose={()=>setSelectedListenToComment(undefined)}>
+        <div className="p-8">
+          <CommentsForm key={Math.random()} listen={selectedListenToComment} onSuccess={()=>{setSelectedListenToComment(undefined);listensSwr.mutate()}} onCancel={()=>setSelectedListenToComment(undefined)}/>
+        </div>
+      </Modal>
+
     </AuthenticatedLayout>
   );
 }

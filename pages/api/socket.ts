@@ -24,7 +24,7 @@ export type IoData = {
 export default function handler(req: NextApiRequest, res: NextApiResponseWithSocket){
     if (res.socket.server.io) {
     } else {
-        console.log('Socket is initializing')
+        console.log('[INFO] Socket is initializing')
         const io = new Server(res.socket.server)
         res.socket.server.io = io;
 

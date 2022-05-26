@@ -30,6 +30,10 @@ export default connect().get(checkJWT, async (req, res) => {
   res.status(200).send(await getCalendar());
 })
 .post(checkJWT, checkSchema({body: postSchema}), async (req: NextApiRequestWithUser, res) => {
+  if(!req.session.user.is_ref) {
+      res.status(403).send("forbidden")
+      return;
+  }
   req.body.date_start = new Date(req.body.date_start);
   if(req.body.date_end){
     req.body.date_end = new Date(req.body.date_end);

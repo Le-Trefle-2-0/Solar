@@ -15,7 +15,10 @@ export default connect().get(checkJWT, async (req, res) => {
     }));
 })
 .put(checkJWT, checkSchema({body: putSchema}), async (req, res) => {
-    if(!req.session.user.is_ref) return;
+    if(!req.session.user.is_ref) {
+        res.status(403).send("forbidden")
+        return;
+    }
     req.body.date_start = new Date(req.body.date_start);
     if(req.body.date_end){
       req.body.date_end = new Date(req.body.date_end);
@@ -30,7 +33,7 @@ export default connect().get(checkJWT, async (req, res) => {
       delete req.body.needed_roles;
     }
   
-    const calendar_events = await prisma_instance.calendar_events.update({data: req.body, where: {id: parseInt(req.query.id as string)}});
+    const calendar_events = await prisma_instance.calendar_events.update({data: req.body, where:{id: parseInt(req.query.id as string)}});
   
     await prisma_instance.calendar_event_role_needed.deleteMany({
         where: { calendar_event_id: calendar_events.id }
@@ -46,7 +49,10 @@ export default connect().get(checkJWT, async (req, res) => {
     res.status(204).send(req.body);
 })
 .delete(checkJWT, async (req, res) => {
-    if(!req.session.user.is_ref) return;
+    if(!req.session.user.is_ref) {
+        res.status(403).send("forbidden")
+        return;
+    }
     await prisma_instance.calendar_events.delete({
         where: {
             id: parseInt(req.query.id as string)

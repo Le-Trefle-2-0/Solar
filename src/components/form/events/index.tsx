@@ -1,12 +1,11 @@
 import { postSchema as calendarPostSchema } from "../../../../src/schemas/calendarSchemas";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup"
-import { useRouter } from "next/router";
 import { PropsWithChildren, useEffect, useState } from "react";
 import Select from 'react-select';
 import { roles } from "@prisma/client";
 import moment from "moment";
-import {CalendarEvent, CalendarEventWithRolesNeededAndRolesFilled} from "../../../interfaces/calendar"
+import {CalendarEventWithRolesNeededAndRolesFilled} from "../../../interfaces/calendar"
 
 interface ServersideProps{
     rolesSSR: roles[]
@@ -19,10 +18,11 @@ interface needed_role{
 type FormProps = PropsWithChildren<{
     roles: roles[]|null,
     event?: CalendarEventWithRolesNeededAndRolesFilled | null,
-    onCancel?: () => void
+    onCancel?: () => void,
+    onSuccess?: () => void,
 }>
 
-export default function EventsForm({roles, event, onCancel}: FormProps){
+export default function EventsForm({roles, event, onCancel, onSuccess}: FormProps){
     const {register, handleSubmit, watch, formState: { errors }, control, setValue} = useForm({resolver: yupResolver(calendarPostSchema), defaultValues: {
         subject: event?.subject || '',
         date_start: moment.utc(event?.date_start || undefined).format('YYYY-MM-DD'),
@@ -34,7 +34,6 @@ export default function EventsForm({roles, event, onCancel}: FormProps){
     const [showPostResult, setShowPostResult] = useState<boolean>(false)
     const [loading, setLoading] = useState<boolean>(false)
     const [_roles, setRoles] = useState(roles || []);
-    const router = useRouter();
     const rolesSelected: needed_role[] = watch("needed_roles");
 
         
@@ -56,7 +55,7 @@ export default function EventsForm({roles, event, onCancel}: FormProps){
                 if(res.ok){
                     setShowPostResult(true);
                     setTimeout(() => {
-                        onCancel?.call(undefined)
+                        onSuccess?.call(undefined)
                     }, 2000)
                 }
             }).catch((e)=>{
@@ -144,7 +143,7 @@ export default function EventsForm({roles, event, onCancel}: FormProps){
                     : null
                 }
                 <div className="flex justify-end">
-                    <input type="button" value="Annuler" className="btn fake-white mr-2" onClick={()=> {onCancel?.call(undefined)}}/>
+                    <input type="button" value="Annuler" className="btn fake-white mr-2" onClick={()=> {onCancel?.call(undefined)}} />
                     <input type="submit" value={`${event !== null ? "Modifier" : "Ajouter"}`} className={`btn ${loading ? "opacity-50 pointer-events-none" : ""}`}/>
                 </div>
             </form>

@@ -5,7 +5,6 @@ export default function yupFormattedDate(formats = ["YYYY-MM-DD", "YYYY-MM-DD HH
     return date().transform((date, initialValue)=>{
         if(initialValue == "" || initialValue == null) return null;
         let momentVal = moment.utc(initialValue, formats, true);
-        console.log(momentVal);
         if(!momentVal.isValid()){
             return "invalid";
         } else {

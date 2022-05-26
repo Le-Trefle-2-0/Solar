@@ -1,6 +1,7 @@
 import { setCookies } from "cookies-next";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { ReferenceActualEventContext } from "../../src/contexts/ReferenceGlobalCHatContext";
 import session from "../../src/interfaces/session";
 import LoginLayout from "../../src/layouts/login-layout";
 import fetcher from "../../src/utils/fetcher";
@@ -10,6 +11,7 @@ export default function login(){
     const [password, setPassword] = useState("");
     const [error, setError] = useState(false);
     const router = useRouter();
+    const activeEventCtx = useContext(ReferenceActualEventContext);
 
     async function handleLogin(e: React.SyntheticEvent){
         e.preventDefault();
@@ -20,6 +22,7 @@ export default function login(){
             data.user.is_ref = ["admin", "be_ref"].includes(data.user.roles.name);
             data.user.is_bot = ["bot"].includes(data.user.roles.name);
             setCookies("session", data);
+            activeEventCtx.update();
             router.push("/");
         }
     }

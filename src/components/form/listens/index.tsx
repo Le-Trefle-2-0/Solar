@@ -18,31 +18,31 @@ interface ServersideProps{
 type FormProps = PropsWithChildren<{
     event?: calendar_events,
     listen: ListenWithStatusAndAccounts | undefined
-    onCancel?: () => void
+    onCancel?: () => void,
+    onSuccess?: () => void,
 }>
 
-export default function ListensForm({event, listen, onCancel}: FormProps){
+export default function ListensForm({event, listen, onCancel, onSuccess}: FormProps){
     const {register, handleSubmit, formState: { errors }, control, setValue} = useForm({resolver: yupResolver(assignSchema), defaultValues:{
         account_ids: listen?.account_listen.map(al=>(al.accounts.id))
     }});
     const [showPostResult, setShowPostResult] = useState<boolean>(false)
     const [loading, setLoading] = useState<boolean>(false)
     const router = useRouter();
-    const accountsSwr = useSWR<accounts[]|null>(event?`/api/events/${event?.id}/getAccounts`:null, fetcher);
+    const accountsSwr = useSWR<accounts[]|null>(event?`/api/events/${event?.id}/getAccounts?role_names=be`:null, fetcher);
 
     let accounts = accountsSwr.data || [];
     if(typeof accountsSwr.data == "string") accounts = [];
     
     const onSubmit = async (data: any) => {
         setLoading(true);
-        let res = await fetcher<string>(`/api/listen/${listen?.id}/assignAccounts`, 'PUT', data).catch((e)=>{
-            //setError()
+        let res = await fetcher<string>(`/api/listens/${listen?.id}/assignAccounts`, 'PUT', data).catch((e)=>{
             setLoading(false);
         })
         if(res){
             setShowPostResult(true);
             setTimeout(() => {
-                onCancel?.call(undefined)
+                onSuccess?.call(undefined)
             }, 2000)
         }
     };

@@ -6,25 +6,22 @@ setLocale(fr);
 
 
 export const postSchema = object({
-    user_discord_id_encrypted: string(),
-    user_age_encrypted: string(),
-    main_subject_encrypted: string(),
-    date_time_start: yupFormattedDate(),
+    user_discord_id_encrypted: string().required(),
+    main_subject_encrypted: string().required(),
+    date_time_start: yupFormattedDate().required(),
     is_user_minor: bool().required(),
     listen_status_id: number().required()
 });
 export const putSchema = object({
-    user_discord_id_encrypted: string(),
-    user_age_encrypted: string(),
-    main_subject_encrypted: string(),
-    date_time_start: date(),
-    is_user_minor: bool(),
-    listen_status_id: number()
+    listen_status_id: number(),
+    volunteer_notes_encrypted: string(),
+    volunteer_main_observations_encrypted: string()
 });
 export const filterSchema = object({
     id: number(),
     not_done: bool(),
-    with_users: bool()
+    with_users: bool(),
+    for_transcript: bool()
 });
 export const assignSchema = object({
     account_ids: array().of(number()),

@@ -31,12 +31,22 @@ users.getAll({with:{event:{id:actualEvent.id}}}) listens uniquement ouvertes
 
 export default connect().get(checkJWT, checkSchema({query: filterSchema}), async (req: NextApiRequestWithUser, res) => {
 
+  if(req.query.for_transcript){
+    if(!req.session.user.is_admin) {
+      res.status(403).send("forbidden")
+      return;
+    }
+    res.status(200).send(await getListens({listen_status:{name:{in:["commented","closed"]}}, listen_message:{some:{message_id:{gt:0}}}}))
+    return;
+  }
 
   let filter: Prisma.listensWhereInput = {
-    NOT: {
-      listen_status: {
-        name: req.query.not_done ? "commented" : ""
-      },
+    listen_status: {
+      name: {
+        notIn: [
+          ...(req.query.not_done ? ["commented"] : [])
+        ]
+      }
     },
   }
 
@@ -118,7 +128,11 @@ export default connect().get(checkJWT, checkSchema({query: filterSchema}), async
   res.status(200).send(listens);
 })
 .post(checkJWT, checkSchema({body: postSchema}), async (req: NextApiRequestWithUser, res) => {
-  req.body.date_time_start = new Date(req.body.date_time_start);
+  if(!req.session.user.is_bot) {
+    res.status(403).send("forbidden")
+    return;
+  }
+  req.body.date_time_start = new Date();
   await prisma_instance.listens.create({data: req.body});
   res.status(201).send(req.body);
 })

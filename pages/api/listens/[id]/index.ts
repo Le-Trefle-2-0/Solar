@@ -4,6 +4,7 @@ import {Prisma, PrismaClient} from "@prisma/client";
 import { filterSchema, putSchema } from "../../../../src/schemas/listensSchemas";
 import prisma_instance from "../../../../src/utils/prisma_instance";
 import checkSchema from "../../../../src/middlewares/checkSchema";
+import MessageEncryptService from './../../../../src/utils/message_encrypt_service';
 
 export default connect().get(checkJWT, checkSchema({query: filterSchema}), async (req, res) => {
     let filter = {
@@ -20,19 +21,24 @@ export default connect().get(checkJWT, checkSchema({query: filterSchema}), async
     }));
 })
 .put(checkJWT, checkSchema({body: putSchema}), async (req, res) => {
+    let additionnalValues = {} as any;
+    if(req.body.volunteer_notes_encrypted || req.body.volunteer_main_observations_encrypted){
+        additionnalValues.listen_status = {
+            connect:{
+                name:"commented"
+            }
+        }
+    }
+    if(req.body.volunteer_notes_encrypted) additionnalValues.volunteer_notes_encrypted = MessageEncryptService.encrypt(req.body.volunteer_notes_encrypted);
+    if(req.body.volunteer_main_observations_encrypted) additionnalValues.volunteer_main_observations_encrypted = MessageEncryptService.encrypt(req.body.volunteer_main_observations_encrypted);
     await prisma_instance.listens.update({
         where: {
             id: parseInt(req.query.id as string)
         },
-        data: req.body
-    });
-    res.status(204).send(req.body);
-})
-.delete(checkJWT, async (req, res) => {
-    await prisma_instance.listens.delete({
-        where: {
-            id: parseInt(req.query.id as string)
+        data: {
+            ...req.body,
+            ...additionnalValues
         }
-    })
-    res.status(204).send(req.body);
+    });
+    res.status(204).end();
 })
