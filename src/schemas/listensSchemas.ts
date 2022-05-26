@@ -8,7 +8,7 @@ setLocale(fr);
 export const postSchema = object({
     user_discord_id_encrypted: string().required(),
     main_subject_encrypted: string().required(),
-    date_time_start: yupFormattedDate().required(),
+    date_time_start: yupFormattedDate(),
     is_user_minor: bool().required(),
     listen_status_id: number().required()
 });

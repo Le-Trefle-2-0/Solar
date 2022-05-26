@@ -7,6 +7,7 @@ import prisma_instance from "../../../src/utils/prisma_instance";
 import checkSchema from "../../../src/middlewares/checkSchema";
 import moment from "moment";
 import { getActiveEvent } from "../events/getActive";
+import MessageEncryptService from './../../../src/utils/message_encrypt_service';
 
 
 
@@ -132,6 +133,8 @@ export default connect().get(checkJWT, checkSchema({query: filterSchema}), async
     res.status(403).send("forbidden")
     return;
   }
+  if(req.body.user_discord_id_encrypted)req.body.user_discord_id_encrypted = MessageEncryptService.encrypt(req.body.user_discord_id_encrypted);
+  if(req.body.main_subject_encrypted)req.body.main_subject_encrypted = MessageEncryptService.encrypt(req.body.main_subject_encrypted);
   req.body.date_time_start = new Date();
   await prisma_instance.listens.create({data: req.body});
   res.status(201).send(req.body);
