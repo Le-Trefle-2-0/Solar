@@ -36,11 +36,12 @@ export default function globalChat() {
       globalChatSocket.current?.off(ClientEvents.history);
       globalChatSocket.current?.off(ClientEvents.new_message);
       globalChatSocket.current?.emit(ServerEvents.get_history);
+      console.log("sending getHistory");
       globalChatSocket.current?.on(ClientEvents.history, (data: eventMessage[])=>{setMessages(data);messagesContainerRef.current?.scrollIntoView({});});
       globalChatSocket.current?.on(ClientEvents.new_message, (data: eventMessage)=>{addMessage(data)});
     }
 
-    useEffect(()=>{contextUpdated()});
+    useEffect(()=>{contextUpdated()},[]);
 
     useEffect(()=>{
         messagesRef.current = messages;
