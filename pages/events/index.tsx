@@ -43,7 +43,8 @@ export default function calendar({rolesSSR} : ServersideProps){
 
   const calendarRef = useRef<FullCalendar>(new FullCalendar({}));
 
-  for (const calendarItem of calendar){
+  for (const calendarItemTemp of calendar){
+    let calendarItem = {...calendarItemTemp};
     let dateStart = moment(calendarItem.date_start).toDate();
     dateStart = setHour(dateStart, moment((calendarItem.daily_time_start as any).replace("Z",""), "YYYY-MM-DDTHH:mm:ss.SSS", true).toDate());
     if(calendarItem.date_end == null){
@@ -105,7 +106,7 @@ export default function calendar({rolesSSR} : ServersideProps){
           eventOverlap={false}
           selectOverlap={false}
           slotEventOverlap={false}
-          events={newCalendarItems.map( c => ({title: c.subject,date: c.date_start,start: c.date_start,end: c.date_end, extendedProps: {calendar_event: c}, color: "#00000000", borderColor: "#00000000", overlap: false} as EventInput)) as EventSourceInput}
+          events={newCalendarItems.map( c => ({title: c.subject,date: c.date_start,start: c.date_start,end: c.date_end, extendedProps: {calendar_event: calendar.find(oc=>oc.id == c.id)}, color: "#00000000", borderColor: "#00000000", overlap: false} as EventInput)) as EventSourceInput}
           headerToolbar={
             {
               left: 'prev',

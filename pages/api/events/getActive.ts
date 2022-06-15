@@ -12,13 +12,11 @@ export async function getActiveEvent(user_id: bigint) {
     let todayHour = new Date(hourTimeStamp)
     todayDate.setHours(- todayDate.getTimezoneOffset() / 60);
     todayDate.setMinutes(0);
-    todayDate.setSeconds(1);
+    todayDate.setSeconds(0);
     todayDate.setMilliseconds(0);
     let yesterdayDate = new Date(todayDate);
     yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-    console.log(todayDate);
-    console.log(yesterdayDate);
-    console.log(todayHour.toISOString());
+
     //request apparently not supporting timezones 
     /*
     let ev = await prisma_instance.calendar_events.findFirst({
@@ -41,10 +39,33 @@ export async function getActiveEvent(user_id: bigint) {
     });
     */
     let query = `
-        SELECT \`solar\`.\`calendar_events\`.\`id\`, \`solar\`.\`calendar_events\`.\`subject\`, \`solar\`.\`calendar_events\`.\`date_start\`, \`solar\`.\`calendar_events\`.\`date_end\`, \`solar\`.\`calendar_events\`.\`daily_time_start\`, \`solar\`.\`calendar_events\`.\`daily_time_end\`, \`solar\`.\`calendar_events\`.\`creator_id\` FROM \`solar\`.\`calendar_events\` WHERE ((\`solar\`.\`calendar_events\`.\`id\`) IN (SELECT \`t0\`.\`id\` FROM \`solar\`.\`calendar_events\` AS \`t0\` INNER JOIN \`solar\`.\`account_calendar_event\` AS \`j0\` ON (\`j0\`.\`calendar_event_id\`) = (\`t0\`.\`id\`) WHERE ((\`j0\`.\`account_id\`,\`j0\`.\`calendar_event_id\`) IN (SELECT \`t1\`.\`account_id\`, \`t1\`.\`calendar_event_id\` FROM \`solar\`.\`account_calendar_event\` AS \`t1\` INNER JOIN \`solar\`.\`accounts\` AS \`j1\` ON (\`j1\`.\`id\`) = (\`t1\`.\`account_id\`) WHERE (\`j1\`.\`id\` = ${user_id} AND \`t1\`.\`account_id\` IS NOT NULL AND \`t1\`.\`calendar_event_id\` IS NOT NULL)) AND \`t0\`.\`id\` IS NOT NULL)) AND \`solar\`.\`calendar_events\`.\`date_start\` <= "${todayDate.toISOString()}" AND \`solar\`.\`calendar_events\`.\`daily_time_start\` <= "${todayHour.toISOString()}" AND (\`solar\`.\`calendar_events\`.\`date_start\` >= "${yesterdayDate.toISOString()}" OR \`solar\`.\`calendar_events\`.\`date_end\` >= "${todayDate.toISOString()}") AND \`solar\`.\`calendar_events\`.\`daily_time_end\` >= "${todayHour.toISOString()}") LIMIT 1 OFFSET 0
+        SELECT 
+            \`solar\`.\`calendar_events\`.\`id\`,
+            \`solar\`.\`calendar_events\`.\`subject\`, 
+            \`solar\`.\`calendar_events\`.\`date_start\`, 
+            \`solar\`.\`calendar_events\`.\`date_end\`, 
+            \`solar\`.\`calendar_events\`.\`daily_time_start\`, 
+            \`solar\`.\`calendar_events\`.\`daily_time_end\`, 
+            \`solar\`.\`calendar_events\`.\`creator_id\` 
+        FROM \`solar\`.\`calendar_events\` 
+        WHERE ((\`solar\`.\`calendar_events\`.\`id\`) IN (
+            SELECT \`t0\`.\`id\` 
+            FROM \`solar\`.\`calendar_events\`AS \`t0\` 
+            INNER JOIN \`solar\`.\`account_calendar_event\` AS \`j0\` ON (\`j0\`.\`calendar_event_id\`) = (\`t0\`.\`id\`) 
+            WHERE ((\`j0\`.\`account_id\`,\`j0\`.\`calendar_event_id\`) IN (
+                SELECT \`t1\`.\`account_id\`, \`t1\`.\`calendar_event_id\` 
+                FROM \`solar\`.\`account_calendar_event\` AS \`t1\` 
+                INNER JOIN \`solar\`.\`accounts\` AS \`j1\` ON (\`j1\`.\`id\`) = (\`t1\`.\`account_id\`)
+                WHERE (\`j1\`.\`id\` = ${user_id} AND \`t1\`.\`account_id\` IS NOT NULL AND \`t1\`.\`calendar_event_id\` IS NOT NULL)) AND \`t0\`.\`id\` IS NOT NULL)
+            ) 
+            AND \`solar\`.\`calendar_events\`.\`date_start\` <= "${todayDate.toISOString()}" 
+            AND \`solar\`.\`calendar_events\`.\`daily_time_start\` <= "${todayHour.getHours()}:${todayHour.getMinutes()}" 
+            AND (\`solar\`.\`calendar_events\`.\`date_start\` >= "${yesterdayDate.toISOString()}" 
+                OR \`solar\`.\`calendar_events\`.\`date_end\` >= "${todayDate.toISOString()}") 
+            AND \`solar\`.\`calendar_events\`.\`daily_time_end\` >= "${todayHour.getHours()}:${todayHour.getMinutes()}") 
+            LIMIT 1 OFFSET 0
     `;
     let ev = await prisma_instance.$queryRawUnsafe(query)
-    console.log(ev);
     return ev[0] || null;
 }
 

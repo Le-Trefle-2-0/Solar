@@ -55,12 +55,8 @@ const ReferenceActualEventContextProvider = ({ children } : any) => {
         dispatchEvent();
     }
 
-    function dispatchEvent(){
-        if(typeof document !== 'undefined') document.dispatchEvent(new Event('eventContextUpdated'))
-    }
-    function update(){
-        if(typeof document !== 'undefined') document.dispatchEvent(new Event('eventContextNeedUpdate'))
-    }
+    function dispatchEvent(){if(typeof document !== 'undefined') document.dispatchEvent(new Event('eventContextUpdated'))}
+    function update(){if(typeof document !== 'undefined') document.dispatchEvent(new Event('eventContextNeedUpdate'))}
 
     return (
         <ReferenceActualEventContext.Provider value={{ globalChatSocket:globalChatSocket, globalChatSocketState: socketState, event: event, update}}>

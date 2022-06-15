@@ -13,7 +13,7 @@ let prisma_instance: PrismaClient;
 if (!global.prisma_instance) {
     console.log("[INFO] generating new Prisma instance")
     global.prisma_instance = new PrismaClient({
-      log: ['query', 'info', 'warn', 'error'],
+      //log: ['query', 'info', 'warn', 'error'],
     });
 }
 
