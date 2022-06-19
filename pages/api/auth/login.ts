@@ -1,5 +1,6 @@
 import {prisma, PrismaClient} from "@prisma/client";
-import * as crypto from "crypto";
+import cryptoJS from "crypto-js";
+import Base64 from 'crypto-js/enc-base64';
 import connect from "next-connect";
 import { sign } from "jsonwebtoken";
 import session, { sessionAccountWithRoles } from "../../../src/interfaces/session";
@@ -16,13 +17,13 @@ const schema = object({
 export default connect().post(checkSchema({body: schema}), async (req, res) => {
   let acc = await prisma_instance.accounts.findFirst({
     where: {
-      password: crypto.createHash("sha512").update(req.body.password).digest("base64"),
+      password: Base64.stringify(cryptoJS.SHA512(req.body.password)),
       name: req.body.name
     },
     include: {
       roles: true
     }
-  }) as sessionAccountWithRoles ;
+  }) as sessionAccountWithRoles;
   if(acc){
     delete acc.password;
     res.status(200).send({
