@@ -40,7 +40,7 @@ export default function globalChat() {
       globalChatSocket.current?.on(ClientEvents.new_message, (data: eventMessage)=>{addMessage(data)});
     }
 
-    useEffect(()=>{contextUpdated()});
+    useEffect(()=>{contextUpdated()},[]);
 
     useEffect(()=>{
         messagesRef.current = messages;

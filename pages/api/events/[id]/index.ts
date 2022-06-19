@@ -53,6 +53,33 @@ export default connect().get(checkJWT, async (req, res) => {
         res.status(403).send("forbidden")
         return;
     }
+    let messages = await prisma_instance.calendar_event_message.findMany({
+        where: {
+            calendar_event_id: parseInt(req.query.id as string)
+        }
+    })
+    await prisma_instance.calendar_event_message.deleteMany({
+        where: {
+            calendar_event_id: parseInt(req.query.id as string)
+        }
+    })
+    await prisma_instance.event_messages.deleteMany({
+        where: {
+            id: {
+                in: messages.map(m=>m.event_message_id)
+            }
+        }
+    })
+    await prisma_instance.calendar_event_role_needed.deleteMany({
+        where: {
+            calendar_event_id: parseInt(req.query.id as string)
+        }
+    })
+    await prisma_instance.account_calendar_event.deleteMany({
+        where: {
+            calendar_event_id: parseInt(req.query.id as string)
+        }
+    })
     await prisma_instance.calendar_events.delete({
         where: {
             id: parseInt(req.query.id as string)

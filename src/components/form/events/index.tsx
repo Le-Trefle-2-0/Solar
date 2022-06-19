@@ -25,8 +25,8 @@ type FormProps = PropsWithChildren<{
 export default function EventsForm({roles, event, onCancel, onSuccess}: FormProps){
     const {register, handleSubmit, watch, formState: { errors }, control, setValue} = useForm({resolver: yupResolver(calendarPostSchema), defaultValues: {
         subject: event?.subject || '',
-        date_start: moment.utc(event?.date_start || undefined).format('YYYY-MM-DD'),
-        date_end: !! (event?.date_end) ? moment.utc(event?.date_end || undefined).format('YYYY/MM/DD') : undefined,
+        date_start: moment(event?.date_start || undefined).format('YYYY-MM-DD'),
+        date_end: (!! (event?.date_end)) ? moment(event?.date_end || undefined).format('YYYY-MM-DD') : undefined,
         daily_time_start: moment.utc(event?.daily_time_start || undefined).format('HH:mm'),
         daily_time_end: moment.utc(event?.daily_time_end || undefined).format('HH:mm'),
         needed_roles: event?.calendar_event_role_needed.map(ernp=>({role_id: parseInt(ernp.role_id.toString()), number: ernp.number} as needed_role)) || []
