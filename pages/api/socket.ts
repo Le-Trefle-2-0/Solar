@@ -32,6 +32,14 @@ export default function handler(req: NextApiRequest, res: NextApiResponseWithSoc
             socket.onAny((eventName, ...args) => {
                 SocketEvent.dispatchEvent(socket, eventName, io_data, ...args);
             });
+
+            socket.on('bot_connect', () => {
+                globalThis.botSocket = socket;
+                console.log('[INFO] Bot socket is connected')
+            });
+
+            socket.emit('hello', {});
+
             socket.on("disconnect", () => socketAuth.removeSession(socket, io_data))
         })
     }
