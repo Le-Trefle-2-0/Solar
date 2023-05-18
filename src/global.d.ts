@@ -1,1 +1,0 @@
-declare let botSocket: any;
