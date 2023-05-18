@@ -11,6 +11,7 @@ export class ServerEventCallbacks {
     static logout: EnumEventCallback = (socket: Socket, ioData: IoData) => SocketAuth.removeSession(socket, ioData);
     static get_history: EnumEventCallback = (socket: Socket, ioData: IoData) => SocketMessage.getHistory(socket, ioData);
     static send_message: EnumEventCallback = (socket: Socket, ioData: IoData, message: string) => SocketMessage.sendMessage(socket, ioData, message);
+    static bot_message: EnumEventCallback = (socket: Socket, ioData: IoData, message: string, userID: string) => SocketMessage.recieveBotMessage(socket, ioData, message, userID);
 }
 
 export default class SocketEvent{

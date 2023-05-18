@@ -5,6 +5,7 @@ import SocketEvent from "../../src/socket/SocketEvent";
 import session from "../../src/interfaces/session";
 import socketAuth, { BotSession, ClientType, SessionType } from "../../src/socket/ServerActions/SocketAuth";
 import io_data from "../../src/utils/io_data";
+import { any } from "@hapi/joi";
 
 type NextApiResponseWithSocket = NextApiResponse & {socket: {server: (Partial<ServerOptions> | http.Server | number) & { io: Server, ioData: IoData } }};
 export type IoData = {
@@ -30,15 +31,21 @@ export default function handler(req: NextApiRequest, res: NextApiResponseWithSoc
 
         io.on('connection', socket => {
             socket.onAny((eventName, ...args) => {
+                console.log(eventName)
+                console.log(args)
                 SocketEvent.dispatchEvent(socket, eventName, io_data, ...args);
             });
 
             socket.on('bot_connect', () => {
                 globalThis.botSocket = socket;
-                console.log('[INFO] Bot socket is connected')
             });
 
             socket.emit('hello', {});
+
+            socket.on('bot_message', (message: string, userID: string) => {
+                console.log('MESSAGE RECIEVED FROM BOT')
+                console.log(message)
+            });
 
             socket.on("disconnect", () => socketAuth.removeSession(socket, io_data))
         })

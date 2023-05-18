@@ -111,7 +111,9 @@ export default class SocketMessage{
                     message_id: message.id,
                     listen_id: session.id
                 }
-            })
+            });
+            let listen = await prisma_instance.listens.findFirst({ where: { id: session.id }});
+            globalThis.botSocket.emit('bot_message', { content: messageStr, userID: listen?.user_discord_id_encrypted });
             message.content_encrypted = MessageEncryptService.decrypt(message.content_encrypted);
             message.discord_message_encrypted = MessageEncryptService.decrypt(message.discord_message_encrypted);
             socket.to(ioData.listenSessions.filter(s=>s.id == session?.id).map(s=>s.socket_id)).emit(ClientEvents.new_message, message);
@@ -120,5 +122,37 @@ export default class SocketMessage{
         }
         socket.emit(ClientEvents.auth_invalid);
         return;
+    }
+
+    static async recieveBotMessage(socket: Socket, ioData: IoData, messageContent: string, userID: string){
+        console.log('User message recieved')
+        let listen = await prisma_instance.listens.findFirst({ where: { user_discord_id_encrypted: userID }});
+        if (listen) {
+            let message = await prisma_instance.messages.create({
+                data: {
+                    content_encrypted: MessageEncryptService.encrypt(messageContent),
+                    account_id: 4,
+                    discord_message_encrypted: MessageEncryptService.encrypt(messageContent)
+                },
+                include:{
+                    accounts: {
+                        select: {
+                            id: true,
+                            name: true,
+                        }
+                    }
+                }
+            });
+            await prisma_instance.listen_message.create({
+                data:{
+                    message_id: message.id,
+                    listen_id: listen.id
+                }
+            });
+            message.content_encrypted = MessageEncryptService.decrypt(message.content_encrypted);
+            message.discord_message_encrypted = MessageEncryptService.decrypt(message.discord_message_encrypted);
+            socket.to(ioData.listenSessions.filter(s=>s.id == Number(listen?.id)).map(s=>s.socket_id)).emit(ClientEvents.new_message, message);
+            return;
+        }
     }
 }
