@@ -77,7 +77,7 @@ export default function Listens(){
       :
         <div className="flex flex-col h-full w-full">
           <div className="flex items-center justify-between mb-8">
-            <h2>ÉCOUTE #{listen?.id}</h2>
+            <h2>ÉCOUTE {listen?.id}</h2>
             <div className="flex">
               <button className="btn outlined" onClick={() => router.back()}>Retour a la liste</button>
               <button className="btn ml-4" onClick={async() =>{
