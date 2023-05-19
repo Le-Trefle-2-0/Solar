@@ -1,4 +1,3 @@
-import {prisma, PrismaClient} from "@prisma/client";
 import cryptoJS from "crypto-js";
 import Base64 from 'crypto-js/enc-base64';
 import connect from "next-connect";
