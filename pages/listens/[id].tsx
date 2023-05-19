@@ -9,14 +9,14 @@ import { ClientType, SessionType } from "../../src/socket/ServerActions/SocketAu
 import { ClientEvents, ServerEvents } from "../../src/socket/Enums";
 import 'emoji-mart/css/emoji-mart.css'
 import ChatInput from "../../src/components/chat_input";
-import { messages, prisma } from "@prisma/client";
+import { messages } from "@prisma/client";
 import ChatBubble from "../../src/components/chat_bubble";
 import getSession from "../../src/utils/get_session";
 import { SocketState } from "../../src/interfaces/socketState";
 
 type listenMessage = (messages & { accounts: { id: bigint; name: string; }; });
 
-export default function Listens(){
+export default function Listens(props){
   const router = useRouter();
   const listenSwr = useSWR<ListenWithStatusAndAccounts|null>(router.query.id?`/api/listens/${router.query.id}?not_done=true&with_users=true`:null, fetcherAuth);
   const [socketState, setSocketState] = useState<SocketState>(SocketState.deactivated);
