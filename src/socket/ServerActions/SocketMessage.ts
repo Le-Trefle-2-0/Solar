@@ -127,7 +127,8 @@ export default class SocketMessage{
 
     static async recieveBotMessage(socket: Socket, ioData: IoData, messageContent: string, userID: string){
         console.log('User message recieved')
-        let listen = await prisma_instance.listens.findFirst({ where: { user_discord_id_encrypted: userID.toString() }});
+        let listens = await prisma_instance.listens.findMany({ where: { user_discord_id_encrypted: userID.toString() }});
+        let listen = listens[listens.length - 1];
         if (listen) {
             let message = await prisma_instance.messages.create({
                 data: {
