@@ -16,7 +16,7 @@ import { SocketState } from "../../src/interfaces/socketState";
 
 type listenMessage = (messages & { accounts: { id: bigint; name: string; }; });
 
-export default function Listens(props){
+export default function Listens(){
   const router = useRouter();
   const listenSwr = useSWR<ListenWithStatusAndAccounts|null>(router.query.id?`/api/listens/${router.query.id}?not_done=true&with_users=true`:null, fetcherAuth);
   const [socketState, setSocketState] = useState<SocketState>(SocketState.deactivated);
