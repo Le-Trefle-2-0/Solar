@@ -36,7 +36,6 @@ export default connect().get(checkJWT, async (req: NextApiRequestWithUser, res) 
             <body style="font-family: sans-serif;">
                 <h1>Transcipt de l'écoute ${listen.id}</h1>
                 <h3 style="margin:0">Sujet principal: ${decodeURI(listen.main_subject_encrypted)}</h3>
-                <h3 style="margin:0; margin-bottom: 1rem;">ID utilisateur Discord: ${listen.user_discord_id_encrypted}</h3>
                 <h4 style="margin:0">notes du bénévole:</h4>
                 <p style="margin:0">${decodeURI(listen.volunteer_notes_encrypted || "Aucune note")}</p>
                 <h4 style="margin:0">observations du bénévole:</h4>
