@@ -23,10 +23,10 @@ import prisma_instance from "../src/utils/prisma_instance";
   })
   await prisma_instance.listen_status.createMany({
     data: [
-      {name:"waiting", label: "En attente" },
-      {name:"started", label: "Démarrée" },
-      {name:"closed", label: "Fermée" },
-      {name:"commented", label: "Commentée" },
+      {name:"waiting", label: "Non-Assignée" },
+      {name:"started", label: "En cours" },
+      {name:"closed", label: "En attente de transmission" },
+      {name:"commented", label: "Terminée" },
     ]
   })
   
