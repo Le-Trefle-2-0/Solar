@@ -29,10 +29,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponseWithSoc
         const io = new Server(res.socket.server)
         res.socket.server.io = io;
 
-        io.on('connection', socket => {
+        io.on('connection', socket => {            
             socket.onAny((eventName, ...args) => {
-                console.log(eventName)
-                console.log(args)
                 SocketEvent.dispatchEvent(socket, eventName, io_data, ...args);
             });
 
@@ -41,11 +39,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponseWithSoc
             });
 
             socket.emit('hello', {});
-
-            socket.on('bot_message', (message: string, userID: string) => {
-                console.log('MESSAGE RECIEVED FROM BOT')
-                console.log(message)
-            });
 
             socket.on("disconnect", () => socketAuth.removeSession(socket, io_data))
         })

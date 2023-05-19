@@ -40,5 +40,6 @@ export default connect().get(checkJWT, checkSchema({query: filterSchema}), async
             ...additionnalValues
         }
     });
+    console.log(req.body)
     res.status(204).end();
 })
