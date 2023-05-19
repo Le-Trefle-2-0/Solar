@@ -65,7 +65,7 @@ export async function getActiveEvent(user_id: bigint) {
             AND \`solar\`.\`calendar_events\`.\`daily_time_end\` >= "${todayHour.getHours()}:${todayHour.getMinutes()}") 
             LIMIT 1 OFFSET 0
     `;
-    let ev = await prisma_instance.$queryRawUnsafe(query)
+    let ev: any = await prisma_instance.$queryRawUnsafe(query)
     return ev[0] || null;
 }
 
