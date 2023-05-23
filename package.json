@@ -21,6 +21,8 @@
     "@fullcalendar/react": "^5.11.1",
     "@fullcalendar/timegrid": "^5.11.0",
     "@fullhuman/postcss-purgecss": "^4.1.3",
+    "@headlessui/react": "^1.7.14",
+    "@heroicons/react": "^2.0.18",
     "@hookform/resolvers": "^2.8.9",
     "@prisma/client": "^4.10.1",
     "@types/crypto-js": "^4.1.1",
