@@ -47,8 +47,6 @@ export default connect().get(checkJWT, async (req: NextApiRequestWithUser, res) 
                         <b>${messages.accounts.roles.name == "bot" ? "utilisateur" : messages.accounts.name}</b>
                         <br>
                         ${decodeURI(messages.content_encrypted)}
-                        <br>
-                        <small>&lt;discord message id: ${messages.discord_message_encrypted || "aucun"}&gt;</small>
                     </div>
                 `)).join("")}
             </body>
