@@ -16,17 +16,10 @@ const withTM = require("next-transpile-modules")([
   ]);
   
 
-let config = withTM(
+module.exports = withTM(
     {
         sassOptions: {
             includePaths: [path.join(__dirname, 'assets/stylesheets')]
         }
     }
 );
-
-config.webpack = (config) => {
-    config.experiments = {  ...config.experiments, topLevelAwait: true };
-    return config;
-}
-
-module.exports = config;
