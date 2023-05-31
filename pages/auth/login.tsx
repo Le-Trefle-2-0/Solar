@@ -21,6 +21,7 @@ export default function login(){
             data.user.is_admin = ["admin"].includes(data.user.roles.name);
             data.user.is_ref = ["admin", "be_ref"].includes(data.user.roles.name);
             data.user.is_bot = ["bot"].includes(data.user.roles.name);
+            data.user.is_listener = ["be"].includes(data.user.roles.name);
             setCookies("session", data);
             activeEventCtx.update();
             router.push("/");

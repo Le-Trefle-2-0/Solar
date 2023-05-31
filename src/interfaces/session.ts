@@ -12,4 +12,5 @@ export interface sessionAccount extends  Omit<accounts, 'password'> {
     is_admin: boolean,
     is_bot: boolean,
     is_ref: boolean,
+    is_listener: boolean,
 }
