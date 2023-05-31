@@ -20,6 +20,7 @@ export default function Listens(){
   const session =  useRef(getSession());
   let eventCtx = useContext(ReferenceActualEventContext);
   let [event, setEvent] = useState<calendar_events|undefined>(eventCtx.event.current);
+  console.log(eventCtx.event)
   let [selectedListenToAssign, setSelectedListenForAssign] = useState<ListenWithStatusAndAccounts>();
   let [selectedListenToComment, setSelectedListenToComment] = useState<ListenWithStatusAndAccounts>();
   
@@ -45,8 +46,7 @@ export default function Listens(){
             <th>Numéro</th>
             <th>Age de l'utilisateur</th>
             <th>Date début</th>
-            <th>Status</th>
-            { session.current?.user.is_ref ? <th>Nombre de bénévoles assignés</th> : null }
+            <th>Statut</th>
             <th></th>
           </tr>
         </thead>
@@ -57,13 +57,12 @@ export default function Listens(){
               <td>{l.is_user_minor ? "mineur" : "majeur"}</td>
               <td>{moment(l.date_time_start).format("DD/MM/YYYY HH:mm")}</td>
               <td>{l.listen_status.label}</td>
-              { session.current?.user.is_ref ? <td>{l.account_listen.length}</td> : null }
               <td className="flex justify-end">
-                {session.current?.user.is_ref && event ?
-                  <button className="btn py-0.5 -my-1 mr-2" onClick={()=>setSelectedListenForAssign(l)}>Assigner bénévoles</button>
-                : null}
+                {session.current?.user.is_ref ?
+                  <button className="btn py-0.5 -my-1 mr-2" onClick={()=>setSelectedListenForAssign(l)}>Assigner un bénévole</button>
+                : ''}
                 {l.listen_status.name !== 'closed'? <button className="btn py-0.5 -my-1" onClick={()=>router.push(`/listens/${l.id}`)}>Go <FontAwesomeIcon icon={faAngleRight} className="text-sm"/></button>
-                : !session.current?.user.is_bot? <button className="btn py-0.5 -my-1" onClick={()=>setSelectedListenToComment(l)}>Commenter l'écoute <FontAwesomeIcon icon={faAngleRight} className="text-sm"/></button> : ''}
+                : session.current?.user.is_listener ? <button className="btn py-0.5 -my-1" onClick={()=>setSelectedListenToComment(l)}>Rédiger la transmission <FontAwesomeIcon icon={faAngleRight} className="text-sm"/></button> : ''}
                 
               </td>
             </tr>
@@ -74,7 +73,7 @@ export default function Listens(){
           )}
         </tbody>
       </table>
-      <Modal isOpened={selectedListenToAssign !== undefined} title={`Assigner bénévole à l'écoute ${selectedListenToAssign?.id}`} onClose={()=>setSelectedListenForAssign(undefined)}>
+      <Modal isOpened={selectedListenToAssign !== undefined} title={`Assigner un bénévole à l'écoute ${selectedListenToAssign?.id}`} onClose={()=>setSelectedListenForAssign(undefined)}>
         <div className="p-8">
           <ListensForm key={Math.random()} listen={selectedListenToAssign} event={event} onSuccess={()=>{setSelectedListenForAssign(undefined);listensSwr.mutate()}} onCancel={()=>setSelectedListenForAssign(undefined)}/>
         </div>
