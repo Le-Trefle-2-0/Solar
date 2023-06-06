@@ -117,7 +117,7 @@ export default class SocketMessage{
             message.discord_message_encrypted = MessageEncryptService.decrypt(message.discord_message_encrypted);
             socket.to(ioData.listenSessions.filter(s=>s.id == session?.id).map(s=>s.socket_id)).emit(ClientEvents.new_message, message);
             socket.emit(ClientEvents.new_message, message);
-            globalThis.botSocket.emit('messageForBot', { content: decodeURI(messageStr), userID: listen?.user_discord_id_encrypted });
+            globalThis?.botSocket.emit('messageForBot', { content: decodeURI(messageStr), userID: listen?.user_discord_id_encrypted });
             console.log('msg sent to bot')
             return;
         }
