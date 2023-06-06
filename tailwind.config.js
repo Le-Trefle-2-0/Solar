@@ -3,6 +3,7 @@ minMawWidthHeightValues = {
   "200": "50rem",
   "62.5": "15.625rem",
   "8/10": "80%",
+  "half": "40vw",
 };
 
 module.exports = {

@@ -1,5 +1,5 @@
 import { faCalendarAlt, faMessage } from "@fortawesome/free-regular-svg-icons";
-import { faAlignLeft, faAngleUp, faBook, faUsers } from "@fortawesome/free-solid-svg-icons";
+import { faAlignLeft, faAngleUp, faBook, faUsers, faChartColumn } from "@fortawesome/free-solid-svg-icons";
 import Image from "next/image";
 import logo from "../../../assets/img/logo.png"
 import Dropdown, {DropdownDirection} from "../dropdown";
@@ -49,6 +49,7 @@ export default function Nav(){
             <>
               <NavLink text="Comptes" icon={faUsers} path="/accounts"/>
               <NavLink text="Transcripts" icon={faBook} path="/transcripts"/>
+              <NavLink text="Statistiques" icon={faChartColumn} path="/stats"/>
             </>
           : null
         }
