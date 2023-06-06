@@ -30,7 +30,6 @@ export default function Listens({listensSSR}: ServersideProps){
         <AuthenticatedLayout>
             <div className="flex items-center mb-8 justify-between">
                 <h2 className="">TRANSCRIPTS</h2>
-                <button className="btn py-0.5 -my-1" onClick={()=>{}}>Ajouter</button>
             </div>
             <table>
                 <thead> 

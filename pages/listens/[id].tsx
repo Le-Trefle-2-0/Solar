@@ -73,8 +73,6 @@ export default function Listens(){
     return classes.filter(Boolean).join(' ')
   }
 
-  let [selected, setSelected] = useState(people[0]);
-
   return (
     <AuthenticatedLayout>
       { socketState != SocketState.loaded ? 

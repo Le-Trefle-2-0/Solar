@@ -30,7 +30,7 @@ export default connect().get(checkJWT, async (req, res) => {
   res.status(200).send(await getCalendar());
 })
 .post(checkJWT, checkSchema({body: postSchema}), async (req: NextApiRequestWithUser, res) => {
-  if(!req.session.user.is_ref) {
+  if(!req.session.user.is_ref && !req.session.user.is_admin) {
       res.status(403).send("forbidden")
       return;
   }
@@ -47,6 +47,9 @@ export default connect().get(checkJWT, async (req, res) => {
     needed_roles = req.body.needed_roles;
     delete req.body.needed_roles;
   }
+
+  console.log(req.body)
+  req.body.type_id = 1;
 
   const calendar_events = await prisma_instance.calendar_events.create({data: req.body});
 

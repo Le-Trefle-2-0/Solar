@@ -32,6 +32,8 @@ model accounts {
   name                   String                   @unique(map: "name") @db.VarChar(192)
   password               String                   @db.VarChar(192)
   tel                    String?                  @db.VarChar(20)
+  last_listen_date       DateTime?                @db.Date
+  listen_count           Int                      @default(0)
   role_id                BigInt
   roles                  roles                    @relation(fields: [role_id], references: [id], onUpdate: Restrict, map: "accounts_ibfk_1")
   account_calendar_event account_calendar_event[]
@@ -64,6 +66,13 @@ model calendar_event_role_needed {
   @@index([calendar_event_id], map: "calendar_event_id")
 }
 
+model event_types {
+  id   BigInt @id @default(autoincrement())
+  name String @unique(map: "name") @db.VarChar(192)
+  label String @db.VarChar(192)
+  calendar_events calendar_events[]
+}
+
 model calendar_events {
   id                         BigInt                       @id @default(autoincrement())
   subject                    String                       @db.VarChar(192)
@@ -73,6 +82,8 @@ model calendar_events {
   daily_time_end             DateTime                     @db.Time(0)
   creator_id                 BigInt
   accounts                   accounts                     @relation(fields: [creator_id], references: [id], onUpdate: Restrict, map: "calendar_events_ibfk_1")
+  type_id                    BigInt
+  type                       event_types                   @relation(fields: [type_id], references: [id], onUpdate: Restrict, map: "calendar_events_ibfk_2")
   account_calendar_event     account_calendar_event[]
   calendar_event_message     calendar_event_message[]
   calendar_event_role_needed calendar_event_role_needed[]

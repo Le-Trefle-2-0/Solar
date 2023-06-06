@@ -29,7 +29,8 @@ export default function ListensForm({event, listen, onCancel, onSuccess}: FormPr
     const [showPostResult, setShowPostResult] = useState<boolean>(false)
     const [loading, setLoading] = useState<boolean>(false)
     const router = useRouter();
-    const accountsSwr = useSWR<accounts[]|null>(event?`/api/events/${event?.id}/getAccounts?role_names=be`:null, fetcher);
+    const accountsSwr = useSWR<accounts[]|null>(event ? `/api/events/${event?.id}/getAccounts?role_names=be` : null, fetcher);
+    
 
     let accounts = accountsSwr.data || [];
     if(typeof accountsSwr.data == "string") accounts = [];
@@ -49,10 +50,10 @@ export default function ListensForm({event, listen, onCancel, onSuccess}: FormPr
 
     return (
         <>
-            {showPostResult && <div className="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">Bénévole(s) correctement ajouté</div>}
+            {showPostResult && <div className="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">Bénévole correctement ajouté</div>}
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="mb-4">
-                    <label> Bénévoles</label>
+                    <label> Bénévole</label>
                     <Controller
                         control={control}
                         name="account_ids"

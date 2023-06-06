@@ -36,25 +36,27 @@ export default function Listens({rolesSSR}: ServersideProps){
         <AuthenticatedLayout>
             <div className="flex items-center mb-8 justify-between">
                 <h2 className="">COMPTES</h2>
-                <button className="btn py-0.5 -my-1" onClick={()=>setSelectedAccountToEdit(null)}>Ajouter</button>
+                <button className="btn py-0.5 -my-1" onClick={()=>setSelectedAccountToEdit(null)}>Créer un compte</button>
             </div>
             <table>
             <thead> 
                 <tr>
-                    <th>identifiant</th>
                     <th>Nom</th>
                     <th>Tel</th>
                     <th>Role</th>
+                    <th>Écoutes prises en charge</th>
+                    <th>Derniere écoute</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
                 { !!accounts && accounts.length > 0 ? accounts.map((a,k)=>(
                 <tr key={"listen" + a.id} className={`${k%2 == 1 ? "odd":""}`}>
-                    <td>{a.id}</td>
                     <td>{a.name}</td>
                     <td>{a.tel}</td>
                     <td>{a.roles.label}</td>
+                    <td>{a.listen_count}</td>
+                    <td>{a.last_listen_date}</td>
                     <td className="flex justify-end">
                         <button className="btn py-0.5 -my-1 mr-2" onClick={()=>setSelectedAccountToEdit(a)}>Modifier</button>
                         <button className="btn py-0.5 -my-1" onClick={async ()=>{
@@ -79,7 +81,7 @@ export default function Listens({rolesSSR}: ServersideProps){
             </Modal>
         </AuthenticatedLayout>
     );
-  }
+}
 
   export async function getServerSideProps(){
       return {props: {rolesSSR: JSON.parse(JSON.stringify(await getRoles()))} as ServersideProps};
