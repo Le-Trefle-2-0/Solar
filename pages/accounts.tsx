@@ -25,6 +25,9 @@ export default function Listens({rolesSSR}: ServersideProps){
     let [selectedAccountToEdit, setSelectedAccountToEdit] = useState<(Omit<accounts, "password"> & {roles: roles})|null>();
     const accountsSWR = useSWR<(Omit<accounts, "password"> & {roles: roles})[]|null>("/api/accounts", fetcher);
     let accounts = accountsSWR.data || [];
+    // for (let account of accounts) {
+    //     if (!account?.last_listen_date) account.last_listen_date = new Date();
+    // }
     if(typeof accountsSWR.data == "string") accounts = [];
       
     useEffect(()=>{
@@ -36,16 +39,36 @@ export default function Listens({rolesSSR}: ServersideProps){
         <AuthenticatedLayout>
             <div className="flex items-center mb-8 justify-between">
                 <h2 className="">COMPTES</h2>
+                <input type="text" onKeyUp={
+                    () => {
+                        if (document.getElementById("searchInput")) {
+                            let search = document.getElementById("searchInput").value.toLowerCase();
+                            let table = document.getElementById("userTable");
+                            let rows = table?.getElementsByTagName("tr");
+                            for (let i = 0; i < rows!.length; i++) {
+                                let td = rows![i].getElementsByTagName("td")[0];
+                                if (td) {
+                                    let txtValue = td.textContent || td.innerText;
+                                    if (txtValue.toLowerCase().indexOf(search) > -1) {
+                                        rows![i].style.display = "";
+                                    } else {
+                                        rows![i].style.display = "none";
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } placeholder="Rechercher" id="searchInput" className="min-w-0 max-w-[50%] flex-auto rounded-md border-0 px-3.5 py-2 shadow-sm ring-white/10 focus:ring-white/10"/>
                 <button className="btn py-0.5 -my-1" onClick={()=>setSelectedAccountToEdit(null)}>Créer un compte</button>
             </div>
-            <table>
+            <table id="userTable">
             <thead> 
                 <tr>
                     <th>Nom</th>
                     <th>Tel</th>
                     <th>Role</th>
                     <th>Écoutes prises en charge</th>
-                    <th>Derniere écoute</th>
+                    {/* <th>Derniere écoute</th> */}
                     <th></th>
                 </tr>
             </thead>
@@ -56,7 +79,7 @@ export default function Listens({rolesSSR}: ServersideProps){
                     <td>{a.tel}</td>
                     <td>{a.roles.label}</td>
                     <td>{a.listen_count}</td>
-                    <td>{a.last_listen_date}</td>
+                    {/* <td>{a.last_listen_date?.toLocaleDateString()}</td> */}
                     <td className="flex justify-end">
                         <button className="btn py-0.5 -my-1 mr-2" onClick={()=>setSelectedAccountToEdit(a)}>Modifier</button>
                         <button className="btn py-0.5 -my-1" onClick={async ()=>{
