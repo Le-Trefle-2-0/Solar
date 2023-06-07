@@ -20,7 +20,6 @@ export default function Listens(){
   const session =  useRef(getSession());
   let eventCtx = useContext(ReferenceActualEventContext);
   let [event, setEvent] = useState<calendar_events|undefined>(eventCtx.event.current);
-  console.log(eventCtx.event)
   let [selectedListenToAssign, setSelectedListenForAssign] = useState<ListenWithStatusAndAccounts>();
   let [selectedListenToComment, setSelectedListenToComment] = useState<ListenWithStatusAndAccounts>();
   
@@ -56,7 +55,7 @@ export default function Listens(){
               <td>{l.id}</td>
               <td>{l.is_user_minor ? "mineur" : "majeur"}</td>
               <td>{moment(l.date_time_start).format("DD/MM/YYYY HH:mm")}</td>
-              <td>{l.listen_status.label}</td>
+              <td>{ l.account_listen[0]?.accounts?.name ? ('Assignée a ' + l.account_listen[0].accounts.name) : 'Non assignée' }</td>
               <td className="flex justify-end">
                 {session.current?.user.is_ref ?
                   <button className="btn py-0.5 -my-1 mr-2" onClick={()=>setSelectedListenForAssign(l)}>Assigner un bénévole</button>

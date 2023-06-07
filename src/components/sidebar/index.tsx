@@ -13,6 +13,9 @@ import getSession from "../../utils/get_session";
 import { ReferenceActualEventContext } from "../../contexts/ReferenceGlobalCHatContext";
 import { SocketState } from "../../interfaces/socketState";
 import { ClientEvents } from "../../socket/Enums";
+import useSWR from "swr";
+import { ListenWithStatusAndAccounts } from "../../interfaces/listens";
+import fetcher from "../../utils/fetcher";
 
 export default function Nav(){
   let [ses, setSes] = useState<session|undefined>()
@@ -20,6 +23,9 @@ export default function Nav(){
   const session =  useRef(getSession());
   let eventCtx = useContext(ReferenceActualEventContext);
   let [showGlobalChatLink, setShowGlobalChatLink] = useState(eventCtx.globalChatSocketState.current != SocketState.deactivated);
+  const listensSwr = useSWR<ListenWithStatusAndAccounts[]|null>("/api/listens?not_done=true&with_users=true", fetcher);
+  let listens = listensSwr.data || [];
+  if(typeof listensSwr.data == "string") listens = [];
 
   useEffect(()=>{
     if(typeof document !== 'undefined') document.addEventListener('eventContextUpdated', updateShowGlobalChatLink);
@@ -37,7 +43,15 @@ export default function Nav(){
       <div className="sidebar-logo"><Image src={logo}/></div>
       <h4 className="sidebar-title">LE TREFLE 2.0</h4>
       <div className="sidebar-links-wrapper">
-        <NavLink text="Écoutes" icon={faMessage} path="/listens"/>
+        {
+          (session.current?.user.is_admin || session.current?.user.is_ref) ?
+          <NavLink text="Écoutes" icon={faMessage} path="/listens"/> : null
+        }
+        {
+          session.current?.user.is_listener ? (listens.map((l,k) => (
+            <NavLink text={`Écoute ${l.id}`} icon={faMessage} path={`/listens/${l.id}`}/>
+          ))) : null
+        }
         <NavLink text="Planning" icon={faCalendarAlt} path="/events"/>
         {
           showGlobalChatLink ? 
