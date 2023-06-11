@@ -31,10 +31,10 @@ export default connect().get(checkJWT, async (req: NextApiRequestWithUser, res) 
         <html>
             <head>
                 <meta charset="utf-8">
-                <title>Transcipt de l'écoute ${listen.id}</title>
+                <title>Transcript de l'écoute ${listen.id}</title>
             </head>
             <body style="font-family: sans-serif;">
-                <h1>Transcipt de l'écoute ${listen.id}</h1>
+                <h1>Transcript de l'écoute ${listen.id}</h1>
                 <h3 style="margin:0">Sujet principal: ${decodeURI(listen.main_subject_encrypted)}</h3>
                 <h4 style="margin:0">notes du bénévole:</h4>
                 <p style="margin:0">${decodeURI(listen.volunteer_notes_encrypted || "Aucune note")}</p>
