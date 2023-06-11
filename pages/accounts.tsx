@@ -14,6 +14,7 @@ import AuthenticatedLayout from "../src/layouts/authenticated-layout";
 import fetcher from "../src/utils/fetcher";
 import getSession from "../src/utils/get_session";
 import { getRoles } from "./api/roles";
+import { any } from "@hapi/joi";
 
 interface ServersideProps{
     rolesSSR: roles[]
@@ -41,24 +42,25 @@ export default function Listens({rolesSSR}: ServersideProps){
                 <h2 className="">COMPTES</h2>
                 <input type="text" onKeyUp={
                     () => {
-                        if (document.getElementById("searchInput")) {
-                            let search = document.getElementById("searchInput").value.toLowerCase();
-                            let table = document.getElementById("userTable");
-                            let rows = table?.getElementsByTagName("tr");
-                            for (let i = 0; i < rows!.length; i++) {
-                                let td = rows![i].getElementsByTagName("td")[0];
-                                if (td) {
-                                    let txtValue = td.textContent || td.innerText;
-                                    if (txtValue.toLowerCase().indexOf(search) > -1) {
-                                        rows![i].style.display = "";
-                                    } else {
-                                        rows![i].style.display = "none";
-                                    }
+                        let searchInput: any = document.getElementById("searchInput");
+                        if (!searchInput) searchInput = { value: "" }
+                        let search = searchInput?.value.toLowerCase();
+                        let table = document.getElementById("userTable");
+                        let rows = table?.getElementsByTagName("tr");
+                        for (let i = 0; i < rows!.length; i++) {
+                            let td = rows![i].getElementsByTagName("td")[0];
+                            if (td) {
+                                let txtValue = td.textContent || td.innerText;
+                                if (txtValue.toLowerCase().indexOf(search) > -1) {
+                                    rows![i].style.display = "";
+                                } else {
+                                    rows![i].style.display = "none";
                                 }
                             }
                         }
                     }
-                } placeholder="Rechercher" id="searchInput" className="min-w-0 max-w-[50%] flex-auto rounded-md border-0 px-3.5 py-2 shadow-sm ring-white/10 focus:ring-white/10"/>
+                } 
+                placeholder="Rechercher" id="searchInput" className="min-w-0 max-w-[50%] flex-auto rounded-md border-0 px-3.5 py-2 shadow-sm ring-white/10 focus:ring-white/10"/>
                 <button className="btn py-0.5 -my-1" onClick={()=>setSelectedAccountToEdit(null)}>Créer un compte</button>
             </div>
             <table id="userTable">
