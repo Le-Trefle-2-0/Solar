@@ -62,7 +62,8 @@ export default connect().get(checkJWT, checkSchema({query: filterSchema}), async
   let calendarEventForUser = await getActiveEvent(req.session.user.id);
 
   switch(req.session.user.roles.name){
-    case 'admin':case 'be_ref':
+    case 'admin':
+    case 'be_ref':
       filter = {
         listen_status: {
           name: {

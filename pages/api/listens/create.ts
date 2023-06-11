@@ -11,7 +11,6 @@ export default connect().post(checkJWT, async (req: NextApiRequestWithUser, res)
     let newListen: any = await prisma_instance.listens.create({
         data: req.body
     });
-
-    console.log(newListen);
+    
     res.status(200).send(newListen);
 });

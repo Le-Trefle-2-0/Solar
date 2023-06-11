@@ -10,7 +10,6 @@ export default connect().get(checkJWT, async (req, res) => {
     let listens = await prisma_instance.listens.findMany({ where: { user_discord_id_encrypted: req.query.discordID.toString() }});
     let listen = listens[listens.length - 1];
     if (listen) {
-        console.log(listen)
         res.status(200).send(listen)
     }
     else res.status(200).send(null)

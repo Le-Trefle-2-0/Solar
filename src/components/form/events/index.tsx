@@ -33,6 +33,7 @@ export default function EventsForm({roles, event, onCancel, onSuccess}: FormProp
     }});
     const [showPostResult, setShowPostResult] = useState<boolean>(false)
     const [loading, setLoading] = useState<boolean>(false)
+    const [error, setError] = useState<boolean>(false)
     const [_roles, setRoles] = useState(roles || []);
     const rolesSelected: needed_role[] = watch("needed_roles");
 
@@ -58,8 +59,9 @@ export default function EventsForm({roles, event, onCancel, onSuccess}: FormProp
                         onSuccess?.call(undefined)
                     }, 2000)
                 }
+                console.log(res)
             }).catch((e)=>{
-                //setError()
+                setError(true);
                 setLoading(false);
             });
     };
@@ -67,6 +69,8 @@ export default function EventsForm({roles, event, onCancel, onSuccess}: FormProp
     return (
         <>
             {showPostResult && <div className="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">Évenement correctement {event !== null ? "modifié" : "ajouté"}</div>}
+            {loading && <div className="mb-4 bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative" role="alert">Application des modifications en cours...</div>}
+            {error && <div className="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">Une erreur est survenue</div>}
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="mb-4">
                     <label> Sujet</label>

@@ -47,8 +47,7 @@ export default connect().get(checkJWT, async (req, res) => {
     needed_roles = req.body.needed_roles;
     delete req.body.needed_roles;
   }
-
-  console.log(req.body)
+  
   req.body.type_id = 1;
 
   const calendar_events = await prisma_instance.calendar_events.create({data: req.body});
