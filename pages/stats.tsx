@@ -24,7 +24,8 @@ export default function Stats(){
             borderColor: [
                 'rgba(255, 99, 132, 1)',
             ],
-            borderWidth: 2
+            borderWidth: 2,
+            lineTension: 0.3
         },
         {
             label: "Bénévoles",
@@ -35,7 +36,8 @@ export default function Stats(){
             borderColor: [
                 'rgba(54, 162, 235, 1)',
             ],
-            borderWidth: 2
+            borderWidth: 2,
+            lineTension: 0.3
         }]
     });
     const [ListenAge] = useState({
@@ -82,6 +84,11 @@ export default function Stats(){
                                 display: true,
                                 text: "Écoutes par jour"
                             }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
                         }
                     }} />
                     <Bar data={ListenAge} options={{
@@ -89,6 +96,11 @@ export default function Stats(){
                             title: {
                                 display: true,
                                 text: "Écoutes par tranche d'âge"
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
                             }
                         }
                     }} />
