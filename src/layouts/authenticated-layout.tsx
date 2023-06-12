@@ -25,7 +25,7 @@ export default function  AuthenticatedLayout({children} : React.PropsWithChildre
   return(
     <div className="flex h-full relative items-stretch">
       <Nav/>
-      <div className="flex-1 p-8 overflow-auto">
+      <div className="flex-1 p-8 overflow-auto content">
         {children}
       </div>
     </div>

@@ -40,11 +40,14 @@ export default function Nav(){
 
   return(
     <div className="responsive-sidebar">
-      <div className="sidebar-toggle my-10 mx-2 fixed lg:hidden" onClick={() => {
+      <div className="sidebar-toggle my-10 mx-2 fixed z-50 lg:hidden" onClick={() => {
         let sidebar = document.querySelector(".sidebar") as HTMLElement;
         sidebar.classList.toggle("w-0");
         sidebar.classList.toggle("fixed")
         sidebar.classList.toggle("w-screen");
+
+        let content = document.querySelector(".content") as HTMLElement;
+        content.classList.toggle("hidden");
       }}>
         <FontAwesomeIcon icon={faBars} className=""/>
       </div>

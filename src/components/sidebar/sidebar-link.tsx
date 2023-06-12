@@ -23,8 +23,7 @@ export default function NavLink({text, icon, path, socket, socketEvent} : NavLin
     }
   }, [])
 
-  let isSameRouteStart = router.pathname.startsWith(path);
-  console.log(router.pathname, path, isSameRouteStart);
+  let isSameRouteStart = router.pathname == (path);
   let isSameRoute = router.pathname == path;
 
   return (
