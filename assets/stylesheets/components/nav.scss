@@ -1,5 +1,5 @@
 nav.sidebar{
-    @apply bg-trefle-light-green min-w-62.5 h-full flex flex-col overflow-hidden relative lg:hidden;
+    @apply bg-trefle-light-green h-full flex flex-col overflow-hidden relative;
     &:before{
         content: "";
         @apply block w-2.5 drop-shadow-nav bg-white absolute top-0 bottom-0 right-0 transform translate-x-full;
