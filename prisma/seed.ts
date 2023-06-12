@@ -39,6 +39,13 @@ import prisma_instance from "../src/utils/prisma_instance";
     ]
   })
 
+  await prisma_instance.event_types.createMany({
+    data: [
+      { name: "permanent", label: "Permanence" },
+      { name: "formation", label: "Formation" },
+    ]
+  })
+
   await prisma_instance.calendar_events.createMany({
     data: [
       {
@@ -47,7 +54,8 @@ import prisma_instance from "../src/utils/prisma_instance";
         date_end: null,
         daily_time_start: new Date().toISOString(),
         daily_time_end: new Date().toISOString(),
-        creator_id: 1
+        creator_id: 1,
+        type_id: 1,
       },
   ]
   })
