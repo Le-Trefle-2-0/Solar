@@ -12,10 +12,13 @@ import ChatInput from "../../src/components/chat_input";
 import { messages } from "@prisma/client";
 import ChatBubble from "../../src/components/chat_bubble";
 import getSession from "../../src/utils/get_session";
+import Modal from "../../src/components/modal";
+import CommentsForm from "../../src/components/form/comments";
 import { SocketState } from "../../src/interfaces/socketState";
 import { Listbox, Transition } from '@headlessui/react';
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
 import prisma_instance from "../../src/utils/prisma_instance";
+import fetcher from "../../src/utils/fetcher";
 
 type listenMessage = (messages & { accounts: { id: bigint; name: string; }; });
 
@@ -28,6 +31,9 @@ export default function Listens(){
   const [socket, setSocket] = useState<Socket>();
   const messagesRef = useRef(messages);
   const messagesContainerRef = useRef<HTMLDivElement>();
+  let [selectedListenToAssign, setSelectedListenForAssign] = useState<ListenWithStatusAndAccounts>();
+  let [selectedListenToComment, setSelectedListenToComment] = useState<ListenWithStatusAndAccounts>();
+  const listensSwr = useSWR<ListenWithStatusAndAccounts[]|null>("/api/listens?not_done=true&with_users=true", fetcher);
 
   if(listenSwr.data && socketState == SocketState.deactivated){
     setSocketState(SocketState.loading);
@@ -55,9 +61,10 @@ export default function Listens(){
     }
   }, [socketState]);
 
-
+  console.log(router.query.id);
   useEffect(()=>{
     messagesRef.current = messages;
+    if (!session.current?.user.is_admin && !session.current?.user.is_ref && !session.current?.user.is_training && (listen && listen.account_listen.length > 0 && listen?.account_listen[0].account_id == session.current?.user.id)) router.push("/");
   }, [messages]);
 
   function addMessage(data: listenMessage){
@@ -102,7 +109,16 @@ export default function Listens(){
             { messages ? messages.map((m)=><ChatBubble key={"message_"+m.id} text={decodeURIComponent(m.content_encrypted)} author={m.accounts.name} is_me={m.accounts.id == session.current?.user.id}/>) : null}
             <div ref={messagesContainerRef as LegacyRef<HTMLDivElement>} />
           </div>
-          <ChatInput onSubmitText={submitText}/>
+          { (listenSwr.data && listenSwr.data.listen_status.name == 'closed') ? 
+          
+            <Modal isOpened={selectedListenToComment !== undefined} title={`Commenter l'écoute ${selectedListenToAssign?.id}`} onClose={()=>setSelectedListenToComment(undefined)}>
+              <div className="p-8">
+                <CommentsForm key={Math.random()} listen={selectedListenToComment} onSuccess={()=>{setSelectedListenToComment(undefined);listensSwr.mutate()}} onCancel={()=>setSelectedListenToComment(undefined)}/>
+              </div>
+            </Modal> :
+
+            <ChatInput onSubmitText={submitText}/>
+          }
         </div>
 
       }

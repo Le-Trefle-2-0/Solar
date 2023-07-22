@@ -10,6 +10,7 @@ import prisma_instance from "../src/utils/prisma_instance";
       {name:"bot", label:"Bot"},
       {name:"be", label:"Bénévole"},
       {name:"be_ref", label:"Bénévole Référent"},
+      {name:"training", label:"Bénévole en Formation"},
     ]
   })
   await prisma_instance.accounts.createMany({
