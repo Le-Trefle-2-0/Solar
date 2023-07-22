@@ -15,12 +15,13 @@ import fetcher from "../src/utils/fetcher";
 import getSession from "../src/utils/get_session";
 import { getRoles } from "./api/roles";
 import { any } from "@hapi/joi";
+import { InferGetServerSidePropsType } from "next";
 
 interface ServersideProps{
     rolesSSR: roles[]
 }
 
-export default function Listens({rolesSSR}: ServersideProps){
+export default function Listens({rolesSSR}: InferGetServerSidePropsType<typeof getServerSideProps>){
     const router = useRouter();
     const session = useRef(getSession());
     let [selectedAccountToEdit, setSelectedAccountToEdit] = useState<(Omit<accounts, "password"> & {roles: roles})|null>();
@@ -70,7 +71,7 @@ export default function Listens({rolesSSR}: ServersideProps){
                     <th>Tel</th>
                     <th>Role</th>
                     <th>Écoutes prises en charge</th>
-                    {/* <th>Derniere écoute</th> */}
+                    <th>Derniere écoute</th>
                     <th></th>
                 </tr>
             </thead>
@@ -81,7 +82,7 @@ export default function Listens({rolesSSR}: ServersideProps){
                     <td>{a.tel}</td>
                     <td>{a.roles.label}</td>
                     <td>{a.listen_count}</td>
-                    {/* <td>{a.last_listen_date?.toLocaleDateString()}</td> */}
+                    <td>{a.last_listen_date ? new Date(a.last_listen_date).toLocaleDateString('fr-FR') : 'Aucune'}</td>
                     <td className="flex justify-end">
                         <button className="btn py-0.5 -my-1 mr-2" onClick={()=>setSelectedAccountToEdit(a)}>Modifier</button>
                         <button className="btn py-0.5 -my-1" onClick={async ()=>{
