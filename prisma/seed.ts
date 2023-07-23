@@ -8,18 +8,19 @@ import prisma_instance from "../src/utils/prisma_instance";
     data: [
       {name:"admin", label: "Admin"},
       {name:"bot", label:"Bot"},
-      {name:"be", label:"Bénévole"},
-      {name:"be_ref", label:"Bénévole Référent"},
+      {name:"be", label:"Bénévole Écoutant"},
+      {name:"be_ref", label:"Référent Bénévole Écoutant"},
       {name:"training", label:"Bénévole en Formation"},
     ]
   })
   await prisma_instance.accounts.createMany({
     data: [
       //Evidement, il ne faut pas utiliser ce compte en prod
-      {name:"admin", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 1, tel: "0123456789" },
-      {name:"be", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 3, tel: "0123456789" },
-      {name:"be_ref", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 4, tel: "0123456789" },
-      {name:"bot", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 2, tel: "" }
+      {name:"admin", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 1, tel: "" },
+      {name:"be", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 3, tel: "" },
+      {name:"be_ref", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 4, tel: "" },
+      {name:"bot", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 2, tel: "" },
+      {name:"nbe", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 5, tel: "" },
     ]
   })
   await prisma_instance.listen_status.createMany({
