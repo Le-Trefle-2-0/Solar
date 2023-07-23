@@ -92,6 +92,9 @@ export default function Nav(){
               removeCookies("session");
               router.reload();
             }}>Déconnexion</div>
+            <div className="btn white" onClick={()=>{
+              router.push("/settings");
+            }}>Paramètres</div>
           </Dropdown>
         </div>
       </nav>
