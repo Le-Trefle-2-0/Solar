@@ -27,9 +27,6 @@ export default function Listens({rolesSSR}: InferGetServerSidePropsType<typeof g
     let [selectedAccountToEdit, setSelectedAccountToEdit] = useState<(Omit<accounts, "password"> & {roles: roles})|null>();
     const accountsSWR = useSWR<(Omit<accounts, "password"> & {roles: roles})[]|null>("/api/accounts", fetcher);
     let accounts = accountsSWR.data || [];
-    // for (let account of accounts) {
-    //     if (!account?.last_listen_date) account.last_listen_date = new Date();
-    // }
     if(typeof accountsSWR.data == "string") accounts = [];
       
     useEffect(()=>{
