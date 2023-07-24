@@ -9,7 +9,7 @@ import checkSchema from "../../../src/middlewares/checkSchema";
 
 
 const schema = object({
-  name: string().required(),
+  email: string().required(),
   password: string().required()
 })
 
