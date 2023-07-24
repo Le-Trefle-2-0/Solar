@@ -1,9 +1,9 @@
 import connect from "next-connect";
 import { generate } from 'rand-token';
 import nodemailer from "nodemailer";
-import prisma_instance from "../../../../src/utils/prisma_instance";
+import prisma_instance from "../../../src/utils/prisma_instance";
 import { object, string } from "yup";
-import checkSchema from "../../../../src/middlewares/checkSchema";
+import checkSchema from "../../../src/middlewares/checkSchema";
 
 const schema = object({
   email: string().required()
