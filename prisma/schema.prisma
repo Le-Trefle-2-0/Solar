@@ -32,6 +32,7 @@ model accounts {
   name                   String                   @unique(map: "name") @db.VarChar(192)
   email                  String                   @unique(map: "email") @db.VarChar(192)
   password               String                   @db.VarChar(192)
+  recovery_token         String?                  @db.VarChar(192)
   last_listen_date       DateTime?                @db.Date
   listen_count           Int                      @default(0)
   role_id                BigInt
