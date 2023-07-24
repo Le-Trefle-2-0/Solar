@@ -1,11 +1,11 @@
 import { useRouter } from "next/router";
 import { useContext, useState } from "react";
-import { ReferenceActualEventContext } from "../../src/contexts/ReferenceGlobalCHatContext";
-import session from "../../src/interfaces/session";
-import RecoverLayout from "../../src/layouts/recover-layout";
-import fetcher from "../../src/utils/fetcher";
+import { ReferenceActualEventContext } from "../../../src/contexts/ReferenceGlobalCHatContext";
+import session from "../../../src/interfaces/session";
+import RecoverLayout from "../../../src/layouts/recover-layout";
+import fetcher from "../../../src/utils/fetcher";
 
-export default function login(){
+export default function recover(){
     const [email, setEmail] = useState("");
     const [error, setError] = useState(false);
     const [success, setSuccess] = useState(false);
