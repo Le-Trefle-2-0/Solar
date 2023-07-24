@@ -16,11 +16,11 @@ import prisma_instance from "../src/utils/prisma_instance";
   await prisma_instance.accounts.createMany({
     data: [
       //Evidement, il ne faut pas utiliser ce compte en prod
-      {name:"admin", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 1, tel: "" },
-      {name:"be", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 3, tel: "" },
-      {name:"be_ref", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 4, tel: "" },
-      {name:"bot", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 2, tel: "" },
-      {name:"nbe", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 5, tel: "" },
+      {name:"admin", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 1, email: "admin@letrefle.org" },
+      {name:"be", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 3, email: "be@letrefle.org" },
+      {name:"rbe", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 4, email: "rbe@letrefle.org" },
+      {name:"bot", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 2, email: "bot@letrefle.org" },
+      {name:"nbe", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 5, email: "nbe@letrefle.org" },
     ]
   })
   await prisma_instance.listen_status.createMany({

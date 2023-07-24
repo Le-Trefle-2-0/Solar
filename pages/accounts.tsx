@@ -65,7 +65,7 @@ export default function Listens({rolesSSR}: InferGetServerSidePropsType<typeof g
             <thead> 
                 <tr>
                     <th>Nom</th>
-                    <th>Tel</th>
+                    <th>Courriel</th>
                     <th>Role</th>
                     <th>Écoutes prises en charge</th>
                     <th>Derniere écoute</th>
@@ -76,7 +76,7 @@ export default function Listens({rolesSSR}: InferGetServerSidePropsType<typeof g
                 { !!accounts && accounts.length > 0 ? accounts.map((a,k)=>(
                 <tr key={"listen" + a.id} className={`${k%2 == 1 ? "odd":""}`}>
                     <td>{a.name}</td>
-                    <td>{a.tel}</td>
+                    <td>{a.email}</td>
                     <td>{a.roles.label}</td>
                     <td>{a.listen_count}</td>
                     <td>{a.last_listen_date ? new Date(a.last_listen_date).toLocaleDateString('fr-FR') : 'Aucune'}</td>
