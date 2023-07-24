@@ -24,7 +24,7 @@ export default function AccountForm({roles, account, onCancel, onSuccess}: FormP
         role_id: account? parseInt(account.role_id.toString()) : null,
         name: account?.name,
         password: "",
-        tel: account?.tel
+        email: account?.email
     }});
     const [showPostResult, setShowPostResult] = useState<boolean>(false)
     const [loading, setLoading] = useState<boolean>(false)
@@ -55,10 +55,10 @@ export default function AccountForm({roles, account, onCancel, onSuccess}: FormP
                     <div className="text-red-500">{errors.name?.message}</div>
                 </div>
                 <div className="mb-4">
-                    <label>Numéro de téléphone</label>
-                    <input className={`field ${errors.tel?.message ? "error" : ""}`}
-                    type="text" {...register("tel")}/>
-                    <div className="text-red-500">{errors.tel?.message}</div>
+                    <label>Courriel</label>
+                    <input className={`field ${errors.email?.message ? "error" : ""}`}
+                    type="text" {...register("email")}/>
+                    <div className="text-red-500">{errors.email?.message}</div>
                 </div>
                 <div className="mb-4">
                     <label>Rôle</label>
