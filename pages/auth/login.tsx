@@ -7,7 +7,7 @@ import LoginLayout from "../../src/layouts/login-layout";
 import fetcher from "../../src/utils/fetcher";
 
 export default function login(){
-    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState(false);
     const router = useRouter();
@@ -15,8 +15,8 @@ export default function login(){
 
     async function handleLogin(e: React.SyntheticEvent){
         e.preventDefault();
-        if(name == "" || password == "") {setError(true); return;}
-        let data = await fetcher<session>("/api/auth/login", "POST", {name:name, password:password}).catch(()=>null);
+        if(email == "" || password == "") {setError(true); return;}
+        let data = await fetcher<session>("/api/auth/login", "POST", {email:email, password:password}).catch(()=>null);
         if(data == null || !data.jwt){setError(true);} else {
             data.user.is_admin = ["admin"].includes(data.user.roles.name);
             data.user.is_ref = ["admin", "be_ref"].includes(data.user.roles.name);
@@ -35,10 +35,10 @@ export default function login(){
             <form onSubmit={handleLogin} className="flex flex-col items-center w-full">
                 <input 
                     type="text"
-                    defaultValue={name}
-                    onChange={({currentTarget:{value}})=>{setName(value);setError(false)}}
+                    defaultValue={email}
+                    onChange={({currentTarget:{value}})=>{setEmail(value);setError(false)}}
                     className="field mt-8"
-                    placeholder="Identifiant" 
+                    placeholder="Adresse courriel" 
                 />
                 <input 
                     type="password"
@@ -47,8 +47,9 @@ export default function login(){
                     className="field mt-8"
                     placeholder="Mot de passe"
                 />
-                <small className={`text-red-500 ${error?"opacity-100":"opacity-0"}`}>Les identifiants sont invalides</small>
+                <small className={`text-red-500 ${error?"opacity-100":"opacity-0"}`}>Email ou mot de passe invalide !</small>
                 <input type="submit" value="Se connecter" className="btn mt-8"/>
+                <a href="/auth/recover" className="mt-8 h-4">Mot de passe oublié ?</a>
             </form>
         </LoginLayout>
     )

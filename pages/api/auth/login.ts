@@ -17,7 +17,7 @@ export default connect().post(checkSchema({body: schema}), async (req, res) => {
   let acc = await prisma_instance.accounts.findFirst({
     where: {
       password: Base64.stringify(cryptoJS.SHA512(req.body.password)),
-      name: req.body.name
+      email: req.body.email
     },
     include: {
       roles: true
