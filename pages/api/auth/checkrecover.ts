@@ -9,11 +9,10 @@ const schema = object({
   token: string().required()
 })
 
-export default connect().post(checkSchema({body: schema}), async (req, res) => {
-    console.log('check recovery')
+export default connect().get(checkSchema({query: schema}), async (req, res) => {
     let acc = await prisma_instance.accounts.findFirst({
         where: {
-            recovery_token: req.body.token
+            recovery_token: req.query.token as string
         }
     });
     if (acc) {

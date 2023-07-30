@@ -12,6 +12,8 @@ const schema = object({
 })
 
 export default connect().post(checkSchema({body: schema}), async (req, res) => {
+    console.log('password reset')
+    console.log(req.body)
     let acc = await prisma_instance.accounts.findFirst({
         where: {
             recovery_token: req.body.token
@@ -24,7 +26,7 @@ export default connect().post(checkSchema({body: schema}), async (req, res) => {
     }
 
     acc.recovery_token = null;
-    acc.password =  crypto.createHash("sha512").update(acc.password).digest("base64")
+    acc.password = crypto.createHash("sha512").update(req.body.password).digest("base64")
     await prisma_instance.accounts.update({
         where: {
             id: acc.id
