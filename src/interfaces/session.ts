@@ -8,9 +8,7 @@ export default interface session{
 
 export type sessionAccountWithRoles = sessionAccount & {
     roles: roles, 
-    password?:string,
-    otp_secret?:string
-    otp_enabled?:boolean
+    password?:string
 };
 
 export interface sessionAccount extends Omit<accounts, 'password'> {

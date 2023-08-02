@@ -7,6 +7,7 @@ import session, { sessionAccountWithRoles } from "../../../src/interfaces/sessio
 import prisma_instance from "../../../src/utils/prisma_instance";
 import { object, string } from "yup";
 import checkSchema from "../../../src/middlewares/checkSchema";
+import { de } from "yup-locales";
 
 const schema = object({
   email: string().required(),
@@ -16,7 +17,7 @@ const schema = object({
 
 export default connect().post(checkSchema({body: schema}), async (req, res) => {
   console.log(req.body)
-  let acc = await prisma_instance.accounts.findFirst({
+  let fullAccount = await prisma_instance.accounts.findFirst({
     where: {
       password: Base64.stringify(cryptoJS.SHA512(req.body.password)),
       email: req.body.email
@@ -24,13 +25,15 @@ export default connect().post(checkSchema({body: schema}), async (req, res) => {
     include: {
       roles: true
     }
-  }) as sessionAccountWithRoles;
+  });
+  let acc = fullAccount as sessionAccountWithRoles;
   if(acc){
     delete acc.password;
+    acc.otp_token = null;
     console.log(acc)
-    if (req.body.otp && acc.otp_token) {
-      console.log(totp(acc.otp_token), req.body.otp)
-      if (totp(acc.otp_token) === req.body.otp) {
+    if (req.body.otp && fullAccount?.otp_token) {
+      console.log(totp(fullAccount.otp_token), req.body.otp)
+      if (totp(fullAccount.otp_token) === req.body.otp) {
         res.status(200).send({
           jwt: sign(
             acc,

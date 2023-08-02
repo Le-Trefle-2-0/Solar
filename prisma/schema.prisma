@@ -44,7 +44,6 @@ model accounts {
   messages               messages[]
 
   otp_enabled            Boolean                  @default(false)
-  otp_timestamp          DateTime?                @db.DateTime(0) @default(now())
   otp_token              String?                  @db.VarChar(192) @default("")
 
   @@index([role_id], map: "role_id")
