@@ -11,7 +11,7 @@
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   },
   "dependencies": {
-    "@capacitor/android": "^5.0.5",
+    "@capacitor/android": "^5.2.2",
     "@capacitor/cli": "^5.0.5",
     "@capacitor/core": "^5.0.5",
     "@fortawesome/fontawesome-svg-core": "^6.4.0",
@@ -37,6 +37,7 @@
     "@types/react": "^17.0.45",
     "@types/react-click-outside-hook": "^1.0.0",
     "@types/react-dom": "^17.0.17",
+    "@types/react-modal": "^3.16.0",
     "@types/socket.io": "^3.0.2",
     "autoprefixer": "^10.4.4",
     "axios": "^1.4.0",
