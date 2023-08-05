@@ -7,7 +7,6 @@ import session, { sessionAccountWithRoles } from "../../../src/interfaces/sessio
 import prisma_instance from "../../../src/utils/prisma_instance";
 import { object, string } from "yup";
 import checkSchema from "../../../src/middlewares/checkSchema";
-import { de } from "yup-locales";
 
 const schema = object({
   email: string().required(),
