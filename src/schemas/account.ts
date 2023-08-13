@@ -16,5 +16,6 @@ export const putSchema = object({
     name: string(),
     email: string().matches(emailRegex, {message: 'Courriel invalide.', excludeEmptyString: true}),
     password: string(),
+    currPassword: string(),
     role_id: number()
 });
