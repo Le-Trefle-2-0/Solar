@@ -58,7 +58,7 @@ export default function Listens({listensSSR}: ServersideProps){
                         </tr>
                     )) : (
                         <tr>
-                            <td colSpan={4}>Aucune écoute transcriptable n'a été trouvée</td>
+                            <td colSpan={4}>Aucun transcript n'a été trouvé</td>
                         </tr>
                     )}
                 </tbody>

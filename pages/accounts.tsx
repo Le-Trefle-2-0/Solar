@@ -92,7 +92,7 @@ export default function Listens({rolesSSR}: InferGetServerSidePropsType<typeof g
                 </tr>
                 )) : (
                 <tr>
-                    <td colSpan={4}>Aucune écoute n'a été trouvé</td>
+                    <td colSpan={4}>Aucun compte n'a été trouvé</td>
                 </tr>
                 )}
             </tbody>
