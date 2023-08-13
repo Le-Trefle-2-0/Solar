@@ -14,14 +14,13 @@ interface ServersideProps{
 
 type FormProps = PropsWithChildren<{
     roles: roles[],
-    account: Omit<accounts, "password"> & {password ?: string, roles: roles} | null,
+    account: Omit<accounts, "password"> & {password ?: string} | null,
     onCancel?: () => void,
     onSuccess?: () => void
 }>
 
 export default function SettingsForm({roles, account, onCancel, onSuccess}: FormProps){
     const {register, handleSubmit, formState: { errors }, control, setValue} = useForm({resolver: yupResolver(account?putSchema:postSchema), defaultValues:{
-        role_id: account? parseInt(account.role_id.toString()) : null,
         name: account?.name,
         password: "",
         email: account?.email
@@ -55,17 +54,10 @@ export default function SettingsForm({roles, account, onCancel, onSuccess}: Form
                     <div className="text-red-500">{errors.name?.message}</div>
                 </div>
                 <div className="mb-4">
-                    <label>Numéro de téléphone</label>
+                    <label>Adresse courriel</label>
                     <input className={`field ${errors.email?.message ? "error" : ""}`}
                     type="text" {...register("email")}/>
                     <div className="text-red-500">{errors.email?.message}</div>
-                </div>
-                <div className="mb-4">
-                    <label>{account ? "Changer le mot de passe ?" : "Mot de passe"}</label>
-                    <input className={`field ${errors.password?.message ? "error" : ""}`}
-                    type="text" {...register("password")}/>
-                    {account ? <div>Ne replissez ce champ que si vous souhaitez changer votre mot de passe !</div> : null}
-                    <div className="text-red-500">{errors.password?.message}</div>
                 </div>
                 <div className="flex justify-end">
                     <input type="button" value="Annuler" className="btn fake-white mr-2" onClick={()=> {onCancel?.call(undefined)}}/>
