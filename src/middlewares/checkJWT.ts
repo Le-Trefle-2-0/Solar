@@ -28,7 +28,7 @@ export async function getSessionFromJWT(req: NextApiRequest, res: NextApiRespons
     if(!ses && !headerAuth)  return null;
     const jwt = ses ? ses.jwt : headerAuth!.replace("Bearer ", "");
     try{
-        const jwtPayload: JwtPayload | string = verify(jwt, process.env.JWT_SECRET || "secret");
+        const jwtPayload: JwtPayload | string = verify(jwt || "", process.env.JWT_SECRET || "secret");
         if(jwtPayload && typeof jwtPayload != "string"){
             let user = await prisma_instance.accounts.findFirst({
                 where:{id: jwtPayload.id},
@@ -40,7 +40,8 @@ export async function getSessionFromJWT(req: NextApiRequest, res: NextApiRespons
             delete user.password;
             return {
                 jwt: jwt,
-                user: user
+                user: user,
+                otp: user.otp_enabled
             };
         }
     } catch {}
