@@ -35,7 +35,7 @@ export default function TwoFactorAuthModal({ isOpen, onClose, qrData, userID }: 
 
   return (
       <div className="modal-content flex flex-center flex-col p-1">
-        <QRCode className="w-screen" value={qrData} />
+        <QRCode className="w-screen" value={`otpauth://totp/Solar?secret=${qrData}&issuer=Le%20Tr%C3%A8fle%202.0`} />
         <p className="modal-text">
           Code manuel :<br/>
           <strong>{qrData}</strong>
