@@ -33,7 +33,6 @@ export default function login(){
         e.preventDefault();
         if(email == "" || password == "") {setError(true); return;}
         let data = await fetcher<session>("/api/auth/login", "POST", {email:email, password:password}).catch(()=>null);
-        console.log(data)
         if(data == null) {
             setError(true);
         } else if (data.user.otp_enabled) {
