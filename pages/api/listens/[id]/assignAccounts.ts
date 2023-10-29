@@ -13,9 +13,14 @@ export default connect().put(checkJWT, checkSchema({body: assignSchema}), async 
         res.status(403).send("forbidden")
         return;
     }
+    await prisma_instance.listens.update({
+        where: {id: listenId},
+        data: {listen_status_id: 2}
+    });
     await prisma_instance.account_listen.deleteMany({
         where: {listen_id: listenId},
     });
+    console.log(req.body.account_ids)
     await prisma_instance.account_listen.createMany({
         data: req.body.account_ids.map((id: number) => ({account_id: id, listen_id: listenId}))
     });
