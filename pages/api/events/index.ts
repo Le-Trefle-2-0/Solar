@@ -27,10 +27,11 @@ export async function getCalendar() {
 }
 
 export default connect().get(checkJWT, async (req, res) => {
+  console.log(req.session)
   res.status(200).send(await getCalendar());
 })
 .post(checkJWT, checkSchema({body: postSchema}), async (req: NextApiRequestWithUser, res) => {
-  if(!req.session.user.is_ref && !req.session.user.is_admin) {
+  if(!req.session.user.is_ref && !req.session.user.is_admin && !req.session.user.is_bot) {
       res.status(403).send("forbidden")
       return;
   }
