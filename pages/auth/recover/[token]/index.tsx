@@ -7,7 +7,6 @@ import useSWR from "swr";
 
 export default function reset(){  
     const router = useRouter();
-    console.log('resettings pwd')  
     const [password, setPassword] = useState("");
     const [error, setError] = useState(false);
     const [success, setSuccess] = useState(false);
