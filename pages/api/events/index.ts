@@ -27,7 +27,6 @@ export async function getCalendar() {
 }
 
 export default connect().get(checkJWT, async (req, res) => {
-  console.log(req.session)
   res.status(200).send(await getCalendar());
 })
 .post(checkJWT, checkSchema({body: postSchema}), async (req: NextApiRequestWithUser, res) => {
