@@ -59,7 +59,6 @@ export default function EventsForm({roles, event, onCancel, onSuccess}: FormProp
                         onSuccess?.call(undefined)
                     }, 2000)
                 }
-                console.log(res)
             }).catch((e)=>{
                 setError(true);
                 setLoading(false);

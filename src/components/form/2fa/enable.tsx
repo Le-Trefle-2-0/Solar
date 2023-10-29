@@ -25,7 +25,6 @@ export default function TwoFactorAuthModal({ isOpen, onClose, qrData, userID }: 
       });
       if (res) {
         if (res.startsWith('invalid')) return setError('Code invalide');
-        console.log(res);
         setSuccess(true);
         setTimeout(() => {
           router.push('/auth/login')

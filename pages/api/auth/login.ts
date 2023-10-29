@@ -15,7 +15,6 @@ const schema = object({
 });
 
 export default connect().post(checkSchema({body: schema}), async (req, res) => {
-  console.log(req.body)
   let fullAccount = await prisma_instance.accounts.findFirst({
     where: {
       password: Base64.stringify(cryptoJS.SHA512(req.body.password)),
@@ -29,9 +28,7 @@ export default connect().post(checkSchema({body: schema}), async (req, res) => {
   if(acc){
     delete acc.password;
     acc.otp_token = null;
-    console.log(acc)
     if (req.body.otp && fullAccount?.otp_token) {
-      console.log(totp(fullAccount.otp_token), req.body.otp)
       if (totp(fullAccount.otp_token) === req.body.otp) {
         res.status(200).send({
           jwt: sign(

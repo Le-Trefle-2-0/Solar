@@ -20,7 +20,6 @@ export default connect().put(checkJWT, checkSchema({body: assignSchema}), async 
     await prisma_instance.account_listen.deleteMany({
         where: {listen_id: listenId},
     });
-    console.log(req.body.account_ids)
     await prisma_instance.account_listen.createMany({
         data: req.body.account_ids.map((id: number) => ({account_id: id, listen_id: listenId}))
     });
