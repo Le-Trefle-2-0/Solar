@@ -42,7 +42,7 @@ export default function Listens(){
   const listen = listenSwr.data || null;
 
   useEffect(()=>{
-    if(socketState == SocketState.unauthenticated) {router.push("/auth/login");}
+    if(socketState == SocketState.unauthenticated) {router.push("/auth/login");console.log('unauth')}
     if(listenSwr.data && listenSwr.data.listen_status.name == 'closed'){router.push("/listens");}
     if(socketState == SocketState.loading && listen  != null ){
       (async()=>{
@@ -61,7 +61,6 @@ export default function Listens(){
     }
   }, [socketState]);
 
-  console.log(router.query.id);
   useEffect(()=>{
     messagesRef.current = messages;
     if (!session.current?.user.is_admin && !session.current?.user.is_ref && !session.current?.user.is_training && (listen && listen.account_listen.length > 0 && listen?.account_listen[0].account_id == session.current?.user.id)) router.push("/");
