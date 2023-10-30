@@ -44,7 +44,7 @@
     "browserlist": "^1.0.1",
     "chart.js": "^4.3.0",
     "cookies-next": "^2.0.4",
-    "crypto-js": "^4.1.1",
+    "crypto-js": "^4.2.0",
     "emoji-mart": "^3.0.1",
     "fullcalendar": "^5.0.0-beta.2",
     "jest": "^28.1.1",
