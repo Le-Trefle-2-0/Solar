@@ -1,47 +1,39 @@
-# TypeScript Next.js example
+# Le Trèfle 2.0 - Solar
 
-This is a really simple project that shows the usage of Next.js with TypeScript.
+Application web pour l'association [Le Trèfle 2.0](https://letrefle.org/) permettant la prise en charge des écoutes de maniere optimisée et securisée, sans les contraintes techniques et pratiques de la prise en charge directement via Discord.
 
-## Preview
+## Spécifications :
 
-Preview the example live on [StackBlitz](http://stackblitz.com/):
+| **Version**              | Beta 1.0              |
+|:------------------------:|:---------------------:|
+| **Date de publication**  | Lundi 20 octobre 2023 |
+| **Utilisation destinée** | Test interne          |
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/vercel/next.js/tree/canary/examples/with-typescript)
 
-## Deploy your own
+## Bugs connus :
 
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=next-example):
+[**La validation des codes d'authentification a deux facteurs ne fonctionne pas**](https://github.com/Le-Trefle-2-0/Solar/issues/19)
+*Contournement : ne pas activer l'A2F sur les comptes*
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https://github.com/vercel/next.js/tree/canary/examples/with-typescript&project-name=with-typescript&repository-name=with-typescript)
+[**Les messages transmis au bot ne sont pas convertis en format UTF-8 avant envoi**](https://github.com/Le-Trefle-2-0/Solar/issues/1), causant la réception de certains caracteres illisibles.
+*Courtournement : Aucun*
 
-## How to use it?
+## Bugs corrigés :
 
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init) or [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/) to bootstrap the example:
+Premiere version, aucune correction de bugs signalés.
 
-```bash
-npx create-next-app --example with-typescript with-typescript-app
-# or
-yarn create next-app --example with-typescript with-typescript-app
-```
+## Objectifs :
 
-Deploy it to the cloud with [Vercel](https://vercel.com/new?utm_source=github&utm_medium=readme&utm_campaign=next-example) ([Documentation](https://nextjs.org/docs/deployment)).
+Test a moyenne/grande échelle du systeme d'écoute, de planning ainsi que de lien avec le bot. Grace aux fonctionnalités déja implémentées.
+Fonctionnalités présentes :
 
-## Notes
+- Ouverture des écoutes par les utilisateurs via le bot.
+- Planification et inscription aux permanences via le planning.
+- Chat de permanence disponible pendant les permanences.
+- Assignation des écoutes aux BE par le RBE.
+- Réinitialisation du mot de passe par l'envoi d'un courriel.
 
-This example shows how to integrate the TypeScript type system into Next.js. Since TypeScript is supported out of the box with Next.js, all we have to do is to install TypeScript.
+## Informations supplémentaires :
 
-```
-npm install --save-dev typescript
-```
-
-To enable TypeScript's features, we install the type declarations for React and Node.
-
-```
-npm install --save-dev @types/react @types/react-dom @types/node
-```
-
-When we run `next dev` the next time, Next.js will start looking for any `.ts` or `.tsx` files in our project and builds it. It even automatically creates a `tsconfig.json` file for our project with the recommended settings.
-
-Next.js has built-in TypeScript declarations, so we'll get autocompletion for Next.js' modules straight away.
-
-A `type-check` script is also added to `package.json`, which runs TypeScript's `tsc` CLI in `noEmit` mode to run type-checking separately. You can then include this, for example, in your `test` scripts.
+- Le chat de permanence se ferme automatiquement immédiatement a la fin de l'événement au quel il est lié, ce sera changé a l'avenir.
+- 
