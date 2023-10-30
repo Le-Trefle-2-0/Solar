@@ -36,4 +36,3 @@ Fonctionnalités présentes :
 ## Informations supplémentaires :
 
 - Le chat de permanence se ferme automatiquement immédiatement a la fin de l'événement au quel il est lié, ce sera changé a l'avenir.
-- 
