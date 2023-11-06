@@ -123,6 +123,7 @@ export default function calendar({rolesSSR} : ServersideProps){
               let joined = false;
               let filled = true;
               let rolesFill : {role_label: string, role_id: bigint, count: number, needed: number}[] = []
+              let users : {name: string, id: number | bigint, role: {id: bigint, label: string}}[] = [];
               
               for (let roleNeeded of calendarEvent.calendar_event_role_needed){
                 let sameRoleCount = 0;
@@ -134,6 +135,16 @@ export default function calendar({rolesSSR} : ServersideProps){
                 if(sameRoleCount < roleNeeded.number) filled = false;
                 rolesFill.push({role_label: roleNeeded.roles.label, role_id: roleNeeded.roles.id, count: sameRoleCount, needed: roleNeeded.number})
               }
+
+              for (let {accounts: {roles, id, name}} of calendarEvent.account_calendar_event){
+                let user = users.find(u=>u.id == id);
+                if(!user){
+                  users.push({id: id, role: roles, name: name});
+                }
+              }
+
+              console.log(users)
+
               if(calendarEvent.calendar_event_role_needed.length == 0){
                 for(let {accounts: {id}} of calendarEvent.account_calendar_event){
                   if(id == session.current?.user.id) joined = true;
@@ -153,7 +164,7 @@ export default function calendar({rolesSSR} : ServersideProps){
                 <div className={`h-full w-full p-2 rounded-4 ${bg}`}>
                   <div className={`p-1 h-fit ${bg} bg-opacity-80 rounded-2`}>
                     <div className="font-bold leading-none">
-                      Permanence {calendarEvent.id} ({calendarEvent.subject})
+                      {calendarEvent.subject}
                       <br />
                       <small>
                         de {event.event.start?.getHours()}h{event.event.start?.getMinutes()} à {event.event.end?.getHours() ?? ( ( event.event.start?.getHours() || 0 ) + 1 )}h{event.event.end?.getMinutes() ?? event.event.start?.getMinutes()} 
@@ -162,9 +173,13 @@ export default function calendar({rolesSSR} : ServersideProps){
                     {
                       calendarEvent.calendar_event_role_needed.length != 0 ? 
                         <div className="pt-2">
-                          Nécessite: 
+                          Nécessite : 
                           <ul className="list-disc pl-4">
-                            {rolesFill.map(rf=><li key={`event_${calendarEvent.id}_requirement_${rf.role_id}`}>{rf.needed}x {rf.role_label} ({rf.count}/{rf.needed})</li>)}
+                            {rolesFill.map(rf=><li key={`event_${calendarEvent.id}_requirement_${rf.role_id}`}>{rf.needed}x {rf.role_label} ({rf.count}/{rf.needed}) :{
+                              users.filter(u=>u.role.id == rf.role_id).map(u=>{
+                                return <li key={`event_${calendarEvent.id}_requirement_${rf.role_id}_user_${u.id}`}>{u.name}</li>
+                              })
+                            }</li>)}
                           </ul>
                         </div>
                       : null
@@ -201,7 +216,14 @@ export default function calendar({rolesSSR} : ServersideProps){
                       : null
                     }
                   </div>
-                  
+                  <br />
+                  {
+                    JSON.stringify(users)
+                  }
+                  <br />
+                  {
+                    JSON.stringify(rolesFill)
+                  }
                 </div>
               )
             }}
