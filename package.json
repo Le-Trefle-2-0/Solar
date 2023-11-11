@@ -40,7 +40,7 @@
     "@types/react-modal": "^3.16.0",
     "@types/socket.io": "^3.0.2",
     "autoprefixer": "^10.4.4",
-    "axios": "^1.4.0",
+    "axios": "^1.6.0",
     "browserlist": "^1.0.1",
     "chart.js": "^4.3.0",
     "cookies-next": "^2.0.4",
