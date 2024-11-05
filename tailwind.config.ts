@@ -1,4 +1,6 @@
-minMawWidthHeightValues = {
+import type { Config } from "tailwindcss";
+
+let minMawWidthHeightValues = {
   "280": "70rem",
   "200": "50rem",
   "62.5": "15.625rem",
@@ -6,7 +8,7 @@ minMawWidthHeightValues = {
   "half": "40vw",
 };
 
-module.exports = {
+const config: Config = {
   mode: 'jit',
   content: ['./pages/**/*.{js,ts,jsx,tsx}','./src/components/**/*.{js,ts,jsx,tsx}','./src/layouts/**/*.{js,ts,jsx,tsx}'],
   theme: {
@@ -53,4 +55,5 @@ module.exports = {
   plugins: [
     require("tailwind-scrollbar")
   ],
-}
+};
+export default config;
