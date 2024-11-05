@@ -1,5 +1,0 @@
-{
-    "scss.lint.unknownAtRules": "ignore",
-    "WillLuke.nextjs.addTypesOnSave": true,
-    "WillLuke.nextjs.hasPrompted": true
-}
