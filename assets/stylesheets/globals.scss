@@ -1,3 +1,4 @@
+@use "sass:meta";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,16 +11,16 @@ body{
   }
 }
 
-@import "./components/calendar.scss";
-@import "./components/emoji_picker.scss";
+@include meta.load-css("components/calendar.scss");
+@include meta.load-css("components/emoji_picker.scss");
 
 @layer components {
-  @import "./components/button.scss";
-  @import "./components/input.scss";
-  @import "./components/nav.scss";
-  @import "./components/table.scss";
-  @import "./components/modal.scss";
-  @import "./components/dropdown.scss";
+  @include meta.load-css("components/button.scss");
+  @include meta.load-css("components/input.scss");
+  @include meta.load-css("components/nav.scss");
+  @include meta.load-css("components/table.scss");
+  @include meta.load-css("components/modal.scss");
+  @include meta.load-css("components/dropdown.scss");
 
   h1{@apply text-4xl font-bold;}
   h2{@apply text-3xl font-medium;}
