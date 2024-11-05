@@ -1,10 +1,13 @@
-import connect from "next-connect";
 import { CalendarEventWithRolesNeededAndRolesFilled } from "../../../src/interfaces/calendar";
 import checkJWT, { NextApiRequestWithUser } from "../../../src/middlewares/checkJWT";
 import checkSchema from "../../../src/middlewares/checkSchema";
  import { postSchema } from "../../../src/schemas/calendarSchemas";
 import prisma_instance from "../../../src/utils/prisma_instance";
+import type { NextApiRequest, NextApiResponse } from "next";
+import { createRouter, expressWrapper } from "next-connect";
+import cors from "cors";
 
+const router = createRouter<NextApiRequest, NextApiResponse>();
 
 export async function getActiveEvent(user_id: bigint) {
     let todayDate = new Date();
@@ -69,6 +72,21 @@ export async function getActiveEvent(user_id: bigint) {
     return ev[0] || null;
 }
 
-export default connect().get(checkJWT, async (req, res) => {
-  res.status(200).send(await getActiveEvent(req.session.user.id));
-})
+// export default connect().get(checkJWT, async (req, res) => {
+//   res.status(200).send(await getActiveEvent(req.session.user.id));
+// });
+
+router.use(expressWrapper(checkJWT)).get(async (req: NextApiRequestWithUser, res) => {
+    if (req.user) {
+        res.status(200).send(await getActiveEvent(req.user.id));
+    } else {
+        res.status(400).send("Bad request");
+    }
+});
+
+export default router.handler({
+    onError: (err, req, res) => {
+        console.error(err.stack);
+        res.status(err.statusCode || 500).end(err.message);
+    },
+});

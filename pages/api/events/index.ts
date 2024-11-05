@@ -1,10 +1,14 @@
-import connect from "next-connect";
 import { CalendarEventWithRolesNeededAndRolesFilled } from "../../../src/interfaces/calendar";
 import checkJWT, { NextApiRequestWithUser } from "../../../src/middlewares/checkJWT";
 import checkSchema from "../../../src/middlewares/checkSchema";
- import { postSchema } from "../../../src/schemas/calendarSchemas";
+import { postSchema } from "../../../src/schemas/calendarSchemas";
 import prisma_instance from "../../../src/utils/prisma_instance";
 
+import type { NextApiRequest, NextApiResponse } from "next";
+import { createRouter, expressWrapper } from "next-connect";
+import cors from "cors";
+
+const router = createRouter<NextApiRequest, NextApiResponse>();
 
 export async function getCalendar() {
   return await prisma_instance.calendar_events.findMany({
@@ -26,10 +30,10 @@ export async function getCalendar() {
   }) as CalendarEventWithRolesNeededAndRolesFilled[];
 }
 
-export default connect().get(checkJWT, async (req, res) => {
+router.use(expressWrapper(checkJWT)).get(async (req, res) => {
   res.status(200).send(await getCalendar());
 })
-.post(checkJWT, checkSchema({body: postSchema}), async (req: NextApiRequestWithUser, res) => {
+.post(checkSchema({body: postSchema}), async (req: NextApiRequestWithUser, res) => {
   if(!req.session.user.is_ref && !req.session.user.is_admin && !req.session.user.is_bot) {
       res.status(403).send("forbidden")
       return;
@@ -59,4 +63,11 @@ export default connect().get(checkJWT, async (req, res) => {
   }
   
   res.status(201).send(req.body);
-})
+});
+
+export default router.handler({
+    onError: (err, req, res) => {
+        console.error(err.stack);
+        res.status(err.statusCode || 500).end(err.message);
+    },
+});

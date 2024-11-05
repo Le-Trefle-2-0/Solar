@@ -5,7 +5,6 @@ import SocketEvent from "../../src/socket/SocketEvent";
 import session from "../../src/interfaces/session";
 import socketAuth, { BotSession, ClientType, SessionType } from "../../src/socket/ServerActions/SocketAuth";
 import io_data from "../../src/utils/io_data";
-import { any } from "@hapi/joi";
 
 type NextApiResponseWithSocket = NextApiResponse & {socket: {server: (Partial<ServerOptions> | http.Server | number) & { io: Server, ioData: IoData } }};
 export type IoData = {
