@@ -12,6 +12,7 @@ import fetcher from "../src/utils/fetcher";
 import SettingsForm from "../src/components/form/settings";
 import Modal from "../src/components/modal";
 import { InferGetServerSidePropsType } from "next";
+import superjson from 'superjson';
 
 interface ServersideProps{
     rolesSSR: roles[]
@@ -81,5 +82,5 @@ export default function Settings({rolesSSR}: InferGetServerSidePropsType<typeof 
 }
 
 export async function getServerSideProps(){
-    return {props: {rolesSSR: JSON.parse(JSON.stringify(await getRoles()))} as ServersideProps};
+    return {props: {rolesSSR: JSON.parse(superjson.stringify(await getRoles()))} as ServersideProps};
 }

@@ -13,6 +13,7 @@ import { messages } from "@prisma/client";
 import ChatBubble from "../../src/components/chat_bubble";
 import getSession from "../../src/utils/get_session";
 import { SocketState } from "../../src/interfaces/socketState";
+import superjson from 'superjson';
 
 type listenMessage = (messages & { accounts: { id: bigint; name: string; }; });
 
@@ -82,7 +83,7 @@ export default function Listens(){
               <button className="btn outlined" onClick={() => router.back()}>Retour a la liste</button>
               <button className="btn ml-4" onClick={async() =>{
                 if(confirm("Êtes-vous sur de vouloir fermer l'écoute?\nCette action est irréversible!")){
-                  fetch(`/api/listens/${listen?.id}`, {method: "PUT", body: JSON.stringify({listen_status_id: 3})}).then((r)=>{if(r.ok){listenSwr.mutate();}}).then(() => {
+                  fetch(`/api/listens/${listen?.id}`, {method: "PUT", body: superjson.stringify({listen_status_id: 3})}).then((r)=>{if(r.ok){listenSwr.mutate();}}).then(() => {
                     router.back();
                   });
                 }

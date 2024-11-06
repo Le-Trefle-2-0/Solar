@@ -6,6 +6,7 @@ import Select from 'react-select';
 import { roles } from "@prisma/client";
 import moment from "moment";
 import {CalendarEventWithRolesNeededAndRolesFilled} from "../../../interfaces/calendar"
+import superjson from 'superjson';
 
 interface ServersideProps{
     rolesSSR: roles[]
@@ -49,7 +50,7 @@ export default function EventsForm({roles, event, onCancel, onSuccess}: FormProp
         setLoading(true);
         fetch(`/api/events${event ? `/${event.id}` : "" }`, {
             method: event? 'PUT' : 'POST',
-            body: JSON.stringify(data)
+            body: superjson.stringify(data)
           })
           .then(
             (res) => {

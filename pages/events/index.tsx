@@ -16,6 +16,7 @@ import EventsForm from "../../src/components/form/events";
 import { getRoles } from "../api/roles";
 import Nav from "../../src/components/sidebar";
 import { ReferenceActualEventContext } from "../../src/contexts/ReferenceGlobalCHatContext";
+import superjson from 'superjson';
 
 interface ServersideProps{
   rolesSSR: roles[]
@@ -218,5 +219,5 @@ export default function calendar({rolesSSR} : ServersideProps){
 }
 
 export async function getServerSideProps(){
-    return {props:{rolesSSR: JSON.parse(JSON.stringify(await getRoles()))} as ServersideProps}
+  return {props:{rolesSSR: JSON.parse(superjson.stringify(await getRoles()))} as ServersideProps}
 }

@@ -7,6 +7,7 @@ import AuthenticatedLayout from "../src/layouts/authenticated-layout";
 import fetcher from "../src/utils/fetcher";
 import getSession from "../src/utils/get_session";
 import { getListens } from './api/listens/index';
+import superjson from 'superjson';
 
 interface ServersideProps{
     listensSSR: listens[]
@@ -68,5 +69,5 @@ export default function Listens({listensSSR}: ServersideProps){
   }
 
   export async function getServerSideProps(){
-      return {props: {listensSSR: JSON.parse(JSON.stringify(await getListens({listen_status:{name:{in:["commented","closed"]}}, listen_message:{some:{message_id:{gt:0}}}})))} as ServersideProps};
+      return {props: {listensSSR: JSON.parse(superjson.stringify(await getListens({listen_status:{name:{in:["commented","closed"]}}, listen_message:{some:{message_id:{gt:0}}}})))} as ServersideProps};
   }

@@ -16,6 +16,7 @@ import getSession from "../src/utils/get_session";
 import { getRoles } from "./api/roles";
 import { any } from "@hapi/joi";
 import { InferGetServerSidePropsType } from "next";
+import superjson from 'superjson';
 
 interface ServersideProps{
     rolesSSR: roles[]
@@ -106,6 +107,6 @@ export default function Listens({rolesSSR}: InferGetServerSidePropsType<typeof g
     );
 }
 
-  export async function getServerSideProps(){
-      return {props: {rolesSSR: JSON.parse(JSON.stringify(await getRoles()))} as ServersideProps};
-  }
+export async function getServerSideProps(){
+    return {props: {rolesSSR: JSON.parse(superjson.stringify(await getRoles()))} as ServersideProps};
+}
