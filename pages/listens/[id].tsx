@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 import { io, Socket } from "socket.io-client";
 import { ClientType, SessionType } from "../../src/socket/ServerActions/SocketAuth";
 import { ClientEvents, ServerEvents } from "../../src/socket/Enums";
-import 'emoji-mart/css/emoji-mart.css'
+// import 'emoji-mart/css/emoji-mart.css' TEMPORARY IGNORED
 import ChatInput from "../../src/components/chat_input";
 import { messages } from "@prisma/client";
 import ChatBubble from "../../src/components/chat_bubble";
