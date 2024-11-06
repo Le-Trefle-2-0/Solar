@@ -85,7 +85,7 @@ router.use(expressWrapper(checkJWT)).get(async (req: NextApiRequestWithUser, res
 });
 
 export default router.handler({
-    onError: (err, req, res) => {
+    onError: (err: any, req, res) => {
         console.error(err.stack);
         res.status(err.statusCode || 500).end(err.message);
     },

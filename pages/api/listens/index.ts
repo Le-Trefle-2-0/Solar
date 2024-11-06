@@ -1,4 +1,3 @@
-import connect from "next-connect";
 import checkJWT, { NextApiRequestWithUser } from "../../../src/middlewares/checkJWT";
 import { Prisma } from "@prisma/client";
 import { ListenWithStatus } from "../../../src/interfaces/listens";
@@ -8,8 +7,10 @@ import checkSchema from "../../../src/middlewares/checkSchema";
 import moment from "moment";
 import { getActiveEvent } from "../events/getActive";
 import MessageEncryptService from './../../../src/utils/message_encrypt_service';
+import type { NextApiRequest, NextApiResponse } from "next";
+import { createRouter, expressWrapper } from "next-connect";
 
-
+const router = createRouter<NextApiRequest, NextApiResponse>();
 
 export function getListens(filter?:Prisma.listensWhereInput, includes?: Prisma.listensInclude ) : Promise<ListenWithStatus[]> {
   return prisma_instance.listens.findMany({include:includes, where: filter, orderBy: includes?.account_listen ? {account_listen: {_count: "asc"}} : undefined }).then((v)=>{
@@ -30,7 +31,8 @@ users.getAll({with:{event:{id:actualEvent.id}}}) listens uniquement ouvertes
 
 */
 
-export default connect().get(checkJWT, checkSchema({query: filterSchema}), async (req: NextApiRequestWithUser, res) => {
+router.use(expressWrapper(checkJWT)).get(checkSchema({query: filterSchema}), async (req: NextApiRequestWithUser, res) => {
+
 
   if(req.query.for_transcript){
     if(!req.session.user.is_admin) {
@@ -129,7 +131,7 @@ export default connect().get(checkJWT, checkSchema({query: filterSchema}), async
   )
   res.status(200).send(listens);
 })
-.post(checkJWT, checkSchema({body: postSchema}), async (req: NextApiRequestWithUser, res) => {
+.post(async (req: NextApiRequestWithUser, res) => {
   if(!req.session.user.is_bot) {
     res.status(403).send("forbidden")
     return;
@@ -139,4 +141,11 @@ export default connect().get(checkJWT, checkSchema({query: filterSchema}), async
   req.body.date_time_start = new Date();
   await prisma_instance.listens.create({data: req.body});
   res.status(201).send(req.body);
-})
+});
+
+export default router.handler({
+    onError: (err: any, req, res) => {
+        console.error(err.stack);
+        res.status(err.statusCode || 500).end(err.message);
+    },
+});
