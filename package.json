@@ -39,6 +39,7 @@
     "superjson": "^2.2.1",
     "swr": "^2.2.5",
     "tailwind-scrollbar": "^3.1.0",
+    "totp-generator": "^1.0.0",
     "yup": "^1.4.0",
     "yup-locales": "^1.2.28"
   },
