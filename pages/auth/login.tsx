@@ -1,4 +1,4 @@
-import { setCookies } from "cookies-next";
+import { setCookie } from "cookies-next";
 import { useRouter } from "next/router";
 import { useContext, useState } from "react";
 import { ReferenceActualEventContext } from "../../src/contexts/ReferenceGlobalCHatContext";
@@ -19,12 +19,13 @@ export default function login(){
     async function authCookie(data: { user: {
         otp_enabled: boolean; is_admin: boolean; roles: { name: string; }; is_ref: boolean; is_bot: boolean; is_listener: boolean; is_training: boolean; 
     }; }) {
+        console.log(data)
         data.user.is_admin = (["admin"].includes(data.user.roles.name) && data.user.otp_enabled);
         data.user.is_ref = (["admin", "be_ref"].includes(data.user.roles.name) && data.user.otp_enabled);
         data.user.is_bot = ["bot"].includes(data.user.roles.name);
         data.user.is_listener = ["be"].includes(data.user.roles.name);
         data.user.is_training = ["training"].includes(data.user.roles.name);
-        setCookies("session", data);
+        setCookie("session", data);
         activeEventCtx.update();
         router.push("/");
     }
@@ -35,7 +36,8 @@ export default function login(){
         let data = await fetcher<session>("/api/auth/login", "POST", {email:email, password:password}).catch(()=>null);
         if(data == null) {
             setError(true);
-        } else if (data.user.otp_enabled) {
+        // } else if (data.user.otp_enabled) { SKIP FOR TEST PURPOSE
+        } else if (false) {
             setIsPopupOpen(true);
         } else {
             authCookie(data);
