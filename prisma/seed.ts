@@ -16,11 +16,11 @@ import prisma_instance from "../src/utils/prisma_instance";
   await prisma_instance.accounts.createMany({
     data: [
       // TODO: Evidement, il ne faut pas utiliser ce compte en prod
-      {name:"admin", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 1, email: "admin@letrefle.org" },
-      {name:"be", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 3, email: "be@letrefle.org" },
-      {name:"rbe", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 4, email: "rbe@letrefle.org" },
-      {name:"bot", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 2, email: "bot@letrefle.org" },
-      {name:"nbe", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 5, email: "nbe@letrefle.org" },
+      {name:"admin", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 1, email: "admin@letrefle.org", otp_enabled: false, otp_token: null,  },
+      {name:"be", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 3, email: "be@letrefle.org", otp_enabled: false, otp_token: null,  },
+      {name:"rbe", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 4, email: "rbe@letrefle.org", otp_enabled: false, otp_token: null,  },
+      {name:"bot", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 2, email: "bot@letrefle.org", otp_enabled: false, otp_token: null,  },
+      {name:"nbe", password: crypto.createHash("sha512").update("password").digest("base64"), role_id: 5, email: "nbe@letrefle.org", otp_enabled: false, otp_token: null,  },
     ]
   })
   await prisma_instance.listen_status.createMany({
