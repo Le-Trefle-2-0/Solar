@@ -1,20 +1,13 @@
-import { faAngleRight } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { accounts, calendar_events, roles } from "@prisma/client";
-import moment from "moment";
+import { accounts, roles } from "@prisma/client";
 import { useRouter } from "next/router";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
 import AccountForm from "../src/components/form/accounts";
-import ListensForm from "../src/components/form/listens";
 import Modal from "../src/components/modal";
-import { ReferenceActualEventContext } from "../src/contexts/ReferenceGlobalCHatContext";
-import { ListenWithStatusAndAccounts } from "../src/interfaces/listens";
 import AuthenticatedLayout from "../src/layouts/authenticated-layout";
 import fetcher from "../src/utils/fetcher";
 import getSession from "../src/utils/get_session";
 import { getRoles } from "./api/roles";
-import { any } from "@hapi/joi";
 import { InferGetServerSidePropsType } from "next";
 import superjson from 'superjson';
 
@@ -25,7 +18,7 @@ interface ServersideProps{
 export default function Listens({rolesSSR}: InferGetServerSidePropsType<typeof getServerSideProps>){
     const router = useRouter();
     const session = useRef(getSession());
-    let [selectedAccountToEdit, setSelectedAccountToEdit] = useState<(Omit<accounts, "password"> & {roles: roles})|null>();
+    const [selectedAccountToEdit, setSelectedAccountToEdit] = useState<(Omit<accounts, "password"> & {roles: roles})|null>();
     const accountsSWR = useSWR<(Omit<accounts, "password"> & {roles: roles})[]|null>("/api/accounts", fetcher);
     let accounts = accountsSWR.data || [];
     if(typeof accountsSWR.data == "string") accounts = [];
@@ -43,11 +36,11 @@ export default function Listens({rolesSSR}: InferGetServerSidePropsType<typeof g
                     () => {
                         let searchInput: any = document.getElementById("searchInput");
                         if (!searchInput) searchInput = { value: "" }
-                        let search = searchInput?.value.toLowerCase();
-                        let table = document.getElementById("userTable");
-                        let rows = table?.getElementsByTagName("tr");
+                        const search = searchInput?.value.toLowerCase();
+                        const table = document.getElementById("userTable");
+                        const rows = table?.getElementsByTagName("tr");
                         for (let i = 0; i < rows!.length; i++) {
-                            let td = rows![i].getElementsByTagName("td")[0];
+                            const td = rows![i].getElementsByTagName("td")[0];
                             if (td) {
                                 let txtValue = td.textContent || td.innerText;
                                 if (txtValue.toLowerCase().indexOf(search) > -1) {
