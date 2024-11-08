@@ -82,5 +82,5 @@ export default function Settings({rolesSSR}: InferGetServerSidePropsType<typeof 
 }
 
 export async function getServerSideProps(){
-    return {props: {rolesSSR: superjson.parse(superjson.stringify(await getRoles()))} as ServersideProps};
+    return {props: {rolesSSR: JSON.parse(superjson.stringify(await getRoles()))} as ServersideProps};
 }

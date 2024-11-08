@@ -44,12 +44,12 @@ router.post(async (req, res) => {
       if (otp === req.body.otp) {
         res.status(200).send({
           jwt: sign(
-            SuperJSON.parse(SuperJSON.stringify(acc)),
+            JSON.parse(SuperJSON.stringify(acc)),
             process.env.JWT_SECRET || "secret",
             {expiresIn: "1d"}
           ),
           otp: false,
-          user: acc
+          user: JSON.parse(SuperJSON.stringify(acc))
         } as session);
       } else {
         res.status(401).send("invalid credentials");
@@ -63,16 +63,16 @@ router.post(async (req, res) => {
     } else {
       res.status(200).send({
         jwt: sign(
-          SuperJSON.parse(SuperJSON.stringify(acc)),
+          JSON.parse(SuperJSON.stringify(acc)),
           process.env.JWT_SECRET || "secret",
           {expiresIn: "1d"}
         ),
         otp: false,
-        user: acc
+        user: JSON.parse(SuperJSON.stringify(acc))
       } as session);
     }
   } else {
-    res.status(401).send("invalid credentials")
+    res.status(401).json({ error: "invalid credentials"})
   }
 });
 

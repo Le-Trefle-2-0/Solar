@@ -69,5 +69,5 @@ export default function Listens({listensSSR}: ServersideProps){
   }
 
   export async function getServerSideProps(){
-      return {props: {listensSSR: superjson.parse(superjson.stringify(await getListens({listen_status:{name:{in:["commented","closed"]}}, listen_message:{some:{message_id:{gt:0}}}})))} as ServersideProps};
+      return {props: {listensSSR: JSON.parse(superjson.stringify(await getListens({listen_status:{name:{in:["commented","closed"]}}, listen_message:{some:{message_id:{gt:0}}}})))} as ServersideProps};
   }
