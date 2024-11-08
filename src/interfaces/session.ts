@@ -12,10 +12,12 @@ export type sessionAccountWithRoles = sessionAccount & {
 };
 
 export interface sessionAccount extends Omit<accounts, 'password'> {
-    password?:string,
-    is_admin: boolean,
-    is_bot: boolean,
-    is_ref: boolean,
-    is_listener: boolean,
-    is_training: boolean,
+    json : {
+        password?:string,
+        is_admin: boolean,
+        is_bot: boolean,
+        is_ref: boolean,
+        is_listener: boolean,
+        is_training: boolean,
+    },
 }
