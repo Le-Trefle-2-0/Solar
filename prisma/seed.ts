@@ -1,6 +1,8 @@
 import * as crypto from "crypto";
 import MessageEncryptService from "../src/utils/message_encrypt_service";
-import prisma_instance from "../src/utils/prisma_instance";
+import {PrismaClient} from "@prisma/client";
+
+const prisma_instance = new PrismaClient();
 
 
 (async()=>{
