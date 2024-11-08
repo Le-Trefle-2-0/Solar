@@ -218,12 +218,12 @@ export default function calendar({rolesSSR} : ServersideProps){
   );
 }
 
-// export async function getServerSideProps(){
-//   console.log('GENERATING SERVER SIDE PROPS FOR EVENTS PAGE')
-//   const roles = await getRoles();
-//   let rolesSSR = superjson.parse(superjson.stringify(roles));
-//   console.log(rolesSSR)
-//   return {props:{rolesSSR} as ServersideProps}
-//   // console.log(superjson.stringify(await getRoles()))
-//   // return {props:{rolesSSR: superjson.parse(superjson.stringify({}))} as ServersideProps}
-// }
+export async function getServerSideProps(){
+  console.log('GENERATING SERVER SIDE PROPS FOR EVENTS PAGE')
+  const roles = await getRoles();
+  let rolesSSR = superjson.parse(superjson.stringify(roles));
+  console.log(rolesSSR)
+  return {props:{rolesSSR} as ServersideProps}
+  // console.log(superjson.stringify(await getRoles()))
+  // return {props:{rolesSSR: superjson.parse(superjson.stringify({}))} as ServersideProps}
+}
