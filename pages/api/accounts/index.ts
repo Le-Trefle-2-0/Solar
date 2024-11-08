@@ -16,7 +16,7 @@ export default connect().get(checkJWT, async (req, res) => {
         res.status(403).send("forbidden")
         return;
     }
-    let acc = req.body;
+    const acc = req.body;
     acc.password =  crypto.createHash("sha512").update(acc.password).digest("base64")
     await prisma_instance.accounts.create({data: acc});
     res.status(200).send("done");

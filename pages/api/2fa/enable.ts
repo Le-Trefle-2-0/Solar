@@ -2,10 +2,9 @@ import connect from "next-connect";
 import checkJWT from "../../../src/middlewares/checkJWT";
 import prisma_instance from "../../../src/utils/prisma_instance";
 import totp from "totp-generator";
-import checkSchema from "../../../src/middlewares/checkSchema";
 
 export default connect().post(checkJWT, async (req, res) => {
-    let acc = await prisma_instance.accounts.findFirst({ where: { id: req.body.userID } });
+    const acc = await prisma_instance.accounts.findFirst({ where: { id: req.body.userID } });
     if (!acc) {
         res.status(401).send("invalid credentials");
     } else if (acc.otp_enabled) {
