@@ -5,6 +5,7 @@ import checkSchema from "../../../src/middlewares/checkSchema";
 import prisma_instance from "../../../src/utils/prisma_instance";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createRouter, expressWrapper } from "next-connect";
+import superjson from "superjson";
 
 const router = createRouter<NextApiRequest, NextApiResponse>();
 
@@ -76,8 +77,8 @@ export async function getActiveEvent(user_id: bigint) {
 // });
 
 router.use(expressWrapper(checkJWT)).get(async (req: NextApiRequestWithUser, res) => {
-    if (req.user) {
-        res.status(200).send(await getActiveEvent(req.user.id));
+    if (req.session.user) {
+        res.status(200).send(await getActiveEvent(JSON.parse(superjson.stringify(req.session.user.id))));
     } else {
         res.status(400).send("Bad request");
     }
