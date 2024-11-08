@@ -33,8 +33,8 @@ export async function getCalendar() {
 router.use(expressWrapper(checkJWT)).get(async (req, res) => {
   res.status(200).send(await getCalendar());
 })
-.post(checkSchema({body: postSchema}), async (req: NextApiRequestWithUser, res) => {
-  if(!req.session.user.is_ref && !req.session.user.is_admin && !req.session.user.is_bot) {
+.post(async (req: NextApiRequestWithUser, res) => {
+  if(!req.session.user.json.is_ref && !req.session.user.json.is_admin && !req.session.user.json.is_bot) {
       res.status(403).send("forbidden")
       return;
   }
@@ -66,7 +66,7 @@ router.use(expressWrapper(checkJWT)).get(async (req, res) => {
 });
 
 export default router.handler({
-    onError: (err, req, res) => {
+    onError: (err: any, req, res) => {
         console.error(err.stack);
         res.status(err.statusCode || 500).end(err.message);
     },
