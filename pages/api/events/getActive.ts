@@ -5,7 +5,6 @@ import checkSchema from "../../../src/middlewares/checkSchema";
 import prisma_instance from "../../../src/utils/prisma_instance";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createRouter, expressWrapper } from "next-connect";
-import cors from "cors";
 
 const router = createRouter<NextApiRequest, NextApiResponse>();
 
