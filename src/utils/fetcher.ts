@@ -1,4 +1,4 @@
-import { deleteCookie } from "cookies-next/server";
+import { deleteCookie } from "cookies-next/client";
 import getSession from "./get_session";
 import { parseParams } from "./helper";
 
