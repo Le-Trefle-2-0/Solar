@@ -24,7 +24,6 @@ type NextApiResponseWithSocket = NextApiResponse & {socket: {server: (Partial<Se
 
 const SocketHandler = (req: NextApiRequest, res: NextApiResponseWithSocket) => {
   if (res.socket.server.io) {
-    console.log('Socket is already running')
   } else {
     console.log('Socket is initializing')
     const io = new Server(res.socket.server)
