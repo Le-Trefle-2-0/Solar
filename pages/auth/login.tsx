@@ -19,8 +19,6 @@ export default function login(){
     async function authCookie(data: { user: {json: {
         otp_enabled: boolean; is_admin: boolean; roles: { name: string; }; is_ref: boolean; is_bot: boolean; is_listener: boolean; is_training: boolean; 
     }}; }) {
-        console.log('WRITING AUTH COOKIE')
-        console.log(data)
         data.user.json.is_admin = (["admin"].includes(data.user.json.roles.name) && data.user.json.otp_enabled);
         data.user.json.is_ref = (["admin", "be_ref"].includes(data.user.json.roles.name) && data.user.json.otp_enabled);
         data.user.json.is_bot = ["bot"].includes(data.user.json.roles.name);
@@ -40,7 +38,6 @@ export default function login(){
         // } else if (data.user.json.otp_enabled) { 
         //     setIsPopupOpen(true);
         } else {
-            console.log('INITIATING COOKIE AUTH')
             authCookie(data);
         }
     }
