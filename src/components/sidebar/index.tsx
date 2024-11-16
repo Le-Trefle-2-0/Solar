@@ -5,7 +5,7 @@ import logo from "../../../assets/img/logo.png"
 import Dropdown, {DropdownDirection} from "../dropdown";
 import NavLink from "./sidebar-link";
 import session from "../../interfaces/session";
-import { removeCookies } from "cookies-next";
+import { deleteCookie } from "cookies-next/server";
 import { useContext, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -56,11 +56,11 @@ export default function Nav(){
         <h4 className="sidebar-title">LE TREFLE 2.0</h4>
         <div className="sidebar-links-wrapper">
           {
-            (session.current?.user.is_admin || session.current?.user.is_ref) ?
+            (session.current?.user.json.is_admin || session.current?.user.json.is_ref) ?
             <NavLink text="Écoutes" icon={faMessage} path="/listens"/> : null
           }
           {
-            session.current?.user.is_listener ? (listens.map((l,k) => (
+            session.current?.user.json.is_listener ? (listens.map((l,k) => (
               <NavLink text={`Écoute ${l.id}`} icon={faMessage} path={`/listens/${l.id}`}/>
             ))) : null
           }
@@ -71,7 +71,7 @@ export default function Nav(){
             : null
           }
           {
-            session.current?.user.is_admin ? 
+            session.current?.user.json.is_admin ? 
               <>
                 <NavLink text="Comptes" icon={faUsers} path="/accounts"/>
                 <NavLink text="Transcripts" icon={faBook} path="/transcripts"/>
@@ -89,7 +89,7 @@ export default function Nav(){
           }
           direction={DropdownDirection.top}>
             <div className="btn white" onClick={()=>{
-              removeCookies("session");
+              deleteCookie("session");
               router.reload();
             }}>Déconnexion</div>
             <div className="btn white" onClick={()=>{

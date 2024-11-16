@@ -1,4 +1,4 @@
-import { removeCookies } from "cookies-next";
+import { deleteCookie } from "cookies-next/server";
 import getSession from "./get_session";
 import { parseParams } from "./helper";
 
@@ -28,7 +28,7 @@ export default async function fetcher<T>(url: string, method?:string, body?: any
     .then(
       (res) => {
         if(res.status == 401){
-          removeCookies("session");
+          deleteCookie("session");
           window.location.href = '/auth/login';
           return null;
         }

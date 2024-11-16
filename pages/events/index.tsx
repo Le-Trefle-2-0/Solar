@@ -66,7 +66,7 @@ export default function calendar({rolesSSR} : ServersideProps){
       <div className="h-full flex flex-col">
         <div className="flex items-center mb-8 justify-between">
           <h2 className="">PLANNING</h2>
-          {session.current?.user.is_ref? <button className="btn py-0.5 -my-1" onClick={()=>setSelectedEventForEdit(null)}>Créer un événement</button> : ''}
+          {session.current?.user.json.is_ref? <button className="btn py-0.5 -my-1" onClick={()=>setSelectedEventForEdit(null)}>Créer un événement</button> : ''}
         </div>
         <FullCalendar
           plugins={[dayGridPlugin, interactionPlugin]}
@@ -172,7 +172,7 @@ export default function calendar({rolesSSR} : ServersideProps){
                     }
                     
                     {
-                      !session.current?.user.is_bot ?
+                      !session.current?.user.json.is_bot ?
                         <button className={`btn border-white hover:border-white text-white py-0.5 mt-1 ${bg} hover:bg-white hover:bg-opacity-30`} 
                         onClick={()=> {
                           fetch(`api/events/${calendarEvent.id}/register`, {method: joined ? "DELETE" : "POST"}).then((r)=>{
@@ -183,7 +183,7 @@ export default function calendar({rolesSSR} : ServersideProps){
                       : null
                     }
                     {
-                      !session.current?.user.is_bot && session.current?.user.is_ref ? 
+                      !session.current?.user.json.is_bot && session.current?.user.json.is_ref ? 
                       <>
                         <button className={`btn border-white hover:border-white text-white py-0.5 mt-1 ${bg} hover:bg-white hover:bg-opacity-30`} 
                         onClick={()=> setSelectedEventForEdit(calendarEvent)}>
@@ -219,7 +219,6 @@ export default function calendar({rolesSSR} : ServersideProps){
 }
 
 export async function getServerSideProps(){
-  console.log('GENERATING SERVER SIDE PROPS FOR EVENTS PAGE')
   const roles = await getRoles();
   let rolesSSR = JSON.parse(superjson.stringify(roles));
   console.log(rolesSSR)
