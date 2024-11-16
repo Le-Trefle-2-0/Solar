@@ -7,7 +7,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { createRouter, expressWrapper } from "next-connect";
 import superjson from "superjson";
 
-const router = createRouter<NextApiRequest, NextApiResponse>();
+const router = createRouter<NextApiRequestWithUser, NextApiResponse>();
 
 export async function getActiveEvent(user_id: bigint) {
     let todayDate = new Date();
@@ -76,8 +76,8 @@ export async function getActiveEvent(user_id: bigint) {
 //   res.status(200).send(await getActiveEvent(req.session.user.id));
 // });
 
-router.use(expressWrapper(checkJWT)).get(async (req: NextApiRequestWithUser, res) => {
-    if (req.session.user) {
+router.use(expressWrapper(checkJWT)).get(async (req, res) => {
+    if (req.session?.user) {
         res.status(200).send(await getActiveEvent(JSON.parse(superjson.stringify(req.session.user.id))));
     } else {
         res.status(400).send("Bad request");
