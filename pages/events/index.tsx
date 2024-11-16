@@ -221,7 +221,6 @@ export default function calendar({rolesSSR} : ServersideProps){
 export async function getServerSideProps(){
   const roles = await getRoles();
   let rolesSSR = JSON.parse(superjson.stringify(roles));
-  console.log(rolesSSR)
   return {props:{rolesSSR} as ServersideProps}
   // console.log(superjson.stringify(await getRoles()))
   // return {props:{rolesSSR: JSON.parse(superjson.stringify({}))} as ServersideProps}
