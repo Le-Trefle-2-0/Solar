@@ -7,6 +7,22 @@ import session from "../../src/interfaces/session";
 import LoginLayout from "../../src/layouts/login-layout";
 import fetcher from "../../src/utils/fetcher";
 
+type data = { 
+    jwt: string,
+    otp: boolean,
+    user: {
+        json: {
+            otp_enabled: boolean;
+            roles: { name: string; };
+            is_admin: boolean;
+            is_ref: boolean;
+            is_bot: boolean;
+            is_listener: boolean;
+            is_training: boolean; 
+        }
+    }
+}
+
 export default function login(){
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -16,9 +32,8 @@ export default function login(){
     const router = useRouter();
     const activeEventCtx = useContext(ReferenceActualEventContext);
 
-    async function authCookie(data: { user: {json: {
-        otp_enabled: boolean; is_admin: boolean; roles: { name: string; }; is_ref: boolean; is_bot: boolean; is_listener: boolean; is_training: boolean; 
-    }}; }) {
+    async function authCookie(data: data) {
+        data.user.json.otp_enabled = true;
         data.user.json.is_admin = (["admin"].includes(data.user.json.roles.name) && data.user.json.otp_enabled);
         data.user.json.is_ref = (["admin", "be_ref"].includes(data.user.json.roles.name) && data.user.json.otp_enabled);
         data.user.json.is_bot = ["bot"].includes(data.user.json.roles.name);
@@ -38,18 +53,18 @@ export default function login(){
         // } else if (data.user.json.otp_enabled) { 
         //     setIsPopupOpen(true);
         } else {
-            authCookie(data);
+            authCookie(data as any);
         }
     }
 
-    async function handle2FA(code: string){
-        let data = await fetcher<session>("/api/auth/login", "POST", {email:email, password:password, otp: code}).catch(()=>null);
-        if(data == null) {
-            setError(true);
-        } else {
-            authCookie(data);
-        }
-    }
+    // async function handle2FA(code: string){
+    //     let data = await fetcher<session>("/api/auth/login", "POST", {email:email, password:password, otp: code}).catch(()=>null);
+    //     if(data == null) {
+    //         setError(true);
+    //     } else {
+    //         authCookie(data);
+    //     }
+    // }
 
     return(
         <div>
@@ -76,7 +91,7 @@ export default function login(){
                 </form>
 
             </LoginLayout>
-            <TwoFactorAuthForm isOpen={isPopupOpen} submit={handle2FA} />
+            {/* <TwoFactorAuthForm isOpen={isPopupOpen} submit={handle2FA} /> */}
         </div>
     )
 }
