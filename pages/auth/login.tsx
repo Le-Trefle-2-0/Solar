@@ -6,6 +6,7 @@ import TwoFactorAuthForm from "../../src/components/form/2fa";
 import session from "../../src/interfaces/session";
 import LoginLayout from "../../src/layouts/login-layout";
 import fetcher from "../../src/utils/fetcher";
+import { signIn } from "../../auth";
 
 type data = { 
     jwt: string,
@@ -57,7 +58,7 @@ export default function login(){
                 email, password
             })
         });
-        
+
         if(data == null) {
             setError(true);
         // } else if (data.user.json.otp_enabled) { 
@@ -80,7 +81,10 @@ export default function login(){
         <div>
             <LoginLayout>
                 <h2>Le Trèfle 2.0</h2>
-                <form onSubmit={handleLogin} className="flex flex-col items-center w-full">
+                <form className="flex flex-col items-center w-full" action={async (formData) => {
+                    'use server'
+                    await signIn(formData)
+                }}>
                     <input 
                         type="text"
                         defaultValue={email}
@@ -94,6 +98,11 @@ export default function login(){
                         onChange={({currentTarget:{value}})=>{setPassword(value);setError(false)}}
                         className="field mt-8"
                         placeholder="Mot de passe"
+                    />
+                    <input
+                        type="text"
+                        placeholder="Code A2F"
+                        className="invisible field mt-8"
                     />
                     <small className={`text-red-500 ${error?"opacity-100":"opacity-0"}`}>Email ou mot de passe invalide !</small>
                     <input type="submit" value="Se connecter" className="btn mt-8"/>
