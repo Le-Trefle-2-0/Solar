@@ -1,6 +1,7 @@
 import { deleteCookie } from "cookies-next/client";
 import getSession from "./get_session";
 import { parseParams } from "./helper";
+import superjson from "superjson";
 
 export default async function fetcher<T>(url: string, method?:string, body?: any, query?: any, authenticated?:boolean) : Promise<T|null>  {
   let options = {
@@ -8,7 +9,7 @@ export default async function fetcher<T>(url: string, method?:string, body?: any
     headers: {},
   } as {method: string, body: any, headers:any};
   if(body != undefined) {
-    options.body = JSON.stringify(body);
+    options.body = superjson.stringify(body);
     options.headers["Content-Type"] = `application/json`;
   }
   if(query != undefined) url += parseParams(query);
