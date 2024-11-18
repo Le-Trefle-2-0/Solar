@@ -8,7 +8,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { createRouter, expressWrapper } from "next-connect";
 import cors from "cors";
 
-const router = createRouter<NextApiRequest, NextApiResponse>();
+const router = createRouter<NextApiRequestWithUser, NextApiResponse>();
 
 export async function getCalendar() {
   return await prisma_instance.calendar_events.findMany({
@@ -33,7 +33,7 @@ export async function getCalendar() {
 router.use(expressWrapper(checkJWT)).get(async (req, res) => {
   res.status(200).send(await getCalendar());
 })
-.post(async (req: NextApiRequestWithUser, res) => {
+.post(async (req, res) => {
   if(!req.session.user.json.is_ref && !req.session.user.json.is_admin && !req.session.user.json.is_bot) {
       res.status(403).send("forbidden")
       return;
