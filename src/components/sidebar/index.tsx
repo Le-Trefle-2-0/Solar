@@ -89,7 +89,7 @@ export default function Nav(){
           }
           direction={DropdownDirection.top}>
             <div className="btn white" onClick={()=>{
-              deleteCookie("session");
+              // deleteCookie("session");
               router.reload();
             }}>Déconnexion</div>
             <div className="btn white" onClick={()=>{

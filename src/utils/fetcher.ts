@@ -28,7 +28,8 @@ export default async function fetcher<T>(url: string, method?:string, body?: any
     .then(
       (res) => {
         if(res.status == 401){
-          deleteCookie("session");
+          // deleteCookie("session");
+          console.log("Session expired, redirecting to login page");
           window.location.href = '/auth/login';
           return null;
         }
