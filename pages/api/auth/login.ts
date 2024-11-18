@@ -11,7 +11,7 @@ import { createRouter } from "next-connect";
 import SuperJSON from "superjson";
 
 export type NextApiRequestWithUser = NextApiRequest & {session: session};
-const router = createRouter<NextApiRequest, NextApiResponse>();
+const router = createRouter<NextApiRequestWithUser, NextApiResponse>();
 
 const schema = object({
   email: string().required(),
@@ -20,8 +20,7 @@ const schema = object({
 });
 
 router.post(async (req, res) => {
-  const reqWithUser = req as NextApiRequestWithUser;
-  checkSchema({body: schema})(reqWithUser, res, async () => {});
+  checkSchema({body: schema})(req, res, async () => {});
 
   let fullAccount = await prisma_instance.accounts.findFirst({
     where: {
