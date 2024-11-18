@@ -47,7 +47,17 @@ export default function login(){
     async function handleLogin(e: React.SyntheticEvent){
         e.preventDefault();
         if(email == "" || password == "") {setError(true); return;}
-        let data = await fetcher<session>("/api/auth/login", "POST", {email:email, password:password}).catch(()=>null);
+        // let data = await fetcher<session>("/api/auth/login", "POST", {email:email, password:password}).catch(()=>null);
+        let data = await fetch(`/api/auth/login`, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email, password
+            })
+        });
+        
         if(data == null) {
             setError(true);
         // } else if (data.user.json.otp_enabled) { 
