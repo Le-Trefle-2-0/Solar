@@ -20,6 +20,9 @@ const schema = object({
 });
 
 router.post(async (req, res) => {
+  if (req.body.json) {
+    req.body = req.body.json;
+  }
   checkSchema({body: schema})(req, res, async () => {});
 
   let fullAccount = await prisma_instance.accounts.findFirst({
