@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { memo, useEffect, useRef, useState } from "react";
 import Nav from "../components/sidebar";
 import getSession from "../utils/get_session";
+import { auth } from "@/auth";
 
 export default function  AuthenticatedLayout({children} : React.PropsWithChildren<any>){
   const router = useRouter();
@@ -10,7 +11,7 @@ export default function  AuthenticatedLayout({children} : React.PropsWithChildre
 
   useEffect(()=>{
     (async()=>{
-      let ses = getSession();
+      let ses = await auth();
       if(!ses){
         setMessage("Redirection")
         router.push("/auth/login");
