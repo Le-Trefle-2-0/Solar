@@ -6,7 +6,7 @@ import TwoFactorAuthForm from "../../src/components/form/2fa";
 import session from "../../src/interfaces/session";
 import LoginLayout from "../../src/layouts/login-layout";
 import fetcher from "../../src/utils/fetcher";
-import { signIn } from "../../auth";
+import { signIn } from "next-auth/react";
 
 type data = { 
     jwt: string,
@@ -47,25 +47,41 @@ export default function login(){
 
     async function handleLogin(e: React.SyntheticEvent){
         e.preventDefault();
-        if(email == "" || password == "") {setError(true); return;}
-        // let data = await fetcher<session>("/api/auth/login", "POST", {email:email, password:password}).catch(()=>null);
-        let data = await fetch(`/api/auth/login`, {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                email, password
-            })
+        let res = await signIn("credentials", {
+            email,
+            password,
+            redirectTo: "/events"
         });
-
-        if(data == null) {
-            setError(true);
-        // } else if (data.user.json.otp_enabled) { 
-        //     setIsPopupOpen(true);
+        if (res?.ok) {
+            // toast success
+            console.log("success");
+            return;
         } else {
-            authCookie(data as any);
+            // Toast failed
+            setError(true);
+            // return;
+            console.log("Failed", res);
         }
+        return res;
+        // if(email == "" || password == "") {setError(true); return;}
+        // // let data = await fetcher<session>("/api/auth/login", "POST", {email:email, password:password}).catch(()=>null);
+        // let data = await fetch(`/api/auth/login`, {
+        //     method: "POST",
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify({
+        //         email, password
+        //     })
+        // });
+
+        // if(data == null) {
+        //     setError(true);
+        // // } else if (data.user.json.otp_enabled) { 
+        // //     setIsPopupOpen(true);
+        // } else {
+        //     authCookie(data as any);
+        // }
     }
 
     // async function handle2FA(code: string){
@@ -81,10 +97,7 @@ export default function login(){
         <div>
             <LoginLayout>
                 <h2>Le Trèfle 2.0</h2>
-                <form className="flex flex-col items-center w-full" action={async (formData) => {
-                    'use server'
-                    await signIn(formData)
-                }}>
+                <form className="flex flex-col items-center w-full" onSubmit={handleLogin}>
                     <input 
                         type="text"
                         defaultValue={email}
