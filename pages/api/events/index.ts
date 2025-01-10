@@ -34,10 +34,10 @@ router.use(expressWrapper(checkJWT)).get(async (req, res) => {
   res.status(200).send(await getCalendar());
 })
 .post(async (req, res) => {
-  if(!req.session.user.json.is_ref && !req.session.user.json.is_admin && !req.session.user.json.is_bot) {
-      res.status(403).send("forbidden")
-      return;
-  }
+  // if(!req.session.user.json.is_ref && !req.session.user.json.is_admin && !req.session.user.json.is_bot) {
+  //     res.status(403).send("forbidden")
+  //     return;
+  // }
   req.body.date_start = new Date(req.body.date_start);
   if(req.body.date_end){
     req.body.date_end = new Date(req.body.date_end);
