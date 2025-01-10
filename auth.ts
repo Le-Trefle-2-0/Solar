@@ -11,7 +11,6 @@ import { prisma } from "./prisma";
 export const { handlers, signIn, signOut, auth } = NextAuth({
     // adapter: PrismaAdapter(prisma),
     providers: [
-        // Discord
         Credentials({
             credentials: {
                 email: {},
@@ -57,9 +56,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     }
                 }
             }
-        })
+        }),
+        Discord,
     ],
     pages: {
-        signIn: '/auth/login',
+        // signIn: '/auth/login',
     }
 })
