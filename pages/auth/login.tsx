@@ -6,7 +6,9 @@ import TwoFactorAuthForm from "../../src/components/form/2fa";
 import session from "../../src/interfaces/session";
 import LoginLayout from "../../src/layouts/login-layout";
 import fetcher from "../../src/utils/fetcher";
-import { signIn } from "next-auth/react";
+// import { signIn } from "next-auth/react";
+import { useEffect } from "react";
+import { auth, signIn } from "@/auth";
 
 type data = { 
     jwt: string,
@@ -25,6 +27,15 @@ type data = {
 }
 
 export default function login(){
+    useEffect(()=>{
+        (async()=>{
+            let ses = await auth();
+            if(ses){
+                router.push("/events");
+            }
+        })()
+    },[])
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [otp, setOtp] = useState("");
@@ -53,35 +64,13 @@ export default function login(){
             redirectTo: "/events"
         });
         if (res?.ok) {
-            // toast success
             console.log("success");
             return;
         } else {
-            // Toast failed
             setError(true);
-            // return;
             console.log("Failed", res);
         }
         return res;
-        // if(email == "" || password == "") {setError(true); return;}
-        // // let data = await fetcher<session>("/api/auth/login", "POST", {email:email, password:password}).catch(()=>null);
-        // let data = await fetch(`/api/auth/login`, {
-        //     method: "POST",
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify({
-        //         email, password
-        //     })
-        // });
-
-        // if(data == null) {
-        //     setError(true);
-        // // } else if (data.user.json.otp_enabled) { 
-        // //     setIsPopupOpen(true);
-        // } else {
-        //     authCookie(data as any);
-        // }
     }
 
     // async function handle2FA(code: string){
@@ -97,7 +86,14 @@ export default function login(){
         <div>
             <LoginLayout>
                 <h2>Le Trèfle 2.0</h2>
-                <form className="flex flex-col items-center w-full" onSubmit={handleLogin}>
+                <form className="flex flex-col items-center w-full" action={async () => {
+                    "use server"
+                    await signIn("credentials", {
+                        email,
+                        password,
+                        redirectTo: "/events"
+                    });
+                }}>
                     <input 
                         type="text"
                         defaultValue={email}
