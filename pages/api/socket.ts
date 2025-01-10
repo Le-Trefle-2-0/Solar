@@ -1,8 +1,8 @@
-import { Server, ServerOptions } from 'socket.io';
 import http from "http";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { Server, ServerOptions } from 'socket.io';
 import session from "../../src/interfaces/session";
-import socketAuth, { BotSession, ClientType } from "../../src/socket/ServerActions/SocketAuth";
+import { BotSession, ClientType } from "../../src/socket/ServerActions/SocketAuth";
 
 type IoData = {
     eventSessions: {
