@@ -1,13 +1,11 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { NextResponse, NextRequest } from 'next/server';
-import checkJWT, { getSessionFromJWT } from './src/middlewares/checkJWT';
+import { auth } from "@/auth";
 
-export { auth as middleware } from "./auth";
+const publicRoutes = ['/api/auth/signin', '/api/auth/signin/discord', '/api/auth/callback/discord']
 
-// export async function middleware(req: NextApiRequest & NextRequest, res: NextApiResponse & NextResponse) {
-//   const { href, pathname } = req.nextUrl
-//   switch(pathname) {
-//     case "/": return NextResponse.redirect(href + 'events');
-//   }
-//   return NextResponse.next()
-// }
+export default auth((req) => {
+    if (!req.auth && !publicRoutes.includes(req.nextUrl.pathname)) {
+        const newUrl = new URL('/api/auth/signin', req.nextUrl.origin);
+        console.log(req.nextUrl.pathname);
+        return Response.redirect(newUrl);
+    }
+})
