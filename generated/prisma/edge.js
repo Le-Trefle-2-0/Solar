@@ -199,7 +199,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\admin\\WebstormProjects\\Solar\\generated\\prisma",
+      "value": "/Users/paul/WebstormProjects/Solar/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -208,17 +208,16 @@ const config = {
     "binaryTargets": [
       {
         "fromEnvVar": null,
-        "value": "windows",
+        "value": "darwin-arm64",
         "native": true
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\admin\\WebstormProjects\\Solar\\prisma\\schema.prisma",
+    "sourceFilePath": "/Users/paul/WebstormProjects/Solar/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null,
-    "schemaEnvPath": "../../.env"
+    "rootEnvPath": null
   },
   "relativePath": "../../prisma",
   "clientVersion": "6.9.0",
@@ -227,7 +226,7 @@ const config = {
     "db"
   ],
   "activeProvider": "mysql",
-  "postinstall": false,
+  "postinstall": true,
   "inlineDatasources": {
     "db": {
       "url": {
