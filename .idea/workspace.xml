@@ -5,34 +5,29 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="setup prisma for better-auth">
-      <change afterPath="$PROJECT_DIR$/generated/prisma/client.d.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/generated/prisma/client.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/generated/prisma/default.d.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/generated/prisma/default.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/generated/prisma/edge.d.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/generated/prisma/edge.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/generated/prisma/index-browser.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/generated/prisma/index.d.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/generated/prisma/index.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/generated/prisma/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/generated/prisma/query_engine-windows.dll.node" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/generated/prisma/runtime/edge-esm.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/generated/prisma/runtime/edge.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/generated/prisma/runtime/index-browser.d.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/generated/prisma/runtime/index-browser.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/generated/prisma/runtime/library.d.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/generated/prisma/runtime/library.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/generated/prisma/runtime/react-native.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/generated/prisma/runtime/wasm-compiler-edge.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/generated/prisma/runtime/wasm-engine-edge.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/generated/prisma/schema.prisma" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/generated/prisma/wasm.d.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/generated/prisma/wasm.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/prisma/migrations/20250608132205_dev/migration.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/prisma/migrations/migration_lock.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/prisma/schema.prisma" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/api/auth/[...all]/route.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/auth/signin/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/auth/signup/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/components/ui/button.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/components/ui/card.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/components/ui/checkbox.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/components/ui/input.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/components/ui/label.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/auth-client.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/resend.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/utils.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/auth.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/auth.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/prisma/edge.js" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/edge.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/prisma/index-browser.js" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/index-browser.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/prisma/index.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/index.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/prisma/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/prisma/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/schema.prisma" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/prisma/wasm.js" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/wasm.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/schema.prisma" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,8 +37,9 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="TypeScript JSX File" />
         <option value="TypeScript File" />
+        <option value="tsconfig.json" />
+        <option value="TypeScript JSX File" />
       </list>
     </option>
   </component>
@@ -110,6 +106,7 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\admin\WebstormProjects\Solar\lib" />
       <recent name="C:\Users\admin\WebstormProjects\Solar" />
       <recent name="C:\Users\admin\WebstormProjects\Solar\components\auth" />
     </key>
@@ -131,7 +128,7 @@
       <updated>1749129029242</updated>
       <workItem from="1749129030358" duration="8079000" />
       <workItem from="1749387412260" duration="1223000" />
-      <workItem from="1749388665920" duration="299000" />
+      <workItem from="1749388665920" duration="2538000" />
     </task>
     <task id="LOCAL-00001" summary="Base setup">
       <option name="closed" value="true" />
@@ -173,7 +170,15 @@
       <option name="project" value="LOCAL" />
       <updated>1749388510235</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="setup prisma for better-auth">
+      <option name="closed" value="true" />
+      <created>1749389006328</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1749389006329</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

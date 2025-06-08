@@ -1,7 +1,6 @@
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../app/generated/prisma"
+  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -12,22 +11,21 @@ datasource db {
 model User {
   id            String    @id
   name          String    @db.Text
-  email         String
+  email         String    @unique
   emailVerified Boolean
   image         String?   @db.Text
   createdAt     DateTime
   updatedAt     DateTime
-  sessions      Session[]
   accounts      Account[]
+  sessions      Session[]
 
-  @@unique([email])
   @@map("user")
 }
 
 model Session {
   id        String   @id
   expiresAt DateTime
-  token     String
+  token     String   @unique
   createdAt DateTime
   updatedAt DateTime
   ipAddress String?  @db.Text
@@ -35,7 +33,7 @@ model Session {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([token])
+  @@index([userId], map: "session_userId_fkey")
   @@map("session")
 }
 
@@ -44,7 +42,6 @@ model Account {
   accountId             String    @db.Text
   providerId            String    @db.Text
   userId                String
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   accessToken           String?   @db.Text
   refreshToken          String?   @db.Text
   idToken               String?   @db.Text
@@ -54,7 +51,9 @@ model Account {
   password              String?   @db.Text
   createdAt             DateTime
   updatedAt             DateTime
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId], map: "account_userId_fkey")
   @@map("account")
 }
 

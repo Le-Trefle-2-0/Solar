@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../app/generated/prisma"
+  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -8,72 +8,62 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Account {
-  id                       String   @id
-  userId                   String   @unique
-  type                     String
-  provider                 String
-  providerAccountId        String
-  refresh_token            String?  @db.Text
-  access_token             String?  @db.Text
-  expires_at               Int?
-  token_type               String?
-  scope                    String?
-  id_token                 String?  @db.Text
-  session_state            String?
-  refresh_token_expires_in Int?
-  createdAt                DateTime @default(now())
-  updatedAt                DateTime
-  User                     User     @relation(fields: [userId], references: [id])
+model User {
+  id            String    @id
+  name          String    @db.Text
+  email         String    @unique
+  emailVerified Boolean
+  image         String?   @db.Text
+  createdAt     DateTime
+  updatedAt     DateTime
+  accounts      Account[]
+  sessions      Session[]
 
-  @@unique([provider, providerAccountId])
-  @@index([userId])
-}
-
-model Authenticator {
-  credentialID         String  @unique
-  userId               String
-  providerAccountId    String
-  credentialPublicKey  String
-  counter              Int
-  credentialDeviceType String
-  credentialBackedUp   Boolean
-  transports           String?
-  User                 User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@id([userId, credentialID])
+  @@map("user")
 }
 
 model Session {
-  id           String   @id
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime
-  User         User     @relation(fields: [userId], references: [id])
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?  @db.Text
+  userAgent String?  @db.Text
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId])
+  @@index([userId], map: "session_userId_fkey")
+  @@map("session")
 }
 
-model User {
-  id            String          @id
-  name          String?
-  username      String?         @unique
-  email         String?         @unique
-  emailVerified DateTime?
-  image         String?
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime
-  Account       Account?
-  Authenticator Authenticator[]
-  Session       Session[]
+model Account {
+  id                    String    @id
+  accountId             String    @db.Text
+  providerId            String    @db.Text
+  userId                String
+  accessToken           String?   @db.Text
+  refreshToken          String?   @db.Text
+  idToken               String?   @db.Text
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?   @db.Text
+  password              String?   @db.Text
+  createdAt             DateTime
+  updatedAt             DateTime
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "account_userId_fkey")
+  @@map("account")
 }
 
-model VerificationToken {
-  identifier String
-  token      String
-  expires    DateTime
+model Verification {
+  id         String    @id
+  identifier String    @db.Text
+  value      String    @db.Text
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
 
-  @@unique([identifier, token])
+  @@map("verification")
 }
