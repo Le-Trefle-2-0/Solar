@@ -127,7 +127,12 @@ exports.Prisma.UserScalarFieldEnum = {
   emailVerified: 'emailVerified',
   image: 'image',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    role: 'role',
+    banned: 'banned',
+    banReason: 'banReason',
+    banExpires: 'banExpires',
+    twoFactorEnabled: 'twoFactorEnabled'
 };
 
 exports.Prisma.SessionScalarFieldEnum = {
@@ -138,7 +143,9 @@ exports.Prisma.SessionScalarFieldEnum = {
   updatedAt: 'updatedAt',
   ipAddress: 'ipAddress',
   userAgent: 'userAgent',
-  userId: 'userId'
+    userId: 'userId',
+    impersonatedBy: 'impersonatedBy',
+    activeOrganizationId: 'activeOrganizationId'
 };
 
 exports.Prisma.AccountScalarFieldEnum = {
@@ -166,6 +173,40 @@ exports.Prisma.VerificationScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.OrganizationScalarFieldEnum = {
+    id: 'id',
+    name: 'name',
+    slug: 'slug',
+    logo: 'logo',
+    createdAt: 'createdAt',
+    metadata: 'metadata'
+};
+
+exports.Prisma.MemberScalarFieldEnum = {
+    id: 'id',
+    organizationId: 'organizationId',
+    userId: 'userId',
+    role: 'role',
+    createdAt: 'createdAt'
+};
+
+exports.Prisma.InvitationScalarFieldEnum = {
+    id: 'id',
+    organizationId: 'organizationId',
+    email: 'email',
+    role: 'role',
+    status: 'status',
+    expiresAt: 'expiresAt',
+    inviterId: 'inviterId'
+};
+
+exports.Prisma.TwoFactorScalarFieldEnum = {
+    id: 'id',
+    secret: 'secret',
+    backupCodes: 'backupCodes',
+    userId: 'userId'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -180,7 +221,9 @@ exports.Prisma.UserOrderByRelevanceFieldEnum = {
   id: 'id',
   name: 'name',
   email: 'email',
-  image: 'image'
+    image: 'image',
+    role: 'role',
+    banReason: 'banReason'
 };
 
 exports.Prisma.SessionOrderByRelevanceFieldEnum = {
@@ -188,7 +231,9 @@ exports.Prisma.SessionOrderByRelevanceFieldEnum = {
   token: 'token',
   ipAddress: 'ipAddress',
   userAgent: 'userAgent',
-  userId: 'userId'
+    userId: 'userId',
+    impersonatedBy: 'impersonatedBy',
+    activeOrganizationId: 'activeOrganizationId'
 };
 
 exports.Prisma.AccountOrderByRelevanceFieldEnum = {
@@ -209,12 +254,47 @@ exports.Prisma.VerificationOrderByRelevanceFieldEnum = {
   value: 'value'
 };
 
+exports.Prisma.OrganizationOrderByRelevanceFieldEnum = {
+    id: 'id',
+    name: 'name',
+    slug: 'slug',
+    logo: 'logo',
+    metadata: 'metadata'
+};
+
+exports.Prisma.MemberOrderByRelevanceFieldEnum = {
+    id: 'id',
+    organizationId: 'organizationId',
+    userId: 'userId',
+    role: 'role'
+};
+
+exports.Prisma.InvitationOrderByRelevanceFieldEnum = {
+    id: 'id',
+    organizationId: 'organizationId',
+    email: 'email',
+    role: 'role',
+    status: 'status',
+    inviterId: 'inviterId'
+};
+
+exports.Prisma.TwoFactorOrderByRelevanceFieldEnum = {
+    id: 'id',
+    secret: 'secret',
+    backupCodes: 'backupCodes',
+    userId: 'userId'
+};
+
 
 exports.Prisma.ModelName = {
   User: 'User',
   Session: 'Session',
   Account: 'Account',
-  Verification: 'Verification'
+    Verification: 'Verification',
+    Organization: 'Organization',
+    Member: 'Member',
+    Invitation: 'Invitation',
+    TwoFactor: 'TwoFactor'
 };
 
 /**
