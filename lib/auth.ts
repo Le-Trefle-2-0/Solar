@@ -17,6 +17,7 @@ export const auth = betterAuth({
                 subject: "Réinitialisation de mot de passe",
                 html: data.url
             });
-        }
+        },
+        autoSignIn: true,
     },
 });
