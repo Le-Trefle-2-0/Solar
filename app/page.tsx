@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { signIn, signUp } from "@/server/users";
 import { headers } from "next/headers";
-import SignOut from "./signout";
+import SignOut from "@/components/auth/signout";
 
 export default async function Home() {
   const session = await auth.api.getSession({
