@@ -1,8 +1,9 @@
-import { betterAuth } from "better-auth";
-import { prismaAdapter } from "better-auth/adapters/prisma";
-import { PrismaClient } from "@/generated/prisma";
+import {betterAuth} from "better-auth";
+import {prismaAdapter} from "better-auth/adapters/prisma";
+import {PrismaClient} from "@/generated/prisma";
 import {resend} from "@/lib/resend";
-import {emailOTP} from "better-auth/plugins";
+import {ac, admin, myCustomRole, user} from "./permissions"
+import {admin as adminPlugin, emailOTP, organization, twoFactor} from "better-auth/plugins";
 
 const prisma = new PrismaClient();
 export const auth = betterAuth({
@@ -31,6 +32,13 @@ export const auth = betterAuth({
                     html: otp
                 });
             }
-        })
+        }),
+        adminPlugin({
+            ac, roles: {
+                admin, user, myCustomRole
+            }
+        }),
+        organization(),
+        twoFactor()
     ]
 });
