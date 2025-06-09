@@ -74,7 +74,7 @@ export default function SignIn() {
                                     email,
                                     password,
                                     rememberMe: true,
-                                    callbackURL: "/dashboard",
+                                    callbackURL: "/app",
                                 },
                                 {
                                     onRequest: (ctx) => {

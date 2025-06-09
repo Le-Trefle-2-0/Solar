@@ -4,15 +4,31 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="prisma and better-auth full base setup">
-      <change afterPath="$PROJECT_DIR$/lib/auth-session.ts" afterDir="false" />
+    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="update auth style and translate pages to french">
+      <change afterPath="$PROJECT_DIR$/app/app/layout.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/app/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/components/nav/link.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/components/nav/sidebar.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/permissions.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/assets/Logomark.svg" beforeDir="false" afterPath="$PROJECT_DIR$/app/logo.svg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/auth/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/auth/layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/auth/recover/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/auth/recover/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/auth/reset/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/auth/reset/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/auth/signin/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/auth/signin/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/auth/signup/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/auth/signup/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/globals.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/prisma/edge.js" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/edge.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/prisma/index-browser.js" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/index-browser.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/prisma/index.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/index.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/prisma/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/prisma/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/schema.prisma" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/prisma/wasm.js" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/wasm.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/auth-client.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/auth-client.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/auth.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/next.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/next.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/schema.prisma" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,8 +39,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="tsconfig.json" />
-        <option value="TypeScript JSX File" />
         <option value="TypeScript File" />
+        <option value="TypeScript JSX File" />
       </list>
     </option>
   </component>
@@ -63,7 +79,7 @@
   }
 }</component>
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="CurrentFile" />
+    <option name="selectedTabId" value="DEPENDENCY_CHECKER_PROBLEMS_TAB" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 5
@@ -86,18 +102,15 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;settings.qodana&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.CommitDialog&quot;,
     &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\admin\\WebstormProjects\\Solar\\node_modules\\typescript\\lib&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="QodanaReportsService">
-    <option name="descriptions">
-      <ReportDescription localRun="true" path="C:\Users\admin\AppData\Local\Temp\qodana_output\qodana.sarif.json" publishedReportLink="https://qodana.cloud/projects/Q6jv1/reports/YOO8nv" reportGuid="1c489040-1f3f-4e3e-b55b-472f7ac3477c" reportId="Solar/qodana/2025-06-05" />
-    </option>
-  </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\admin\WebstormProjects\Solar\app" />
+      <recent name="C:\Users\admin\WebstormProjects\Solar\app\assets" />
       <recent name="C:\Users\admin\WebstormProjects\Solar\lib" />
       <recent name="C:\Users\admin\WebstormProjects\Solar" />
       <recent name="C:\Users\admin\WebstormProjects\Solar\components\auth" />
@@ -120,7 +133,9 @@
       <updated>1749129029242</updated>
       <workItem from="1749129030358" duration="8079000" />
       <workItem from="1749387412260" duration="1223000" />
-      <workItem from="1749388665920" duration="5701000" />
+      <workItem from="1749388665920" duration="7169000" />
+      <workItem from="1749471981714" duration="4976000" />
+      <workItem from="1749477012478" duration="610000" />
     </task>
     <task id="LOCAL-00001" summary="Base setup">
       <option name="closed" value="true" />
@@ -178,7 +193,31 @@
       <option name="project" value="LOCAL" />
       <updated>1749391630813</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="update password recovery system">
+      <option name="closed" value="true" />
+      <created>1749470676615</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1749470676615</updated>
+    </task>
+    <task id="LOCAL-00009" summary="autofix unused imports">
+      <option name="closed" value="true" />
+      <created>1749470914261</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1749470914261</updated>
+    </task>
+    <task id="LOCAL-00010" summary="update auth style and translate pages to french">
+      <option name="closed" value="true" />
+      <created>1749473074490</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1749473074490</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -201,6 +240,11 @@
     <MESSAGE value="configure base prisma" />
     <MESSAGE value="setup prisma for better-auth" />
     <MESSAGE value="prisma and better-auth full base setup" />
-    <option name="LAST_COMMIT_MESSAGE" value="prisma and better-auth full base setup" />
+    <MESSAGE value="update password recovery system" />
+    <MESSAGE value="autofix unused imports" />
+    <MESSAGE value="update auth style and translate pages to french" />
+    <option name="LAST_COMMIT_MESSAGE" value="update auth style and translate pages to french" />
+    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
+    <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
 </project>
