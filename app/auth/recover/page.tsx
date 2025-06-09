@@ -1,12 +1,12 @@
 "use client"
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useState } from "react";
-import { Loader2 } from "lucide-react";
-import { forgetPassword } from "@/lib/auth-client";
+import {Button} from "@/components/ui/button";
+import {CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {useState} from "react";
+import {Loader2} from "lucide-react";
+import {forgetPassword} from "@/lib/auth-client";
 import {toast} from "sonner";
 
 export default function SignIn() {
@@ -14,7 +14,7 @@ export default function SignIn() {
     const [loading, setLoading] = useState(false);
 
     return (
-        <Card className="max-w-md">
+        <div>
             <CardHeader>
                 <CardTitle className="text-lg md:text-xl">Sign In</CardTitle>
                 <CardDescription className="text-xs md:text-sm">
@@ -73,6 +73,6 @@ export default function SignIn() {
                 </div>
             </CardContent>
 
-        </Card>
+        </div>
     );
 }

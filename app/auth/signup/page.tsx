@@ -1,21 +1,15 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import {Button} from "@/components/ui/button";
+import {CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {useState} from "react";
 import Image from "next/image";
-import { Loader2, X } from "lucide-react";
-import { signUp } from "@/lib/auth-client";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import {Loader2, X} from "lucide-react";
+import {signUp} from "@/lib/auth-client";
+import {toast} from "sonner";
+import {useRouter} from "next/navigation";
 
 export default function SignUp() {
     const [firstName, setFirstName] = useState("");
@@ -41,18 +35,18 @@ export default function SignUp() {
     };
 
     return (
-        <Card className="z-50 rounded-md rounded-t-none max-w-md">
+        <div>
             <CardHeader>
-                <CardTitle className="text-lg md:text-xl">Sign Up</CardTitle>
+                <CardTitle className="text-lg md:text-xl">Inscription</CardTitle>
                 <CardDescription className="text-xs md:text-sm">
-                    Enter your information to create an account
+                    Merci d'entrer les informations nécessaires a la création du compte
                 </CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="grid gap-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="first-name">First name</Label>
+                            <Label htmlFor="first-name">Prénom</Label>
                             <Input
                                 id="first-name"
                                 placeholder="Max"
@@ -64,7 +58,7 @@ export default function SignUp() {
                             />
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="last-name">Last name</Label>
+                            <Label htmlFor="last-name">Nom</Label>
                             <Input
                                 id="last-name"
                                 placeholder="Robinson"
@@ -77,7 +71,7 @@ export default function SignUp() {
                         </div>
                     </div>
                     <div className="grid gap-2">
-                        <Label htmlFor="email">Email</Label>
+                        <Label htmlFor="email">Courriel</Label>
                         <Input
                             id="email"
                             type="email"
@@ -90,7 +84,7 @@ export default function SignUp() {
                         />
                     </div>
                     <div className="grid gap-2">
-                        <Label htmlFor="password">Password</Label>
+                        <Label htmlFor="password">Mot de passe</Label>
                         <Input
                             id="password"
                             type="password"
@@ -101,7 +95,7 @@ export default function SignUp() {
                         />
                     </div>
                     <div className="grid gap-2">
-                        <Label htmlFor="password">Confirm Password</Label>
+                        <Label htmlFor="password">Confirmation de mot de passe</Label>
                         <Input
                             id="password_confirmation"
                             type="password"
@@ -112,7 +106,7 @@ export default function SignUp() {
                         />
                     </div>
                     <div className="grid gap-2">
-                        <Label htmlFor="image">Profile Image (optional)</Label>
+                        <Label htmlFor="image">Image de profil (optionel)</Label>
                         <div className="flex items-end gap-4">
                             {imagePreview && (
                                 <div className="relative w-16 h-16 rounded-sm overflow-hidden">
@@ -178,12 +172,12 @@ export default function SignUp() {
                         {loading ? (
                             <Loader2 size={16} className="animate-spin" />
                         ) : (
-                            "Create an account"
+                            "Inscription"
                         )}
                     </Button>
                 </div>
             </CardContent>
-        </Card>
+        </div>
     );
 }
 

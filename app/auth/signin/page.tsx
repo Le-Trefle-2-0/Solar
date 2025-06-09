@@ -1,15 +1,13 @@
 "use client"
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useState } from "react";
-import { Loader2, Key } from "lucide-react";
-import { signIn } from "@/lib/auth-client";
+import {Button} from "@/components/ui/button";
+import {CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {useState} from "react";
+import {Loader2} from "lucide-react";
+import {signIn} from "@/lib/auth-client";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 
 export default function SignIn() {
     const [email, setEmail] = useState("");
@@ -18,17 +16,17 @@ export default function SignIn() {
 
 
     return (
-        <Card className="max-w-md">
+        <div>
             <CardHeader>
-                <CardTitle className="text-lg md:text-xl">Sign In</CardTitle>
+                <CardTitle className="text-lg md:text-xl">Connexion</CardTitle>
                 <CardDescription className="text-xs md:text-sm">
-                    Enter your email below to login to your account
+                    Entrez votre courriel et mot de passe
                 </CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="grid gap-4">
                     <div className="grid gap-2">
-                        <Label htmlFor="email">Email</Label>
+                        <Label htmlFor="email">Courriel</Label>
                         <Input
                             id="email"
                             type="email"
@@ -43,19 +41,19 @@ export default function SignIn() {
 
                     <div className="grid gap-2">
                         <div className="flex items-center">
-                            <Label htmlFor="password">Password</Label>
+                            <Label htmlFor="password">Mot de passe</Label>
                             <Link
                                 href="/auth/recover"
                                 className="ml-auto inline-block text-sm underline"
                             >
-                                Forgot your password?
+                                Mot de passe oublié ?
                             </Link>
                         </div>
 
                         <Input
                             id="password"
                             type="password"
-                            placeholder="password"
+                            placeholder="Mot de passe"
                             autoComplete="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
@@ -92,7 +90,7 @@ export default function SignIn() {
                         {loading ? (
                             <Loader2 size={16} className="animate-spin" />
                         ) : (
-                            <p> Login </p>
+                            <p> Connexion </p>
                         )}
                     </Button>
 
@@ -102,6 +100,6 @@ export default function SignIn() {
                 </div>
             </CardContent>
 
-        </Card>
+        </div>
     );
 }
