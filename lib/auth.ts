@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { PrismaClient } from "@/generated/prisma";
 import {resend} from "@/lib/resend";
+import {emailOTP} from "better-auth/plugins";
 
 const prisma = new PrismaClient();
 export const auth = betterAuth({
@@ -20,4 +21,16 @@ export const auth = betterAuth({
         },
         autoSignIn: true,
     },
+    plugins: [
+        emailOTP({
+            async sendVerificationOTP({ email, otp, type }) {
+                await resend.emails.send({
+                    from: "noreply@solar.letrefle.org",
+                    to: email,
+                    subject: "OTP connection",
+                    html: otp
+                });
+            }
+        })
+    ]
 });
