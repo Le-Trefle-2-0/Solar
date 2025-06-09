@@ -150,7 +150,7 @@ export default function SignUp() {
                         className="w-full"
                         disabled={loading}
                         onClick={async () => {
-                            await signUp.email({
+                            const { data, error } = await signUp.email({
                                 email,
                                 password,
                                 name: `${firstName} - ${lastName}`,
@@ -171,6 +171,9 @@ export default function SignUp() {
                                     },
                                 },
                             });
+                            if (error) {
+                                toast.error(error.message);
+                            }
                         }}
                     >
                         {loading ? (

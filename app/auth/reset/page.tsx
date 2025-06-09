@@ -10,17 +10,18 @@ import { Loader2, Key } from "lucide-react";
 import { resetPassword } from "@/lib/auth-client";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { useRouter } from "next/navigation";
+import {useRouter, useSearchParams} from "next/navigation";
+import {toast} from "sonner";
 
 export default function SignIn() {
     const router = useRouter();
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
-    const token = new URLSearchParams(window.location.search).get("token");
+    const searchParams = useSearchParams();
+    const token = searchParams.get("token");
     if (!token) {
         return router.push("/auth/sigin");
     }
-
 
     return (
         <Card className="max-w-md">
@@ -51,10 +52,26 @@ export default function SignIn() {
                         className="w-full"
                         disabled={loading}
                         onClick={async () => {
-                            const { data, error } = await resetPassword({
-                                newPassword: "password1234",
-                                token,
-                            });
+                            setLoading(true);
+                            const { data, error } = await resetPassword(
+                                {
+                                    newPassword: password,
+                                    token,
+                                },
+                                {
+                                    onError: (error) => {
+                                        toast.error(error.error.message);
+                                        setLoading(false);
+                                    },
+                                    onSuccess: () => {
+                                        toast.success("Mot de passe réinitialisé");
+                                        setLoading(false);
+                                        setTimeout(() => {
+                                            router.push('/auth/signin');
+                                        }, 1000)
+                                    }
+                                }
+                            );
                         }}
                     >
                         {loading ? (

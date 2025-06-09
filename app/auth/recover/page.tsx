@@ -10,11 +10,11 @@ import { Loader2, Key } from "lucide-react";
 import { forgetPassword } from "@/lib/auth-client";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import {toast} from "sonner";
 
 export default function SignIn() {
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
-
 
     return (
         <Card className="max-w-md">
@@ -46,10 +46,21 @@ export default function SignIn() {
                         disabled={loading}
                         onClick={async () => {
                             setLoading(true);
-                            await forgetPassword({
-                                email: email,
-                                redirectTo: "/auth/reset"
-                            });
+                            await forgetPassword(
+                                {
+                                    email: email,
+                                    redirectTo: "/auth/reset"
+                                },
+                                {
+                                    onError: (error) => {
+                                        toast.error(error.error.message);
+                                        setLoading(false);
+                                    },
+                                    onSuccess: () => {
+                                        toast.success("Lien de réinitialisation envoyé par mail");
+                                        setLoading(false);
+                                    }
+                                });
                         }}
                     >
                         {loading ? (
