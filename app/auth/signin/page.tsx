@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import { Loader2, Key } from "lucide-react";
-import { signIn } from "@/lib/auth-client";
+import { signIn  } from "@/lib/auth-client";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -45,7 +45,7 @@ export default function SignIn() {
                         <div className="flex items-center">
                             <Label htmlFor="password">Password</Label>
                             <Link
-                                href="#"
+                                href="/auth/recover"
                                 className="ml-auto inline-block text-sm underline"
                             >
                                 Forgot your password?
@@ -71,10 +71,12 @@ export default function SignIn() {
                         className="w-full"
                         disabled={loading}
                         onClick={async () => {
-                            const {error} = await signIn.email(
+                            await signIn.email(
                                 {
                                     email,
-                                    password
+                                    password,
+                                    rememberMe: true,
+                                    callbackURL: "/dashboard",
                                 },
                                 {
                                     onRequest: (ctx) => {
@@ -85,10 +87,6 @@ export default function SignIn() {
                                     },
                                 },
                             );
-
-                            if (error) {
-                                console.error(error);
-                            }
                         }}
                     >
                         {loading ? (
