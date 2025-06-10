@@ -1,5 +1,5 @@
 import {Card} from '@/components/ui/card';
-import logo from '@/app/logo.svg'
+import logo from '@/public/logo.svg'
 import Image from "next/image";
 
 export default function RootLayout({

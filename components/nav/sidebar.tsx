@@ -1,50 +1,28 @@
-"use client";
+"use server";
+import NavLink from "./link"
+import logo from '@/public/logo.svg'
+import Image from "next/image";
+import {auth} from "@/lib/auth"; // path to your Better Auth server instance
+import {headers} from "next/headers";
+import {redirect} from "next/navigation";
 
-import {Sidebar, SidebarItem, SidebarItemGroup, SidebarItems, SidebarLogo} from "flowbite-react";
-import {HiArrowSmRight, HiChartPie, HiInbox, HiShoppingBag, HiTable, HiUser, HiViewBoards} from "react-icons/hi";
-
-export default function Nav() {
+export default async function Nav() {
+    const session = await auth.api.getSession({
+        headers: await headers()
+    });
+    if (!session) return redirect("/auth/signin");
     return (
-        <Sidebar aria-label="Default sidebar example">
-            <SidebarLogo href="#" img="/logo.svg" imgAlt="Le Trèfle 2.0 logo">
+        <div className="w-3xs border-e border-main flex flex-col justify-between items-center">
+            <div className="w-5/6 flex flex-row items-center gap-6 mt-2">
+                <Image src={logo} alt="logo" height={80}/>
                 Le Trèfle 2.0
-            </SidebarLogo>
-            <SidebarItems>
-                <SidebarItemGroup>
-                    <SidebarItem href="#" icon={HiChartPie}>
-                        Dashboard
-                    </SidebarItem>
-                    <SidebarItem href="#" icon={HiViewBoards} label="Pro" labelColor="dark">
-                        Kanban
-                    </SidebarItem>
-                    <SidebarItem href="#" icon={HiInbox} label="5">
-                        Inbox
-                    </SidebarItem>
-                    <SidebarItem href="#" icon={HiUser}>
-                        Users
-                    </SidebarItem>
-                    <SidebarItem href="#" icon={HiShoppingBag}>
-                        Products
-                    </SidebarItem>
-                    <SidebarItem href="#" icon={HiArrowSmRight}>
-                        Sign In
-                    </SidebarItem>
-                    <SidebarItem href="#" icon={HiTable}>
-                        Sign Up
-                    </SidebarItem>
-                </SidebarItemGroup>
-                <SidebarItemGroup>
-                    <SidebarItem href="#" icon={HiChartPie}>
-                        Upgrade to Pro
-                    </SidebarItem>
-                    <SidebarItem href="#" icon={HiViewBoards}>
-                        Documentation
-                    </SidebarItem>
-                    <SidebarItem href="#" icon={HiViewBoards}>
-                        Help
-                    </SidebarItem>
-                </SidebarItemGroup>
-            </SidebarItems>
-        </Sidebar>
+            </div>
+            <ul className="flex flex-col w-full">
+                <NavLink link='/app' name='Accueil' icon='none'/>
+                <NavLink link='/dashboard' name='Dashboard' icon='none'/>
+                <NavLink link='/admin' name='Admin' icon='none'/>
+            </ul>
+            <div>{session.user.name}</div>
+        </div>
     );
 }

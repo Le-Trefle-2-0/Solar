@@ -4,10 +4,11 @@
 @source "../.flowbite-react/class-list.json";
 
 :root {
-  --background: #f6f6f6;
+  --background: #fff;
   --foreground: #171717;
   --main: #8cc088;
   --accent: #9bd2d2;
+  --fill: #d1e8dd;
 }
 
 @theme inline {
@@ -15,6 +16,7 @@
   --color-foreground: var(--foreground);
   --color-main: var(--main);
   --color-accent: var(--accent);
+  --color-fill: var(--fill);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

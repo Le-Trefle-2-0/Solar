@@ -40,5 +40,10 @@ export const auth = betterAuth({
         }),
         organization(),
         twoFactor()
-    ]
+    ],
+    account: {
+        accountLinking: {
+            enabled: true
+        }
+    }
 });
