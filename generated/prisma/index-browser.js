@@ -207,6 +207,14 @@ exports.Prisma.TwoFactorScalarFieldEnum = {
     userId: 'userId'
 };
 
+exports.Prisma.MessageScalarFieldEnum = {
+    id: 'id',
+    createdAt: 'createdAt',
+    userId: 'userId',
+    channelId: 'channelId',
+    content: 'content'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -285,6 +293,12 @@ exports.Prisma.TwoFactorOrderByRelevanceFieldEnum = {
     userId: 'userId'
 };
 
+exports.Prisma.MessageOrderByRelevanceFieldEnum = {
+    userId: 'userId',
+    channelId: 'channelId',
+    content: 'content'
+};
+
 
 exports.Prisma.ModelName = {
   User: 'User',
@@ -294,7 +308,8 @@ exports.Prisma.ModelName = {
     Organization: 'Organization',
     Member: 'Member',
     Invitation: 'Invitation',
-    TwoFactor: 'TwoFactor'
+    TwoFactor: 'TwoFactor',
+    Message: 'Message'
 };
 
 /**
