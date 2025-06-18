@@ -14,8 +14,15 @@ app.prepare().then(() => {
 
     const io = new Server(httpServer);
 
-    io.on("connection", (socket) => {
-        // ...
+    io.on("connection", async (socket) => {
+        socket.on("listen", (data) => {
+            socket.join(data.id)
+        });
+
+        socket.on("sendMessage", (data) => {
+            console.log(data, 'DATA');
+            socket.to(data.channel.id).emit("message", data);
+        })
     });
 
     httpServer

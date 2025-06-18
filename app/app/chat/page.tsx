@@ -1,11 +1,48 @@
 "use client";
 
-import {useEffect, useState} from "react";
+import {FormEvent, useEffect, useState} from "react";
 import {socket} from "@/socket";
+import {authClient} from "@/lib/auth-client";
+import Image from "next/image";
+import {Msg} from "@/lib/interface"
+import {saveMessage} from "@/lib/messageManager";
 
-export default function Home() {
+export default function Chat() {
+    const session = authClient.useSession();
     const [isConnected, setIsConnected] = useState(false);
     const [transport, setTransport] = useState("N/A");
+    const [currentMsg, setCurrentMsg] = useState("");
+    const [chat, setChat] = useState<Msg[]>([])
+
+    socket.emit('listen', {id: '1'})
+    useEffect(() => {
+        fetch('/api/messages/1')
+            .then(res => res.json())
+            .then(data => setChat(data))
+    }, []);
+
+    const sendMessage = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (currentMsg !== "") {
+            const msg: Msg = {
+                author: {
+                    id: session.data?.user.id as string,
+                    name: session.data?.user.name as string,
+                    image: session.data?.user.image as string
+                },
+                content: currentMsg,
+                timestamp: Date.now(),
+                channel: {
+                    id: '1'
+                }
+            }
+
+            saveMessage(msg)
+            socket.emit("sendMessage", msg);
+            setCurrentMsg("");
+            setChat((pre) => [...pre, msg])
+        }
+    }
 
     useEffect(() => {
         if (socket.connected) {
@@ -28,6 +65,9 @@ export default function Home() {
 
         socket.on("connect", onConnect);
         socket.on("disconnect", onDisconnect);
+        socket.on("message", (data: Msg) => {
+            setChat((pre) => [...pre, data])
+        })
 
         return () => {
             socket.off("connect", onConnect);
@@ -37,8 +77,39 @@ export default function Home() {
 
     return (
         <div>
-            <p>Status: {isConnected ? "connected" : "disconnected"}</p>
-            <p>Transport: {transport}</p>
+            <div className="flex flex-col justify-between h-screen p-3">
+                <div className="flex flex-col justify-start h-screen gap-6">
+                    {chat.map(({author, content, timestamp}, key) => (
+                        <div className="w-full flex flex-row gap-2" key={key}>
+                            <Image src={(author.image ? author.image : '/logo.svg')} alt="Image de profil" width={48}
+                                   height={48} className="rounded-xl"/>
+                            <div>
+                                <div className="flex flex-row items-center gap-4">
+                                    <span className="font-semibold text-sm font-bold text-gray-900">
+                                        {author.name}
+                                    </span>
+                                    <span className="font-light text-sm text-gray-900">
+                                        {new Date(timestamp).toLocaleString()}
+                                    </span>
+                                </div>
+                                <h3 className="text-lg text-gray-900">
+                                    {content}
+                                </h3>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                <form onSubmit={(e) => sendMessage(e)}>
+                    <input
+                        type="text"
+                        value={currentMsg}
+                        placeholder="Type your message.."
+                        onChange={(e) => setCurrentMsg(e.target.value)}
+                    />
+                    <button>Send</button>
+                </form>
+            </div>
         </div>
     );
 }
