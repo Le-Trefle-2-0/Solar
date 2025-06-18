@@ -14,7 +14,9 @@ export default function RootLayout({
     return (
         <div className="flex h-screen">
             <Nav/>
-            {children}
+            <div className="overflow-auto w-full">
+                {children}
+            </div>
         </div>
     );
 }

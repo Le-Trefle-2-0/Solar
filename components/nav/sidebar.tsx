@@ -12,7 +12,7 @@ export default async function Nav() {
     const session = await auth.api.getSession({
         headers: await headers()
     });
-    if (!session) return redirect("/auth/signin");
+    if (!session) return redirect("/auth/sign-in");
     return (
         <div className="w-3xs border-e border-main flex flex-col justify-between items-center">
             <div className="w-5/6 flex flex-row items-center gap-6 mt-2">
@@ -23,9 +23,7 @@ export default async function Nav() {
                 <NavLink link='/app' name='Accueil' icon={faHouse}/>
                 <NavLink link='/app/chat' name='Permanence' icon={faComment}/>
             </ul>
-            <div>
-                <UserButton size="full"/>
-            </div>
+            <UserButton size="full" className="w-full rounded-none"/>
         </div>
     );
 }

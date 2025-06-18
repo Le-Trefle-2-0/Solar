@@ -4,20 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="sidebar styling">
-      <change afterPath="$PROJECT_DIR$/app/auth/[pathname]/page.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/auth/[pathname]/view.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/providers.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/auth-bg.png" afterDir="false" />
+    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="install socket.io">
+      <change afterPath="$PROJECT_DIR$/app/app/chat/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/app/settings/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/socket.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/auth/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/auth/layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/globals.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/nav/link.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/nav/link.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/app/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/app/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/auth/[pathname]/view.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/auth/[pathname]/view.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/providers.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/providers.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/nav/sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/nav/sidebar.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/auth.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/utils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/utils.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -30,6 +28,7 @@
       <list>
         <option value="tsconfig.json" />
         <option value="TypeScript File" />
+        <option value="JavaScript File" />
         <option value="TypeScript JSX File" />
       </list>
     </option>
@@ -125,7 +124,9 @@
       <workItem from="1749387412260" duration="1223000" />
       <workItem from="1749388665920" duration="7169000" />
       <workItem from="1749471981714" duration="4976000" />
-      <workItem from="1749477012478" duration="14320000" />
+      <workItem from="1749477012478" duration="15760000" />
+      <workItem from="1749913419546" duration="1325000" />
+      <workItem from="1750256176404" duration="4643000" />
     </task>
     <task id="LOCAL-00001" summary="Base setup">
       <option name="closed" value="true" />
@@ -239,7 +240,23 @@
       <option name="project" value="LOCAL" />
       <updated>1749514590389</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="base app interface layout">
+      <option name="closed" value="true" />
+      <created>1749522876431</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1749522876431</updated>
+    </task>
+    <task id="LOCAL-00016" summary="install socket.io">
+      <option name="closed" value="true" />
+      <created>1749547285771</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1749547285771</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -269,7 +286,9 @@
     <MESSAGE value="update prisma schema for plugins" />
     <MESSAGE value="base app layout" />
     <MESSAGE value="sidebar styling" />
-    <option name="LAST_COMMIT_MESSAGE" value="sidebar styling" />
+    <MESSAGE value="base app interface layout" />
+    <MESSAGE value="install socket.io" />
+    <option name="LAST_COMMIT_MESSAGE" value="install socket.io" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
