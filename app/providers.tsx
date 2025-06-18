@@ -33,7 +33,7 @@ export function Providers({children}: { children: ReactNode }) {
             }}
             twoFactor={["totp"]}
             localization={locale}
-            signUp={false}
+            signUp={true}
             signInSocial={async () => {
                 await authClient.signIn.social({
                     provider: "discord",

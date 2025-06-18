@@ -6,10 +6,14 @@ import {authClient} from "@/lib/auth-client";
 import Image from "next/image";
 import {Msg} from "@/lib/interface"
 import {saveMessage} from "@/lib/messageManager";
+import EmojiPicker, {EmojiStyle} from 'emoji-picker-react';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import {faFaceSmileWink, faPaperPlane} from "@fortawesome/free-regular-svg-icons";
 
 export default function Chat() {
     const session = authClient.useSession();
     const [isConnected, setIsConnected] = useState(false);
+    const [emojiOpen, setEmojiOpen] = useState(false);
     const [transport, setTransport] = useState("N/A");
     const [currentMsg, setCurrentMsg] = useState("");
     const [chat, setChat] = useState<Msg[]>([])
@@ -78,7 +82,7 @@ export default function Chat() {
     return (
         <div>
             <div className="flex flex-col justify-between h-screen p-3">
-                <div className="flex flex-col justify-start h-screen gap-6">
+                <div className="flex flex-col justify-start h-screen gap-6 overflow-auto">
                     {chat.map(({author, content, timestamp}, key) => (
                         <div className="w-full flex flex-row gap-2" key={key}>
                             <Image src={(author.image ? author.image : '/logo.svg')} alt="Image de profil" width={48}
@@ -100,14 +104,26 @@ export default function Chat() {
                     ))}
                 </div>
 
-                <form onSubmit={(e) => sendMessage(e)}>
+                <div className="absolute right-2 bottom-15">
+                    <EmojiPicker emojiStyle={EmojiStyle.TWITTER} onEmojiClick={(emoji) => {
+                        setCurrentMsg(currentMsg + ' ' + emoji.emoji);
+                    }} open={emojiOpen}/>
+                </div>
+
+                <form onSubmit={(e) => sendMessage(e)} className='flex flex-row w-full gap-2 items-center'>
                     <input
                         type="text"
                         value={currentMsg}
-                        placeholder="Type your message.."
+                        placeholder="Envoyer un message dans permanence"
                         onChange={(e) => setCurrentMsg(e.target.value)}
+                        className="w-full flex flex-row w-full outline-main outline-1 p-2 rounded-lg"
                     />
-                    <button>Send</button>
+                    <FontAwesomeIcon icon={faFaceSmileWink} width={32} onClick={() => {
+                        console.log('emoji click')
+                        if (emojiOpen) setEmojiOpen(false);
+                        else setEmojiOpen(true);
+                    }} className='cursor-pointer'/>
+                    <button className='cursor-pointer'><FontAwesomeIcon icon={faPaperPlane} width={32}/></button>
                 </form>
             </div>
         </div>
