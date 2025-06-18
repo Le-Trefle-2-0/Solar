@@ -14,7 +14,7 @@ export default async function Nav() {
     });
     if (!session) return redirect("/auth/sign-in");
     return (
-        <div className="w-3xs border-e border-main flex flex-col justify-between items-center">
+        <div className="w-2xs border-e border-main flex flex-col justify-between items-center">
             <div className="w-5/6 flex flex-row items-center gap-6 mt-2">
                 <Image src={logo} alt="logo" height={80}/>
                 Le Trèfle 2.0
