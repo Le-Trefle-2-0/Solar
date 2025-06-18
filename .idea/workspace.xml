@@ -4,19 +4,26 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="install socket.io">
-      <change afterPath="$PROJECT_DIR$/app/app/chat/page.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/app/settings/page.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/socket.js" afterDir="false" />
+    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="auth ui update">
+      <change afterPath="$PROJECT_DIR$/app/api/messages/[channel]/route.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/app/chat/getMessages.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/components/ui/messages.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/interface.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/messageManager.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/prisma.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/app/layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/app/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/auth/[pathname]/view.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/auth/[pathname]/view.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/app/chat/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/app/chat/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/providers.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/providers.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/nav/sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/nav/sidebar.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/prisma/edge.js" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/edge.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/prisma/index-browser.js" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/index-browser.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/prisma/index.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/index.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/prisma/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/prisma/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/schema.prisma" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/prisma/wasm.js" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/wasm.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/schema.prisma" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/server.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,9 +34,9 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="tsconfig.json" />
-        <option value="TypeScript File" />
         <option value="JavaScript File" />
         <option value="TypeScript JSX File" />
+        <option value="TypeScript File" />
       </list>
     </option>
   </component>
@@ -68,7 +75,7 @@
   }
 }</component>
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="DEPENDENCY_CHECKER_PROBLEMS_TAB" />
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 5
@@ -98,11 +105,11 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\admin\WebstormProjects\Solar\app\api\messages" />
+      <recent name="C:\Users\admin\WebstormProjects\Solar\lib" />
       <recent name="C:\Users\admin\WebstormProjects\Solar\public" />
       <recent name="C:\Users\admin\WebstormProjects\Solar\app" />
       <recent name="C:\Users\admin\WebstormProjects\Solar\app\assets" />
-      <recent name="C:\Users\admin\WebstormProjects\Solar\lib" />
-      <recent name="C:\Users\admin\WebstormProjects\Solar" />
     </key>
   </component>
   <component name="SharedIndexes">
@@ -126,7 +133,7 @@
       <workItem from="1749471981714" duration="4976000" />
       <workItem from="1749477012478" duration="15760000" />
       <workItem from="1749913419546" duration="1325000" />
-      <workItem from="1750256176404" duration="4643000" />
+      <workItem from="1750256176404" duration="20565000" />
     </task>
     <task id="LOCAL-00001" summary="Base setup">
       <option name="closed" value="true" />
@@ -256,7 +263,23 @@
       <option name="project" value="LOCAL" />
       <updated>1749547285771</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="setup socket server">
+      <option name="closed" value="true" />
+      <created>1750260978496</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1750260978496</updated>
+    </task>
+    <task id="LOCAL-00018" summary="auth ui update">
+      <option name="closed" value="true" />
+      <created>1750261079133</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1750261079133</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -288,7 +311,9 @@
     <MESSAGE value="sidebar styling" />
     <MESSAGE value="base app interface layout" />
     <MESSAGE value="install socket.io" />
-    <option name="LAST_COMMIT_MESSAGE" value="install socket.io" />
+    <MESSAGE value="setup socket server" />
+    <MESSAGE value="auth ui update" />
+    <option name="LAST_COMMIT_MESSAGE" value="auth ui update" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
