@@ -89,7 +89,7 @@ export default function Chat() {
                                    height={48} className="rounded-xl"/>
                             <div>
                                 <div className="flex flex-row items-center gap-4">
-                                    <span className="font-semibold text-sm font-bold text-gray-900">
+                                    <span className="font-semibold text-sm text-gray-900">
                                         {author.name}
                                     </span>
                                     <span className="font-light text-sm text-gray-900">
@@ -116,7 +116,7 @@ export default function Chat() {
                         value={currentMsg}
                         placeholder="Envoyer un message dans permanence"
                         onChange={(e) => setCurrentMsg(e.target.value)}
-                        className="w-full flex flex-row w-full outline-main outline-1 p-2 rounded-lg"
+                        className="w-full flex flex-row outline-main outline-1 p-2 rounded-lg"
                     />
                     <FontAwesomeIcon icon={faFaceSmileWink} width={32} onClick={() => {
                         if (emojiOpen) setEmojiOpen(false);
