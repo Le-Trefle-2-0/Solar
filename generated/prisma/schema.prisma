@@ -18,6 +18,7 @@ model User {
   updatedAt     DateTime
   accounts      Account[]
   sessions      Session[]
+  messages Message[]
 
   role       String?   @db.Text
   banned     Boolean?
@@ -131,4 +132,13 @@ model TwoFactor {
   user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("twoFactor")
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channelId String
+  content   String
 }
