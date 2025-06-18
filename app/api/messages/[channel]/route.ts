@@ -43,6 +43,5 @@ export async function GET(
             }
         });
     }
-    console.log(messages);
     return Response.json(messages);
 }

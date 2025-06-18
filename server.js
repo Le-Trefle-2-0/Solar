@@ -20,7 +20,6 @@ app.prepare().then(() => {
         });
 
         socket.on("sendMessage", (data) => {
-            console.log(data, 'DATA');
             socket.to(data.channel.id).emit("message", data);
         })
     });

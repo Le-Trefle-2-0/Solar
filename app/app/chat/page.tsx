@@ -119,7 +119,6 @@ export default function Chat() {
                         className="w-full flex flex-row w-full outline-main outline-1 p-2 rounded-lg"
                     />
                     <FontAwesomeIcon icon={faFaceSmileWink} width={32} onClick={() => {
-                        console.log('emoji click')
                         if (emojiOpen) setEmojiOpen(false);
                         else setEmojiOpen(true);
                     }} className='cursor-pointer'/>

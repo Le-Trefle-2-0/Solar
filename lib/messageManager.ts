@@ -45,6 +45,5 @@ export const getMessages = async (channelId: string) => {
             }
         });
     }
-    console.log(messages);
     return messages;
 }
