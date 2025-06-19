@@ -6,7 +6,7 @@ import {auth} from "@/lib/auth";
 import {headers} from "next/headers";
 import {redirect} from "next/navigation";
 import {UserButton} from "@daveyplate/better-auth-ui";
-import {faComment, faHouse} from "@fortawesome/free-solid-svg-icons";
+import {faCalendarDays, faComment, faHouse} from "@fortawesome/free-solid-svg-icons";
 
 export default async function Nav() {
     const session = await auth.api.getSession({
@@ -22,6 +22,7 @@ export default async function Nav() {
             <ul className="flex flex-col w-full">
                 <NavLink link='/app' name='Accueil' icon={faHouse}/>
                 <NavLink link='/app/chat' name='Permanence' icon={faComment}/>
+                <NavLink link='/app/planning' name='Planning' icon={faCalendarDays}/>
             </ul>
             <UserButton size="full" className="w-full rounded-none"/>
         </div>
