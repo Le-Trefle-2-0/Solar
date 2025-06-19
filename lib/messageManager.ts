@@ -9,7 +9,7 @@ export const saveMessage = async (msg: Msg) => {
                 createdAt: new Date(),
                 userId: msg.author.id,
                 channelId: '1',
-                content: msg.content,
+                content: Buffer.from(msg.content, "utf8"),
             }
         });
 
@@ -38,7 +38,7 @@ export const getMessages = async (channelId: string) => {
                 image: user.image as string,
                 name: user.name
             },
-            content: msg.content,
+            content: Buffer.from(new Uint8Array(Object.values(msg.content))).toString('utf8'),
             timestamp: new Date(msg.createdAt).getTime(),
             channel: {
                 id: '1',

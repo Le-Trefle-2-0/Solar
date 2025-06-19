@@ -295,8 +295,7 @@ exports.Prisma.TwoFactorOrderByRelevanceFieldEnum = {
 
 exports.Prisma.MessageOrderByRelevanceFieldEnum = {
     userId: 'userId',
-    channelId: 'channelId',
-    content: 'content'
+    channelId: 'channelId'
 };
 
 

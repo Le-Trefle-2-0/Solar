@@ -18,7 +18,7 @@ model User {
   updatedAt     DateTime
   accounts      Account[]
   sessions      Session[]
-  messages Message[]
+  messages      Message[]
 
   role       String?   @db.Text
   banned     Boolean?
@@ -140,5 +140,5 @@ model Message {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   channelId String
-  content   String
+  content   Bytes
 }

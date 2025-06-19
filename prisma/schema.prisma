@@ -141,5 +141,5 @@ model Message {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   channelId String
-  content   String
+  content   Bytes
 }

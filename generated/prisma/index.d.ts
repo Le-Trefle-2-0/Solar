@@ -54,7 +54,7 @@ export type Invitation = $Result.DefaultSelection<Prisma.$InvitationPayload>
 export type TwoFactor = $Result.DefaultSelection<Prisma.$TwoFactorPayload>
 /**
  * Model Message
- *
+ * 
  */
 export type Message = $Result.DefaultSelection<Prisma.$MessagePayload>
 
@@ -171,7 +171,7 @@ export class PrismaClient<
    *   prisma.user.create({ data: { name: 'Alice' } }),
    * ])
    * ```
-   *
+   * 
    * Read more in our [docs](https://www.prisma.io/docs/concepts/components/prisma-client/transactions).
    */
   $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>
@@ -9530,7 +9530,7 @@ export namespace Prisma {
         createdAt: Date | null
         userId: string | null
         channelId: string | null
-        content: string | null
+        content: Uint8Array | null
     }
 
     export type MessageMaxAggregateOutputType = {
@@ -9538,7 +9538,7 @@ export namespace Prisma {
         createdAt: Date | null
         userId: string | null
         channelId: string | null
-        content: string | null
+        content: Uint8Array | null
     }
 
     export type MessageCountAggregateOutputType = {
@@ -9673,7 +9673,7 @@ export namespace Prisma {
         createdAt: Date
         userId: string
         channelId: string
-        content: string
+        content: Uint8Array
         _count: MessageCountAggregateOutputType | null
         _avg: MessageAvgAggregateOutputType | null
         _sum: MessageSumAggregateOutputType | null
@@ -9728,7 +9728,7 @@ export namespace Prisma {
             createdAt: Date
             userId: string
             channelId: string
-            content: string
+            content: Uint8Array
         }, ExtArgs["result"]["message"]>
         composites: {}
     }
@@ -10107,7 +10107,7 @@ export namespace Prisma {
         readonly createdAt: FieldRef<"Message", 'DateTime'>
         readonly userId: FieldRef<"Message", 'String'>
         readonly channelId: FieldRef<"Message", 'String'>
-        readonly content: FieldRef<"Message", 'String'>
+        readonly content: FieldRef<"Message", 'Bytes'>
     }
 
 
@@ -10715,8 +10715,7 @@ export namespace Prisma {
 
     export const MessageOrderByRelevanceFieldEnum: {
         userId: 'userId',
-        channelId: 'channelId',
-        content: 'content'
+        channelId: 'channelId'
     };
 
     export type MessageOrderByRelevanceFieldEnum = (typeof MessageOrderByRelevanceFieldEnum)[keyof typeof MessageOrderByRelevanceFieldEnum]
@@ -10749,6 +10748,12 @@ export namespace Prisma {
    * Reference to a field of type 'Int'
    */
   export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+
+
+    /**
+     * Reference to a field of type 'Bytes'
+     */
+    export type BytesFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Bytes'>
 
 
     /**
@@ -11353,7 +11358,7 @@ export namespace Prisma {
         createdAt?: DateTimeFilter<"Message"> | Date | string
         userId?: StringFilter<"Message"> | string
         channelId?: StringFilter<"Message"> | string
-        content?: StringFilter<"Message"> | string
+        content?: BytesFilter<"Message"> | Uint8Array
         user?: XOR<UserScalarRelationFilter, UserWhereInput>
     }
 
@@ -11375,7 +11380,7 @@ export namespace Prisma {
         createdAt?: DateTimeFilter<"Message"> | Date | string
         userId?: StringFilter<"Message"> | string
         channelId?: StringFilter<"Message"> | string
-        content?: StringFilter<"Message"> | string
+        content?: BytesFilter<"Message"> | Uint8Array
         user?: XOR<UserScalarRelationFilter, UserWhereInput>
     }, "id">
 
@@ -11400,7 +11405,7 @@ export namespace Prisma {
         createdAt?: DateTimeWithAggregatesFilter<"Message"> | Date | string
         userId?: StringWithAggregatesFilter<"Message"> | string
         channelId?: StringWithAggregatesFilter<"Message"> | string
-        content?: StringWithAggregatesFilter<"Message"> | string
+        content?: BytesWithAggregatesFilter<"Message"> | Uint8Array
     }
 
   export type UserCreateInput = {
@@ -12040,7 +12045,7 @@ export namespace Prisma {
     export type MessageCreateInput = {
         createdAt: Date | string
         channelId: string
-        content: string
+        content: Uint8Array
         user: UserCreateNestedOneWithoutMessagesInput
     }
 
@@ -12049,13 +12054,13 @@ export namespace Prisma {
         createdAt: Date | string
         userId: string
         channelId: string
-        content: string
+        content: Uint8Array
     }
 
     export type MessageUpdateInput = {
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
         channelId?: StringFieldUpdateOperationsInput | string
-        content?: StringFieldUpdateOperationsInput | string
+        content?: BytesFieldUpdateOperationsInput | Uint8Array
         user?: UserUpdateOneRequiredWithoutMessagesNestedInput
     }
 
@@ -12064,7 +12069,7 @@ export namespace Prisma {
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
         userId?: StringFieldUpdateOperationsInput | string
         channelId?: StringFieldUpdateOperationsInput | string
-        content?: StringFieldUpdateOperationsInput | string
+        content?: BytesFieldUpdateOperationsInput | Uint8Array
     }
 
     export type MessageCreateManyInput = {
@@ -12072,13 +12077,13 @@ export namespace Prisma {
         createdAt: Date | string
         userId: string
         channelId: string
-        content: string
+        content: Uint8Array
     }
 
     export type MessageUpdateManyMutationInput = {
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
         channelId?: StringFieldUpdateOperationsInput | string
-        content?: StringFieldUpdateOperationsInput | string
+        content?: BytesFieldUpdateOperationsInput | Uint8Array
     }
 
     export type MessageUncheckedUpdateManyInput = {
@@ -12086,7 +12091,7 @@ export namespace Prisma {
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
         userId?: StringFieldUpdateOperationsInput | string
         channelId?: StringFieldUpdateOperationsInput | string
-        content?: StringFieldUpdateOperationsInput | string
+        content?: BytesFieldUpdateOperationsInput | Uint8Array
     }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -12626,6 +12631,13 @@ export namespace Prisma {
         not?: NestedIntFilter<$PrismaModel> | number
     }
 
+    export type BytesFilter<$PrismaModel = never> = {
+        equals?: Uint8Array | BytesFieldRefInput<$PrismaModel>
+        in?: Uint8Array[]
+        notIn?: Uint8Array[]
+        not?: NestedBytesFilter<$PrismaModel> | Uint8Array
+    }
+
     export type MessageOrderByRelevanceInput = {
         fields: MessageOrderByRelevanceFieldEnum | MessageOrderByRelevanceFieldEnum[]
         sort: SortOrder
@@ -12678,6 +12690,16 @@ export namespace Prisma {
         _sum?: NestedIntFilter<$PrismaModel>
         _min?: NestedIntFilter<$PrismaModel>
         _max?: NestedIntFilter<$PrismaModel>
+    }
+
+    export type BytesWithAggregatesFilter<$PrismaModel = never> = {
+        equals?: Uint8Array | BytesFieldRefInput<$PrismaModel>
+        in?: Uint8Array[]
+        notIn?: Uint8Array[]
+        not?: NestedBytesWithAggregatesFilter<$PrismaModel> | Uint8Array
+        _count?: NestedIntFilter<$PrismaModel>
+        _min?: NestedBytesFilter<$PrismaModel>
+        _max?: NestedBytesFilter<$PrismaModel>
     }
 
   export type AccountCreateNestedManyWithoutUserInput = {
@@ -13144,6 +13166,10 @@ export namespace Prisma {
         connect?: UserWhereUniqueInput
     }
 
+    export type BytesFieldUpdateOperationsInput = {
+        set?: Uint8Array
+    }
+
     export type UserUpdateOneRequiredWithoutMessagesNestedInput = {
         create?: XOR<UserCreateWithoutMessagesInput, UserUncheckedCreateWithoutMessagesInput>
         connectOrCreate?: UserCreateOrConnectWithoutMessagesInput
@@ -13324,6 +13350,13 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
+    export type NestedBytesFilter<$PrismaModel = never> = {
+        equals?: Uint8Array | BytesFieldRefInput<$PrismaModel>
+        in?: Uint8Array[]
+        notIn?: Uint8Array[]
+        not?: NestedBytesFilter<$PrismaModel> | Uint8Array
+    }
+
     export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
         equals?: number | IntFieldRefInput<$PrismaModel>
         in?: number[]
@@ -13349,6 +13382,16 @@ export namespace Prisma {
         gt?: number | FloatFieldRefInput<$PrismaModel>
         gte?: number | FloatFieldRefInput<$PrismaModel>
         not?: NestedFloatFilter<$PrismaModel> | number
+    }
+
+    export type NestedBytesWithAggregatesFilter<$PrismaModel = never> = {
+        equals?: Uint8Array | BytesFieldRefInput<$PrismaModel>
+        in?: Uint8Array[]
+        notIn?: Uint8Array[]
+        not?: NestedBytesWithAggregatesFilter<$PrismaModel> | Uint8Array
+        _count?: NestedIntFilter<$PrismaModel>
+        _min?: NestedBytesFilter<$PrismaModel>
+        _max?: NestedBytesFilter<$PrismaModel>
     }
 
   export type AccountCreateWithoutUserInput = {
@@ -13428,14 +13471,14 @@ export namespace Prisma {
     export type MessageCreateWithoutUserInput = {
         createdAt: Date | string
         channelId: string
-        content: string
+        content: Uint8Array
     }
 
     export type MessageUncheckedCreateWithoutUserInput = {
         id?: number
         createdAt: Date | string
         channelId: string
-        content: string
+        content: Uint8Array
     }
 
     export type MessageCreateOrConnectWithoutUserInput = {
@@ -13613,7 +13656,7 @@ export namespace Prisma {
         createdAt?: DateTimeFilter<"Message"> | Date | string
         userId?: StringFilter<"Message"> | string
         channelId?: StringFilter<"Message"> | string
-        content?: StringFilter<"Message"> | string
+        content?: BytesFilter<"Message"> | Uint8Array
     }
 
     export type MemberUpsertWithWhereUniqueWithoutUserInput = {
@@ -14501,7 +14544,7 @@ export namespace Prisma {
         id?: number
         createdAt: Date | string
         channelId: string
-        content: string
+        content: Uint8Array
     }
 
     export type MemberCreateManyUserInput = {
@@ -14610,21 +14653,21 @@ export namespace Prisma {
     export type MessageUpdateWithoutUserInput = {
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
         channelId?: StringFieldUpdateOperationsInput | string
-        content?: StringFieldUpdateOperationsInput | string
+        content?: BytesFieldUpdateOperationsInput | Uint8Array
     }
 
     export type MessageUncheckedUpdateWithoutUserInput = {
         id?: IntFieldUpdateOperationsInput | number
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
         channelId?: StringFieldUpdateOperationsInput | string
-        content?: StringFieldUpdateOperationsInput | string
+        content?: BytesFieldUpdateOperationsInput | Uint8Array
     }
 
     export type MessageUncheckedUpdateManyWithoutUserInput = {
         id?: IntFieldUpdateOperationsInput | number
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
         channelId?: StringFieldUpdateOperationsInput | string
-        content?: StringFieldUpdateOperationsInput | string
+        content?: BytesFieldUpdateOperationsInput | Uint8Array
     }
 
     export type MemberUpdateWithoutUserInput = {
