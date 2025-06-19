@@ -11,6 +11,8 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faFaceSmileWink, faPaperPlane} from "@fortawesome/free-regular-svg-icons";
 import {faCircle} from "@fortawesome/free-solid-svg-icons";
 import {Textarea} from "@/components/ui/textarea";
+import {z, ZodError} from "zod";
+import {toast} from "sonner";
 
 export default function Chat() {
     const session = authClient.useSession();
@@ -22,6 +24,15 @@ export default function Chat() {
     const [chat, setChat] = useState<Msg[]>([])
     const [opacity, setOpacity] = useState(25);
     const formRef = useRef<HTMLFormElement>(null);
+    const textRef = useRef<HTMLTextAreaElement>(null);
+    const rootDivRef = useRef<HTMLDivElement>(null);
+
+    const messageSchema = z
+        .string()
+        .max(2000, "Votre message est trop long")
+        .refine((val) => val.trim().length >= 1, {
+            message: "Contenu du message non supporté",
+        });
 
     socket.emit('listen', {id: '1'})
     useEffect(() => {
@@ -39,6 +50,14 @@ export default function Chat() {
 
     const sendMessage = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        try {
+            messageSchema.parse(currentMsg);
+        } catch (error) {
+            if (error instanceof ZodError) {
+                return toast.error(error.errors[0].message);
+            }
+        }
         if (currentMsg !== "") {
             const msg: Msg = {
                 author: {
@@ -64,6 +83,7 @@ export default function Chat() {
     }
 
     useEffect(() => {
+        rootDivRef.current?.focus();
         if (socket.connected) {
             onConnect();
         }
@@ -97,7 +117,11 @@ export default function Chat() {
     }, []);
 
     return (
-        <div>
+        <div onKeyDown={(e) => {
+            if (e.key !== "Enter") {
+                textRef.current?.focus();
+            }
+        }} tabIndex={0} ref={rootDivRef}>
             <div className="flex flex-col justify-between h-screen p-3 gap-4">
                 <div className="flex flex-col justify-end h-screen gap-6 overflow-auto">
                     {chat.map(({author, content, timestamp}, key) => (
@@ -124,6 +148,8 @@ export default function Chat() {
                 <div className="absolute right-2 bottom-15">
                     <EmojiPicker emojiStyle={EmojiStyle.TWITTER} onEmojiClick={(emoji) => {
                         setCurrentMsg(currentMsg + ' ' + emoji.emoji);
+                        setEmojiOpen(false);
+                        textRef.current?.focus();
                     }} open={emojiOpen}/>
                 </div>
                 <div className={showTyping ? 'flex flex-row gap-1 relative left-2 bottom-3' : 'hidden'}>
@@ -140,6 +166,7 @@ export default function Chat() {
                             setCurrentMsg(e.target.value)
                             sendTyping()
                         }}
+                        ref={textRef}
                         onKeyDown={(e) => {
                             if (e.key === "Enter" && !e.shiftKey) {
                                 e.preventDefault();
