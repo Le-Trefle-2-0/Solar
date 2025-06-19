@@ -215,6 +215,32 @@ exports.Prisma.MessageScalarFieldEnum = {
     content: 'content'
 };
 
+exports.Prisma.EventScalarFieldEnum = {
+    id: 'id',
+    title: 'title',
+    description: 'description',
+    start: 'start',
+    end: 'end',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    userId: 'userId'
+};
+
+exports.Prisma.RoleSlotScalarFieldEnum = {
+    id: 'id',
+    role: 'role',
+    goalCount: 'goalCount',
+    eventId: 'eventId'
+};
+
+exports.Prisma.EventRegistrationScalarFieldEnum = {
+    id: 'id',
+    userId: 'userId',
+    roleSlotId: 'roleSlotId',
+    registeredAt: 'registeredAt',
+    eventId: 'eventId'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -298,6 +324,26 @@ exports.Prisma.MessageOrderByRelevanceFieldEnum = {
     channelId: 'channelId'
 };
 
+exports.Prisma.EventOrderByRelevanceFieldEnum = {
+    id: 'id',
+    title: 'title',
+    description: 'description',
+    userId: 'userId'
+};
+
+exports.Prisma.RoleSlotOrderByRelevanceFieldEnum = {
+    id: 'id',
+    role: 'role',
+    eventId: 'eventId'
+};
+
+exports.Prisma.EventRegistrationOrderByRelevanceFieldEnum = {
+    id: 'id',
+    userId: 'userId',
+    roleSlotId: 'roleSlotId',
+    eventId: 'eventId'
+};
+
 
 exports.Prisma.ModelName = {
   User: 'User',
@@ -308,7 +354,10 @@ exports.Prisma.ModelName = {
     Member: 'Member',
     Invitation: 'Invitation',
     TwoFactor: 'TwoFactor',
-    Message: 'Message'
+    Message: 'Message',
+    Event: 'Event',
+    RoleSlot: 'RoleSlot',
+    EventRegistration: 'EventRegistration'
 };
 
 /**

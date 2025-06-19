@@ -4,11 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="remove double styling property">
-      <change afterPath="$PROJECT_DIR$/components/ui/textarea.tsx" afterDir="false" />
+    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="update database and text components to save long strings and line breaks">
+      <change afterPath="$PROJECT_DIR$/app/api/events/route.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/app/planning/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/eventManager.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/api/messages/[channel]/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/messages/[channel]/route.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/app/chat/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/app/chat/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/nav/sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/nav/sidebar.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/generated/prisma/edge.js" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/edge.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/generated/prisma/index-browser.js" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/index-browser.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/generated/prisma/index.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/index.d.ts" afterDir="false" />
@@ -16,7 +19,10 @@
       <change beforePath="$PROJECT_DIR$/generated/prisma/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/generated/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/schema.prisma" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/generated/prisma/wasm.js" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/wasm.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/messageManager.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/messageManager.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/interface.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/interface.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/permissions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/permissions.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/schema.prisma" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -29,9 +35,16 @@
       <list>
         <option value="tsconfig.json" />
         <option value="JavaScript File" />
-        <option value="TypeScript File" />
         <option value="TypeScript JSX File" />
+        <option value="TypeScript File" />
       </list>
+    </option>
+  </component>
+  <component name="FormatOnSaveOptions">
+    <option name="myRunOnSave" value="false" />
+    <option name="myAllFileTypesSelected" value="true" />
+    <option name="mySelectedFileTypes">
+      <set />
     </option>
   </component>
   <component name="Git.Settings">
@@ -85,7 +98,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.keymap",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
     "ts.external.directory.path": "/Users/paul/WebstormProjects/Solar/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
   }
@@ -122,7 +135,8 @@
       <workItem from="1749913419546" duration="1325000" />
       <workItem from="1750256176404" duration="27172000" />
       <workItem from="1750317616997" duration="272000" />
-      <workItem from="1750317896164" duration="5148000" />
+      <workItem from="1750317896164" duration="6375000" />
+      <workItem from="1750325497089" duration="5738000" />
     </task>
     <task id="LOCAL-00001" summary="Base setup">
       <option name="closed" value="true" />
@@ -356,7 +370,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750288272068</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="update database and text components to save long strings and line breaks">
+      <option name="closed" value="true" />
+      <created>1750324502631</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1750324502632</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -374,7 +396,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="configure base prisma" />
     <MESSAGE value="setup prisma for better-auth" />
     <MESSAGE value="prisma and better-auth full base setup" />
     <MESSAGE value="update password recovery system" />
@@ -399,7 +420,8 @@
     <MESSAGE value="add emoji selector to message sending" />
     <MESSAGE value="clean up console.log" />
     <MESSAGE value="remove double styling property" />
-    <option name="LAST_COMMIT_MESSAGE" value="remove double styling property" />
+    <MESSAGE value="update database and text components to save long strings and line breaks" />
+    <option name="LAST_COMMIT_MESSAGE" value="update database and text components to save long strings and line breaks" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>

@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -29,8 +28,10 @@ model User {
   members     Member[]
   invitations Invitation[]
 
-  twoFactorEnabled Boolean?
-  twofactors       TwoFactor[]
+  twoFactorEnabled  Boolean?
+  twofactors        TwoFactor[]
+  Event             Event[]
+  EventRegistration EventRegistration[]
 
   @@map("user")
 }
@@ -142,4 +143,40 @@ model Message {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   channelId String
   content   Bytes
+}
+
+model Event {
+  id            String              @id @default(cuid())
+  title         String
+  description   String?
+  start         DateTime
+  end           DateTime
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  userId        String
+  user          User                @relation(fields: [userId], references: [id])
+  roleSlots     RoleSlot[]
+  registrations EventRegistration[]
+}
+
+model RoleSlot {
+  id            String              @id @default(cuid())
+  role          String
+  goalCount     Int
+  event         Event               @relation(fields: [eventId], references: [id])
+  eventId       String
+  registrations EventRegistration[]
+}
+
+model EventRegistration {
+  id           String   @id @default(cuid())
+  user         User     @relation(fields: [userId], references: [id])
+  userId       String
+  roleSlot     RoleSlot @relation(fields: [roleSlotId], references: [id])
+  roleSlotId   String
+  registeredAt DateTime @default(now())
+  Event        Event?   @relation(fields: [eventId], references: [id])
+  eventId      String?
+
+  @@unique([userId, roleSlotId])
 }

@@ -10,3 +10,17 @@ export interface Msg {
         id: string;
     }
 }
+
+export type RoleSlotInput = {
+    role: string;
+    goalCount: number;
+};
+
+export type EventInput = {
+    title: string;
+    description?: string;
+    start: Date | string;
+    end: Date | string;
+    userId: string;
+    roleSlots: RoleSlotInput[];
+};
