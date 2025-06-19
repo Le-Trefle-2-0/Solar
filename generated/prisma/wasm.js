@@ -21,11 +21,11 @@ exports.$Enums = {}
 
 /**
  * Prisma Client JS version: 6.9.0
- * Query Engine version: 81e4af48011447c3cc503a190e86995b66d2a28e
+ * Query Engine version: 605197351a3c8bdd595af2d2a9bc3025bca48ea2
  */
 Prisma.prismaVersion = {
   client: "6.9.0",
-  engine: "81e4af48011447c3cc503a190e86995b66d2a28e"
+  engine: "605197351a3c8bdd595af2d2a9bc3025bca48ea2"
 }
 
 Prisma.PrismaClientKnownRequestError = () => {
@@ -127,12 +127,12 @@ exports.Prisma.UserScalarFieldEnum = {
   emailVerified: 'emailVerified',
   image: 'image',
   createdAt: 'createdAt',
-    updatedAt: 'updatedAt',
-    role: 'role',
-    banned: 'banned',
-    banReason: 'banReason',
-    banExpires: 'banExpires',
-    twoFactorEnabled: 'twoFactorEnabled'
+  updatedAt: 'updatedAt',
+  role: 'role',
+  banned: 'banned',
+  banReason: 'banReason',
+  banExpires: 'banExpires',
+  twoFactorEnabled: 'twoFactorEnabled'
 };
 
 exports.Prisma.SessionScalarFieldEnum = {
@@ -143,9 +143,9 @@ exports.Prisma.SessionScalarFieldEnum = {
   updatedAt: 'updatedAt',
   ipAddress: 'ipAddress',
   userAgent: 'userAgent',
-    userId: 'userId',
-    impersonatedBy: 'impersonatedBy',
-    activeOrganizationId: 'activeOrganizationId'
+  userId: 'userId',
+  impersonatedBy: 'impersonatedBy',
+  activeOrganizationId: 'activeOrganizationId'
 };
 
 exports.Prisma.AccountScalarFieldEnum = {
@@ -174,71 +174,71 @@ exports.Prisma.VerificationScalarFieldEnum = {
 };
 
 exports.Prisma.OrganizationScalarFieldEnum = {
-    id: 'id',
-    name: 'name',
-    slug: 'slug',
-    logo: 'logo',
-    createdAt: 'createdAt',
-    metadata: 'metadata'
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  logo: 'logo',
+  createdAt: 'createdAt',
+  metadata: 'metadata'
 };
 
 exports.Prisma.MemberScalarFieldEnum = {
-    id: 'id',
-    organizationId: 'organizationId',
-    userId: 'userId',
-    role: 'role',
-    createdAt: 'createdAt'
+  id: 'id',
+  organizationId: 'organizationId',
+  userId: 'userId',
+  role: 'role',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.InvitationScalarFieldEnum = {
-    id: 'id',
-    organizationId: 'organizationId',
-    email: 'email',
-    role: 'role',
-    status: 'status',
-    expiresAt: 'expiresAt',
-    inviterId: 'inviterId'
+  id: 'id',
+  organizationId: 'organizationId',
+  email: 'email',
+  role: 'role',
+  status: 'status',
+  expiresAt: 'expiresAt',
+  inviterId: 'inviterId'
 };
 
 exports.Prisma.TwoFactorScalarFieldEnum = {
-    id: 'id',
-    secret: 'secret',
-    backupCodes: 'backupCodes',
-    userId: 'userId'
+  id: 'id',
+  secret: 'secret',
+  backupCodes: 'backupCodes',
+  userId: 'userId'
 };
 
 exports.Prisma.MessageScalarFieldEnum = {
-    id: 'id',
-    createdAt: 'createdAt',
-    userId: 'userId',
-    channelId: 'channelId',
-    content: 'content'
+  id: 'id',
+  createdAt: 'createdAt',
+  userId: 'userId',
+  channelId: 'channelId',
+  content: 'content'
 };
 
 exports.Prisma.EventScalarFieldEnum = {
-    id: 'id',
-    title: 'title',
-    description: 'description',
-    start: 'start',
-    end: 'end',
-    createdAt: 'createdAt',
-    updatedAt: 'updatedAt',
-    userId: 'userId'
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  start: 'start',
+  end: 'end',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId'
 };
 
 exports.Prisma.RoleSlotScalarFieldEnum = {
-    id: 'id',
-    role: 'role',
-    goalCount: 'goalCount',
-    eventId: 'eventId'
+  id: 'id',
+  role: 'role',
+  goalCount: 'goalCount',
+  eventId: 'eventId'
 };
 
 exports.Prisma.EventRegistrationScalarFieldEnum = {
-    id: 'id',
-    userId: 'userId',
-    roleSlotId: 'roleSlotId',
-    registeredAt: 'registeredAt',
-    eventId: 'eventId'
+  id: 'id',
+  userId: 'userId',
+  roleSlotId: 'roleSlotId',
+  registeredAt: 'registeredAt',
+  eventId: 'eventId'
 };
 
 exports.Prisma.SortOrder = {
@@ -251,113 +251,20 @@ exports.Prisma.NullsOrder = {
   last: 'last'
 };
 
-exports.Prisma.UserOrderByRelevanceFieldEnum = {
-  id: 'id',
-  name: 'name',
-  email: 'email',
-    image: 'image',
-    role: 'role',
-    banReason: 'banReason'
-};
-
-exports.Prisma.SessionOrderByRelevanceFieldEnum = {
-  id: 'id',
-  token: 'token',
-  ipAddress: 'ipAddress',
-  userAgent: 'userAgent',
-    userId: 'userId',
-    impersonatedBy: 'impersonatedBy',
-    activeOrganizationId: 'activeOrganizationId'
-};
-
-exports.Prisma.AccountOrderByRelevanceFieldEnum = {
-  id: 'id',
-  accountId: 'accountId',
-  providerId: 'providerId',
-  userId: 'userId',
-  accessToken: 'accessToken',
-  refreshToken: 'refreshToken',
-  idToken: 'idToken',
-  scope: 'scope',
-  password: 'password'
-};
-
-exports.Prisma.VerificationOrderByRelevanceFieldEnum = {
-  id: 'id',
-  identifier: 'identifier',
-  value: 'value'
-};
-
-exports.Prisma.OrganizationOrderByRelevanceFieldEnum = {
-    id: 'id',
-    name: 'name',
-    slug: 'slug',
-    logo: 'logo',
-    metadata: 'metadata'
-};
-
-exports.Prisma.MemberOrderByRelevanceFieldEnum = {
-    id: 'id',
-    organizationId: 'organizationId',
-    userId: 'userId',
-    role: 'role'
-};
-
-exports.Prisma.InvitationOrderByRelevanceFieldEnum = {
-    id: 'id',
-    organizationId: 'organizationId',
-    email: 'email',
-    role: 'role',
-    status: 'status',
-    inviterId: 'inviterId'
-};
-
-exports.Prisma.TwoFactorOrderByRelevanceFieldEnum = {
-    id: 'id',
-    secret: 'secret',
-    backupCodes: 'backupCodes',
-    userId: 'userId'
-};
-
-exports.Prisma.MessageOrderByRelevanceFieldEnum = {
-    userId: 'userId',
-    channelId: 'channelId'
-};
-
-exports.Prisma.EventOrderByRelevanceFieldEnum = {
-    id: 'id',
-    title: 'title',
-    description: 'description',
-    userId: 'userId'
-};
-
-exports.Prisma.RoleSlotOrderByRelevanceFieldEnum = {
-    id: 'id',
-    role: 'role',
-    eventId: 'eventId'
-};
-
-exports.Prisma.EventRegistrationOrderByRelevanceFieldEnum = {
-    id: 'id',
-    userId: 'userId',
-    roleSlotId: 'roleSlotId',
-    eventId: 'eventId'
-};
-
 
 exports.Prisma.ModelName = {
   User: 'User',
   Session: 'Session',
   Account: 'Account',
-    Verification: 'Verification',
-    Organization: 'Organization',
-    Member: 'Member',
-    Invitation: 'Invitation',
-    TwoFactor: 'TwoFactor',
-    Message: 'Message',
-    Event: 'Event',
-    RoleSlot: 'RoleSlot',
-    EventRegistration: 'EventRegistration'
+  Verification: 'Verification',
+  Organization: 'Organization',
+  Member: 'Member',
+  Invitation: 'Invitation',
+  TwoFactor: 'TwoFactor',
+  Message: 'Message',
+  Event: 'Event',
+  RoleSlot: 'RoleSlot',
+  EventRegistration: 'EventRegistration'
 };
 
 /**
