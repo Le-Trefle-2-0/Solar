@@ -3,7 +3,7 @@ import {prismaAdapter} from "better-auth/adapters/prisma";
 import {PrismaClient} from "@/generated/prisma";
 import {resend} from "@/lib/resend";
 import {ac, admin, myCustomRole, user} from "./permissions"
-import {admin as adminPlugin, emailOTP, organization, twoFactor} from "better-auth/plugins";
+import {admin as adminPlugin, emailOTP, organization, twoFactor, username} from "better-auth/plugins";
 
 const prisma = new PrismaClient();
 export const auth = betterAuth({
@@ -39,7 +39,8 @@ export const auth = betterAuth({
             }
         }),
         organization(),
-        twoFactor()
+        twoFactor(),
+        username()
     ],
     account: {
         accountLinking: {

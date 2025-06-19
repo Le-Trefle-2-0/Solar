@@ -1,5 +1,11 @@
 import {createAuthClient} from "better-auth/react";
-import {adminClient, emailOTPClient, organizationClient, twoFactorClient} from "better-auth/client/plugins";
+import {
+    adminClient,
+    emailOTPClient,
+    organizationClient,
+    twoFactorClient,
+    usernameClient
+} from "better-auth/client/plugins";
 import {ac, admin, myCustomRole, user} from "@/lib/permissions";
 
 
@@ -13,7 +19,8 @@ export const authClient = createAuthClient({
             }
         }),
         organizationClient(),
-        twoFactorClient()
+        twoFactorClient(),
+        usernameClient()
     ]
 })
 
