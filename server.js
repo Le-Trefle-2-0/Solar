@@ -21,6 +21,10 @@ app.prepare().then(() => {
 
         socket.on("sendMessage", (data) => {
             socket.to(data.channel.id).emit("message", data);
+        });
+
+        socket.on('typing', (data) => {
+            socket.to(data.id).emit("typingIndicator", data);
         })
     });
 

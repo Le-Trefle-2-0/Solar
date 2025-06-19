@@ -9,14 +9,18 @@ import {saveMessage} from "@/lib/messageManager";
 import EmojiPicker, {EmojiStyle} from 'emoji-picker-react';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faFaceSmileWink, faPaperPlane} from "@fortawesome/free-regular-svg-icons";
+import {faCircle} from "@fortawesome/free-solid-svg-icons";
 
 export default function Chat() {
     const session = authClient.useSession();
     const [isConnected, setIsConnected] = useState(false);
     const [emojiOpen, setEmojiOpen] = useState(false);
+    const [showTyping, setShowTyping] = useState(false);
     const [transport, setTransport] = useState("N/A");
     const [currentMsg, setCurrentMsg] = useState("");
     const [chat, setChat] = useState<Msg[]>([])
+    const [opacity, setOpacity] = useState<number[]>([25, 50, 75]);
+    const [opacityDirection, setOpacityDirection] = useState<boolean[]>([true, true, false])
 
     socket.emit('listen', {id: '1'})
     useEffect(() => {
@@ -24,6 +28,13 @@ export default function Chat() {
             .then(res => res.json())
             .then(data => setChat(data))
     }, []);
+    let oldMsg = currentMsg;
+    setInterval(() => {
+        if (oldMsg !== currentMsg) {
+            socket.emit('typing', {id: '1'});
+            oldMsg = currentMsg;
+        }
+    }, 1000)
 
     const sendMessage = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -47,7 +58,47 @@ export default function Chat() {
             setChat((pre) => [...pre, msg])
         }
     }
+    const sendTyping = async () => {
+        await socket.emit('typing', {id: '1'});
+    }
 
+    setInterval(() => {
+        let newOpacity = [];
+        for (let i in opacity) {
+            switch (opacityDirection[i]) {
+                case true:
+                    newOpacity.push(opacity[i]++);
+                    if (newOpacity[i] >= 75) {
+                        let oldDir = opacityDirection;
+                        oldDir[i] = false;
+                        setOpacityDirection(oldDir);
+                    }
+                    break;
+
+                case false:
+                    newOpacity.push(opacity[i]--);
+                    if (newOpacity[i] <= 25) {
+                        let oldDir = opacityDirection;
+                        oldDir[i] = true;
+                        setOpacityDirection(oldDir);
+                    }
+                    break;
+            }
+        }
+        setOpacity(newOpacity);
+        console.log(newOpacity);
+    }, 100000)
+
+    let typingTimeout = setTimeout(() => {
+    });
+
+    function typing() {
+        setShowTyping(true);
+        if (typingTimeout) clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => {
+            setShowTyping(false);
+        }, 5000);
+    }
     useEffect(() => {
         if (socket.connected) {
             onConnect();
@@ -71,7 +122,8 @@ export default function Chat() {
         socket.on("disconnect", onDisconnect);
         socket.on("message", (data: Msg) => {
             setChat((pre) => [...pre, data])
-        })
+        });
+        socket.on('typingIndicator', typing);
 
         return () => {
             socket.off("connect", onConnect);
@@ -109,19 +161,30 @@ export default function Chat() {
                         setCurrentMsg(currentMsg + ' ' + emoji.emoji);
                     }} open={emojiOpen}/>
                 </div>
+                <div
+                    className={showTyping ? 'flex flex-row gap-1 relative left-2 bottom-3' : 'flex flex-row gap-1 relative left-2 bottom-3'}>
+                    <FontAwesomeIcon icon={faCircle} className={`opacity-${opacity[0]}`}/>
+                    <FontAwesomeIcon icon={faCircle} className={`opacity-${opacity[1]}`}/>
+                    <FontAwesomeIcon icon={faCircle} className={`opacity-${opacity[2]}`}/>
+                </div>
 
                 <form onSubmit={(e) => sendMessage(e)} className='flex flex-row w-full gap-2 items-center'>
                     <input
                         type="text"
                         value={currentMsg}
                         placeholder="Envoyer un message dans permanence"
-                        onChange={(e) => setCurrentMsg(e.target.value)}
+                        spellCheck={true}
+                        onChange={(e) => {
+                            setCurrentMsg(e.target.value)
+                            sendTyping()
+                        }}
                         className="w-full flex flex-row outline-main outline-1 p-2 rounded-lg"
+                        data-ms-editor="true"
                     />
                     <FontAwesomeIcon icon={faFaceSmileWink} width={32} onClick={() => {
                         if (emojiOpen) setEmojiOpen(false);
                         else setEmojiOpen(true);
-                    }} className='cursor-pointer'/>
+                    }} className={emojiOpen ? 'cursor-pointer text-main' : 'cursor-pointer'}/>
                     <button className='cursor-pointer'><FontAwesomeIcon icon={faPaperPlane} width={32}/></button>
                 </form>
             </div>
