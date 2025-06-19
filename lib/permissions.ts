@@ -1,5 +1,5 @@
 import {createAccessControl} from "better-auth/plugins/access";
-import {adminAc, defaultStatements} from "better-auth/plugins/admin/access";
+import {defaultStatements} from "better-auth/plugins/admin/access";
 
 export const statement = {
     ...defaultStatements,
@@ -17,7 +17,6 @@ export const user = ac.newRole({
 export const admin = ac.newRole({
     project: ["create", "update"],
     event: ['create', 'register', 'view'],
-    ...adminAc.statements,
 });
 
 export const myCustomRole = ac.newRole({
