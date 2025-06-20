@@ -1,5 +1,6 @@
 import {auth} from "@/lib/auth";
 import {headers} from "next/headers";
+import {getMessages} from "@/lib/messageManager";
 
 export async function GET(
     request: Request,
@@ -8,11 +9,11 @@ export async function GET(
     const session = await auth.api.getSession({
         headers: await headers()
     });
-    if (!session) {
-        return new Response('Unauthorized', {
-            status: 401,
-        });
-    }
+    // if (!session) {
+    //     return new Response('Unauthorized', {
+    //         status: 401,
+    //     });
+    // }
 
     const perm = await auth.api.userHasPermission({
         body: {
@@ -27,5 +28,8 @@ export async function GET(
         return new Response('Unauthorized', {status: 401,});
     }
 
+    const {channel} = await params;
 
+    const messages = await getMessages(channel);
+    return Response.json(messages);
 }
