@@ -53,25 +53,35 @@ export type Invitation = $Result.DefaultSelection<Prisma.$InvitationPayload>
  */
 export type TwoFactor = $Result.DefaultSelection<Prisma.$TwoFactorPayload>
 /**
+ * Model Channel
+ *
+ */
+export type Channel = $Result.DefaultSelection<Prisma.$ChannelPayload>
+/**
  * Model Message
- * 
+ *
  */
 export type Message = $Result.DefaultSelection<Prisma.$MessagePayload>
 /**
  * Model Event
- * 
+ *
  */
 export type Event = $Result.DefaultSelection<Prisma.$EventPayload>
 /**
  * Model RoleSlot
- * 
+ *
  */
 export type RoleSlot = $Result.DefaultSelection<Prisma.$RoleSlotPayload>
 /**
  * Model EventRegistration
- * 
+ *
  */
 export type EventRegistration = $Result.DefaultSelection<Prisma.$EventRegistrationPayload>
+/**
+ * Model Ticket
+ *
+ */
+export type Ticket = $Result.DefaultSelection<Prisma.$TicketPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -186,7 +196,7 @@ export class PrismaClient<
    *   prisma.user.create({ data: { name: 'Alice' } }),
    * ])
    * ```
-   * 
+   *
    * Read more in our [docs](https://www.prisma.io/docs/concepts/components/prisma-client/transactions).
    */
   $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>
@@ -278,6 +288,16 @@ export class PrismaClient<
    */
   get twoFactor(): Prisma.TwoFactorDelegate<ExtArgs, ClientOptions>;
 
+    /**
+     * `prisma.channel`: Exposes CRUD operations for the **Channel** model.
+     * Example usage:
+     * ```ts
+     * // Fetch zero or more Channels
+     * const channels = await prisma.channel.findMany()
+     * ```
+     */
+    get channel(): Prisma.ChannelDelegate<ExtArgs, ClientOptions>;
+
   /**
    * `prisma.message`: Exposes CRUD operations for the **Message** model.
    * Example usage:
@@ -317,6 +337,16 @@ export class PrismaClient<
    * ```
    */
   get eventRegistration(): Prisma.EventRegistrationDelegate<ExtArgs, ClientOptions>;
+
+    /**
+     * `prisma.ticket`: Exposes CRUD operations for the **Ticket** model.
+     * Example usage:
+     * ```ts
+     * // Fetch zero or more Tickets
+     * const tickets = await prisma.ticket.findMany()
+     * ```
+     */
+    get ticket(): Prisma.TicketDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -376,7 +406,7 @@ export namespace Prisma {
 
   /**
    * Prisma Client JS version: 6.9.0
-   * Query Engine version: 605197351a3c8bdd595af2d2a9bc3025bca48ea2
+   * Query Engine version: 81e4af48011447c3cc503a190e86995b66d2a28e
    */
   export type PrismaVersion = {
     client: string
@@ -754,10 +784,12 @@ export namespace Prisma {
     Member: 'Member',
     Invitation: 'Invitation',
     TwoFactor: 'TwoFactor',
+      Channel: 'Channel',
     Message: 'Message',
     Event: 'Event',
     RoleSlot: 'RoleSlot',
-    EventRegistration: 'EventRegistration'
+      EventRegistration: 'EventRegistration',
+      Ticket: 'Ticket'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -776,7 +808,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "session" | "account" | "verification" | "organization" | "member" | "invitation" | "twoFactor" | "message" | "event" | "roleSlot" | "eventRegistration"
+        modelProps: "user" | "session" | "account" | "verification" | "organization" | "member" | "invitation" | "twoFactor" | "channel" | "message" | "event" | "roleSlot" | "eventRegistration" | "ticket"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1308,6 +1340,72 @@ export namespace Prisma {
           }
         }
       }
+        Channel: {
+            payload: Prisma.$ChannelPayload<ExtArgs>
+            fields: Prisma.ChannelFieldRefs
+            operations: {
+                findUnique: {
+                    args: Prisma.ChannelFindUniqueArgs<ExtArgs>
+                    result: $Utils.PayloadToResult<Prisma.$ChannelPayload> | null
+                }
+                findUniqueOrThrow: {
+                    args: Prisma.ChannelFindUniqueOrThrowArgs<ExtArgs>
+                    result: $Utils.PayloadToResult<Prisma.$ChannelPayload>
+                }
+                findFirst: {
+                    args: Prisma.ChannelFindFirstArgs<ExtArgs>
+                    result: $Utils.PayloadToResult<Prisma.$ChannelPayload> | null
+                }
+                findFirstOrThrow: {
+                    args: Prisma.ChannelFindFirstOrThrowArgs<ExtArgs>
+                    result: $Utils.PayloadToResult<Prisma.$ChannelPayload>
+                }
+                findMany: {
+                    args: Prisma.ChannelFindManyArgs<ExtArgs>
+                    result: $Utils.PayloadToResult<Prisma.$ChannelPayload>[]
+                }
+                create: {
+                    args: Prisma.ChannelCreateArgs<ExtArgs>
+                    result: $Utils.PayloadToResult<Prisma.$ChannelPayload>
+                }
+                createMany: {
+                    args: Prisma.ChannelCreateManyArgs<ExtArgs>
+                    result: BatchPayload
+                }
+                delete: {
+                    args: Prisma.ChannelDeleteArgs<ExtArgs>
+                    result: $Utils.PayloadToResult<Prisma.$ChannelPayload>
+                }
+                update: {
+                    args: Prisma.ChannelUpdateArgs<ExtArgs>
+                    result: $Utils.PayloadToResult<Prisma.$ChannelPayload>
+                }
+                deleteMany: {
+                    args: Prisma.ChannelDeleteManyArgs<ExtArgs>
+                    result: BatchPayload
+                }
+                updateMany: {
+                    args: Prisma.ChannelUpdateManyArgs<ExtArgs>
+                    result: BatchPayload
+                }
+                upsert: {
+                    args: Prisma.ChannelUpsertArgs<ExtArgs>
+                    result: $Utils.PayloadToResult<Prisma.$ChannelPayload>
+                }
+                aggregate: {
+                    args: Prisma.ChannelAggregateArgs<ExtArgs>
+                    result: $Utils.Optional<AggregateChannel>
+                }
+                groupBy: {
+                    args: Prisma.ChannelGroupByArgs<ExtArgs>
+                    result: $Utils.Optional<ChannelGroupByOutputType>[]
+                }
+                count: {
+                    args: Prisma.ChannelCountArgs<ExtArgs>
+                    result: $Utils.Optional<ChannelCountAggregateOutputType> | number
+                }
+            }
+        }
       Message: {
         payload: Prisma.$MessagePayload<ExtArgs>
         fields: Prisma.MessageFieldRefs
@@ -1572,6 +1670,72 @@ export namespace Prisma {
           }
         }
       }
+        Ticket: {
+            payload: Prisma.$TicketPayload<ExtArgs>
+            fields: Prisma.TicketFieldRefs
+            operations: {
+                findUnique: {
+                    args: Prisma.TicketFindUniqueArgs<ExtArgs>
+                    result: $Utils.PayloadToResult<Prisma.$TicketPayload> | null
+                }
+                findUniqueOrThrow: {
+                    args: Prisma.TicketFindUniqueOrThrowArgs<ExtArgs>
+                    result: $Utils.PayloadToResult<Prisma.$TicketPayload>
+                }
+                findFirst: {
+                    args: Prisma.TicketFindFirstArgs<ExtArgs>
+                    result: $Utils.PayloadToResult<Prisma.$TicketPayload> | null
+                }
+                findFirstOrThrow: {
+                    args: Prisma.TicketFindFirstOrThrowArgs<ExtArgs>
+                    result: $Utils.PayloadToResult<Prisma.$TicketPayload>
+                }
+                findMany: {
+                    args: Prisma.TicketFindManyArgs<ExtArgs>
+                    result: $Utils.PayloadToResult<Prisma.$TicketPayload>[]
+                }
+                create: {
+                    args: Prisma.TicketCreateArgs<ExtArgs>
+                    result: $Utils.PayloadToResult<Prisma.$TicketPayload>
+                }
+                createMany: {
+                    args: Prisma.TicketCreateManyArgs<ExtArgs>
+                    result: BatchPayload
+                }
+                delete: {
+                    args: Prisma.TicketDeleteArgs<ExtArgs>
+                    result: $Utils.PayloadToResult<Prisma.$TicketPayload>
+                }
+                update: {
+                    args: Prisma.TicketUpdateArgs<ExtArgs>
+                    result: $Utils.PayloadToResult<Prisma.$TicketPayload>
+                }
+                deleteMany: {
+                    args: Prisma.TicketDeleteManyArgs<ExtArgs>
+                    result: BatchPayload
+                }
+                updateMany: {
+                    args: Prisma.TicketUpdateManyArgs<ExtArgs>
+                    result: BatchPayload
+                }
+                upsert: {
+                    args: Prisma.TicketUpsertArgs<ExtArgs>
+                    result: $Utils.PayloadToResult<Prisma.$TicketPayload>
+                }
+                aggregate: {
+                    args: Prisma.TicketAggregateArgs<ExtArgs>
+                    result: $Utils.Optional<AggregateTicket>
+                }
+                groupBy: {
+                    args: Prisma.TicketGroupByArgs<ExtArgs>
+                    result: $Utils.Optional<TicketGroupByOutputType>[]
+                }
+                count: {
+                    args: Prisma.TicketCountArgs<ExtArgs>
+                    result: $Utils.Optional<TicketCountAggregateOutputType> | number
+                }
+            }
+        }
     }
   } & {
     other: {
@@ -1617,7 +1781,7 @@ export namespace Prisma {
      * ```
      * // Defaults to stdout
      * log: ['query', 'info', 'warn', 'error']
-     * 
+     *
      * // Emit as events
      * log: [
      *   { emit: 'stdout', level: 'query' },
@@ -1641,7 +1805,7 @@ export namespace Prisma {
     }
     /**
      * Global configuration for omitting model fields by default.
-     * 
+     *
      * @example
      * ```
      * const prisma = new PrismaClient({
@@ -1664,10 +1828,12 @@ export namespace Prisma {
     member?: MemberOmit
     invitation?: InvitationOmit
     twoFactor?: TwoFactorOmit
+      channel?: ChannelOmit
     message?: MessageOmit
     event?: EventOmit
     roleSlot?: RoleSlotOmit
     eventRegistration?: EventRegistrationOmit
+      ticket?: TicketOmit
   }
 
   /* Types for Logging */
@@ -1770,6 +1936,7 @@ export namespace Prisma {
     twofactors: number
     Event: number
     EventRegistration: number
+      Ticket: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1781,6 +1948,7 @@ export namespace Prisma {
     twofactors?: boolean | UserCountOutputTypeCountTwofactorsArgs
     Event?: boolean | UserCountOutputTypeCountEventArgs
     EventRegistration?: boolean | UserCountOutputTypeCountEventRegistrationArgs
+      Ticket?: boolean | UserCountOutputTypeCountTicketArgs
   }
 
   // Custom InputTypes
@@ -1850,6 +2018,13 @@ export namespace Prisma {
     where?: EventRegistrationWhereInput
   }
 
+    /**
+     * UserCountOutputType without action
+     */
+    export type UserCountOutputTypeCountTicketArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        where?: TicketWhereInput
+    }
+
 
   /**
    * Count Type OrganizationCountOutputType
@@ -1889,6 +2064,46 @@ export namespace Prisma {
   export type OrganizationCountOutputTypeCountInvitationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: InvitationWhereInput
   }
+
+
+    /**
+     * Count Type ChannelCountOutputType
+     */
+
+    export type ChannelCountOutputType = {
+        Message: number
+        Ticket: number
+    }
+
+    export type ChannelCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        Message?: boolean | ChannelCountOutputTypeCountMessageArgs
+        Ticket?: boolean | ChannelCountOutputTypeCountTicketArgs
+    }
+
+    // Custom InputTypes
+    /**
+     * ChannelCountOutputType without action
+     */
+    export type ChannelCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the ChannelCountOutputType
+         */
+        select?: ChannelCountOutputTypeSelect<ExtArgs> | null
+    }
+
+    /**
+     * ChannelCountOutputType without action
+     */
+    export type ChannelCountOutputTypeCountMessageArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        where?: MessageWhereInput
+    }
+
+    /**
+     * ChannelCountOutputType without action
+     */
+    export type ChannelCountOutputTypeCountTicketArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        where?: TicketWhereInput
+    }
 
 
   /**
@@ -1989,6 +2204,8 @@ export namespace Prisma {
     banReason: string | null
     banExpires: Date | null
     twoFactorEnabled: boolean | null
+      username: string | null
+      displayUsername: string | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -2004,6 +2221,8 @@ export namespace Prisma {
     banReason: string | null
     banExpires: Date | null
     twoFactorEnabled: boolean | null
+      username: string | null
+      displayUsername: string | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -2019,6 +2238,8 @@ export namespace Prisma {
     banReason: number
     banExpires: number
     twoFactorEnabled: number
+      username: number
+      displayUsername: number
     _all: number
   }
 
@@ -2036,6 +2257,8 @@ export namespace Prisma {
     banReason?: true
     banExpires?: true
     twoFactorEnabled?: true
+      username?: true
+      displayUsername?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -2051,6 +2274,8 @@ export namespace Prisma {
     banReason?: true
     banExpires?: true
     twoFactorEnabled?: true
+      username?: true
+      displayUsername?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -2066,6 +2291,8 @@ export namespace Prisma {
     banReason?: true
     banExpires?: true
     twoFactorEnabled?: true
+      username?: true
+      displayUsername?: true
     _all?: true
   }
 
@@ -2076,43 +2303,43 @@ export namespace Prisma {
     where?: UserWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Users to fetch.
      */
     orderBy?: UserOrderByWithRelationInput | UserOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the start position
      */
     cursor?: UserWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Users from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Users.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Count returned Users
     **/
     _count?: true | UserCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the minimum value
     **/
     _min?: UserMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the maximum value
     **/
     _max?: UserMaxAggregateInputType
@@ -2154,6 +2381,8 @@ export namespace Prisma {
     banReason: string | null
     banExpires: Date | null
     twoFactorEnabled: boolean | null
+      username: string | null
+      displayUsername: string | null
     _count: UserCountAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
@@ -2186,6 +2415,8 @@ export namespace Prisma {
     banReason?: boolean
     banExpires?: boolean
     twoFactorEnabled?: boolean
+      username?: boolean
+      displayUsername?: boolean
     accounts?: boolean | User$accountsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     messages?: boolean | User$messagesArgs<ExtArgs>
@@ -2194,6 +2425,7 @@ export namespace Prisma {
     twofactors?: boolean | User$twofactorsArgs<ExtArgs>
     Event?: boolean | User$EventArgs<ExtArgs>
     EventRegistration?: boolean | User$EventRegistrationArgs<ExtArgs>
+      Ticket?: boolean | User$TicketArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -2212,9 +2444,11 @@ export namespace Prisma {
     banReason?: boolean
     banExpires?: boolean
     twoFactorEnabled?: boolean
+      username?: boolean
+      displayUsername?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "createdAt" | "updatedAt" | "role" | "banned" | "banReason" | "banExpires" | "twoFactorEnabled", ExtArgs["result"]["user"]>
+    export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "createdAt" | "updatedAt" | "role" | "banned" | "banReason" | "banExpires" | "twoFactorEnabled" | "username" | "displayUsername", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     accounts?: boolean | User$accountsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
@@ -2224,6 +2458,7 @@ export namespace Prisma {
     twofactors?: boolean | User$twofactorsArgs<ExtArgs>
     Event?: boolean | User$EventArgs<ExtArgs>
     EventRegistration?: boolean | User$EventRegistrationArgs<ExtArgs>
+      Ticket?: boolean | User$TicketArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -2238,6 +2473,7 @@ export namespace Prisma {
       twofactors: Prisma.$TwoFactorPayload<ExtArgs>[]
       Event: Prisma.$EventPayload<ExtArgs>[]
       EventRegistration: Prisma.$EventRegistrationPayload<ExtArgs>[]
+        Ticket: Prisma.$TicketPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -2252,6 +2488,8 @@ export namespace Prisma {
       banReason: string | null
       banExpires: Date | null
       twoFactorEnabled: boolean | null
+        username: string | null
+        displayUsername: string | null
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -2331,13 +2569,13 @@ export namespace Prisma {
      * @example
      * // Get all Users
      * const users = await prisma.user.findMany()
-     * 
+     *
      * // Get first 10 Users
      * const users = await prisma.user.findMany({ take: 10 })
-     * 
+     *
      * // Only select the `id`
      * const userWithIdOnly = await prisma.user.findMany({ select: { id: true } })
-     * 
+     *
      */
     findMany<T extends UserFindManyArgs>(args?: SelectSubset<T, UserFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -2351,7 +2589,7 @@ export namespace Prisma {
      *     // ... data to create a User
      *   }
      * })
-     * 
+     *
      */
     create<T extends UserCreateArgs>(args: SelectSubset<T, UserCreateArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -2365,7 +2603,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *     
+     *
      */
     createMany<T extends UserCreateManyArgs>(args?: SelectSubset<T, UserCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -2379,7 +2617,7 @@ export namespace Prisma {
      *     // ... filter to delete one User
      *   }
      * })
-     * 
+     *
      */
     delete<T extends UserDeleteArgs>(args: SelectSubset<T, UserDeleteArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -2396,7 +2634,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     update<T extends UserUpdateArgs>(args: SelectSubset<T, UserUpdateArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -2410,7 +2648,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     * 
+     *
      */
     deleteMany<T extends UserDeleteManyArgs>(args?: SelectSubset<T, UserDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -2429,7 +2667,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     updateMany<T extends UserUpdateManyArgs>(args: SelectSubset<T, UserUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -2518,7 +2756,7 @@ export namespace Prisma {
      *     _all: true
      *   },
      * })
-     * 
+     *
     **/
     groupBy<
       T extends UserGroupByArgs,
@@ -2594,18 +2832,14 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     accounts<T extends User$accountsArgs<ExtArgs> = {}>(args?: Subset<T, User$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sessions<T extends User$sessionsArgs<ExtArgs> = {}>(args?: Subset<T, User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-
     messages<T extends User$messagesArgs<ExtArgs> = {}>(args?: Subset<T, User$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-
     members<T extends User$membersArgs<ExtArgs> = {}>(args?: Subset<T, User$membersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-
     invitations<T extends User$invitationsArgs<ExtArgs> = {}>(args?: Subset<T, User$invitationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-
     twofactors<T extends User$twofactorsArgs<ExtArgs> = {}>(args?: Subset<T, User$twofactorsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TwoFactorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-
     Event<T extends User$EventArgs<ExtArgs> = {}>(args?: Subset<T, User$EventArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-
     EventRegistration<T extends User$EventRegistrationArgs<ExtArgs> = {}>(args?: Subset<T, User$EventRegistrationArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventRegistrationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+
+      Ticket<T extends User$TicketArgs<ExtArgs> = {}>(args?: Subset<T, User$TicketArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2647,10 +2881,12 @@ export namespace Prisma {
     readonly banReason: FieldRef<"User", 'String'>
     readonly banExpires: FieldRef<"User", 'DateTime'>
     readonly twoFactorEnabled: FieldRef<"User", 'Boolean'>
+      readonly username: FieldRef<"User", 'String'>
+      readonly displayUsername: FieldRef<"User", 'String'>
   }
 
 
-  // Custom InputTypes
+    // Custom InputTypes
   /**
    * User findUnique
    */
@@ -2717,31 +2953,31 @@ export namespace Prisma {
     where?: UserWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Users to fetch.
      */
     orderBy?: UserOrderByWithRelationInput | UserOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for Users.
      */
     cursor?: UserWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Users from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Users.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of Users.
      */
     distinct?: UserScalarFieldEnum | UserScalarFieldEnum[]
@@ -2769,31 +3005,31 @@ export namespace Prisma {
     where?: UserWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Users to fetch.
      */
     orderBy?: UserOrderByWithRelationInput | UserOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for Users.
      */
     cursor?: UserWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Users from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Users.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of Users.
      */
     distinct?: UserScalarFieldEnum | UserScalarFieldEnum[]
@@ -2821,25 +3057,25 @@ export namespace Prisma {
     where?: UserWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Users to fetch.
      */
     orderBy?: UserOrderByWithRelationInput | UserOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for listing Users.
      */
     cursor?: UserWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Users from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Users.
      */
     skip?: number
@@ -2917,6 +3153,10 @@ export namespace Prisma {
      * Filter which Users to update
      */
     where?: UserWhereInput
+      /**
+       * Limit how many Users to update.
+       */
+      limit?: number
   }
 
   /**
@@ -2979,6 +3219,10 @@ export namespace Prisma {
      * Filter which Users to delete
      */
     where?: UserWhereInput
+      /**
+       * Limit how many Users to delete.
+       */
+      limit?: number
   }
 
   /**
@@ -3173,6 +3417,30 @@ export namespace Prisma {
     distinct?: EventRegistrationScalarFieldEnum | EventRegistrationScalarFieldEnum[]
   }
 
+    /**
+     * User.Ticket
+     */
+    export type User$TicketArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the Ticket
+         */
+        select?: TicketSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the Ticket
+         */
+        omit?: TicketOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: TicketInclude<ExtArgs> | null
+        where?: TicketWhereInput
+        orderBy?: TicketOrderByWithRelationInput | TicketOrderByWithRelationInput[]
+        cursor?: TicketWhereUniqueInput
+        take?: number
+        skip?: number
+        distinct?: TicketScalarFieldEnum | TicketScalarFieldEnum[]
+    }
+
   /**
    * User without action
    */
@@ -3290,43 +3558,43 @@ export namespace Prisma {
     where?: SessionWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Sessions to fetch.
      */
     orderBy?: SessionOrderByWithRelationInput | SessionOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the start position
      */
     cursor?: SessionWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Sessions from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Sessions.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Count returned Sessions
     **/
     _count?: true | SessionCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the minimum value
     **/
     _min?: SessionMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the maximum value
     **/
     _max?: SessionMaxAggregateInputType
@@ -3514,13 +3782,13 @@ export namespace Prisma {
      * @example
      * // Get all Sessions
      * const sessions = await prisma.session.findMany()
-     * 
+     *
      * // Get first 10 Sessions
      * const sessions = await prisma.session.findMany({ take: 10 })
-     * 
+     *
      * // Only select the `id`
      * const sessionWithIdOnly = await prisma.session.findMany({ select: { id: true } })
-     * 
+     *
      */
     findMany<T extends SessionFindManyArgs>(args?: SelectSubset<T, SessionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -3534,7 +3802,7 @@ export namespace Prisma {
      *     // ... data to create a Session
      *   }
      * })
-     * 
+     *
      */
     create<T extends SessionCreateArgs>(args: SelectSubset<T, SessionCreateArgs<ExtArgs>>): Prisma__SessionClient<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -3548,7 +3816,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *     
+     *
      */
     createMany<T extends SessionCreateManyArgs>(args?: SelectSubset<T, SessionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -3562,7 +3830,7 @@ export namespace Prisma {
      *     // ... filter to delete one Session
      *   }
      * })
-     * 
+     *
      */
     delete<T extends SessionDeleteArgs>(args: SelectSubset<T, SessionDeleteArgs<ExtArgs>>): Prisma__SessionClient<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -3579,7 +3847,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     update<T extends SessionUpdateArgs>(args: SelectSubset<T, SessionUpdateArgs<ExtArgs>>): Prisma__SessionClient<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -3593,7 +3861,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     * 
+     *
      */
     deleteMany<T extends SessionDeleteManyArgs>(args?: SelectSubset<T, SessionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -3612,7 +3880,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     updateMany<T extends SessionUpdateManyArgs>(args: SelectSubset<T, SessionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -3701,7 +3969,7 @@ export namespace Prisma {
      *     _all: true
      *   },
      * })
-     * 
+     *
     **/
     groupBy<
       T extends SessionGroupByArgs,
@@ -3818,7 +4086,7 @@ export namespace Prisma {
   }
 
 
-  // Custom InputTypes
+    // Custom InputTypes
   /**
    * Session findUnique
    */
@@ -3885,31 +4153,31 @@ export namespace Prisma {
     where?: SessionWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Sessions to fetch.
      */
     orderBy?: SessionOrderByWithRelationInput | SessionOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for Sessions.
      */
     cursor?: SessionWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Sessions from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Sessions.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of Sessions.
      */
     distinct?: SessionScalarFieldEnum | SessionScalarFieldEnum[]
@@ -3937,31 +4205,31 @@ export namespace Prisma {
     where?: SessionWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Sessions to fetch.
      */
     orderBy?: SessionOrderByWithRelationInput | SessionOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for Sessions.
      */
     cursor?: SessionWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Sessions from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Sessions.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of Sessions.
      */
     distinct?: SessionScalarFieldEnum | SessionScalarFieldEnum[]
@@ -3989,25 +4257,25 @@ export namespace Prisma {
     where?: SessionWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Sessions to fetch.
      */
     orderBy?: SessionOrderByWithRelationInput | SessionOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for listing Sessions.
      */
     cursor?: SessionWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Sessions from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Sessions.
      */
     skip?: number
@@ -4085,6 +4353,10 @@ export namespace Prisma {
      * Filter which Sessions to update
      */
     where?: SessionWhereInput
+      /**
+       * Limit how many Sessions to update.
+       */
+      limit?: number
   }
 
   /**
@@ -4147,6 +4419,10 @@ export namespace Prisma {
      * Filter which Sessions to delete
      */
     where?: SessionWhereInput
+      /**
+       * Limit how many Sessions to delete.
+       */
+      limit?: number
   }
 
   /**
@@ -4284,43 +4560,43 @@ export namespace Prisma {
     where?: AccountWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Accounts to fetch.
      */
     orderBy?: AccountOrderByWithRelationInput | AccountOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the start position
      */
     cursor?: AccountWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Accounts from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Accounts.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Count returned Accounts
     **/
     _count?: true | AccountCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the minimum value
     **/
     _min?: AccountMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the maximum value
     **/
     _max?: AccountMaxAggregateInputType
@@ -4520,13 +4796,13 @@ export namespace Prisma {
      * @example
      * // Get all Accounts
      * const accounts = await prisma.account.findMany()
-     * 
+     *
      * // Get first 10 Accounts
      * const accounts = await prisma.account.findMany({ take: 10 })
-     * 
+     *
      * // Only select the `id`
      * const accountWithIdOnly = await prisma.account.findMany({ select: { id: true } })
-     * 
+     *
      */
     findMany<T extends AccountFindManyArgs>(args?: SelectSubset<T, AccountFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -4540,7 +4816,7 @@ export namespace Prisma {
      *     // ... data to create a Account
      *   }
      * })
-     * 
+     *
      */
     create<T extends AccountCreateArgs>(args: SelectSubset<T, AccountCreateArgs<ExtArgs>>): Prisma__AccountClient<$Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -4554,7 +4830,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *     
+     *
      */
     createMany<T extends AccountCreateManyArgs>(args?: SelectSubset<T, AccountCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -4568,7 +4844,7 @@ export namespace Prisma {
      *     // ... filter to delete one Account
      *   }
      * })
-     * 
+     *
      */
     delete<T extends AccountDeleteArgs>(args: SelectSubset<T, AccountDeleteArgs<ExtArgs>>): Prisma__AccountClient<$Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -4585,7 +4861,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     update<T extends AccountUpdateArgs>(args: SelectSubset<T, AccountUpdateArgs<ExtArgs>>): Prisma__AccountClient<$Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -4599,7 +4875,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     * 
+     *
      */
     deleteMany<T extends AccountDeleteManyArgs>(args?: SelectSubset<T, AccountDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -4618,7 +4894,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     updateMany<T extends AccountUpdateManyArgs>(args: SelectSubset<T, AccountUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -4707,7 +4983,7 @@ export namespace Prisma {
      *     _all: true
      *   },
      * })
-     * 
+     *
     **/
     groupBy<
       T extends AccountGroupByArgs,
@@ -4827,7 +5103,7 @@ export namespace Prisma {
   }
 
 
-  // Custom InputTypes
+    // Custom InputTypes
   /**
    * Account findUnique
    */
@@ -4894,31 +5170,31 @@ export namespace Prisma {
     where?: AccountWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Accounts to fetch.
      */
     orderBy?: AccountOrderByWithRelationInput | AccountOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for Accounts.
      */
     cursor?: AccountWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Accounts from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Accounts.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of Accounts.
      */
     distinct?: AccountScalarFieldEnum | AccountScalarFieldEnum[]
@@ -4946,31 +5222,31 @@ export namespace Prisma {
     where?: AccountWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Accounts to fetch.
      */
     orderBy?: AccountOrderByWithRelationInput | AccountOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for Accounts.
      */
     cursor?: AccountWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Accounts from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Accounts.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of Accounts.
      */
     distinct?: AccountScalarFieldEnum | AccountScalarFieldEnum[]
@@ -4998,25 +5274,25 @@ export namespace Prisma {
     where?: AccountWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Accounts to fetch.
      */
     orderBy?: AccountOrderByWithRelationInput | AccountOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for listing Accounts.
      */
     cursor?: AccountWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Accounts from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Accounts.
      */
     skip?: number
@@ -5094,6 +5370,10 @@ export namespace Prisma {
      * Filter which Accounts to update
      */
     where?: AccountWhereInput
+      /**
+       * Limit how many Accounts to update.
+       */
+      limit?: number
   }
 
   /**
@@ -5156,6 +5436,10 @@ export namespace Prisma {
      * Filter which Accounts to delete
      */
     where?: AccountWhereInput
+      /**
+       * Limit how many Accounts to delete.
+       */
+      limit?: number
   }
 
   /**
@@ -5251,43 +5535,43 @@ export namespace Prisma {
     where?: VerificationWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Verifications to fetch.
      */
     orderBy?: VerificationOrderByWithRelationInput | VerificationOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the start position
      */
     cursor?: VerificationWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Verifications from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Verifications.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Count returned Verifications
     **/
     _count?: true | VerificationCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the minimum value
     **/
     _min?: VerificationMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the maximum value
     **/
     _max?: VerificationMaxAggregateInputType
@@ -5453,13 +5737,13 @@ export namespace Prisma {
      * @example
      * // Get all Verifications
      * const verifications = await prisma.verification.findMany()
-     * 
+     *
      * // Get first 10 Verifications
      * const verifications = await prisma.verification.findMany({ take: 10 })
-     * 
+     *
      * // Only select the `id`
      * const verificationWithIdOnly = await prisma.verification.findMany({ select: { id: true } })
-     * 
+     *
      */
     findMany<T extends VerificationFindManyArgs>(args?: SelectSubset<T, VerificationFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$VerificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -5473,7 +5757,7 @@ export namespace Prisma {
      *     // ... data to create a Verification
      *   }
      * })
-     * 
+     *
      */
     create<T extends VerificationCreateArgs>(args: SelectSubset<T, VerificationCreateArgs<ExtArgs>>): Prisma__VerificationClient<$Result.GetResult<Prisma.$VerificationPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -5487,7 +5771,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *     
+     *
      */
     createMany<T extends VerificationCreateManyArgs>(args?: SelectSubset<T, VerificationCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -5501,7 +5785,7 @@ export namespace Prisma {
      *     // ... filter to delete one Verification
      *   }
      * })
-     * 
+     *
      */
     delete<T extends VerificationDeleteArgs>(args: SelectSubset<T, VerificationDeleteArgs<ExtArgs>>): Prisma__VerificationClient<$Result.GetResult<Prisma.$VerificationPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -5518,7 +5802,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     update<T extends VerificationUpdateArgs>(args: SelectSubset<T, VerificationUpdateArgs<ExtArgs>>): Prisma__VerificationClient<$Result.GetResult<Prisma.$VerificationPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -5532,7 +5816,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     * 
+     *
      */
     deleteMany<T extends VerificationDeleteManyArgs>(args?: SelectSubset<T, VerificationDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -5551,7 +5835,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     updateMany<T extends VerificationUpdateManyArgs>(args: SelectSubset<T, VerificationUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -5640,7 +5924,7 @@ export namespace Prisma {
      *     _all: true
      *   },
      * })
-     * 
+     *
     **/
     groupBy<
       T extends VerificationGroupByArgs,
@@ -5752,7 +6036,7 @@ export namespace Prisma {
   }
 
 
-  // Custom InputTypes
+    // Custom InputTypes
   /**
    * Verification findUnique
    */
@@ -5807,31 +6091,31 @@ export namespace Prisma {
     where?: VerificationWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Verifications to fetch.
      */
     orderBy?: VerificationOrderByWithRelationInput | VerificationOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for Verifications.
      */
     cursor?: VerificationWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Verifications from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Verifications.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of Verifications.
      */
     distinct?: VerificationScalarFieldEnum | VerificationScalarFieldEnum[]
@@ -5855,31 +6139,31 @@ export namespace Prisma {
     where?: VerificationWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Verifications to fetch.
      */
     orderBy?: VerificationOrderByWithRelationInput | VerificationOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for Verifications.
      */
     cursor?: VerificationWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Verifications from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Verifications.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of Verifications.
      */
     distinct?: VerificationScalarFieldEnum | VerificationScalarFieldEnum[]
@@ -5903,25 +6187,25 @@ export namespace Prisma {
     where?: VerificationWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Verifications to fetch.
      */
     orderBy?: VerificationOrderByWithRelationInput | VerificationOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for listing Verifications.
      */
     cursor?: VerificationWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Verifications from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Verifications.
      */
     skip?: number
@@ -5991,6 +6275,10 @@ export namespace Prisma {
      * Filter which Verifications to update
      */
     where?: VerificationWhereInput
+      /**
+       * Limit how many Verifications to update.
+       */
+      limit?: number
   }
 
   /**
@@ -6045,6 +6333,10 @@ export namespace Prisma {
      * Filter which Verifications to delete
      */
     where?: VerificationWhereInput
+      /**
+       * Limit how many Verifications to delete.
+       */
+      limit?: number
   }
 
   /**
@@ -6180,14 +6472,14 @@ export namespace Prisma {
 
   export type GetOrganizationAggregateType<T extends OrganizationAggregateArgs> = {
         [P in keyof T & keyof AggregateOrganization]: P extends '_count' | 'count'
-        ? T[P] extends true
-            ? number
-            : GetScalarType<T[P], AggregateOrganization[P]>
-        : GetScalarType<T[P], AggregateOrganization[P]>
+          ? T[P] extends true
+              ? number
+              : GetScalarType<T[P], AggregateOrganization[P]>
+          : GetScalarType<T[P], AggregateOrganization[P]>
   }
 
 
-  export type OrganizationGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    export type OrganizationGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: OrganizationWhereInput
     orderBy?: OrganizationOrderByWithAggregationInput | OrganizationOrderByWithAggregationInput[]
     by: OrganizationScalarFieldEnum[] | OrganizationScalarFieldEnum
@@ -6215,7 +6507,7 @@ export namespace Prisma {
       Array<
           PickEnumerable<OrganizationGroupByOutputType, T['by']> &
           {
-            [P in ((keyof T) & (keyof OrganizationGroupByOutputType))]: P extends '_count'
+              [P in ((keyof T) & (keyof OrganizationGroupByOutputType))]: P extends '_count'
               ? T[P] extends boolean
                   ? number
                   : GetScalarType<T[P], OrganizationGroupByOutputType[P]>
@@ -6236,6 +6528,7 @@ export namespace Prisma {
     invitations?: boolean | Organization$invitationsArgs<ExtArgs>
     _count?: boolean | OrganizationCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["organization"]>
+
 
 
   export type OrganizationSelectScalar = {
@@ -6275,12 +6568,11 @@ export namespace Prisma {
 
   type OrganizationCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
       Omit<OrganizationFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-    select?: OrganizationCountAggregateInputType | true
+      select?: OrganizationCountAggregateInputType | true
     }
 
   export interface OrganizationDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
     [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Organization'], meta: { name: 'Organization' } }
-
     /**
      * Find zero or one Organization that matches the filter.
      * @param {OrganizationFindUniqueArgs} args - Arguments to find a Organization
@@ -6555,25 +6847,25 @@ export namespace Prisma {
             ? `Error: "by" must not be empty.`
             : HavingValid extends False
                 ? {
-                  [P in HavingFields]: P extends ByFields
-                      ? never
-                      : P extends string
-                          ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-                          : [
-                            Error,
-                            'Field ',
-                            P,
-                            ` in "having" needs to be provided in "by"`,
-                          ]
+                    [P in HavingFields]: P extends ByFields
+                        ? never
+                        : P extends string
+                            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+                            : [
+                                Error,
+                                'Field ',
+                                P,
+                                ` in "having" needs to be provided in "by"`,
+                            ]
                 }[HavingFields]
                 : 'take' extends Keys<T>
                     ? 'orderBy' extends Keys<T>
                         ? ByValid extends True
                             ? {}
                             : {
-                              [P in OrderFields]: P extends ByFields
-                                  ? never
-                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                [P in OrderFields]: P extends ByFields
+                                    ? never
+                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
                         : 'Error: If you provide "take", you also need to provide "orderBy"'
                     : 'skip' extends Keys<T>
@@ -6581,24 +6873,24 @@ export namespace Prisma {
                             ? ByValid extends True
                                 ? {}
                                 : {
-                                  [P in OrderFields]: P extends ByFields
-                                      ? never
-                                      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                    [P in OrderFields]: P extends ByFields
+                                        ? never
+                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                                 }[OrderFields]
                             : 'Error: If you provide "skip", you also need to provide "orderBy"'
                         : ByValid extends True
                             ? {}
                             : {
-                              [P in OrderFields]: P extends ByFields
-                                  ? never
-                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                [P in OrderFields]: P extends ByFields
+                                    ? never
+                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
     >(args: SubsetIntersection<T, OrganizationGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetOrganizationGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
 
-    /**
-     * Fields of the Organization model
-     */
-    readonly fields: OrganizationFieldRefs;
+      /**
+       * Fields of the Organization model
+       */
+      readonly fields: OrganizationFieldRefs;
   }
 
   /**
@@ -6609,11 +6901,8 @@ export namespace Prisma {
    */
   export interface Prisma__OrganizationClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-
     members<T extends Organization$membersArgs<ExtArgs> = {}>(args?: Subset<T, Organization$membersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-
     invitations<T extends Organization$invitationsArgs<ExtArgs> = {}>(args?: Subset<T, Organization$invitationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6621,14 +6910,12 @@ export namespace Prisma {
      * @returns A Promise for the completion of which ever callback is executed.
      */
     then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -6639,7 +6926,7 @@ export namespace Prisma {
   }
 
 
-  /**
+    /**
    * Fields of the Organization model
    */
   interface OrganizationFieldRefs {
@@ -6652,7 +6939,7 @@ export namespace Prisma {
   }
 
 
-  // Custom InputTypes
+    // Custom InputTypes
   /**
    * Organization findUnique
    */
@@ -6919,6 +7206,10 @@ export namespace Prisma {
      * Filter which Organizations to update
      */
     where?: OrganizationWhereInput
+      /**
+       * Limit how many Organizations to update.
+       */
+      limit?: number
   }
 
   /**
@@ -6981,6 +7272,10 @@ export namespace Prisma {
      * Filter which Organizations to delete
      */
     where?: OrganizationWhereInput
+      /**
+       * Limit how many Organizations to delete.
+       */
+      limit?: number
   }
 
   /**
@@ -7162,14 +7457,14 @@ export namespace Prisma {
 
   export type GetMemberAggregateType<T extends MemberAggregateArgs> = {
         [P in keyof T & keyof AggregateMember]: P extends '_count' | 'count'
-        ? T[P] extends true
-            ? number
-            : GetScalarType<T[P], AggregateMember[P]>
-        : GetScalarType<T[P], AggregateMember[P]>
+          ? T[P] extends true
+              ? number
+              : GetScalarType<T[P], AggregateMember[P]>
+          : GetScalarType<T[P], AggregateMember[P]>
   }
 
 
-  export type MemberGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    export type MemberGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: MemberWhereInput
     orderBy?: MemberOrderByWithAggregationInput | MemberOrderByWithAggregationInput[]
     by: MemberScalarFieldEnum[] | MemberScalarFieldEnum
@@ -7196,7 +7491,7 @@ export namespace Prisma {
       Array<
           PickEnumerable<MemberGroupByOutputType, T['by']> &
           {
-            [P in ((keyof T) & (keyof MemberGroupByOutputType))]: P extends '_count'
+              [P in ((keyof T) & (keyof MemberGroupByOutputType))]: P extends '_count'
               ? T[P] extends boolean
                   ? number
                   : GetScalarType<T[P], MemberGroupByOutputType[P]>
@@ -7215,6 +7510,7 @@ export namespace Prisma {
     organization?: boolean | OrganizationDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["member"]>
+
 
 
   export type MemberSelectScalar = {
@@ -7251,12 +7547,11 @@ export namespace Prisma {
 
   type MemberCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
       Omit<MemberFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-    select?: MemberCountAggregateInputType | true
+      select?: MemberCountAggregateInputType | true
     }
 
   export interface MemberDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
     [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Member'], meta: { name: 'Member' } }
-
     /**
      * Find zero or one Member that matches the filter.
      * @param {MemberFindUniqueArgs} args - Arguments to find a Member
@@ -7531,25 +7826,25 @@ export namespace Prisma {
             ? `Error: "by" must not be empty.`
             : HavingValid extends False
                 ? {
-                  [P in HavingFields]: P extends ByFields
-                      ? never
-                      : P extends string
-                          ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-                          : [
-                            Error,
-                            'Field ',
-                            P,
-                            ` in "having" needs to be provided in "by"`,
-                          ]
+                    [P in HavingFields]: P extends ByFields
+                        ? never
+                        : P extends string
+                            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+                            : [
+                                Error,
+                                'Field ',
+                                P,
+                                ` in "having" needs to be provided in "by"`,
+                            ]
                 }[HavingFields]
                 : 'take' extends Keys<T>
                     ? 'orderBy' extends Keys<T>
                         ? ByValid extends True
                             ? {}
                             : {
-                              [P in OrderFields]: P extends ByFields
-                                  ? never
-                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                [P in OrderFields]: P extends ByFields
+                                    ? never
+                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
                         : 'Error: If you provide "take", you also need to provide "orderBy"'
                     : 'skip' extends Keys<T>
@@ -7557,24 +7852,24 @@ export namespace Prisma {
                             ? ByValid extends True
                                 ? {}
                                 : {
-                                  [P in OrderFields]: P extends ByFields
-                                      ? never
-                                      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                    [P in OrderFields]: P extends ByFields
+                                        ? never
+                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                                 }[OrderFields]
                             : 'Error: If you provide "skip", you also need to provide "orderBy"'
                         : ByValid extends True
                             ? {}
                             : {
-                              [P in OrderFields]: P extends ByFields
-                                  ? never
-                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                [P in OrderFields]: P extends ByFields
+                                    ? never
+                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
     >(args: SubsetIntersection<T, MemberGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMemberGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
 
-    /**
-     * Fields of the Member model
-     */
-    readonly fields: MemberFieldRefs;
+      /**
+       * Fields of the Member model
+       */
+      readonly fields: MemberFieldRefs;
   }
 
   /**
@@ -7585,11 +7880,8 @@ export namespace Prisma {
    */
   export interface Prisma__MemberClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-
     organization<T extends OrganizationDefaultArgs<ExtArgs> = {}>(args?: Subset<T, OrganizationDefaultArgs<ExtArgs>>): Prisma__OrganizationClient<$Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7597,14 +7889,12 @@ export namespace Prisma {
      * @returns A Promise for the completion of which ever callback is executed.
      */
     then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -7615,7 +7905,7 @@ export namespace Prisma {
   }
 
 
-  /**
+    /**
    * Fields of the Member model
    */
   interface MemberFieldRefs {
@@ -7627,7 +7917,7 @@ export namespace Prisma {
   }
 
 
-  // Custom InputTypes
+    // Custom InputTypes
   /**
    * Member findUnique
    */
@@ -7894,6 +8184,10 @@ export namespace Prisma {
      * Filter which Members to update
      */
     where?: MemberWhereInput
+      /**
+       * Limit how many Members to update.
+       */
+      limit?: number
   }
 
   /**
@@ -7956,6 +8250,10 @@ export namespace Prisma {
      * Filter which Members to delete
      */
     where?: MemberWhereInput
+      /**
+       * Limit how many Members to delete.
+       */
+      limit?: number
   }
 
   /**
@@ -8101,14 +8399,14 @@ export namespace Prisma {
 
   export type GetInvitationAggregateType<T extends InvitationAggregateArgs> = {
         [P in keyof T & keyof AggregateInvitation]: P extends '_count' | 'count'
-        ? T[P] extends true
-            ? number
-            : GetScalarType<T[P], AggregateInvitation[P]>
-        : GetScalarType<T[P], AggregateInvitation[P]>
+          ? T[P] extends true
+              ? number
+              : GetScalarType<T[P], AggregateInvitation[P]>
+          : GetScalarType<T[P], AggregateInvitation[P]>
   }
 
 
-  export type InvitationGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    export type InvitationGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: InvitationWhereInput
     orderBy?: InvitationOrderByWithAggregationInput | InvitationOrderByWithAggregationInput[]
     by: InvitationScalarFieldEnum[] | InvitationScalarFieldEnum
@@ -8137,7 +8435,7 @@ export namespace Prisma {
       Array<
           PickEnumerable<InvitationGroupByOutputType, T['by']> &
           {
-            [P in ((keyof T) & (keyof InvitationGroupByOutputType))]: P extends '_count'
+              [P in ((keyof T) & (keyof InvitationGroupByOutputType))]: P extends '_count'
               ? T[P] extends boolean
                   ? number
                   : GetScalarType<T[P], InvitationGroupByOutputType[P]>
@@ -8158,6 +8456,7 @@ export namespace Prisma {
     organization?: boolean | OrganizationDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["invitation"]>
+
 
 
   export type InvitationSelectScalar = {
@@ -8198,12 +8497,11 @@ export namespace Prisma {
 
   type InvitationCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
       Omit<InvitationFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-    select?: InvitationCountAggregateInputType | true
+      select?: InvitationCountAggregateInputType | true
     }
 
   export interface InvitationDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
     [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Invitation'], meta: { name: 'Invitation' } }
-
     /**
      * Find zero or one Invitation that matches the filter.
      * @param {InvitationFindUniqueArgs} args - Arguments to find a Invitation
@@ -8478,25 +8776,25 @@ export namespace Prisma {
             ? `Error: "by" must not be empty.`
             : HavingValid extends False
                 ? {
-                  [P in HavingFields]: P extends ByFields
-                      ? never
-                      : P extends string
-                          ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-                          : [
-                            Error,
-                            'Field ',
-                            P,
-                            ` in "having" needs to be provided in "by"`,
-                          ]
+                    [P in HavingFields]: P extends ByFields
+                        ? never
+                        : P extends string
+                            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+                            : [
+                                Error,
+                                'Field ',
+                                P,
+                                ` in "having" needs to be provided in "by"`,
+                            ]
                 }[HavingFields]
                 : 'take' extends Keys<T>
                     ? 'orderBy' extends Keys<T>
                         ? ByValid extends True
                             ? {}
                             : {
-                              [P in OrderFields]: P extends ByFields
-                                  ? never
-                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                [P in OrderFields]: P extends ByFields
+                                    ? never
+                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
                         : 'Error: If you provide "take", you also need to provide "orderBy"'
                     : 'skip' extends Keys<T>
@@ -8504,24 +8802,24 @@ export namespace Prisma {
                             ? ByValid extends True
                                 ? {}
                                 : {
-                                  [P in OrderFields]: P extends ByFields
-                                      ? never
-                                      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                    [P in OrderFields]: P extends ByFields
+                                        ? never
+                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                                 }[OrderFields]
                             : 'Error: If you provide "skip", you also need to provide "orderBy"'
                         : ByValid extends True
                             ? {}
                             : {
-                              [P in OrderFields]: P extends ByFields
-                                  ? never
-                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                [P in OrderFields]: P extends ByFields
+                                    ? never
+                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
     >(args: SubsetIntersection<T, InvitationGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetInvitationGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
 
-    /**
-     * Fields of the Invitation model
-     */
-    readonly fields: InvitationFieldRefs;
+      /**
+       * Fields of the Invitation model
+       */
+      readonly fields: InvitationFieldRefs;
   }
 
   /**
@@ -8532,11 +8830,8 @@ export namespace Prisma {
    */
   export interface Prisma__InvitationClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-
     organization<T extends OrganizationDefaultArgs<ExtArgs> = {}>(args?: Subset<T, OrganizationDefaultArgs<ExtArgs>>): Prisma__OrganizationClient<$Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8544,14 +8839,12 @@ export namespace Prisma {
      * @returns A Promise for the completion of which ever callback is executed.
      */
     then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -8562,7 +8855,7 @@ export namespace Prisma {
   }
 
 
-  /**
+    /**
    * Fields of the Invitation model
    */
   interface InvitationFieldRefs {
@@ -8576,7 +8869,7 @@ export namespace Prisma {
   }
 
 
-  // Custom InputTypes
+    // Custom InputTypes
   /**
    * Invitation findUnique
    */
@@ -8843,6 +9136,10 @@ export namespace Prisma {
      * Filter which Invitations to update
      */
     where?: InvitationWhereInput
+      /**
+       * Limit how many Invitations to update.
+       */
+      limit?: number
   }
 
   /**
@@ -8905,6 +9202,10 @@ export namespace Prisma {
      * Filter which Invitations to delete
      */
     where?: InvitationWhereInput
+      /**
+       * Limit how many Invitations to delete.
+       */
+      limit?: number
   }
 
   /**
@@ -9032,14 +9333,14 @@ export namespace Prisma {
 
   export type GetTwoFactorAggregateType<T extends TwoFactorAggregateArgs> = {
         [P in keyof T & keyof AggregateTwoFactor]: P extends '_count' | 'count'
-        ? T[P] extends true
-            ? number
-            : GetScalarType<T[P], AggregateTwoFactor[P]>
-        : GetScalarType<T[P], AggregateTwoFactor[P]>
+          ? T[P] extends true
+              ? number
+              : GetScalarType<T[P], AggregateTwoFactor[P]>
+          : GetScalarType<T[P], AggregateTwoFactor[P]>
   }
 
 
-  export type TwoFactorGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    export type TwoFactorGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: TwoFactorWhereInput
     orderBy?: TwoFactorOrderByWithAggregationInput | TwoFactorOrderByWithAggregationInput[]
     by: TwoFactorScalarFieldEnum[] | TwoFactorScalarFieldEnum
@@ -9065,7 +9366,7 @@ export namespace Prisma {
       Array<
           PickEnumerable<TwoFactorGroupByOutputType, T['by']> &
           {
-            [P in ((keyof T) & (keyof TwoFactorGroupByOutputType))]: P extends '_count'
+              [P in ((keyof T) & (keyof TwoFactorGroupByOutputType))]: P extends '_count'
               ? T[P] extends boolean
                   ? number
                   : GetScalarType<T[P], TwoFactorGroupByOutputType[P]>
@@ -9082,6 +9383,7 @@ export namespace Prisma {
     userId?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["twoFactor"]>
+
 
 
   export type TwoFactorSelectScalar = {
@@ -9114,12 +9416,11 @@ export namespace Prisma {
 
   type TwoFactorCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
       Omit<TwoFactorFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-    select?: TwoFactorCountAggregateInputType | true
+      select?: TwoFactorCountAggregateInputType | true
     }
 
   export interface TwoFactorDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
     [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['TwoFactor'], meta: { name: 'TwoFactor' } }
-
     /**
      * Find zero or one TwoFactor that matches the filter.
      * @param {TwoFactorFindUniqueArgs} args - Arguments to find a TwoFactor
@@ -9394,25 +9695,25 @@ export namespace Prisma {
             ? `Error: "by" must not be empty.`
             : HavingValid extends False
                 ? {
-                  [P in HavingFields]: P extends ByFields
-                      ? never
-                      : P extends string
-                          ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-                          : [
-                            Error,
-                            'Field ',
-                            P,
-                            ` in "having" needs to be provided in "by"`,
-                          ]
+                    [P in HavingFields]: P extends ByFields
+                        ? never
+                        : P extends string
+                            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+                            : [
+                                Error,
+                                'Field ',
+                                P,
+                                ` in "having" needs to be provided in "by"`,
+                            ]
                 }[HavingFields]
                 : 'take' extends Keys<T>
                     ? 'orderBy' extends Keys<T>
                         ? ByValid extends True
                             ? {}
                             : {
-                              [P in OrderFields]: P extends ByFields
-                                  ? never
-                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                [P in OrderFields]: P extends ByFields
+                                    ? never
+                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
                         : 'Error: If you provide "take", you also need to provide "orderBy"'
                     : 'skip' extends Keys<T>
@@ -9420,24 +9721,24 @@ export namespace Prisma {
                             ? ByValid extends True
                                 ? {}
                                 : {
-                                  [P in OrderFields]: P extends ByFields
-                                      ? never
-                                      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                    [P in OrderFields]: P extends ByFields
+                                        ? never
+                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                                 }[OrderFields]
                             : 'Error: If you provide "skip", you also need to provide "orderBy"'
                         : ByValid extends True
                             ? {}
                             : {
-                              [P in OrderFields]: P extends ByFields
-                                  ? never
-                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                [P in OrderFields]: P extends ByFields
+                                    ? never
+                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
     >(args: SubsetIntersection<T, TwoFactorGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTwoFactorGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
 
-    /**
-     * Fields of the TwoFactor model
-     */
-    readonly fields: TwoFactorFieldRefs;
+      /**
+       * Fields of the TwoFactor model
+       */
+      readonly fields: TwoFactorFieldRefs;
   }
 
   /**
@@ -9448,9 +9749,7 @@ export namespace Prisma {
    */
   export interface Prisma__TwoFactorClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -9458,14 +9757,12 @@ export namespace Prisma {
      * @returns A Promise for the completion of which ever callback is executed.
      */
     then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -9476,7 +9773,7 @@ export namespace Prisma {
   }
 
 
-  /**
+    /**
    * Fields of the TwoFactor model
    */
   interface TwoFactorFieldRefs {
@@ -9487,7 +9784,7 @@ export namespace Prisma {
   }
 
 
-  // Custom InputTypes
+    // Custom InputTypes
   /**
    * TwoFactor findUnique
    */
@@ -9754,6 +10051,10 @@ export namespace Prisma {
      * Filter which TwoFactors to update
      */
     where?: TwoFactorWhereInput
+      /**
+       * Limit how many TwoFactors to update.
+       */
+      limit?: number
   }
 
   /**
@@ -9816,6 +10117,10 @@ export namespace Prisma {
      * Filter which TwoFactors to delete
      */
     where?: TwoFactorWhereInput
+      /**
+       * Limit how many TwoFactors to delete.
+       */
+      limit?: number
   }
 
   /**
@@ -9835,6 +10140,958 @@ export namespace Prisma {
      */
     include?: TwoFactorInclude<ExtArgs> | null
   }
+
+
+    /**
+     * Model Channel
+     */
+
+    export type AggregateChannel = {
+        _count: ChannelCountAggregateOutputType | null
+        _min: ChannelMinAggregateOutputType | null
+        _max: ChannelMaxAggregateOutputType | null
+    }
+
+    export type ChannelMinAggregateOutputType = {
+        id: string | null
+        name: string | null
+    }
+
+    export type ChannelMaxAggregateOutputType = {
+        id: string | null
+        name: string | null
+    }
+
+    export type ChannelCountAggregateOutputType = {
+        id: number
+        name: number
+        _all: number
+    }
+
+
+    export type ChannelMinAggregateInputType = {
+        id?: true
+        name?: true
+    }
+
+    export type ChannelMaxAggregateInputType = {
+        id?: true
+        name?: true
+    }
+
+    export type ChannelCountAggregateInputType = {
+        id?: true
+        name?: true
+        _all?: true
+    }
+
+    export type ChannelAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Filter which Channel to aggregate.
+         */
+        where?: ChannelWhereInput
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+         *
+         * Determine the order of Channels to fetch.
+         */
+        orderBy?: ChannelOrderByWithRelationInput | ChannelOrderByWithRelationInput[]
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+         *
+         * Sets the start position
+         */
+        cursor?: ChannelWhereUniqueInput
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+         *
+         * Take `±n` Channels from the position of the cursor.
+         */
+        take?: number
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+         *
+         * Skip the first `n` Channels.
+         */
+        skip?: number
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+         *
+         * Count returned Channels
+         **/
+        _count?: true | ChannelCountAggregateInputType
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+         *
+         * Select which fields to find the minimum value
+         **/
+        _min?: ChannelMinAggregateInputType
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+         *
+         * Select which fields to find the maximum value
+         **/
+        _max?: ChannelMaxAggregateInputType
+    }
+
+    export type GetChannelAggregateType<T extends ChannelAggregateArgs> = {
+        [P in keyof T & keyof AggregateChannel]: P extends '_count' | 'count'
+            ? T[P] extends true
+                ? number
+                : GetScalarType<T[P], AggregateChannel[P]>
+            : GetScalarType<T[P], AggregateChannel[P]>
+    }
+
+
+    export type ChannelGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        where?: ChannelWhereInput
+        orderBy?: ChannelOrderByWithAggregationInput | ChannelOrderByWithAggregationInput[]
+        by: ChannelScalarFieldEnum[] | ChannelScalarFieldEnum
+        having?: ChannelScalarWhereWithAggregatesInput
+        take?: number
+        skip?: number
+        _count?: ChannelCountAggregateInputType | true
+        _min?: ChannelMinAggregateInputType
+        _max?: ChannelMaxAggregateInputType
+    }
+
+    export type ChannelGroupByOutputType = {
+        id: string
+        name: string
+        _count: ChannelCountAggregateOutputType | null
+        _min: ChannelMinAggregateOutputType | null
+        _max: ChannelMaxAggregateOutputType | null
+    }
+
+    type GetChannelGroupByPayload<T extends ChannelGroupByArgs> = Prisma.PrismaPromise<
+        Array<
+            PickEnumerable<ChannelGroupByOutputType, T['by']> &
+            {
+                [P in ((keyof T) & (keyof ChannelGroupByOutputType))]: P extends '_count'
+                ? T[P] extends boolean
+                    ? number
+                    : GetScalarType<T[P], ChannelGroupByOutputType[P]>
+                : GetScalarType<T[P], ChannelGroupByOutputType[P]>
+            }
+        >
+    >
+
+
+    export type ChannelSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+        id?: boolean
+        name?: boolean
+        Message?: boolean | Channel$MessageArgs<ExtArgs>
+        Ticket?: boolean | Channel$TicketArgs<ExtArgs>
+        _count?: boolean | ChannelCountOutputTypeDefaultArgs<ExtArgs>
+    }, ExtArgs["result"]["channel"]>
+
+
+    export type ChannelSelectScalar = {
+        id?: boolean
+        name?: boolean
+    }
+
+    export type ChannelOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name", ExtArgs["result"]["channel"]>
+    export type ChannelInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        Message?: boolean | Channel$MessageArgs<ExtArgs>
+        Ticket?: boolean | Channel$TicketArgs<ExtArgs>
+        _count?: boolean | ChannelCountOutputTypeDefaultArgs<ExtArgs>
+    }
+
+    export type $ChannelPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        name: "Channel"
+        objects: {
+            Message: Prisma.$MessagePayload<ExtArgs>[]
+            Ticket: Prisma.$TicketPayload<ExtArgs>[]
+        }
+        scalars: $Extensions.GetPayloadResult<{
+            id: string
+            name: string
+        }, ExtArgs["result"]["channel"]>
+        composites: {}
+    }
+
+    type ChannelGetPayload<S extends boolean | null | undefined | ChannelDefaultArgs> = $Result.GetResult<Prisma.$ChannelPayload, S>
+
+    type ChannelCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+        Omit<ChannelFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+        select?: ChannelCountAggregateInputType | true
+    }
+
+    export interface ChannelDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+        [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Channel'], meta: { name: 'Channel' } }
+
+        /**
+         * Find zero or one Channel that matches the filter.
+         * @param {ChannelFindUniqueArgs} args - Arguments to find a Channel
+         * @example
+         * // Get one Channel
+         * const channel = await prisma.channel.findUnique({
+         *   where: {
+         *     // ... provide filter here
+         *   }
+         * })
+         */
+        findUnique<T extends ChannelFindUniqueArgs>(args: SelectSubset<T, ChannelFindUniqueArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+        /**
+         * Find one Channel that matches the filter or throw an error with `error.code='P2025'`
+         * if no matches were found.
+         * @param {ChannelFindUniqueOrThrowArgs} args - Arguments to find a Channel
+         * @example
+         * // Get one Channel
+         * const channel = await prisma.channel.findUniqueOrThrow({
+         *   where: {
+         *     // ... provide filter here
+         *   }
+         * })
+         */
+        findUniqueOrThrow<T extends ChannelFindUniqueOrThrowArgs>(args: SelectSubset<T, ChannelFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+        /**
+         * Find the first Channel that matches the filter.
+         * Note, that providing `undefined` is treated as the value not being there.
+         * Read more here: https://pris.ly/d/null-undefined
+         * @param {ChannelFindFirstArgs} args - Arguments to find a Channel
+         * @example
+         * // Get one Channel
+         * const channel = await prisma.channel.findFirst({
+         *   where: {
+         *     // ... provide filter here
+         *   }
+         * })
+         */
+        findFirst<T extends ChannelFindFirstArgs>(args?: SelectSubset<T, ChannelFindFirstArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+        /**
+         * Find the first Channel that matches the filter or
+         * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+         * Note, that providing `undefined` is treated as the value not being there.
+         * Read more here: https://pris.ly/d/null-undefined
+         * @param {ChannelFindFirstOrThrowArgs} args - Arguments to find a Channel
+         * @example
+         * // Get one Channel
+         * const channel = await prisma.channel.findFirstOrThrow({
+         *   where: {
+         *     // ... provide filter here
+         *   }
+         * })
+         */
+        findFirstOrThrow<T extends ChannelFindFirstOrThrowArgs>(args?: SelectSubset<T, ChannelFindFirstOrThrowArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+        /**
+         * Find zero or more Channels that matches the filter.
+         * Note, that providing `undefined` is treated as the value not being there.
+         * Read more here: https://pris.ly/d/null-undefined
+         * @param {ChannelFindManyArgs} args - Arguments to filter and select certain fields only.
+         * @example
+         * // Get all Channels
+         * const channels = await prisma.channel.findMany()
+         *
+         * // Get first 10 Channels
+         * const channels = await prisma.channel.findMany({ take: 10 })
+         *
+         * // Only select the `id`
+         * const channelWithIdOnly = await prisma.channel.findMany({ select: { id: true } })
+         *
+         */
+        findMany<T extends ChannelFindManyArgs>(args?: SelectSubset<T, ChannelFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+        /**
+         * Create a Channel.
+         * @param {ChannelCreateArgs} args - Arguments to create a Channel.
+         * @example
+         * // Create one Channel
+         * const Channel = await prisma.channel.create({
+         *   data: {
+         *     // ... data to create a Channel
+         *   }
+         * })
+         *
+         */
+        create<T extends ChannelCreateArgs>(args: SelectSubset<T, ChannelCreateArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+        /**
+         * Create many Channels.
+         * @param {ChannelCreateManyArgs} args - Arguments to create many Channels.
+         * @example
+         * // Create many Channels
+         * const channel = await prisma.channel.createMany({
+         *   data: [
+         *     // ... provide data here
+         *   ]
+         * })
+         *
+         */
+        createMany<T extends ChannelCreateManyArgs>(args?: SelectSubset<T, ChannelCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+        /**
+         * Delete a Channel.
+         * @param {ChannelDeleteArgs} args - Arguments to delete one Channel.
+         * @example
+         * // Delete one Channel
+         * const Channel = await prisma.channel.delete({
+         *   where: {
+         *     // ... filter to delete one Channel
+         *   }
+         * })
+         *
+         */
+        delete<T extends ChannelDeleteArgs>(args: SelectSubset<T, ChannelDeleteArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+        /**
+         * Update one Channel.
+         * @param {ChannelUpdateArgs} args - Arguments to update one Channel.
+         * @example
+         * // Update one Channel
+         * const channel = await prisma.channel.update({
+         *   where: {
+         *     // ... provide filter here
+         *   },
+         *   data: {
+         *     // ... provide data here
+         *   }
+         * })
+         *
+         */
+        update<T extends ChannelUpdateArgs>(args: SelectSubset<T, ChannelUpdateArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+        /**
+         * Delete zero or more Channels.
+         * @param {ChannelDeleteManyArgs} args - Arguments to filter Channels to delete.
+         * @example
+         * // Delete a few Channels
+         * const { count } = await prisma.channel.deleteMany({
+         *   where: {
+         *     // ... provide filter here
+         *   }
+         * })
+         *
+         */
+        deleteMany<T extends ChannelDeleteManyArgs>(args?: SelectSubset<T, ChannelDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+        /**
+         * Update zero or more Channels.
+         * Note, that providing `undefined` is treated as the value not being there.
+         * Read more here: https://pris.ly/d/null-undefined
+         * @param {ChannelUpdateManyArgs} args - Arguments to update one or more rows.
+         * @example
+         * // Update many Channels
+         * const channel = await prisma.channel.updateMany({
+         *   where: {
+         *     // ... provide filter here
+         *   },
+         *   data: {
+         *     // ... provide data here
+         *   }
+         * })
+         *
+         */
+        updateMany<T extends ChannelUpdateManyArgs>(args: SelectSubset<T, ChannelUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+        /**
+         * Create or update one Channel.
+         * @param {ChannelUpsertArgs} args - Arguments to update or create a Channel.
+         * @example
+         * // Update or create a Channel
+         * const channel = await prisma.channel.upsert({
+         *   create: {
+         *     // ... data to create a Channel
+         *   },
+         *   update: {
+         *     // ... in case it already exists, update
+         *   },
+         *   where: {
+         *     // ... the filter for the Channel we want to update
+         *   }
+         * })
+         */
+        upsert<T extends ChannelUpsertArgs>(args: SelectSubset<T, ChannelUpsertArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+        /**
+         * Count the number of Channels.
+         * Note, that providing `undefined` is treated as the value not being there.
+         * Read more here: https://pris.ly/d/null-undefined
+         * @param {ChannelCountArgs} args - Arguments to filter Channels to count.
+         * @example
+         * // Count the number of Channels
+         * const count = await prisma.channel.count({
+         *   where: {
+         *     // ... the filter for the Channels we want to count
+         *   }
+         * })
+         **/
+        count<T extends ChannelCountArgs>(
+            args?: Subset<T, ChannelCountArgs>,
+        ): Prisma.PrismaPromise<
+            T extends $Utils.Record<'select', any>
+                ? T['select'] extends true
+                    ? number
+                    : GetScalarType<T['select'], ChannelCountAggregateOutputType>
+                : number
+        >
+
+        /**
+         * Allows you to perform aggregations operations on a Channel.
+         * Note, that providing `undefined` is treated as the value not being there.
+         * Read more here: https://pris.ly/d/null-undefined
+         * @param {ChannelAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+         * @example
+         * // Ordered by age ascending
+         * // Where email contains prisma.io
+         * // Limited to the 10 users
+         * const aggregations = await prisma.user.aggregate({
+         *   _avg: {
+         *     age: true,
+         *   },
+         *   where: {
+         *     email: {
+         *       contains: "prisma.io",
+         *     },
+         *   },
+         *   orderBy: {
+         *     age: "asc",
+         *   },
+         *   take: 10,
+         * })
+         **/
+        aggregate<T extends ChannelAggregateArgs>(args: Subset<T, ChannelAggregateArgs>): Prisma.PrismaPromise<GetChannelAggregateType<T>>
+
+        /**
+         * Group by Channel.
+         * Note, that providing `undefined` is treated as the value not being there.
+         * Read more here: https://pris.ly/d/null-undefined
+         * @param {ChannelGroupByArgs} args - Group by arguments.
+         * @example
+         * // Group by city, order by createdAt, get count
+         * const result = await prisma.user.groupBy({
+         *   by: ['city', 'createdAt'],
+         *   orderBy: {
+         *     createdAt: true
+         *   },
+         *   _count: {
+         *     _all: true
+         *   },
+         * })
+         *
+         **/
+        groupBy<
+            T extends ChannelGroupByArgs,
+            HasSelectOrTake extends Or<
+                Extends<'skip', Keys<T>>,
+                Extends<'take', Keys<T>>
+            >,
+            OrderByArg extends True extends HasSelectOrTake
+                ? { orderBy: ChannelGroupByArgs['orderBy'] }
+                : { orderBy?: ChannelGroupByArgs['orderBy'] },
+            OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+            ByFields extends MaybeTupleToUnion<T['by']>,
+            ByValid extends Has<ByFields, OrderFields>,
+            HavingFields extends GetHavingFields<T['having']>,
+            HavingValid extends Has<ByFields, HavingFields>,
+            ByEmpty extends T['by'] extends never[] ? True : False,
+            InputErrors extends ByEmpty extends True
+                ? `Error: "by" must not be empty.`
+                : HavingValid extends False
+                    ? {
+                        [P in HavingFields]: P extends ByFields
+                            ? never
+                            : P extends string
+                                ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+                                : [
+                                    Error,
+                                    'Field ',
+                                    P,
+                                    ` in "having" needs to be provided in "by"`,
+                                ]
+                    }[HavingFields]
+                    : 'take' extends Keys<T>
+                        ? 'orderBy' extends Keys<T>
+                            ? ByValid extends True
+                                ? {}
+                                : {
+                                    [P in OrderFields]: P extends ByFields
+                                        ? never
+                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                }[OrderFields]
+                            : 'Error: If you provide "take", you also need to provide "orderBy"'
+                        : 'skip' extends Keys<T>
+                            ? 'orderBy' extends Keys<T>
+                                ? ByValid extends True
+                                    ? {}
+                                    : {
+                                        [P in OrderFields]: P extends ByFields
+                                            ? never
+                                            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                    }[OrderFields]
+                                : 'Error: If you provide "skip", you also need to provide "orderBy"'
+                            : ByValid extends True
+                                ? {}
+                                : {
+                                    [P in OrderFields]: P extends ByFields
+                                        ? never
+                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                }[OrderFields]
+        >(args: SubsetIntersection<T, ChannelGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetChannelGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+
+        /**
+         * Fields of the Channel model
+         */
+        readonly fields: ChannelFieldRefs;
+    }
+
+    /**
+     * The delegate class that acts as a "Promise-like" for Channel.
+     * Why is this prefixed with `Prisma__`?
+     * Because we want to prevent naming conflicts as mentioned in
+     * https://github.com/prisma/prisma-client-js/issues/707
+     */
+    export interface Prisma__ChannelClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+        readonly [Symbol.toStringTag]: "PrismaPromise"
+
+        Message<T extends Channel$MessageArgs<ExtArgs> = {}>(args?: Subset<T, Channel$MessageArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+
+        Ticket<T extends Channel$TicketArgs<ExtArgs> = {}>(args?: Subset<T, Channel$TicketArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+
+        /**
+         * Attaches callbacks for the resolution and/or rejection of the Promise.
+         * @param onfulfilled The callback to execute when the Promise is resolved.
+         * @param onrejected The callback to execute when the Promise is rejected.
+         * @returns A Promise for the completion of which ever callback is executed.
+         */
+        then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+
+        /**
+         * Attaches a callback for only the rejection of the Promise.
+         * @param onrejected The callback to execute when the Promise is rejected.
+         * @returns A Promise for the completion of the callback.
+         */
+        catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+
+        /**
+         * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+         * resolved value cannot be modified from the callback.
+         * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+         * @returns A Promise for the completion of the callback.
+         */
+        finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+    }
+
+
+    /**
+     * Fields of the Channel model
+     */
+    interface ChannelFieldRefs {
+        readonly id: FieldRef<"Channel", 'String'>
+        readonly name: FieldRef<"Channel", 'String'>
+    }
+
+
+    // Custom InputTypes
+    /**
+     * Channel findUnique
+     */
+    export type ChannelFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the Channel
+         */
+        select?: ChannelSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the Channel
+         */
+        omit?: ChannelOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: ChannelInclude<ExtArgs> | null
+        /**
+         * Filter, which Channel to fetch.
+         */
+        where: ChannelWhereUniqueInput
+    }
+
+    /**
+     * Channel findUniqueOrThrow
+     */
+    export type ChannelFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the Channel
+         */
+        select?: ChannelSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the Channel
+         */
+        omit?: ChannelOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: ChannelInclude<ExtArgs> | null
+        /**
+         * Filter, which Channel to fetch.
+         */
+        where: ChannelWhereUniqueInput
+    }
+
+    /**
+     * Channel findFirst
+     */
+    export type ChannelFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the Channel
+         */
+        select?: ChannelSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the Channel
+         */
+        omit?: ChannelOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: ChannelInclude<ExtArgs> | null
+        /**
+         * Filter, which Channel to fetch.
+         */
+        where?: ChannelWhereInput
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+         *
+         * Determine the order of Channels to fetch.
+         */
+        orderBy?: ChannelOrderByWithRelationInput | ChannelOrderByWithRelationInput[]
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+         *
+         * Sets the position for searching for Channels.
+         */
+        cursor?: ChannelWhereUniqueInput
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+         *
+         * Take `±n` Channels from the position of the cursor.
+         */
+        take?: number
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+         *
+         * Skip the first `n` Channels.
+         */
+        skip?: number
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+         *
+         * Filter by unique combinations of Channels.
+         */
+        distinct?: ChannelScalarFieldEnum | ChannelScalarFieldEnum[]
+    }
+
+    /**
+     * Channel findFirstOrThrow
+     */
+    export type ChannelFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the Channel
+         */
+        select?: ChannelSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the Channel
+         */
+        omit?: ChannelOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: ChannelInclude<ExtArgs> | null
+        /**
+         * Filter, which Channel to fetch.
+         */
+        where?: ChannelWhereInput
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+         *
+         * Determine the order of Channels to fetch.
+         */
+        orderBy?: ChannelOrderByWithRelationInput | ChannelOrderByWithRelationInput[]
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+         *
+         * Sets the position for searching for Channels.
+         */
+        cursor?: ChannelWhereUniqueInput
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+         *
+         * Take `±n` Channels from the position of the cursor.
+         */
+        take?: number
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+         *
+         * Skip the first `n` Channels.
+         */
+        skip?: number
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+         *
+         * Filter by unique combinations of Channels.
+         */
+        distinct?: ChannelScalarFieldEnum | ChannelScalarFieldEnum[]
+    }
+
+    /**
+     * Channel findMany
+     */
+    export type ChannelFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the Channel
+         */
+        select?: ChannelSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the Channel
+         */
+        omit?: ChannelOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: ChannelInclude<ExtArgs> | null
+        /**
+         * Filter, which Channels to fetch.
+         */
+        where?: ChannelWhereInput
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+         *
+         * Determine the order of Channels to fetch.
+         */
+        orderBy?: ChannelOrderByWithRelationInput | ChannelOrderByWithRelationInput[]
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+         *
+         * Sets the position for listing Channels.
+         */
+        cursor?: ChannelWhereUniqueInput
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+         *
+         * Take `±n` Channels from the position of the cursor.
+         */
+        take?: number
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+         *
+         * Skip the first `n` Channels.
+         */
+        skip?: number
+        distinct?: ChannelScalarFieldEnum | ChannelScalarFieldEnum[]
+    }
+
+    /**
+     * Channel create
+     */
+    export type ChannelCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the Channel
+         */
+        select?: ChannelSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the Channel
+         */
+        omit?: ChannelOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: ChannelInclude<ExtArgs> | null
+        /**
+         * The data needed to create a Channel.
+         */
+        data: XOR<ChannelCreateInput, ChannelUncheckedCreateInput>
+    }
+
+    /**
+     * Channel createMany
+     */
+    export type ChannelCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * The data used to create many Channels.
+         */
+        data: ChannelCreateManyInput | ChannelCreateManyInput[]
+        skipDuplicates?: boolean
+    }
+
+    /**
+     * Channel update
+     */
+    export type ChannelUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the Channel
+         */
+        select?: ChannelSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the Channel
+         */
+        omit?: ChannelOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: ChannelInclude<ExtArgs> | null
+        /**
+         * The data needed to update a Channel.
+         */
+        data: XOR<ChannelUpdateInput, ChannelUncheckedUpdateInput>
+        /**
+         * Choose, which Channel to update.
+         */
+        where: ChannelWhereUniqueInput
+    }
+
+    /**
+     * Channel updateMany
+     */
+    export type ChannelUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * The data used to update Channels.
+         */
+        data: XOR<ChannelUpdateManyMutationInput, ChannelUncheckedUpdateManyInput>
+        /**
+         * Filter which Channels to update
+         */
+        where?: ChannelWhereInput
+        /**
+         * Limit how many Channels to update.
+         */
+        limit?: number
+    }
+
+    /**
+     * Channel upsert
+     */
+    export type ChannelUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the Channel
+         */
+        select?: ChannelSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the Channel
+         */
+        omit?: ChannelOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: ChannelInclude<ExtArgs> | null
+        /**
+         * The filter to search for the Channel to update in case it exists.
+         */
+        where: ChannelWhereUniqueInput
+        /**
+         * In case the Channel found by the `where` argument doesn't exist, create a new Channel with this data.
+         */
+        create: XOR<ChannelCreateInput, ChannelUncheckedCreateInput>
+        /**
+         * In case the Channel was found with the provided `where` argument, update it with this data.
+         */
+        update: XOR<ChannelUpdateInput, ChannelUncheckedUpdateInput>
+    }
+
+    /**
+     * Channel delete
+     */
+    export type ChannelDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the Channel
+         */
+        select?: ChannelSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the Channel
+         */
+        omit?: ChannelOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: ChannelInclude<ExtArgs> | null
+        /**
+         * Filter which Channel to delete.
+         */
+        where: ChannelWhereUniqueInput
+    }
+
+    /**
+     * Channel deleteMany
+     */
+    export type ChannelDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Filter which Channels to delete
+         */
+        where?: ChannelWhereInput
+        /**
+         * Limit how many Channels to delete.
+         */
+        limit?: number
+    }
+
+    /**
+     * Channel.Message
+     */
+    export type Channel$MessageArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the Message
+         */
+        select?: MessageSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the Message
+         */
+        omit?: MessageOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: MessageInclude<ExtArgs> | null
+        where?: MessageWhereInput
+        orderBy?: MessageOrderByWithRelationInput | MessageOrderByWithRelationInput[]
+        cursor?: MessageWhereUniqueInput
+        take?: number
+        skip?: number
+        distinct?: MessageScalarFieldEnum | MessageScalarFieldEnum[]
+    }
+
+    /**
+     * Channel.Ticket
+     */
+    export type Channel$TicketArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the Ticket
+         */
+        select?: TicketSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the Ticket
+         */
+        omit?: TicketOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: TicketInclude<ExtArgs> | null
+        where?: TicketWhereInput
+        orderBy?: TicketOrderByWithRelationInput | TicketOrderByWithRelationInput[]
+        cursor?: TicketWhereUniqueInput
+        take?: number
+        skip?: number
+        distinct?: TicketScalarFieldEnum | TicketScalarFieldEnum[]
+    }
+
+    /**
+     * Channel without action
+     */
+    export type ChannelDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the Channel
+         */
+        select?: ChannelSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the Channel
+         */
+        omit?: ChannelOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: ChannelInclude<ExtArgs> | null
+    }
 
 
   /**
@@ -9979,14 +11236,14 @@ export namespace Prisma {
 
   export type GetMessageAggregateType<T extends MessageAggregateArgs> = {
         [P in keyof T & keyof AggregateMessage]: P extends '_count' | 'count'
-        ? T[P] extends true
-            ? number
-            : GetScalarType<T[P], AggregateMessage[P]>
-        : GetScalarType<T[P], AggregateMessage[P]>
+          ? T[P] extends true
+              ? number
+              : GetScalarType<T[P], AggregateMessage[P]>
+          : GetScalarType<T[P], AggregateMessage[P]>
   }
 
 
-  export type MessageGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    export type MessageGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: MessageWhereInput
     orderBy?: MessageOrderByWithAggregationInput | MessageOrderByWithAggregationInput[]
     by: MessageScalarFieldEnum[] | MessageScalarFieldEnum
@@ -10017,7 +11274,7 @@ export namespace Prisma {
       Array<
           PickEnumerable<MessageGroupByOutputType, T['by']> &
           {
-            [P in ((keyof T) & (keyof MessageGroupByOutputType))]: P extends '_count'
+              [P in ((keyof T) & (keyof MessageGroupByOutputType))]: P extends '_count'
               ? T[P] extends boolean
                   ? number
                   : GetScalarType<T[P], MessageGroupByOutputType[P]>
@@ -10034,7 +11291,9 @@ export namespace Prisma {
     channelId?: boolean
     content?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
+      channel?: boolean | ChannelDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["message"]>
+
 
 
   export type MessageSelectScalar = {
@@ -10048,12 +11307,14 @@ export namespace Prisma {
   export type MessageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "userId" | "channelId" | "content", ExtArgs["result"]["message"]>
   export type MessageInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
+      channel?: boolean | ChannelDefaultArgs<ExtArgs>
   }
 
   export type $MessagePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Message"
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
+        channel: Prisma.$ChannelPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -10069,12 +11330,11 @@ export namespace Prisma {
 
   type MessageCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
       Omit<MessageFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-    select?: MessageCountAggregateInputType | true
+      select?: MessageCountAggregateInputType | true
     }
 
   export interface MessageDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
     [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Message'], meta: { name: 'Message' } }
-
     /**
      * Find zero or one Message that matches the filter.
      * @param {MessageFindUniqueArgs} args - Arguments to find a Message
@@ -10349,25 +11609,25 @@ export namespace Prisma {
             ? `Error: "by" must not be empty.`
             : HavingValid extends False
                 ? {
-                  [P in HavingFields]: P extends ByFields
-                      ? never
-                      : P extends string
-                          ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-                          : [
-                            Error,
-                            'Field ',
-                            P,
-                            ` in "having" needs to be provided in "by"`,
-                          ]
+                    [P in HavingFields]: P extends ByFields
+                        ? never
+                        : P extends string
+                            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+                            : [
+                                Error,
+                                'Field ',
+                                P,
+                                ` in "having" needs to be provided in "by"`,
+                            ]
                 }[HavingFields]
                 : 'take' extends Keys<T>
                     ? 'orderBy' extends Keys<T>
                         ? ByValid extends True
                             ? {}
                             : {
-                              [P in OrderFields]: P extends ByFields
-                                  ? never
-                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                [P in OrderFields]: P extends ByFields
+                                    ? never
+                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
                         : 'Error: If you provide "take", you also need to provide "orderBy"'
                     : 'skip' extends Keys<T>
@@ -10375,24 +11635,24 @@ export namespace Prisma {
                             ? ByValid extends True
                                 ? {}
                                 : {
-                                  [P in OrderFields]: P extends ByFields
-                                      ? never
-                                      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                    [P in OrderFields]: P extends ByFields
+                                        ? never
+                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                                 }[OrderFields]
                             : 'Error: If you provide "skip", you also need to provide "orderBy"'
                         : ByValid extends True
                             ? {}
                             : {
-                              [P in OrderFields]: P extends ByFields
-                                  ? never
-                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                [P in OrderFields]: P extends ByFields
+                                    ? never
+                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
     >(args: SubsetIntersection<T, MessageGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMessageGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
 
-    /**
-     * Fields of the Message model
-     */
-    readonly fields: MessageFieldRefs;
+      /**
+       * Fields of the Message model
+       */
+      readonly fields: MessageFieldRefs;
   }
 
   /**
@@ -10403,9 +11663,9 @@ export namespace Prisma {
    */
   export interface Prisma__MessageClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
 
+      channel<T extends ChannelDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ChannelDefaultArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -10413,14 +11673,12 @@ export namespace Prisma {
      * @returns A Promise for the completion of which ever callback is executed.
      */
     then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -10431,7 +11689,7 @@ export namespace Prisma {
   }
 
 
-  /**
+    /**
    * Fields of the Message model
    */
   interface MessageFieldRefs {
@@ -10443,7 +11701,7 @@ export namespace Prisma {
   }
 
 
-  // Custom InputTypes
+    // Custom InputTypes
   /**
    * Message findUnique
    */
@@ -10710,6 +11968,10 @@ export namespace Prisma {
      * Filter which Messages to update
      */
     where?: MessageWhereInput
+      /**
+       * Limit how many Messages to update.
+       */
+      limit?: number
   }
 
   /**
@@ -10772,6 +12034,10 @@ export namespace Prisma {
      * Filter which Messages to delete
      */
     where?: MessageWhereInput
+      /**
+       * Limit how many Messages to delete.
+       */
+      limit?: number
   }
 
   /**
@@ -10923,14 +12189,14 @@ export namespace Prisma {
 
   export type GetEventAggregateType<T extends EventAggregateArgs> = {
         [P in keyof T & keyof AggregateEvent]: P extends '_count' | 'count'
-        ? T[P] extends true
-            ? number
-            : GetScalarType<T[P], AggregateEvent[P]>
-        : GetScalarType<T[P], AggregateEvent[P]>
+          ? T[P] extends true
+              ? number
+              : GetScalarType<T[P], AggregateEvent[P]>
+          : GetScalarType<T[P], AggregateEvent[P]>
   }
 
 
-  export type EventGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    export type EventGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: EventWhereInput
     orderBy?: EventOrderByWithAggregationInput | EventOrderByWithAggregationInput[]
     by: EventScalarFieldEnum[] | EventScalarFieldEnum
@@ -10960,7 +12226,7 @@ export namespace Prisma {
       Array<
           PickEnumerable<EventGroupByOutputType, T['by']> &
           {
-            [P in ((keyof T) & (keyof EventGroupByOutputType))]: P extends '_count'
+              [P in ((keyof T) & (keyof EventGroupByOutputType))]: P extends '_count'
               ? T[P] extends boolean
                   ? number
                   : GetScalarType<T[P], EventGroupByOutputType[P]>
@@ -10984,6 +12250,7 @@ export namespace Prisma {
     registrations?: boolean | Event$registrationsArgs<ExtArgs>
     _count?: boolean | EventCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["event"]>
+
 
 
   export type EventSelectScalar = {
@@ -11029,12 +12296,11 @@ export namespace Prisma {
 
   type EventCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
       Omit<EventFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-    select?: EventCountAggregateInputType | true
+      select?: EventCountAggregateInputType | true
     }
 
   export interface EventDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
     [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Event'], meta: { name: 'Event' } }
-
     /**
      * Find zero or one Event that matches the filter.
      * @param {EventFindUniqueArgs} args - Arguments to find a Event
@@ -11309,25 +12575,25 @@ export namespace Prisma {
             ? `Error: "by" must not be empty.`
             : HavingValid extends False
                 ? {
-                  [P in HavingFields]: P extends ByFields
-                      ? never
-                      : P extends string
-                          ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-                          : [
-                            Error,
-                            'Field ',
-                            P,
-                            ` in "having" needs to be provided in "by"`,
-                          ]
+                    [P in HavingFields]: P extends ByFields
+                        ? never
+                        : P extends string
+                            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+                            : [
+                                Error,
+                                'Field ',
+                                P,
+                                ` in "having" needs to be provided in "by"`,
+                            ]
                 }[HavingFields]
                 : 'take' extends Keys<T>
                     ? 'orderBy' extends Keys<T>
                         ? ByValid extends True
                             ? {}
                             : {
-                              [P in OrderFields]: P extends ByFields
-                                  ? never
-                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                [P in OrderFields]: P extends ByFields
+                                    ? never
+                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
                         : 'Error: If you provide "take", you also need to provide "orderBy"'
                     : 'skip' extends Keys<T>
@@ -11335,24 +12601,24 @@ export namespace Prisma {
                             ? ByValid extends True
                                 ? {}
                                 : {
-                                  [P in OrderFields]: P extends ByFields
-                                      ? never
-                                      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                    [P in OrderFields]: P extends ByFields
+                                        ? never
+                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                                 }[OrderFields]
                             : 'Error: If you provide "skip", you also need to provide "orderBy"'
                         : ByValid extends True
                             ? {}
                             : {
-                              [P in OrderFields]: P extends ByFields
-                                  ? never
-                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                [P in OrderFields]: P extends ByFields
+                                    ? never
+                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
     >(args: SubsetIntersection<T, EventGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetEventGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
 
-    /**
-     * Fields of the Event model
-     */
-    readonly fields: EventFieldRefs;
+      /**
+       * Fields of the Event model
+       */
+      readonly fields: EventFieldRefs;
   }
 
   /**
@@ -11363,13 +12629,9 @@ export namespace Prisma {
    */
   export interface Prisma__EventClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-
     roleSlots<T extends Event$roleSlotsArgs<ExtArgs> = {}>(args?: Subset<T, Event$roleSlotsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoleSlotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-
     registrations<T extends Event$registrationsArgs<ExtArgs> = {}>(args?: Subset<T, Event$registrationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventRegistrationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -11377,14 +12639,12 @@ export namespace Prisma {
      * @returns A Promise for the completion of which ever callback is executed.
      */
     then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -11395,7 +12655,7 @@ export namespace Prisma {
   }
 
 
-  /**
+    /**
    * Fields of the Event model
    */
   interface EventFieldRefs {
@@ -11410,7 +12670,7 @@ export namespace Prisma {
   }
 
 
-  // Custom InputTypes
+    // Custom InputTypes
   /**
    * Event findUnique
    */
@@ -11677,6 +12937,10 @@ export namespace Prisma {
      * Filter which Events to update
      */
     where?: EventWhereInput
+      /**
+       * Limit how many Events to update.
+       */
+      limit?: number
   }
 
   /**
@@ -11739,6 +13003,10 @@ export namespace Prisma {
      * Filter which Events to delete
      */
     where?: EventWhereInput
+      /**
+       * Limit how many Events to delete.
+       */
+      limit?: number
   }
 
   /**
@@ -11944,14 +13212,14 @@ export namespace Prisma {
 
   export type GetRoleSlotAggregateType<T extends RoleSlotAggregateArgs> = {
         [P in keyof T & keyof AggregateRoleSlot]: P extends '_count' | 'count'
-        ? T[P] extends true
-            ? number
-            : GetScalarType<T[P], AggregateRoleSlot[P]>
-        : GetScalarType<T[P], AggregateRoleSlot[P]>
+          ? T[P] extends true
+              ? number
+              : GetScalarType<T[P], AggregateRoleSlot[P]>
+          : GetScalarType<T[P], AggregateRoleSlot[P]>
   }
 
 
-  export type RoleSlotGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    export type RoleSlotGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: RoleSlotWhereInput
     orderBy?: RoleSlotOrderByWithAggregationInput | RoleSlotOrderByWithAggregationInput[]
     by: RoleSlotScalarFieldEnum[] | RoleSlotScalarFieldEnum
@@ -11981,7 +13249,7 @@ export namespace Prisma {
       Array<
           PickEnumerable<RoleSlotGroupByOutputType, T['by']> &
           {
-            [P in ((keyof T) & (keyof RoleSlotGroupByOutputType))]: P extends '_count'
+              [P in ((keyof T) & (keyof RoleSlotGroupByOutputType))]: P extends '_count'
               ? T[P] extends boolean
                   ? number
                   : GetScalarType<T[P], RoleSlotGroupByOutputType[P]>
@@ -12000,6 +13268,7 @@ export namespace Prisma {
     registrations?: boolean | RoleSlot$registrationsArgs<ExtArgs>
     _count?: boolean | RoleSlotCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["roleSlot"]>
+
 
 
   export type RoleSlotSelectScalar = {
@@ -12035,12 +13304,11 @@ export namespace Prisma {
 
   type RoleSlotCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
       Omit<RoleSlotFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-    select?: RoleSlotCountAggregateInputType | true
+      select?: RoleSlotCountAggregateInputType | true
     }
 
   export interface RoleSlotDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
     [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['RoleSlot'], meta: { name: 'RoleSlot' } }
-
     /**
      * Find zero or one RoleSlot that matches the filter.
      * @param {RoleSlotFindUniqueArgs} args - Arguments to find a RoleSlot
@@ -12315,25 +13583,25 @@ export namespace Prisma {
             ? `Error: "by" must not be empty.`
             : HavingValid extends False
                 ? {
-                  [P in HavingFields]: P extends ByFields
-                      ? never
-                      : P extends string
-                          ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-                          : [
-                            Error,
-                            'Field ',
-                            P,
-                            ` in "having" needs to be provided in "by"`,
-                          ]
+                    [P in HavingFields]: P extends ByFields
+                        ? never
+                        : P extends string
+                            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+                            : [
+                                Error,
+                                'Field ',
+                                P,
+                                ` in "having" needs to be provided in "by"`,
+                            ]
                 }[HavingFields]
                 : 'take' extends Keys<T>
                     ? 'orderBy' extends Keys<T>
                         ? ByValid extends True
                             ? {}
                             : {
-                              [P in OrderFields]: P extends ByFields
-                                  ? never
-                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                [P in OrderFields]: P extends ByFields
+                                    ? never
+                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
                         : 'Error: If you provide "take", you also need to provide "orderBy"'
                     : 'skip' extends Keys<T>
@@ -12341,24 +13609,24 @@ export namespace Prisma {
                             ? ByValid extends True
                                 ? {}
                                 : {
-                                  [P in OrderFields]: P extends ByFields
-                                      ? never
-                                      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                    [P in OrderFields]: P extends ByFields
+                                        ? never
+                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                                 }[OrderFields]
                             : 'Error: If you provide "skip", you also need to provide "orderBy"'
                         : ByValid extends True
                             ? {}
                             : {
-                              [P in OrderFields]: P extends ByFields
-                                  ? never
-                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                [P in OrderFields]: P extends ByFields
+                                    ? never
+                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
     >(args: SubsetIntersection<T, RoleSlotGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetRoleSlotGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
 
-    /**
-     * Fields of the RoleSlot model
-     */
-    readonly fields: RoleSlotFieldRefs;
+      /**
+       * Fields of the RoleSlot model
+       */
+      readonly fields: RoleSlotFieldRefs;
   }
 
   /**
@@ -12369,11 +13637,8 @@ export namespace Prisma {
    */
   export interface Prisma__RoleSlotClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-
     event<T extends EventDefaultArgs<ExtArgs> = {}>(args?: Subset<T, EventDefaultArgs<ExtArgs>>): Prisma__EventClient<$Result.GetResult<Prisma.$EventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-
     registrations<T extends RoleSlot$registrationsArgs<ExtArgs> = {}>(args?: Subset<T, RoleSlot$registrationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventRegistrationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -12381,14 +13646,12 @@ export namespace Prisma {
      * @returns A Promise for the completion of which ever callback is executed.
      */
     then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -12399,7 +13662,7 @@ export namespace Prisma {
   }
 
 
-  /**
+    /**
    * Fields of the RoleSlot model
    */
   interface RoleSlotFieldRefs {
@@ -12410,7 +13673,7 @@ export namespace Prisma {
   }
 
 
-  // Custom InputTypes
+    // Custom InputTypes
   /**
    * RoleSlot findUnique
    */
@@ -12677,6 +13940,10 @@ export namespace Prisma {
      * Filter which RoleSlots to update
      */
     where?: RoleSlotWhereInput
+      /**
+       * Limit how many RoleSlots to update.
+       */
+      limit?: number
   }
 
   /**
@@ -12739,6 +14006,10 @@ export namespace Prisma {
      * Filter which RoleSlots to delete
      */
     where?: RoleSlotWhereInput
+      /**
+       * Limit how many RoleSlots to delete.
+       */
+      limit?: number
   }
 
   /**
@@ -12896,14 +14167,14 @@ export namespace Prisma {
 
   export type GetEventRegistrationAggregateType<T extends EventRegistrationAggregateArgs> = {
         [P in keyof T & keyof AggregateEventRegistration]: P extends '_count' | 'count'
-        ? T[P] extends true
-            ? number
-            : GetScalarType<T[P], AggregateEventRegistration[P]>
-        : GetScalarType<T[P], AggregateEventRegistration[P]>
+          ? T[P] extends true
+              ? number
+              : GetScalarType<T[P], AggregateEventRegistration[P]>
+          : GetScalarType<T[P], AggregateEventRegistration[P]>
   }
 
 
-  export type EventRegistrationGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    export type EventRegistrationGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: EventRegistrationWhereInput
     orderBy?: EventRegistrationOrderByWithAggregationInput | EventRegistrationOrderByWithAggregationInput[]
     by: EventRegistrationScalarFieldEnum[] | EventRegistrationScalarFieldEnum
@@ -12930,7 +14201,7 @@ export namespace Prisma {
       Array<
           PickEnumerable<EventRegistrationGroupByOutputType, T['by']> &
           {
-            [P in ((keyof T) & (keyof EventRegistrationGroupByOutputType))]: P extends '_count'
+              [P in ((keyof T) & (keyof EventRegistrationGroupByOutputType))]: P extends '_count'
               ? T[P] extends boolean
                   ? number
                   : GetScalarType<T[P], EventRegistrationGroupByOutputType[P]>
@@ -12950,6 +14221,7 @@ export namespace Prisma {
     roleSlot?: boolean | RoleSlotDefaultArgs<ExtArgs>
     Event?: boolean | EventRegistration$EventArgs<ExtArgs>
   }, ExtArgs["result"]["eventRegistration"]>
+
 
 
   export type EventRegistrationSelectScalar = {
@@ -12988,12 +14260,11 @@ export namespace Prisma {
 
   type EventRegistrationCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
       Omit<EventRegistrationFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-    select?: EventRegistrationCountAggregateInputType | true
+      select?: EventRegistrationCountAggregateInputType | true
     }
 
   export interface EventRegistrationDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
     [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['EventRegistration'], meta: { name: 'EventRegistration' } }
-
     /**
      * Find zero or one EventRegistration that matches the filter.
      * @param {EventRegistrationFindUniqueArgs} args - Arguments to find a EventRegistration
@@ -13268,25 +14539,25 @@ export namespace Prisma {
             ? `Error: "by" must not be empty.`
             : HavingValid extends False
                 ? {
-                  [P in HavingFields]: P extends ByFields
-                      ? never
-                      : P extends string
-                          ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-                          : [
-                            Error,
-                            'Field ',
-                            P,
-                            ` in "having" needs to be provided in "by"`,
-                          ]
+                    [P in HavingFields]: P extends ByFields
+                        ? never
+                        : P extends string
+                            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+                            : [
+                                Error,
+                                'Field ',
+                                P,
+                                ` in "having" needs to be provided in "by"`,
+                            ]
                 }[HavingFields]
                 : 'take' extends Keys<T>
                     ? 'orderBy' extends Keys<T>
                         ? ByValid extends True
                             ? {}
                             : {
-                              [P in OrderFields]: P extends ByFields
-                                  ? never
-                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                [P in OrderFields]: P extends ByFields
+                                    ? never
+                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
                         : 'Error: If you provide "take", you also need to provide "orderBy"'
                     : 'skip' extends Keys<T>
@@ -13294,24 +14565,24 @@ export namespace Prisma {
                             ? ByValid extends True
                                 ? {}
                                 : {
-                                  [P in OrderFields]: P extends ByFields
-                                      ? never
-                                      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                    [P in OrderFields]: P extends ByFields
+                                        ? never
+                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                                 }[OrderFields]
                             : 'Error: If you provide "skip", you also need to provide "orderBy"'
                         : ByValid extends True
                             ? {}
                             : {
-                              [P in OrderFields]: P extends ByFields
-                                  ? never
-                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                [P in OrderFields]: P extends ByFields
+                                    ? never
+                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
     >(args: SubsetIntersection<T, EventRegistrationGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetEventRegistrationGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
 
-    /**
-     * Fields of the EventRegistration model
-     */
-    readonly fields: EventRegistrationFieldRefs;
+      /**
+       * Fields of the EventRegistration model
+       */
+      readonly fields: EventRegistrationFieldRefs;
   }
 
   /**
@@ -13322,13 +14593,9 @@ export namespace Prisma {
    */
   export interface Prisma__EventRegistrationClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-
     roleSlot<T extends RoleSlotDefaultArgs<ExtArgs> = {}>(args?: Subset<T, RoleSlotDefaultArgs<ExtArgs>>): Prisma__RoleSlotClient<$Result.GetResult<Prisma.$RoleSlotPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-
     Event<T extends EventRegistration$EventArgs<ExtArgs> = {}>(args?: Subset<T, EventRegistration$EventArgs<ExtArgs>>): Prisma__EventClient<$Result.GetResult<Prisma.$EventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -13336,14 +14603,12 @@ export namespace Prisma {
      * @returns A Promise for the completion of which ever callback is executed.
      */
     then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-
     /**
      * Attaches a callback for only the rejection of the Promise.
      * @param onrejected The callback to execute when the Promise is rejected.
      * @returns A Promise for the completion of the callback.
      */
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-
     /**
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
@@ -13354,7 +14619,7 @@ export namespace Prisma {
   }
 
 
-  /**
+    /**
    * Fields of the EventRegistration model
    */
   interface EventRegistrationFieldRefs {
@@ -13366,7 +14631,7 @@ export namespace Prisma {
   }
 
 
-  // Custom InputTypes
+    // Custom InputTypes
   /**
    * EventRegistration findUnique
    */
@@ -13633,6 +14898,10 @@ export namespace Prisma {
      * Filter which EventRegistrations to update
      */
     where?: EventRegistrationWhereInput
+      /**
+       * Limit how many EventRegistrations to update.
+       */
+      limit?: number
   }
 
   /**
@@ -13695,6 +14964,10 @@ export namespace Prisma {
      * Filter which EventRegistrations to delete
      */
     where?: EventRegistrationWhereInput
+      /**
+       * Limit how many EventRegistrations to delete.
+       */
+      limit?: number
   }
 
   /**
@@ -13735,6 +15008,1027 @@ export namespace Prisma {
   }
 
 
+    /**
+     * Model Ticket
+     */
+
+    export type AggregateTicket = {
+        _count: TicketCountAggregateOutputType | null
+        _avg: TicketAvgAggregateOutputType | null
+        _sum: TicketSumAggregateOutputType | null
+        _min: TicketMinAggregateOutputType | null
+        _max: TicketMaxAggregateOutputType | null
+    }
+
+    export type TicketAvgAggregateOutputType = {
+        id: number | null
+    }
+
+    export type TicketSumAggregateOutputType = {
+        id: number | null
+    }
+
+    export type TicketMinAggregateOutputType = {
+        id: number | null
+        discordUserID: string | null
+        channelId: string | null
+        channelName: string | null
+        createdAt: Date | null
+        updatedAt: Date | null
+        type: string | null
+        assignedUserId: string | null
+    }
+
+    export type TicketMaxAggregateOutputType = {
+        id: number | null
+        discordUserID: string | null
+        channelId: string | null
+        channelName: string | null
+        createdAt: Date | null
+        updatedAt: Date | null
+        type: string | null
+        assignedUserId: string | null
+    }
+
+    export type TicketCountAggregateOutputType = {
+        id: number
+        discordUserID: number
+        channelId: number
+        channelName: number
+        createdAt: number
+        updatedAt: number
+        type: number
+        assignedUserId: number
+        _all: number
+    }
+
+
+    export type TicketAvgAggregateInputType = {
+        id?: true
+    }
+
+    export type TicketSumAggregateInputType = {
+        id?: true
+    }
+
+    export type TicketMinAggregateInputType = {
+        id?: true
+        discordUserID?: true
+        channelId?: true
+        channelName?: true
+        createdAt?: true
+        updatedAt?: true
+        type?: true
+        assignedUserId?: true
+    }
+
+    export type TicketMaxAggregateInputType = {
+        id?: true
+        discordUserID?: true
+        channelId?: true
+        channelName?: true
+        createdAt?: true
+        updatedAt?: true
+        type?: true
+        assignedUserId?: true
+    }
+
+    export type TicketCountAggregateInputType = {
+        id?: true
+        discordUserID?: true
+        channelId?: true
+        channelName?: true
+        createdAt?: true
+        updatedAt?: true
+        type?: true
+        assignedUserId?: true
+        _all?: true
+    }
+
+    export type TicketAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Filter which Ticket to aggregate.
+         */
+        where?: TicketWhereInput
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+         *
+         * Determine the order of Tickets to fetch.
+         */
+        orderBy?: TicketOrderByWithRelationInput | TicketOrderByWithRelationInput[]
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+         *
+         * Sets the start position
+         */
+        cursor?: TicketWhereUniqueInput
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+         *
+         * Take `±n` Tickets from the position of the cursor.
+         */
+        take?: number
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+         *
+         * Skip the first `n` Tickets.
+         */
+        skip?: number
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+         *
+         * Count returned Tickets
+         **/
+        _count?: true | TicketCountAggregateInputType
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+         *
+         * Select which fields to average
+         **/
+        _avg?: TicketAvgAggregateInputType
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+         *
+         * Select which fields to sum
+         **/
+        _sum?: TicketSumAggregateInputType
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+         *
+         * Select which fields to find the minimum value
+         **/
+        _min?: TicketMinAggregateInputType
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+         *
+         * Select which fields to find the maximum value
+         **/
+        _max?: TicketMaxAggregateInputType
+    }
+
+    export type GetTicketAggregateType<T extends TicketAggregateArgs> = {
+        [P in keyof T & keyof AggregateTicket]: P extends '_count' | 'count'
+            ? T[P] extends true
+                ? number
+                : GetScalarType<T[P], AggregateTicket[P]>
+            : GetScalarType<T[P], AggregateTicket[P]>
+    }
+
+
+    export type TicketGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        where?: TicketWhereInput
+        orderBy?: TicketOrderByWithAggregationInput | TicketOrderByWithAggregationInput[]
+        by: TicketScalarFieldEnum[] | TicketScalarFieldEnum
+        having?: TicketScalarWhereWithAggregatesInput
+        take?: number
+        skip?: number
+        _count?: TicketCountAggregateInputType | true
+        _avg?: TicketAvgAggregateInputType
+        _sum?: TicketSumAggregateInputType
+        _min?: TicketMinAggregateInputType
+        _max?: TicketMaxAggregateInputType
+    }
+
+    export type TicketGroupByOutputType = {
+        id: number
+        discordUserID: string
+        channelId: string
+        channelName: string
+        createdAt: Date
+        updatedAt: Date
+        type: string
+        assignedUserId: string | null
+        _count: TicketCountAggregateOutputType | null
+        _avg: TicketAvgAggregateOutputType | null
+        _sum: TicketSumAggregateOutputType | null
+        _min: TicketMinAggregateOutputType | null
+        _max: TicketMaxAggregateOutputType | null
+    }
+
+    type GetTicketGroupByPayload<T extends TicketGroupByArgs> = Prisma.PrismaPromise<
+        Array<
+            PickEnumerable<TicketGroupByOutputType, T['by']> &
+            {
+                [P in ((keyof T) & (keyof TicketGroupByOutputType))]: P extends '_count'
+                ? T[P] extends boolean
+                    ? number
+                    : GetScalarType<T[P], TicketGroupByOutputType[P]>
+                : GetScalarType<T[P], TicketGroupByOutputType[P]>
+            }
+        >
+    >
+
+
+    export type TicketSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+        id?: boolean
+        discordUserID?: boolean
+        channelId?: boolean
+        channelName?: boolean
+        createdAt?: boolean
+        updatedAt?: boolean
+        type?: boolean
+        assignedUserId?: boolean
+        channel?: boolean | ChannelDefaultArgs<ExtArgs>
+        user?: boolean | Ticket$userArgs<ExtArgs>
+    }, ExtArgs["result"]["ticket"]>
+
+
+    export type TicketSelectScalar = {
+        id?: boolean
+        discordUserID?: boolean
+        channelId?: boolean
+        channelName?: boolean
+        createdAt?: boolean
+        updatedAt?: boolean
+        type?: boolean
+        assignedUserId?: boolean
+    }
+
+    export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "discordUserID" | "channelId" | "channelName" | "createdAt" | "updatedAt" | "type" | "assignedUserId", ExtArgs["result"]["ticket"]>
+    export type TicketInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        channel?: boolean | ChannelDefaultArgs<ExtArgs>
+        user?: boolean | Ticket$userArgs<ExtArgs>
+    }
+
+    export type $TicketPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        name: "Ticket"
+        objects: {
+            channel: Prisma.$ChannelPayload<ExtArgs>
+            user: Prisma.$UserPayload<ExtArgs> | null
+        }
+        scalars: $Extensions.GetPayloadResult<{
+            id: number
+            discordUserID: string
+            channelId: string
+            channelName: string
+            createdAt: Date
+            updatedAt: Date
+            type: string
+            assignedUserId: string | null
+        }, ExtArgs["result"]["ticket"]>
+        composites: {}
+    }
+
+    type TicketGetPayload<S extends boolean | null | undefined | TicketDefaultArgs> = $Result.GetResult<Prisma.$TicketPayload, S>
+
+    type TicketCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+        Omit<TicketFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+        select?: TicketCountAggregateInputType | true
+    }
+
+    export interface TicketDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+        [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Ticket'], meta: { name: 'Ticket' } }
+
+        /**
+         * Find zero or one Ticket that matches the filter.
+         * @param {TicketFindUniqueArgs} args - Arguments to find a Ticket
+         * @example
+         * // Get one Ticket
+         * const ticket = await prisma.ticket.findUnique({
+         *   where: {
+         *     // ... provide filter here
+         *   }
+         * })
+         */
+        findUnique<T extends TicketFindUniqueArgs>(args: SelectSubset<T, TicketFindUniqueArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+        /**
+         * Find one Ticket that matches the filter or throw an error with `error.code='P2025'`
+         * if no matches were found.
+         * @param {TicketFindUniqueOrThrowArgs} args - Arguments to find a Ticket
+         * @example
+         * // Get one Ticket
+         * const ticket = await prisma.ticket.findUniqueOrThrow({
+         *   where: {
+         *     // ... provide filter here
+         *   }
+         * })
+         */
+        findUniqueOrThrow<T extends TicketFindUniqueOrThrowArgs>(args: SelectSubset<T, TicketFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+        /**
+         * Find the first Ticket that matches the filter.
+         * Note, that providing `undefined` is treated as the value not being there.
+         * Read more here: https://pris.ly/d/null-undefined
+         * @param {TicketFindFirstArgs} args - Arguments to find a Ticket
+         * @example
+         * // Get one Ticket
+         * const ticket = await prisma.ticket.findFirst({
+         *   where: {
+         *     // ... provide filter here
+         *   }
+         * })
+         */
+        findFirst<T extends TicketFindFirstArgs>(args?: SelectSubset<T, TicketFindFirstArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+        /**
+         * Find the first Ticket that matches the filter or
+         * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+         * Note, that providing `undefined` is treated as the value not being there.
+         * Read more here: https://pris.ly/d/null-undefined
+         * @param {TicketFindFirstOrThrowArgs} args - Arguments to find a Ticket
+         * @example
+         * // Get one Ticket
+         * const ticket = await prisma.ticket.findFirstOrThrow({
+         *   where: {
+         *     // ... provide filter here
+         *   }
+         * })
+         */
+        findFirstOrThrow<T extends TicketFindFirstOrThrowArgs>(args?: SelectSubset<T, TicketFindFirstOrThrowArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+        /**
+         * Find zero or more Tickets that matches the filter.
+         * Note, that providing `undefined` is treated as the value not being there.
+         * Read more here: https://pris.ly/d/null-undefined
+         * @param {TicketFindManyArgs} args - Arguments to filter and select certain fields only.
+         * @example
+         * // Get all Tickets
+         * const tickets = await prisma.ticket.findMany()
+         *
+         * // Get first 10 Tickets
+         * const tickets = await prisma.ticket.findMany({ take: 10 })
+         *
+         * // Only select the `id`
+         * const ticketWithIdOnly = await prisma.ticket.findMany({ select: { id: true } })
+         *
+         */
+        findMany<T extends TicketFindManyArgs>(args?: SelectSubset<T, TicketFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+        /**
+         * Create a Ticket.
+         * @param {TicketCreateArgs} args - Arguments to create a Ticket.
+         * @example
+         * // Create one Ticket
+         * const Ticket = await prisma.ticket.create({
+         *   data: {
+         *     // ... data to create a Ticket
+         *   }
+         * })
+         *
+         */
+        create<T extends TicketCreateArgs>(args: SelectSubset<T, TicketCreateArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+        /**
+         * Create many Tickets.
+         * @param {TicketCreateManyArgs} args - Arguments to create many Tickets.
+         * @example
+         * // Create many Tickets
+         * const ticket = await prisma.ticket.createMany({
+         *   data: [
+         *     // ... provide data here
+         *   ]
+         * })
+         *
+         */
+        createMany<T extends TicketCreateManyArgs>(args?: SelectSubset<T, TicketCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+        /**
+         * Delete a Ticket.
+         * @param {TicketDeleteArgs} args - Arguments to delete one Ticket.
+         * @example
+         * // Delete one Ticket
+         * const Ticket = await prisma.ticket.delete({
+         *   where: {
+         *     // ... filter to delete one Ticket
+         *   }
+         * })
+         *
+         */
+        delete<T extends TicketDeleteArgs>(args: SelectSubset<T, TicketDeleteArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+        /**
+         * Update one Ticket.
+         * @param {TicketUpdateArgs} args - Arguments to update one Ticket.
+         * @example
+         * // Update one Ticket
+         * const ticket = await prisma.ticket.update({
+         *   where: {
+         *     // ... provide filter here
+         *   },
+         *   data: {
+         *     // ... provide data here
+         *   }
+         * })
+         *
+         */
+        update<T extends TicketUpdateArgs>(args: SelectSubset<T, TicketUpdateArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+        /**
+         * Delete zero or more Tickets.
+         * @param {TicketDeleteManyArgs} args - Arguments to filter Tickets to delete.
+         * @example
+         * // Delete a few Tickets
+         * const { count } = await prisma.ticket.deleteMany({
+         *   where: {
+         *     // ... provide filter here
+         *   }
+         * })
+         *
+         */
+        deleteMany<T extends TicketDeleteManyArgs>(args?: SelectSubset<T, TicketDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+        /**
+         * Update zero or more Tickets.
+         * Note, that providing `undefined` is treated as the value not being there.
+         * Read more here: https://pris.ly/d/null-undefined
+         * @param {TicketUpdateManyArgs} args - Arguments to update one or more rows.
+         * @example
+         * // Update many Tickets
+         * const ticket = await prisma.ticket.updateMany({
+         *   where: {
+         *     // ... provide filter here
+         *   },
+         *   data: {
+         *     // ... provide data here
+         *   }
+         * })
+         *
+         */
+        updateMany<T extends TicketUpdateManyArgs>(args: SelectSubset<T, TicketUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+        /**
+         * Create or update one Ticket.
+         * @param {TicketUpsertArgs} args - Arguments to update or create a Ticket.
+         * @example
+         * // Update or create a Ticket
+         * const ticket = await prisma.ticket.upsert({
+         *   create: {
+         *     // ... data to create a Ticket
+         *   },
+         *   update: {
+         *     // ... in case it already exists, update
+         *   },
+         *   where: {
+         *     // ... the filter for the Ticket we want to update
+         *   }
+         * })
+         */
+        upsert<T extends TicketUpsertArgs>(args: SelectSubset<T, TicketUpsertArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+        /**
+         * Count the number of Tickets.
+         * Note, that providing `undefined` is treated as the value not being there.
+         * Read more here: https://pris.ly/d/null-undefined
+         * @param {TicketCountArgs} args - Arguments to filter Tickets to count.
+         * @example
+         * // Count the number of Tickets
+         * const count = await prisma.ticket.count({
+         *   where: {
+         *     // ... the filter for the Tickets we want to count
+         *   }
+         * })
+         **/
+        count<T extends TicketCountArgs>(
+            args?: Subset<T, TicketCountArgs>,
+        ): Prisma.PrismaPromise<
+            T extends $Utils.Record<'select', any>
+                ? T['select'] extends true
+                    ? number
+                    : GetScalarType<T['select'], TicketCountAggregateOutputType>
+                : number
+        >
+
+        /**
+         * Allows you to perform aggregations operations on a Ticket.
+         * Note, that providing `undefined` is treated as the value not being there.
+         * Read more here: https://pris.ly/d/null-undefined
+         * @param {TicketAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+         * @example
+         * // Ordered by age ascending
+         * // Where email contains prisma.io
+         * // Limited to the 10 users
+         * const aggregations = await prisma.user.aggregate({
+         *   _avg: {
+         *     age: true,
+         *   },
+         *   where: {
+         *     email: {
+         *       contains: "prisma.io",
+         *     },
+         *   },
+         *   orderBy: {
+         *     age: "asc",
+         *   },
+         *   take: 10,
+         * })
+         **/
+        aggregate<T extends TicketAggregateArgs>(args: Subset<T, TicketAggregateArgs>): Prisma.PrismaPromise<GetTicketAggregateType<T>>
+
+        /**
+         * Group by Ticket.
+         * Note, that providing `undefined` is treated as the value not being there.
+         * Read more here: https://pris.ly/d/null-undefined
+         * @param {TicketGroupByArgs} args - Group by arguments.
+         * @example
+         * // Group by city, order by createdAt, get count
+         * const result = await prisma.user.groupBy({
+         *   by: ['city', 'createdAt'],
+         *   orderBy: {
+         *     createdAt: true
+         *   },
+         *   _count: {
+         *     _all: true
+         *   },
+         * })
+         *
+         **/
+        groupBy<
+            T extends TicketGroupByArgs,
+            HasSelectOrTake extends Or<
+                Extends<'skip', Keys<T>>,
+                Extends<'take', Keys<T>>
+            >,
+            OrderByArg extends True extends HasSelectOrTake
+                ? { orderBy: TicketGroupByArgs['orderBy'] }
+                : { orderBy?: TicketGroupByArgs['orderBy'] },
+            OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+            ByFields extends MaybeTupleToUnion<T['by']>,
+            ByValid extends Has<ByFields, OrderFields>,
+            HavingFields extends GetHavingFields<T['having']>,
+            HavingValid extends Has<ByFields, HavingFields>,
+            ByEmpty extends T['by'] extends never[] ? True : False,
+            InputErrors extends ByEmpty extends True
+                ? `Error: "by" must not be empty.`
+                : HavingValid extends False
+                    ? {
+                        [P in HavingFields]: P extends ByFields
+                            ? never
+                            : P extends string
+                                ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+                                : [
+                                    Error,
+                                    'Field ',
+                                    P,
+                                    ` in "having" needs to be provided in "by"`,
+                                ]
+                    }[HavingFields]
+                    : 'take' extends Keys<T>
+                        ? 'orderBy' extends Keys<T>
+                            ? ByValid extends True
+                                ? {}
+                                : {
+                                    [P in OrderFields]: P extends ByFields
+                                        ? never
+                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                }[OrderFields]
+                            : 'Error: If you provide "take", you also need to provide "orderBy"'
+                        : 'skip' extends Keys<T>
+                            ? 'orderBy' extends Keys<T>
+                                ? ByValid extends True
+                                    ? {}
+                                    : {
+                                        [P in OrderFields]: P extends ByFields
+                                            ? never
+                                            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                    }[OrderFields]
+                                : 'Error: If you provide "skip", you also need to provide "orderBy"'
+                            : ByValid extends True
+                                ? {}
+                                : {
+                                    [P in OrderFields]: P extends ByFields
+                                        ? never
+                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                }[OrderFields]
+        >(args: SubsetIntersection<T, TicketGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTicketGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+
+        /**
+         * Fields of the Ticket model
+         */
+        readonly fields: TicketFieldRefs;
+    }
+
+    /**
+     * The delegate class that acts as a "Promise-like" for Ticket.
+     * Why is this prefixed with `Prisma__`?
+     * Because we want to prevent naming conflicts as mentioned in
+     * https://github.com/prisma/prisma-client-js/issues/707
+     */
+    export interface Prisma__TicketClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+        readonly [Symbol.toStringTag]: "PrismaPromise"
+
+        channel<T extends ChannelDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ChannelDefaultArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+
+        user<T extends Ticket$userArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$userArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+        /**
+         * Attaches callbacks for the resolution and/or rejection of the Promise.
+         * @param onfulfilled The callback to execute when the Promise is resolved.
+         * @param onrejected The callback to execute when the Promise is rejected.
+         * @returns A Promise for the completion of which ever callback is executed.
+         */
+        then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+
+        /**
+         * Attaches a callback for only the rejection of the Promise.
+         * @param onrejected The callback to execute when the Promise is rejected.
+         * @returns A Promise for the completion of the callback.
+         */
+        catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+
+        /**
+         * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+         * resolved value cannot be modified from the callback.
+         * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+         * @returns A Promise for the completion of the callback.
+         */
+        finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+    }
+
+
+    /**
+     * Fields of the Ticket model
+     */
+    interface TicketFieldRefs {
+        readonly id: FieldRef<"Ticket", 'Int'>
+        readonly discordUserID: FieldRef<"Ticket", 'String'>
+        readonly channelId: FieldRef<"Ticket", 'String'>
+        readonly channelName: FieldRef<"Ticket", 'String'>
+        readonly createdAt: FieldRef<"Ticket", 'DateTime'>
+        readonly updatedAt: FieldRef<"Ticket", 'DateTime'>
+        readonly type: FieldRef<"Ticket", 'String'>
+        readonly assignedUserId: FieldRef<"Ticket", 'String'>
+    }
+
+
+    // Custom InputTypes
+    /**
+     * Ticket findUnique
+     */
+    export type TicketFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the Ticket
+         */
+        select?: TicketSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the Ticket
+         */
+        omit?: TicketOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: TicketInclude<ExtArgs> | null
+        /**
+         * Filter, which Ticket to fetch.
+         */
+        where: TicketWhereUniqueInput
+    }
+
+    /**
+     * Ticket findUniqueOrThrow
+     */
+    export type TicketFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the Ticket
+         */
+        select?: TicketSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the Ticket
+         */
+        omit?: TicketOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: TicketInclude<ExtArgs> | null
+        /**
+         * Filter, which Ticket to fetch.
+         */
+        where: TicketWhereUniqueInput
+    }
+
+    /**
+     * Ticket findFirst
+     */
+    export type TicketFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the Ticket
+         */
+        select?: TicketSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the Ticket
+         */
+        omit?: TicketOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: TicketInclude<ExtArgs> | null
+        /**
+         * Filter, which Ticket to fetch.
+         */
+        where?: TicketWhereInput
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+         *
+         * Determine the order of Tickets to fetch.
+         */
+        orderBy?: TicketOrderByWithRelationInput | TicketOrderByWithRelationInput[]
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+         *
+         * Sets the position for searching for Tickets.
+         */
+        cursor?: TicketWhereUniqueInput
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+         *
+         * Take `±n` Tickets from the position of the cursor.
+         */
+        take?: number
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+         *
+         * Skip the first `n` Tickets.
+         */
+        skip?: number
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+         *
+         * Filter by unique combinations of Tickets.
+         */
+        distinct?: TicketScalarFieldEnum | TicketScalarFieldEnum[]
+    }
+
+    /**
+     * Ticket findFirstOrThrow
+     */
+    export type TicketFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the Ticket
+         */
+        select?: TicketSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the Ticket
+         */
+        omit?: TicketOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: TicketInclude<ExtArgs> | null
+        /**
+         * Filter, which Ticket to fetch.
+         */
+        where?: TicketWhereInput
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+         *
+         * Determine the order of Tickets to fetch.
+         */
+        orderBy?: TicketOrderByWithRelationInput | TicketOrderByWithRelationInput[]
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+         *
+         * Sets the position for searching for Tickets.
+         */
+        cursor?: TicketWhereUniqueInput
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+         *
+         * Take `±n` Tickets from the position of the cursor.
+         */
+        take?: number
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+         *
+         * Skip the first `n` Tickets.
+         */
+        skip?: number
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+         *
+         * Filter by unique combinations of Tickets.
+         */
+        distinct?: TicketScalarFieldEnum | TicketScalarFieldEnum[]
+    }
+
+    /**
+     * Ticket findMany
+     */
+    export type TicketFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the Ticket
+         */
+        select?: TicketSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the Ticket
+         */
+        omit?: TicketOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: TicketInclude<ExtArgs> | null
+        /**
+         * Filter, which Tickets to fetch.
+         */
+        where?: TicketWhereInput
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+         *
+         * Determine the order of Tickets to fetch.
+         */
+        orderBy?: TicketOrderByWithRelationInput | TicketOrderByWithRelationInput[]
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+         *
+         * Sets the position for listing Tickets.
+         */
+        cursor?: TicketWhereUniqueInput
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+         *
+         * Take `±n` Tickets from the position of the cursor.
+         */
+        take?: number
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+         *
+         * Skip the first `n` Tickets.
+         */
+        skip?: number
+        distinct?: TicketScalarFieldEnum | TicketScalarFieldEnum[]
+    }
+
+    /**
+     * Ticket create
+     */
+    export type TicketCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the Ticket
+         */
+        select?: TicketSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the Ticket
+         */
+        omit?: TicketOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: TicketInclude<ExtArgs> | null
+        /**
+         * The data needed to create a Ticket.
+         */
+        data: XOR<TicketCreateInput, TicketUncheckedCreateInput>
+    }
+
+    /**
+     * Ticket createMany
+     */
+    export type TicketCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * The data used to create many Tickets.
+         */
+        data: TicketCreateManyInput | TicketCreateManyInput[]
+        skipDuplicates?: boolean
+    }
+
+    /**
+     * Ticket update
+     */
+    export type TicketUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the Ticket
+         */
+        select?: TicketSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the Ticket
+         */
+        omit?: TicketOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: TicketInclude<ExtArgs> | null
+        /**
+         * The data needed to update a Ticket.
+         */
+        data: XOR<TicketUpdateInput, TicketUncheckedUpdateInput>
+        /**
+         * Choose, which Ticket to update.
+         */
+        where: TicketWhereUniqueInput
+    }
+
+    /**
+     * Ticket updateMany
+     */
+    export type TicketUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * The data used to update Tickets.
+         */
+        data: XOR<TicketUpdateManyMutationInput, TicketUncheckedUpdateManyInput>
+        /**
+         * Filter which Tickets to update
+         */
+        where?: TicketWhereInput
+        /**
+         * Limit how many Tickets to update.
+         */
+        limit?: number
+    }
+
+    /**
+     * Ticket upsert
+     */
+    export type TicketUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the Ticket
+         */
+        select?: TicketSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the Ticket
+         */
+        omit?: TicketOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: TicketInclude<ExtArgs> | null
+        /**
+         * The filter to search for the Ticket to update in case it exists.
+         */
+        where: TicketWhereUniqueInput
+        /**
+         * In case the Ticket found by the `where` argument doesn't exist, create a new Ticket with this data.
+         */
+        create: XOR<TicketCreateInput, TicketUncheckedCreateInput>
+        /**
+         * In case the Ticket was found with the provided `where` argument, update it with this data.
+         */
+        update: XOR<TicketUpdateInput, TicketUncheckedUpdateInput>
+    }
+
+    /**
+     * Ticket delete
+     */
+    export type TicketDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the Ticket
+         */
+        select?: TicketSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the Ticket
+         */
+        omit?: TicketOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: TicketInclude<ExtArgs> | null
+        /**
+         * Filter which Ticket to delete.
+         */
+        where: TicketWhereUniqueInput
+    }
+
+    /**
+     * Ticket deleteMany
+     */
+    export type TicketDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Filter which Tickets to delete
+         */
+        where?: TicketWhereInput
+        /**
+         * Limit how many Tickets to delete.
+         */
+        limit?: number
+    }
+
+    /**
+     * Ticket.user
+     */
+    export type Ticket$userArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the User
+         */
+        select?: UserSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the User
+         */
+        omit?: UserOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: UserInclude<ExtArgs> | null
+        where?: UserWhereInput
+    }
+
+    /**
+     * Ticket without action
+     */
+    export type TicketDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the Ticket
+         */
+        select?: TicketSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the Ticket
+         */
+        omit?: TicketOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: TicketInclude<ExtArgs> | null
+    }
+
+
   /**
    * Enums
    */
@@ -13761,7 +16055,9 @@ export namespace Prisma {
     banned: 'banned',
     banReason: 'banReason',
     banExpires: 'banExpires',
-    twoFactorEnabled: 'twoFactorEnabled'
+      twoFactorEnabled: 'twoFactorEnabled',
+      username: 'username',
+      displayUsername: 'displayUsername'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -13860,6 +16156,14 @@ export namespace Prisma {
   export type TwoFactorScalarFieldEnum = (typeof TwoFactorScalarFieldEnum)[keyof typeof TwoFactorScalarFieldEnum]
 
 
+    export const ChannelScalarFieldEnum: {
+        id: 'id',
+        name: 'name'
+    };
+
+    export type ChannelScalarFieldEnum = (typeof ChannelScalarFieldEnum)[keyof typeof ChannelScalarFieldEnum]
+
+
   export const MessageScalarFieldEnum: {
     id: 'id',
     createdAt: 'createdAt',
@@ -13906,6 +16210,20 @@ export namespace Prisma {
   export type EventRegistrationScalarFieldEnum = (typeof EventRegistrationScalarFieldEnum)[keyof typeof EventRegistrationScalarFieldEnum]
 
 
+    export const TicketScalarFieldEnum: {
+        id: 'id',
+        discordUserID: 'discordUserID',
+        channelId: 'channelId',
+        channelName: 'channelName',
+        createdAt: 'createdAt',
+        updatedAt: 'updatedAt',
+        type: 'type',
+        assignedUserId: 'assignedUserId'
+    };
+
+    export type TicketScalarFieldEnum = (typeof TicketScalarFieldEnum)[keyof typeof TicketScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -13922,6 +16240,156 @@ export namespace Prisma {
   export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
+    export const UserOrderByRelevanceFieldEnum: {
+        id: 'id',
+        name: 'name',
+        email: 'email',
+        image: 'image',
+        role: 'role',
+        banReason: 'banReason',
+        username: 'username',
+        displayUsername: 'displayUsername'
+    };
+
+    export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnum)[keyof typeof UserOrderByRelevanceFieldEnum]
+
+
+    export const SessionOrderByRelevanceFieldEnum: {
+        id: 'id',
+        token: 'token',
+        ipAddress: 'ipAddress',
+        userAgent: 'userAgent',
+        userId: 'userId',
+        impersonatedBy: 'impersonatedBy',
+        activeOrganizationId: 'activeOrganizationId'
+    };
+
+    export type SessionOrderByRelevanceFieldEnum = (typeof SessionOrderByRelevanceFieldEnum)[keyof typeof SessionOrderByRelevanceFieldEnum]
+
+
+    export const AccountOrderByRelevanceFieldEnum: {
+        id: 'id',
+        accountId: 'accountId',
+        providerId: 'providerId',
+        userId: 'userId',
+        accessToken: 'accessToken',
+        refreshToken: 'refreshToken',
+        idToken: 'idToken',
+        scope: 'scope',
+        password: 'password'
+    };
+
+    export type AccountOrderByRelevanceFieldEnum = (typeof AccountOrderByRelevanceFieldEnum)[keyof typeof AccountOrderByRelevanceFieldEnum]
+
+
+    export const VerificationOrderByRelevanceFieldEnum: {
+        id: 'id',
+        identifier: 'identifier',
+        value: 'value'
+    };
+
+    export type VerificationOrderByRelevanceFieldEnum = (typeof VerificationOrderByRelevanceFieldEnum)[keyof typeof VerificationOrderByRelevanceFieldEnum]
+
+
+    export const OrganizationOrderByRelevanceFieldEnum: {
+        id: 'id',
+        name: 'name',
+        slug: 'slug',
+        logo: 'logo',
+        metadata: 'metadata'
+    };
+
+    export type OrganizationOrderByRelevanceFieldEnum = (typeof OrganizationOrderByRelevanceFieldEnum)[keyof typeof OrganizationOrderByRelevanceFieldEnum]
+
+
+    export const MemberOrderByRelevanceFieldEnum: {
+        id: 'id',
+        organizationId: 'organizationId',
+        userId: 'userId',
+        role: 'role'
+    };
+
+    export type MemberOrderByRelevanceFieldEnum = (typeof MemberOrderByRelevanceFieldEnum)[keyof typeof MemberOrderByRelevanceFieldEnum]
+
+
+    export const InvitationOrderByRelevanceFieldEnum: {
+        id: 'id',
+        organizationId: 'organizationId',
+        email: 'email',
+        role: 'role',
+        status: 'status',
+        inviterId: 'inviterId'
+    };
+
+    export type InvitationOrderByRelevanceFieldEnum = (typeof InvitationOrderByRelevanceFieldEnum)[keyof typeof InvitationOrderByRelevanceFieldEnum]
+
+
+    export const TwoFactorOrderByRelevanceFieldEnum: {
+        id: 'id',
+        secret: 'secret',
+        backupCodes: 'backupCodes',
+        userId: 'userId'
+    };
+
+    export type TwoFactorOrderByRelevanceFieldEnum = (typeof TwoFactorOrderByRelevanceFieldEnum)[keyof typeof TwoFactorOrderByRelevanceFieldEnum]
+
+
+    export const ChannelOrderByRelevanceFieldEnum: {
+        id: 'id',
+        name: 'name'
+    };
+
+    export type ChannelOrderByRelevanceFieldEnum = (typeof ChannelOrderByRelevanceFieldEnum)[keyof typeof ChannelOrderByRelevanceFieldEnum]
+
+
+    export const MessageOrderByRelevanceFieldEnum: {
+        userId: 'userId',
+        channelId: 'channelId'
+    };
+
+    export type MessageOrderByRelevanceFieldEnum = (typeof MessageOrderByRelevanceFieldEnum)[keyof typeof MessageOrderByRelevanceFieldEnum]
+
+
+    export const EventOrderByRelevanceFieldEnum: {
+        id: 'id',
+        title: 'title',
+        description: 'description',
+        userId: 'userId'
+    };
+
+    export type EventOrderByRelevanceFieldEnum = (typeof EventOrderByRelevanceFieldEnum)[keyof typeof EventOrderByRelevanceFieldEnum]
+
+
+    export const RoleSlotOrderByRelevanceFieldEnum: {
+        id: 'id',
+        role: 'role',
+        eventId: 'eventId'
+    };
+
+    export type RoleSlotOrderByRelevanceFieldEnum = (typeof RoleSlotOrderByRelevanceFieldEnum)[keyof typeof RoleSlotOrderByRelevanceFieldEnum]
+
+
+    export const EventRegistrationOrderByRelevanceFieldEnum: {
+        id: 'id',
+        userId: 'userId',
+        roleSlotId: 'roleSlotId',
+        eventId: 'eventId'
+    };
+
+    export type EventRegistrationOrderByRelevanceFieldEnum = (typeof EventRegistrationOrderByRelevanceFieldEnum)[keyof typeof EventRegistrationOrderByRelevanceFieldEnum]
+
+
+    export const TicketOrderByRelevanceFieldEnum: {
+        discordUserID: 'discordUserID',
+        channelId: 'channelId',
+        channelName: 'channelName',
+        type: 'type',
+        assignedUserId: 'assignedUserId'
+    };
+
+    export type TicketOrderByRelevanceFieldEnum = (typeof TicketOrderByRelevanceFieldEnum)[keyof typeof TicketOrderByRelevanceFieldEnum]
+
+
   /**
    * Field references
    */
@@ -13933,35 +16401,35 @@ export namespace Prisma {
   export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String'>
 
 
-  /**
+    /**
    * Reference to a field of type 'Boolean'
    */
   export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
 
 
-  /**
+    /**
    * Reference to a field of type 'DateTime'
    */
   export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
 
 
-  /**
+    /**
    * Reference to a field of type 'Int'
    */
   export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
 
 
-  /**
+    /**
    * Reference to a field of type 'Bytes'
    */
   export type BytesFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Bytes'>
 
 
-  /**
+    /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
-    
+
   /**
    * Deep Input Types
    */
@@ -13983,6 +16451,8 @@ export namespace Prisma {
     banReason?: StringNullableFilter<"User"> | string | null
     banExpires?: DateTimeNullableFilter<"User"> | Date | string | null
     twoFactorEnabled?: BoolNullableFilter<"User"> | boolean | null
+      username?: StringNullableFilter<"User"> | string | null
+      displayUsername?: StringNullableFilter<"User"> | string | null
     accounts?: AccountListRelationFilter
     sessions?: SessionListRelationFilter
     messages?: MessageListRelationFilter
@@ -13991,6 +16461,7 @@ export namespace Prisma {
     twofactors?: TwoFactorListRelationFilter
     Event?: EventListRelationFilter
     EventRegistration?: EventRegistrationListRelationFilter
+      Ticket?: TicketListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -14006,6 +16477,8 @@ export namespace Prisma {
     banReason?: SortOrderInput | SortOrder
     banExpires?: SortOrderInput | SortOrder
     twoFactorEnabled?: SortOrderInput | SortOrder
+      username?: SortOrderInput | SortOrder
+      displayUsername?: SortOrderInput | SortOrder
     accounts?: AccountOrderByRelationAggregateInput
     sessions?: SessionOrderByRelationAggregateInput
     messages?: MessageOrderByRelationAggregateInput
@@ -14014,11 +16487,14 @@ export namespace Prisma {
     twofactors?: TwoFactorOrderByRelationAggregateInput
     Event?: EventOrderByRelationAggregateInput
     EventRegistration?: EventRegistrationOrderByRelationAggregateInput
+      Ticket?: TicketOrderByRelationAggregateInput
+      _relevance?: UserOrderByRelevanceInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
     id?: string
     email?: string
+      username?: string
     AND?: UserWhereInput | UserWhereInput[]
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
@@ -14032,6 +16508,7 @@ export namespace Prisma {
     banReason?: StringNullableFilter<"User"> | string | null
     banExpires?: DateTimeNullableFilter<"User"> | Date | string | null
     twoFactorEnabled?: BoolNullableFilter<"User"> | boolean | null
+      displayUsername?: StringNullableFilter<"User"> | string | null
     accounts?: AccountListRelationFilter
     sessions?: SessionListRelationFilter
     messages?: MessageListRelationFilter
@@ -14040,7 +16517,8 @@ export namespace Prisma {
     twofactors?: TwoFactorListRelationFilter
     Event?: EventListRelationFilter
     EventRegistration?: EventRegistrationListRelationFilter
-  }, "id" | "email">
+      Ticket?: TicketListRelationFilter
+  }, "id" | "email" | "username">
 
   export type UserOrderByWithAggregationInput = {
     id?: SortOrder
@@ -14055,6 +16533,8 @@ export namespace Prisma {
     banReason?: SortOrderInput | SortOrder
     banExpires?: SortOrderInput | SortOrder
     twoFactorEnabled?: SortOrderInput | SortOrder
+      username?: SortOrderInput | SortOrder
+      displayUsername?: SortOrderInput | SortOrder
     _count?: UserCountOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
@@ -14076,6 +16556,8 @@ export namespace Prisma {
     banReason?: StringNullableWithAggregatesFilter<"User"> | string | null
     banExpires?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     twoFactorEnabled?: BoolNullableWithAggregatesFilter<"User"> | boolean | null
+      username?: StringNullableWithAggregatesFilter<"User"> | string | null
+      displayUsername?: StringNullableWithAggregatesFilter<"User"> | string | null
   }
 
   export type SessionWhereInput = {
@@ -14092,7 +16574,7 @@ export namespace Prisma {
     userId?: StringFilter<"Session"> | string
     impersonatedBy?: StringNullableFilter<"Session"> | string | null
     activeOrganizationId?: StringNullableFilter<"Session"> | string | null
-    user?: XOR<UserRelationFilter, UserWhereInput>
+      user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
 
   export type SessionOrderByWithRelationInput = {
@@ -14107,6 +16589,7 @@ export namespace Prisma {
     impersonatedBy?: SortOrderInput | SortOrder
     activeOrganizationId?: SortOrderInput | SortOrder
     user?: UserOrderByWithRelationInput
+      _relevance?: SessionOrderByRelevanceInput
   }
 
   export type SessionWhereUniqueInput = Prisma.AtLeast<{
@@ -14123,7 +16606,7 @@ export namespace Prisma {
     userId?: StringFilter<"Session"> | string
     impersonatedBy?: StringNullableFilter<"Session"> | string | null
     activeOrganizationId?: StringNullableFilter<"Session"> | string | null
-    user?: XOR<UserRelationFilter, UserWhereInput>
+      user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "id" | "token">
 
   export type SessionOrderByWithAggregationInput = {
@@ -14175,7 +16658,7 @@ export namespace Prisma {
     password?: StringNullableFilter<"Account"> | string | null
     createdAt?: DateTimeFilter<"Account"> | Date | string
     updatedAt?: DateTimeFilter<"Account"> | Date | string
-    user?: XOR<UserRelationFilter, UserWhereInput>
+      user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
 
   export type AccountOrderByWithRelationInput = {
@@ -14193,6 +16676,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
+      _relevance?: AccountOrderByRelevanceInput
   }
 
   export type AccountWhereUniqueInput = Prisma.AtLeast<{
@@ -14212,7 +16696,7 @@ export namespace Prisma {
     password?: StringNullableFilter<"Account"> | string | null
     createdAt?: DateTimeFilter<"Account"> | Date | string
     updatedAt?: DateTimeFilter<"Account"> | Date | string
-    user?: XOR<UserRelationFilter, UserWhereInput>
+      user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "id">
 
   export type AccountOrderByWithAggregationInput = {
@@ -14272,6 +16756,7 @@ export namespace Prisma {
     expiresAt?: SortOrder
     createdAt?: SortOrderInput | SortOrder
     updatedAt?: SortOrderInput | SortOrder
+      _relevance?: VerificationOrderByRelevanceInput
   }
 
   export type VerificationWhereUniqueInput = Prisma.AtLeast<{
@@ -14333,6 +16818,7 @@ export namespace Prisma {
     metadata?: SortOrderInput | SortOrder
     members?: MemberOrderByRelationAggregateInput
     invitations?: InvitationOrderByRelationAggregateInput
+      _relevance?: OrganizationOrderByRelevanceInput
   }
 
   export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
@@ -14382,8 +16868,8 @@ export namespace Prisma {
     userId?: StringFilter<"Member"> | string
     role?: StringFilter<"Member"> | string
     createdAt?: DateTimeFilter<"Member"> | Date | string
-    organization?: XOR<OrganizationRelationFilter, OrganizationWhereInput>
-    user?: XOR<UserRelationFilter, UserWhereInput>
+      organization?: XOR<OrganizationScalarRelationFilter, OrganizationWhereInput>
+      user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
 
   export type MemberOrderByWithRelationInput = {
@@ -14394,6 +16880,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     organization?: OrganizationOrderByWithRelationInput
     user?: UserOrderByWithRelationInput
+      _relevance?: MemberOrderByRelevanceInput
   }
 
   export type MemberWhereUniqueInput = Prisma.AtLeast<{
@@ -14405,8 +16892,8 @@ export namespace Prisma {
     userId?: StringFilter<"Member"> | string
     role?: StringFilter<"Member"> | string
     createdAt?: DateTimeFilter<"Member"> | Date | string
-    organization?: XOR<OrganizationRelationFilter, OrganizationWhereInput>
-    user?: XOR<UserRelationFilter, UserWhereInput>
+      organization?: XOR<OrganizationScalarRelationFilter, OrganizationWhereInput>
+      user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "id">
 
   export type MemberOrderByWithAggregationInput = {
@@ -14442,8 +16929,8 @@ export namespace Prisma {
     status?: StringFilter<"Invitation"> | string
     expiresAt?: DateTimeFilter<"Invitation"> | Date | string
     inviterId?: StringFilter<"Invitation"> | string
-    organization?: XOR<OrganizationRelationFilter, OrganizationWhereInput>
-    user?: XOR<UserRelationFilter, UserWhereInput>
+      organization?: XOR<OrganizationScalarRelationFilter, OrganizationWhereInput>
+      user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
 
   export type InvitationOrderByWithRelationInput = {
@@ -14456,6 +16943,7 @@ export namespace Prisma {
     inviterId?: SortOrder
     organization?: OrganizationOrderByWithRelationInput
     user?: UserOrderByWithRelationInput
+      _relevance?: InvitationOrderByRelevanceInput
   }
 
   export type InvitationWhereUniqueInput = Prisma.AtLeast<{
@@ -14469,8 +16957,8 @@ export namespace Prisma {
     status?: StringFilter<"Invitation"> | string
     expiresAt?: DateTimeFilter<"Invitation"> | Date | string
     inviterId?: StringFilter<"Invitation"> | string
-    organization?: XOR<OrganizationRelationFilter, OrganizationWhereInput>
-    user?: XOR<UserRelationFilter, UserWhereInput>
+      organization?: XOR<OrganizationScalarRelationFilter, OrganizationWhereInput>
+      user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "id">
 
   export type InvitationOrderByWithAggregationInput = {
@@ -14507,7 +16995,7 @@ export namespace Prisma {
     secret?: StringFilter<"TwoFactor"> | string
     backupCodes?: StringFilter<"TwoFactor"> | string
     userId?: StringFilter<"TwoFactor"> | string
-    user?: XOR<UserRelationFilter, UserWhereInput>
+      user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
 
   export type TwoFactorOrderByWithRelationInput = {
@@ -14516,6 +17004,7 @@ export namespace Prisma {
     backupCodes?: SortOrder
     userId?: SortOrder
     user?: UserOrderByWithRelationInput
+      _relevance?: TwoFactorOrderByRelevanceInput
   }
 
   export type TwoFactorWhereUniqueInput = Prisma.AtLeast<{
@@ -14526,7 +17015,7 @@ export namespace Prisma {
     secret?: StringFilter<"TwoFactor"> | string
     backupCodes?: StringFilter<"TwoFactor"> | string
     userId?: StringFilter<"TwoFactor"> | string
-    user?: XOR<UserRelationFilter, UserWhereInput>
+      user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "id">
 
   export type TwoFactorOrderByWithAggregationInput = {
@@ -14549,6 +17038,51 @@ export namespace Prisma {
     userId?: StringWithAggregatesFilter<"TwoFactor"> | string
   }
 
+    export type ChannelWhereInput = {
+        AND?: ChannelWhereInput | ChannelWhereInput[]
+        OR?: ChannelWhereInput[]
+        NOT?: ChannelWhereInput | ChannelWhereInput[]
+        id?: StringFilter<"Channel"> | string
+        name?: StringFilter<"Channel"> | string
+        Message?: MessageListRelationFilter
+        Ticket?: TicketListRelationFilter
+    }
+
+    export type ChannelOrderByWithRelationInput = {
+        id?: SortOrder
+        name?: SortOrder
+        Message?: MessageOrderByRelationAggregateInput
+        Ticket?: TicketOrderByRelationAggregateInput
+        _relevance?: ChannelOrderByRelevanceInput
+    }
+
+    export type ChannelWhereUniqueInput = Prisma.AtLeast<{
+        id?: string
+        id_name?: ChannelIdNameCompoundUniqueInput
+        AND?: ChannelWhereInput | ChannelWhereInput[]
+        OR?: ChannelWhereInput[]
+        NOT?: ChannelWhereInput | ChannelWhereInput[]
+        name?: StringFilter<"Channel"> | string
+        Message?: MessageListRelationFilter
+        Ticket?: TicketListRelationFilter
+    }, "id" | "id_name">
+
+    export type ChannelOrderByWithAggregationInput = {
+        id?: SortOrder
+        name?: SortOrder
+        _count?: ChannelCountOrderByAggregateInput
+        _max?: ChannelMaxOrderByAggregateInput
+        _min?: ChannelMinOrderByAggregateInput
+    }
+
+    export type ChannelScalarWhereWithAggregatesInput = {
+        AND?: ChannelScalarWhereWithAggregatesInput | ChannelScalarWhereWithAggregatesInput[]
+        OR?: ChannelScalarWhereWithAggregatesInput[]
+        NOT?: ChannelScalarWhereWithAggregatesInput | ChannelScalarWhereWithAggregatesInput[]
+        id?: StringWithAggregatesFilter<"Channel"> | string
+        name?: StringWithAggregatesFilter<"Channel"> | string
+    }
+
   export type MessageWhereInput = {
     AND?: MessageWhereInput | MessageWhereInput[]
     OR?: MessageWhereInput[]
@@ -14558,7 +17092,8 @@ export namespace Prisma {
     userId?: StringFilter<"Message"> | string
     channelId?: StringFilter<"Message"> | string
     content?: BytesFilter<"Message"> | Uint8Array
-    user?: XOR<UserRelationFilter, UserWhereInput>
+      user?: XOR<UserScalarRelationFilter, UserWhereInput>
+      channel?: XOR<ChannelScalarRelationFilter, ChannelWhereInput>
   }
 
   export type MessageOrderByWithRelationInput = {
@@ -14568,6 +17103,8 @@ export namespace Prisma {
     channelId?: SortOrder
     content?: SortOrder
     user?: UserOrderByWithRelationInput
+      channel?: ChannelOrderByWithRelationInput
+      _relevance?: MessageOrderByRelevanceInput
   }
 
   export type MessageWhereUniqueInput = Prisma.AtLeast<{
@@ -14579,7 +17116,8 @@ export namespace Prisma {
     userId?: StringFilter<"Message"> | string
     channelId?: StringFilter<"Message"> | string
     content?: BytesFilter<"Message"> | Uint8Array
-    user?: XOR<UserRelationFilter, UserWhereInput>
+      user?: XOR<UserScalarRelationFilter, UserWhereInput>
+      channel?: XOR<ChannelScalarRelationFilter, ChannelWhereInput>
   }, "id">
 
   export type MessageOrderByWithAggregationInput = {
@@ -14618,7 +17156,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Event"> | Date | string
     updatedAt?: DateTimeFilter<"Event"> | Date | string
     userId?: StringFilter<"Event"> | string
-    user?: XOR<UserRelationFilter, UserWhereInput>
+      user?: XOR<UserScalarRelationFilter, UserWhereInput>
     roleSlots?: RoleSlotListRelationFilter
     registrations?: EventRegistrationListRelationFilter
   }
@@ -14635,6 +17173,7 @@ export namespace Prisma {
     user?: UserOrderByWithRelationInput
     roleSlots?: RoleSlotOrderByRelationAggregateInput
     registrations?: EventRegistrationOrderByRelationAggregateInput
+      _relevance?: EventOrderByRelevanceInput
   }
 
   export type EventWhereUniqueInput = Prisma.AtLeast<{
@@ -14649,7 +17188,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Event"> | Date | string
     updatedAt?: DateTimeFilter<"Event"> | Date | string
     userId?: StringFilter<"Event"> | string
-    user?: XOR<UserRelationFilter, UserWhereInput>
+      user?: XOR<UserScalarRelationFilter, UserWhereInput>
     roleSlots?: RoleSlotListRelationFilter
     registrations?: EventRegistrationListRelationFilter
   }, "id">
@@ -14690,7 +17229,7 @@ export namespace Prisma {
     role?: StringFilter<"RoleSlot"> | string
     goalCount?: IntFilter<"RoleSlot"> | number
     eventId?: StringFilter<"RoleSlot"> | string
-    event?: XOR<EventRelationFilter, EventWhereInput>
+      event?: XOR<EventScalarRelationFilter, EventWhereInput>
     registrations?: EventRegistrationListRelationFilter
   }
 
@@ -14701,6 +17240,7 @@ export namespace Prisma {
     eventId?: SortOrder
     event?: EventOrderByWithRelationInput
     registrations?: EventRegistrationOrderByRelationAggregateInput
+      _relevance?: RoleSlotOrderByRelevanceInput
   }
 
   export type RoleSlotWhereUniqueInput = Prisma.AtLeast<{
@@ -14711,7 +17251,7 @@ export namespace Prisma {
     role?: StringFilter<"RoleSlot"> | string
     goalCount?: IntFilter<"RoleSlot"> | number
     eventId?: StringFilter<"RoleSlot"> | string
-    event?: XOR<EventRelationFilter, EventWhereInput>
+      event?: XOR<EventScalarRelationFilter, EventWhereInput>
     registrations?: EventRegistrationListRelationFilter
   }, "id">
 
@@ -14746,9 +17286,9 @@ export namespace Prisma {
     roleSlotId?: StringFilter<"EventRegistration"> | string
     registeredAt?: DateTimeFilter<"EventRegistration"> | Date | string
     eventId?: StringNullableFilter<"EventRegistration"> | string | null
-    user?: XOR<UserRelationFilter, UserWhereInput>
-    roleSlot?: XOR<RoleSlotRelationFilter, RoleSlotWhereInput>
-    Event?: XOR<EventNullableRelationFilter, EventWhereInput> | null
+      user?: XOR<UserScalarRelationFilter, UserWhereInput>
+      roleSlot?: XOR<RoleSlotScalarRelationFilter, RoleSlotWhereInput>
+      Event?: XOR<EventNullableScalarRelationFilter, EventWhereInput> | null
   }
 
   export type EventRegistrationOrderByWithRelationInput = {
@@ -14760,6 +17300,7 @@ export namespace Prisma {
     user?: UserOrderByWithRelationInput
     roleSlot?: RoleSlotOrderByWithRelationInput
     Event?: EventOrderByWithRelationInput
+      _relevance?: EventRegistrationOrderByRelevanceInput
   }
 
   export type EventRegistrationWhereUniqueInput = Prisma.AtLeast<{
@@ -14772,9 +17313,9 @@ export namespace Prisma {
     roleSlotId?: StringFilter<"EventRegistration"> | string
     registeredAt?: DateTimeFilter<"EventRegistration"> | Date | string
     eventId?: StringNullableFilter<"EventRegistration"> | string | null
-    user?: XOR<UserRelationFilter, UserWhereInput>
-    roleSlot?: XOR<RoleSlotRelationFilter, RoleSlotWhereInput>
-    Event?: XOR<EventNullableRelationFilter, EventWhereInput> | null
+      user?: XOR<UserScalarRelationFilter, UserWhereInput>
+      roleSlot?: XOR<RoleSlotScalarRelationFilter, RoleSlotWhereInput>
+      Event?: XOR<EventNullableScalarRelationFilter, EventWhereInput> | null
   }, "id" | "userId_roleSlotId">
 
   export type EventRegistrationOrderByWithAggregationInput = {
@@ -14799,6 +17340,82 @@ export namespace Prisma {
     eventId?: StringNullableWithAggregatesFilter<"EventRegistration"> | string | null
   }
 
+    export type TicketWhereInput = {
+        AND?: TicketWhereInput | TicketWhereInput[]
+        OR?: TicketWhereInput[]
+        NOT?: TicketWhereInput | TicketWhereInput[]
+        id?: IntFilter<"Ticket"> | number
+        discordUserID?: StringFilter<"Ticket"> | string
+        channelId?: StringFilter<"Ticket"> | string
+        channelName?: StringFilter<"Ticket"> | string
+        createdAt?: DateTimeFilter<"Ticket"> | Date | string
+        updatedAt?: DateTimeFilter<"Ticket"> | Date | string
+        type?: StringFilter<"Ticket"> | string
+        assignedUserId?: StringNullableFilter<"Ticket"> | string | null
+        channel?: XOR<ChannelScalarRelationFilter, ChannelWhereInput>
+        user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    }
+
+    export type TicketOrderByWithRelationInput = {
+        id?: SortOrder
+        discordUserID?: SortOrder
+        channelId?: SortOrder
+        channelName?: SortOrder
+        createdAt?: SortOrder
+        updatedAt?: SortOrder
+        type?: SortOrder
+        assignedUserId?: SortOrderInput | SortOrder
+        channel?: ChannelOrderByWithRelationInput
+        user?: UserOrderByWithRelationInput
+        _relevance?: TicketOrderByRelevanceInput
+    }
+
+    export type TicketWhereUniqueInput = Prisma.AtLeast<{
+        id?: number
+        AND?: TicketWhereInput | TicketWhereInput[]
+        OR?: TicketWhereInput[]
+        NOT?: TicketWhereInput | TicketWhereInput[]
+        discordUserID?: StringFilter<"Ticket"> | string
+        channelId?: StringFilter<"Ticket"> | string
+        channelName?: StringFilter<"Ticket"> | string
+        createdAt?: DateTimeFilter<"Ticket"> | Date | string
+        updatedAt?: DateTimeFilter<"Ticket"> | Date | string
+        type?: StringFilter<"Ticket"> | string
+        assignedUserId?: StringNullableFilter<"Ticket"> | string | null
+        channel?: XOR<ChannelScalarRelationFilter, ChannelWhereInput>
+        user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    }, "id">
+
+    export type TicketOrderByWithAggregationInput = {
+        id?: SortOrder
+        discordUserID?: SortOrder
+        channelId?: SortOrder
+        channelName?: SortOrder
+        createdAt?: SortOrder
+        updatedAt?: SortOrder
+        type?: SortOrder
+        assignedUserId?: SortOrderInput | SortOrder
+        _count?: TicketCountOrderByAggregateInput
+        _avg?: TicketAvgOrderByAggregateInput
+        _max?: TicketMaxOrderByAggregateInput
+        _min?: TicketMinOrderByAggregateInput
+        _sum?: TicketSumOrderByAggregateInput
+    }
+
+    export type TicketScalarWhereWithAggregatesInput = {
+        AND?: TicketScalarWhereWithAggregatesInput | TicketScalarWhereWithAggregatesInput[]
+        OR?: TicketScalarWhereWithAggregatesInput[]
+        NOT?: TicketScalarWhereWithAggregatesInput | TicketScalarWhereWithAggregatesInput[]
+        id?: IntWithAggregatesFilter<"Ticket"> | number
+        discordUserID?: StringWithAggregatesFilter<"Ticket"> | string
+        channelId?: StringWithAggregatesFilter<"Ticket"> | string
+        channelName?: StringWithAggregatesFilter<"Ticket"> | string
+        createdAt?: DateTimeWithAggregatesFilter<"Ticket"> | Date | string
+        updatedAt?: DateTimeWithAggregatesFilter<"Ticket"> | Date | string
+        type?: StringWithAggregatesFilter<"Ticket"> | string
+        assignedUserId?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
+    }
+
   export type UserCreateInput = {
     id: string
     name: string
@@ -14812,6 +17429,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
+      username?: string | null
+      displayUsername?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
@@ -14820,6 +17439,7 @@ export namespace Prisma {
     twofactors?: TwoFactorCreateNestedManyWithoutUserInput
     Event?: EventCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
+      Ticket?: TicketCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -14835,6 +17455,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
+      username?: string | null
+      displayUsername?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
@@ -14843,6 +17465,7 @@ export namespace Prisma {
     twofactors?: TwoFactorUncheckedCreateNestedManyWithoutUserInput
     Event?: EventUncheckedCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
+      Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -14858,6 +17481,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+      username?: NullableStringFieldUpdateOperationsInput | string | null
+      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
@@ -14866,6 +17491,7 @@ export namespace Prisma {
     twofactors?: TwoFactorUpdateManyWithoutUserNestedInput
     Event?: EventUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
+      Ticket?: TicketUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -14881,6 +17507,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+      username?: NullableStringFieldUpdateOperationsInput | string | null
+      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
@@ -14889,6 +17517,7 @@ export namespace Prisma {
     twofactors?: TwoFactorUncheckedUpdateManyWithoutUserNestedInput
     Event?: EventUncheckedUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
+      Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -14904,6 +17533,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
+      username?: string | null
+      displayUsername?: string | null
   }
 
   export type UserUpdateManyMutationInput = {
@@ -14919,6 +17550,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+      username?: NullableStringFieldUpdateOperationsInput | string | null
+      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type UserUncheckedUpdateManyInput = {
@@ -14934,6 +17567,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+      username?: NullableStringFieldUpdateOperationsInput | string | null
+      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type SessionCreateInput = {
@@ -15441,11 +18076,54 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
   }
 
+    export type ChannelCreateInput = {
+        id?: string
+        name: string
+        Message?: MessageCreateNestedManyWithoutChannelInput
+        Ticket?: TicketCreateNestedManyWithoutChannelInput
+    }
+
+    export type ChannelUncheckedCreateInput = {
+        id?: string
+        name: string
+        Message?: MessageUncheckedCreateNestedManyWithoutChannelInput
+        Ticket?: TicketUncheckedCreateNestedManyWithoutChannelInput
+    }
+
+    export type ChannelUpdateInput = {
+        id?: StringFieldUpdateOperationsInput | string
+        name?: StringFieldUpdateOperationsInput | string
+        Message?: MessageUpdateManyWithoutChannelNestedInput
+        Ticket?: TicketUpdateManyWithoutChannelNestedInput
+    }
+
+    export type ChannelUncheckedUpdateInput = {
+        id?: StringFieldUpdateOperationsInput | string
+        name?: StringFieldUpdateOperationsInput | string
+        Message?: MessageUncheckedUpdateManyWithoutChannelNestedInput
+        Ticket?: TicketUncheckedUpdateManyWithoutChannelNestedInput
+    }
+
+    export type ChannelCreateManyInput = {
+        id?: string
+        name: string
+    }
+
+    export type ChannelUpdateManyMutationInput = {
+        id?: StringFieldUpdateOperationsInput | string
+        name?: StringFieldUpdateOperationsInput | string
+    }
+
+    export type ChannelUncheckedUpdateManyInput = {
+        id?: StringFieldUpdateOperationsInput | string
+        name?: StringFieldUpdateOperationsInput | string
+    }
+
   export type MessageCreateInput = {
     createdAt: Date | string
-    channelId: string
     content: Uint8Array
     user: UserCreateNestedOneWithoutMessagesInput
+      channel: ChannelCreateNestedOneWithoutMessageInput
   }
 
   export type MessageUncheckedCreateInput = {
@@ -15458,9 +18136,9 @@ export namespace Prisma {
 
   export type MessageUpdateInput = {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    channelId?: StringFieldUpdateOperationsInput | string
     content?: BytesFieldUpdateOperationsInput | Uint8Array
     user?: UserUpdateOneRequiredWithoutMessagesNestedInput
+      channel?: ChannelUpdateOneRequiredWithoutMessageNestedInput
   }
 
   export type MessageUncheckedUpdateInput = {
@@ -15481,7 +18159,6 @@ export namespace Prisma {
 
   export type MessageUpdateManyMutationInput = {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    channelId?: StringFieldUpdateOperationsInput | string
     content?: BytesFieldUpdateOperationsInput | Uint8Array
   }
 
@@ -15682,6 +18359,75 @@ export namespace Prisma {
     eventId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
+    export type TicketCreateInput = {
+        discordUserID: string
+        createdAt: Date | string
+        updatedAt: Date | string
+        type: string
+        channel: ChannelCreateNestedOneWithoutTicketInput
+        user?: UserCreateNestedOneWithoutTicketInput
+    }
+
+    export type TicketUncheckedCreateInput = {
+        id?: number
+        discordUserID: string
+        channelId: string
+        channelName: string
+        createdAt: Date | string
+        updatedAt: Date | string
+        type: string
+        assignedUserId?: string | null
+    }
+
+    export type TicketUpdateInput = {
+        discordUserID?: StringFieldUpdateOperationsInput | string
+        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        type?: StringFieldUpdateOperationsInput | string
+        channel?: ChannelUpdateOneRequiredWithoutTicketNestedInput
+        user?: UserUpdateOneWithoutTicketNestedInput
+    }
+
+    export type TicketUncheckedUpdateInput = {
+        id?: IntFieldUpdateOperationsInput | number
+        discordUserID?: StringFieldUpdateOperationsInput | string
+        channelId?: StringFieldUpdateOperationsInput | string
+        channelName?: StringFieldUpdateOperationsInput | string
+        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        type?: StringFieldUpdateOperationsInput | string
+        assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    }
+
+    export type TicketCreateManyInput = {
+        id?: number
+        discordUserID: string
+        channelId: string
+        channelName: string
+        createdAt: Date | string
+        updatedAt: Date | string
+        type: string
+        assignedUserId?: string | null
+    }
+
+    export type TicketUpdateManyMutationInput = {
+        discordUserID?: StringFieldUpdateOperationsInput | string
+        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        type?: StringFieldUpdateOperationsInput | string
+    }
+
+    export type TicketUncheckedUpdateManyInput = {
+        id?: IntFieldUpdateOperationsInput | number
+        discordUserID?: StringFieldUpdateOperationsInput | string
+        channelId?: StringFieldUpdateOperationsInput | string
+        channelName?: StringFieldUpdateOperationsInput | string
+        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        type?: StringFieldUpdateOperationsInput | string
+        assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[]
@@ -15693,6 +18439,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
+      search?: string
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
@@ -15712,6 +18459,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
+      search?: string
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
@@ -15790,6 +18538,12 @@ export namespace Prisma {
     none?: EventRegistrationWhereInput
   }
 
+    export type TicketListRelationFilter = {
+        every?: TicketWhereInput
+        some?: TicketWhereInput
+        none?: TicketWhereInput
+    }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -15827,6 +18581,16 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+    export type TicketOrderByRelationAggregateInput = {
+        _count?: SortOrder
+    }
+
+    export type UserOrderByRelevanceInput = {
+        fields: UserOrderByRelevanceFieldEnum | UserOrderByRelevanceFieldEnum[]
+        sort: SortOrder
+        search: string
+    }
+
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
@@ -15840,6 +18604,8 @@ export namespace Prisma {
     banReason?: SortOrder
     banExpires?: SortOrder
     twoFactorEnabled?: SortOrder
+      username?: SortOrder
+      displayUsername?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -15855,6 +18621,8 @@ export namespace Prisma {
     banReason?: SortOrder
     banExpires?: SortOrder
     twoFactorEnabled?: SortOrder
+      username?: SortOrder
+      displayUsername?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -15870,6 +18638,8 @@ export namespace Prisma {
     banReason?: SortOrder
     banExpires?: SortOrder
     twoFactorEnabled?: SortOrder
+      username?: SortOrder
+      displayUsername?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -15883,6 +18653,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
+      search?: string
     not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedStringFilter<$PrismaModel>
@@ -15908,6 +18679,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
+      search?: string
     not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
@@ -15950,10 +18722,16 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
-  export type UserRelationFilter = {
+    export type UserScalarRelationFilter = {
     is?: UserWhereInput
     isNot?: UserWhereInput
   }
+
+    export type SessionOrderByRelevanceInput = {
+        fields: SessionOrderByRelevanceFieldEnum | SessionOrderByRelevanceFieldEnum[]
+        sort: SortOrder
+        search: string
+    }
 
   export type SessionCountOrderByAggregateInput = {
     id?: SortOrder
@@ -15993,6 +18771,12 @@ export namespace Prisma {
     impersonatedBy?: SortOrder
     activeOrganizationId?: SortOrder
   }
+
+    export type AccountOrderByRelevanceInput = {
+        fields: AccountOrderByRelevanceFieldEnum | AccountOrderByRelevanceFieldEnum[]
+        sort: SortOrder
+        search: string
+    }
 
   export type AccountCountOrderByAggregateInput = {
     id?: SortOrder
@@ -16042,6 +18826,12 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
+    export type VerificationOrderByRelevanceInput = {
+        fields: VerificationOrderByRelevanceFieldEnum | VerificationOrderByRelevanceFieldEnum[]
+        sort: SortOrder
+        search: string
+    }
+
   export type VerificationCountOrderByAggregateInput = {
     id?: SortOrder
     identifier?: SortOrder
@@ -16068,6 +18858,12 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
+
+    export type OrganizationOrderByRelevanceInput = {
+        fields: OrganizationOrderByRelevanceFieldEnum | OrganizationOrderByRelevanceFieldEnum[]
+        sort: SortOrder
+        search: string
+    }
 
   export type OrganizationCountOrderByAggregateInput = {
     id?: SortOrder
@@ -16096,10 +18892,16 @@ export namespace Prisma {
     metadata?: SortOrder
   }
 
-  export type OrganizationRelationFilter = {
+    export type OrganizationScalarRelationFilter = {
     is?: OrganizationWhereInput
     isNot?: OrganizationWhereInput
   }
+
+    export type MemberOrderByRelevanceInput = {
+        fields: MemberOrderByRelevanceFieldEnum | MemberOrderByRelevanceFieldEnum[]
+        sort: SortOrder
+        search: string
+    }
 
   export type MemberCountOrderByAggregateInput = {
     id?: SortOrder
@@ -16124,6 +18926,12 @@ export namespace Prisma {
     role?: SortOrder
     createdAt?: SortOrder
   }
+
+    export type InvitationOrderByRelevanceInput = {
+        fields: InvitationOrderByRelevanceFieldEnum | InvitationOrderByRelevanceFieldEnum[]
+        sort: SortOrder
+        search: string
+    }
 
   export type InvitationCountOrderByAggregateInput = {
     id?: SortOrder
@@ -16155,6 +18963,12 @@ export namespace Prisma {
     inviterId?: SortOrder
   }
 
+    export type TwoFactorOrderByRelevanceInput = {
+        fields: TwoFactorOrderByRelevanceFieldEnum | TwoFactorOrderByRelevanceFieldEnum[]
+        sort: SortOrder
+        search: string
+    }
+
   export type TwoFactorCountOrderByAggregateInput = {
     id?: SortOrder
     secret?: SortOrder
@@ -16176,6 +18990,32 @@ export namespace Prisma {
     userId?: SortOrder
   }
 
+    export type ChannelOrderByRelevanceInput = {
+        fields: ChannelOrderByRelevanceFieldEnum | ChannelOrderByRelevanceFieldEnum[]
+        sort: SortOrder
+        search: string
+    }
+
+    export type ChannelIdNameCompoundUniqueInput = {
+        id: string
+        name: string
+    }
+
+    export type ChannelCountOrderByAggregateInput = {
+        id?: SortOrder
+        name?: SortOrder
+    }
+
+    export type ChannelMaxOrderByAggregateInput = {
+        id?: SortOrder
+        name?: SortOrder
+    }
+
+    export type ChannelMinOrderByAggregateInput = {
+        id?: SortOrder
+        name?: SortOrder
+    }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[]
@@ -16193,6 +19033,17 @@ export namespace Prisma {
     notIn?: Uint8Array[]
     not?: NestedBytesFilter<$PrismaModel> | Uint8Array
   }
+
+    export type ChannelScalarRelationFilter = {
+        is?: ChannelWhereInput
+        isNot?: ChannelWhereInput
+    }
+
+    export type MessageOrderByRelevanceInput = {
+        fields: MessageOrderByRelevanceFieldEnum | MessageOrderByRelevanceFieldEnum[]
+        sort: SortOrder
+        search: string
+    }
 
   export type MessageCountOrderByAggregateInput = {
     id?: SortOrder
@@ -16262,6 +19113,12 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+    export type EventOrderByRelevanceInput = {
+        fields: EventOrderByRelevanceFieldEnum | EventOrderByRelevanceFieldEnum[]
+        sort: SortOrder
+        search: string
+    }
+
   export type EventCountOrderByAggregateInput = {
     id?: SortOrder
     title?: SortOrder
@@ -16295,10 +19152,16 @@ export namespace Prisma {
     userId?: SortOrder
   }
 
-  export type EventRelationFilter = {
+    export type EventScalarRelationFilter = {
     is?: EventWhereInput
     isNot?: EventWhereInput
   }
+
+    export type RoleSlotOrderByRelevanceInput = {
+        fields: RoleSlotOrderByRelevanceFieldEnum | RoleSlotOrderByRelevanceFieldEnum[]
+        sort: SortOrder
+        search: string
+    }
 
   export type RoleSlotCountOrderByAggregateInput = {
     id?: SortOrder
@@ -16329,15 +19192,21 @@ export namespace Prisma {
     goalCount?: SortOrder
   }
 
-  export type RoleSlotRelationFilter = {
+    export type RoleSlotScalarRelationFilter = {
     is?: RoleSlotWhereInput
     isNot?: RoleSlotWhereInput
   }
 
-  export type EventNullableRelationFilter = {
+    export type EventNullableScalarRelationFilter = {
     is?: EventWhereInput | null
     isNot?: EventWhereInput | null
   }
+
+    export type EventRegistrationOrderByRelevanceInput = {
+        fields: EventRegistrationOrderByRelevanceFieldEnum | EventRegistrationOrderByRelevanceFieldEnum[]
+        sort: SortOrder
+        search: string
+    }
 
   export type EventRegistrationUserIdRoleSlotIdCompoundUniqueInput = {
     userId: string
@@ -16367,6 +19236,58 @@ export namespace Prisma {
     registeredAt?: SortOrder
     eventId?: SortOrder
   }
+
+    export type UserNullableScalarRelationFilter = {
+        is?: UserWhereInput | null
+        isNot?: UserWhereInput | null
+    }
+
+    export type TicketOrderByRelevanceInput = {
+        fields: TicketOrderByRelevanceFieldEnum | TicketOrderByRelevanceFieldEnum[]
+        sort: SortOrder
+        search: string
+    }
+
+    export type TicketCountOrderByAggregateInput = {
+        id?: SortOrder
+        discordUserID?: SortOrder
+        channelId?: SortOrder
+        channelName?: SortOrder
+        createdAt?: SortOrder
+        updatedAt?: SortOrder
+        type?: SortOrder
+        assignedUserId?: SortOrder
+    }
+
+    export type TicketAvgOrderByAggregateInput = {
+        id?: SortOrder
+    }
+
+    export type TicketMaxOrderByAggregateInput = {
+        id?: SortOrder
+        discordUserID?: SortOrder
+        channelId?: SortOrder
+        channelName?: SortOrder
+        createdAt?: SortOrder
+        updatedAt?: SortOrder
+        type?: SortOrder
+        assignedUserId?: SortOrder
+    }
+
+    export type TicketMinOrderByAggregateInput = {
+        id?: SortOrder
+        discordUserID?: SortOrder
+        channelId?: SortOrder
+        channelName?: SortOrder
+        createdAt?: SortOrder
+        updatedAt?: SortOrder
+        type?: SortOrder
+        assignedUserId?: SortOrder
+    }
+
+    export type TicketSumOrderByAggregateInput = {
+        id?: SortOrder
+    }
 
   export type AccountCreateNestedManyWithoutUserInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
@@ -16424,6 +19345,13 @@ export namespace Prisma {
     connect?: EventRegistrationWhereUniqueInput | EventRegistrationWhereUniqueInput[]
   }
 
+    export type TicketCreateNestedManyWithoutUserInput = {
+        create?: XOR<TicketCreateWithoutUserInput, TicketUncheckedCreateWithoutUserInput> | TicketCreateWithoutUserInput[] | TicketUncheckedCreateWithoutUserInput[]
+        connectOrCreate?: TicketCreateOrConnectWithoutUserInput | TicketCreateOrConnectWithoutUserInput[]
+        createMany?: TicketCreateManyUserInputEnvelope
+        connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    }
+
   export type AccountUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -16479,6 +19407,13 @@ export namespace Prisma {
     createMany?: EventRegistrationCreateManyUserInputEnvelope
     connect?: EventRegistrationWhereUniqueInput | EventRegistrationWhereUniqueInput[]
   }
+
+    export type TicketUncheckedCreateNestedManyWithoutUserInput = {
+        create?: XOR<TicketCreateWithoutUserInput, TicketUncheckedCreateWithoutUserInput> | TicketCreateWithoutUserInput[] | TicketUncheckedCreateWithoutUserInput[]
+        connectOrCreate?: TicketCreateOrConnectWithoutUserInput | TicketCreateOrConnectWithoutUserInput[]
+        createMany?: TicketCreateManyUserInputEnvelope
+        connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    }
 
   export type StringFieldUpdateOperationsInput = {
     set?: string
@@ -16616,6 +19551,20 @@ export namespace Prisma {
     deleteMany?: EventRegistrationScalarWhereInput | EventRegistrationScalarWhereInput[]
   }
 
+    export type TicketUpdateManyWithoutUserNestedInput = {
+        create?: XOR<TicketCreateWithoutUserInput, TicketUncheckedCreateWithoutUserInput> | TicketCreateWithoutUserInput[] | TicketUncheckedCreateWithoutUserInput[]
+        connectOrCreate?: TicketCreateOrConnectWithoutUserInput | TicketCreateOrConnectWithoutUserInput[]
+        upsert?: TicketUpsertWithWhereUniqueWithoutUserInput | TicketUpsertWithWhereUniqueWithoutUserInput[]
+        createMany?: TicketCreateManyUserInputEnvelope
+        set?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+        disconnect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+        delete?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+        connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+        update?: TicketUpdateWithWhereUniqueWithoutUserInput | TicketUpdateWithWhereUniqueWithoutUserInput[]
+        updateMany?: TicketUpdateManyWithWhereWithoutUserInput | TicketUpdateManyWithWhereWithoutUserInput[]
+        deleteMany?: TicketScalarWhereInput | TicketScalarWhereInput[]
+    }
+
   export type AccountUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -16727,6 +19676,20 @@ export namespace Prisma {
     updateMany?: EventRegistrationUpdateManyWithWhereWithoutUserInput | EventRegistrationUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: EventRegistrationScalarWhereInput | EventRegistrationScalarWhereInput[]
   }
+
+    export type TicketUncheckedUpdateManyWithoutUserNestedInput = {
+        create?: XOR<TicketCreateWithoutUserInput, TicketUncheckedCreateWithoutUserInput> | TicketCreateWithoutUserInput[] | TicketUncheckedCreateWithoutUserInput[]
+        connectOrCreate?: TicketCreateOrConnectWithoutUserInput | TicketCreateOrConnectWithoutUserInput[]
+        upsert?: TicketUpsertWithWhereUniqueWithoutUserInput | TicketUpsertWithWhereUniqueWithoutUserInput[]
+        createMany?: TicketCreateManyUserInputEnvelope
+        set?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+        disconnect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+        delete?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+        connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+        update?: TicketUpdateWithWhereUniqueWithoutUserInput | TicketUpdateWithWhereUniqueWithoutUserInput[]
+        updateMany?: TicketUpdateManyWithWhereWithoutUserInput | TicketUpdateManyWithWhereWithoutUserInput[]
+        deleteMany?: TicketScalarWhereInput | TicketScalarWhereInput[]
+    }
 
   export type UserCreateNestedOneWithoutSessionsInput = {
     create?: XOR<UserCreateWithoutSessionsInput, UserUncheckedCreateWithoutSessionsInput>
@@ -16910,11 +19873,101 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutTwofactorsInput, UserUpdateWithoutTwofactorsInput>, UserUncheckedUpdateWithoutTwofactorsInput>
   }
 
+    export type MessageCreateNestedManyWithoutChannelInput = {
+        create?: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput> | MessageCreateWithoutChannelInput[] | MessageUncheckedCreateWithoutChannelInput[]
+        connectOrCreate?: MessageCreateOrConnectWithoutChannelInput | MessageCreateOrConnectWithoutChannelInput[]
+        createMany?: MessageCreateManyChannelInputEnvelope
+        connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    }
+
+    export type TicketCreateNestedManyWithoutChannelInput = {
+        create?: XOR<TicketCreateWithoutChannelInput, TicketUncheckedCreateWithoutChannelInput> | TicketCreateWithoutChannelInput[] | TicketUncheckedCreateWithoutChannelInput[]
+        connectOrCreate?: TicketCreateOrConnectWithoutChannelInput | TicketCreateOrConnectWithoutChannelInput[]
+        createMany?: TicketCreateManyChannelInputEnvelope
+        connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    }
+
+    export type MessageUncheckedCreateNestedManyWithoutChannelInput = {
+        create?: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput> | MessageCreateWithoutChannelInput[] | MessageUncheckedCreateWithoutChannelInput[]
+        connectOrCreate?: MessageCreateOrConnectWithoutChannelInput | MessageCreateOrConnectWithoutChannelInput[]
+        createMany?: MessageCreateManyChannelInputEnvelope
+        connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    }
+
+    export type TicketUncheckedCreateNestedManyWithoutChannelInput = {
+        create?: XOR<TicketCreateWithoutChannelInput, TicketUncheckedCreateWithoutChannelInput> | TicketCreateWithoutChannelInput[] | TicketUncheckedCreateWithoutChannelInput[]
+        connectOrCreate?: TicketCreateOrConnectWithoutChannelInput | TicketCreateOrConnectWithoutChannelInput[]
+        createMany?: TicketCreateManyChannelInputEnvelope
+        connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    }
+
+    export type MessageUpdateManyWithoutChannelNestedInput = {
+        create?: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput> | MessageCreateWithoutChannelInput[] | MessageUncheckedCreateWithoutChannelInput[]
+        connectOrCreate?: MessageCreateOrConnectWithoutChannelInput | MessageCreateOrConnectWithoutChannelInput[]
+        upsert?: MessageUpsertWithWhereUniqueWithoutChannelInput | MessageUpsertWithWhereUniqueWithoutChannelInput[]
+        createMany?: MessageCreateManyChannelInputEnvelope
+        set?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+        disconnect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+        delete?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+        connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+        update?: MessageUpdateWithWhereUniqueWithoutChannelInput | MessageUpdateWithWhereUniqueWithoutChannelInput[]
+        updateMany?: MessageUpdateManyWithWhereWithoutChannelInput | MessageUpdateManyWithWhereWithoutChannelInput[]
+        deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
+    }
+
+    export type TicketUpdateManyWithoutChannelNestedInput = {
+        create?: XOR<TicketCreateWithoutChannelInput, TicketUncheckedCreateWithoutChannelInput> | TicketCreateWithoutChannelInput[] | TicketUncheckedCreateWithoutChannelInput[]
+        connectOrCreate?: TicketCreateOrConnectWithoutChannelInput | TicketCreateOrConnectWithoutChannelInput[]
+        upsert?: TicketUpsertWithWhereUniqueWithoutChannelInput | TicketUpsertWithWhereUniqueWithoutChannelInput[]
+        createMany?: TicketCreateManyChannelInputEnvelope
+        set?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+        disconnect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+        delete?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+        connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+        update?: TicketUpdateWithWhereUniqueWithoutChannelInput | TicketUpdateWithWhereUniqueWithoutChannelInput[]
+        updateMany?: TicketUpdateManyWithWhereWithoutChannelInput | TicketUpdateManyWithWhereWithoutChannelInput[]
+        deleteMany?: TicketScalarWhereInput | TicketScalarWhereInput[]
+    }
+
+    export type MessageUncheckedUpdateManyWithoutChannelNestedInput = {
+        create?: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput> | MessageCreateWithoutChannelInput[] | MessageUncheckedCreateWithoutChannelInput[]
+        connectOrCreate?: MessageCreateOrConnectWithoutChannelInput | MessageCreateOrConnectWithoutChannelInput[]
+        upsert?: MessageUpsertWithWhereUniqueWithoutChannelInput | MessageUpsertWithWhereUniqueWithoutChannelInput[]
+        createMany?: MessageCreateManyChannelInputEnvelope
+        set?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+        disconnect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+        delete?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+        connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+        update?: MessageUpdateWithWhereUniqueWithoutChannelInput | MessageUpdateWithWhereUniqueWithoutChannelInput[]
+        updateMany?: MessageUpdateManyWithWhereWithoutChannelInput | MessageUpdateManyWithWhereWithoutChannelInput[]
+        deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
+    }
+
+    export type TicketUncheckedUpdateManyWithoutChannelNestedInput = {
+        create?: XOR<TicketCreateWithoutChannelInput, TicketUncheckedCreateWithoutChannelInput> | TicketCreateWithoutChannelInput[] | TicketUncheckedCreateWithoutChannelInput[]
+        connectOrCreate?: TicketCreateOrConnectWithoutChannelInput | TicketCreateOrConnectWithoutChannelInput[]
+        upsert?: TicketUpsertWithWhereUniqueWithoutChannelInput | TicketUpsertWithWhereUniqueWithoutChannelInput[]
+        createMany?: TicketCreateManyChannelInputEnvelope
+        set?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+        disconnect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+        delete?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+        connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+        update?: TicketUpdateWithWhereUniqueWithoutChannelInput | TicketUpdateWithWhereUniqueWithoutChannelInput[]
+        updateMany?: TicketUpdateManyWithWhereWithoutChannelInput | TicketUpdateManyWithWhereWithoutChannelInput[]
+        deleteMany?: TicketScalarWhereInput | TicketScalarWhereInput[]
+    }
+
   export type UserCreateNestedOneWithoutMessagesInput = {
     create?: XOR<UserCreateWithoutMessagesInput, UserUncheckedCreateWithoutMessagesInput>
     connectOrCreate?: UserCreateOrConnectWithoutMessagesInput
     connect?: UserWhereUniqueInput
   }
+
+    export type ChannelCreateNestedOneWithoutMessageInput = {
+        create?: XOR<ChannelCreateWithoutMessageInput, ChannelUncheckedCreateWithoutMessageInput>
+        connectOrCreate?: ChannelCreateOrConnectWithoutMessageInput
+        connect?: ChannelWhereUniqueInput
+    }
 
   export type BytesFieldUpdateOperationsInput = {
     set?: Uint8Array
@@ -16927,6 +19980,14 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutMessagesInput, UserUpdateWithoutMessagesInput>, UserUncheckedUpdateWithoutMessagesInput>
   }
+
+    export type ChannelUpdateOneRequiredWithoutMessageNestedInput = {
+        create?: XOR<ChannelCreateWithoutMessageInput, ChannelUncheckedCreateWithoutMessageInput>
+        connectOrCreate?: ChannelCreateOrConnectWithoutMessageInput
+        upsert?: ChannelUpsertWithoutMessageInput
+        connect?: ChannelWhereUniqueInput
+        update?: XOR<XOR<ChannelUpdateToOneWithWhereWithoutMessageInput, ChannelUpdateWithoutMessageInput>, ChannelUncheckedUpdateWithoutMessageInput>
+    }
 
   export type IntFieldUpdateOperationsInput = {
     set?: number
@@ -17134,6 +20195,36 @@ export namespace Prisma {
     update?: XOR<XOR<EventUpdateToOneWithWhereWithoutRegistrationsInput, EventUpdateWithoutRegistrationsInput>, EventUncheckedUpdateWithoutRegistrationsInput>
   }
 
+    export type ChannelCreateNestedOneWithoutTicketInput = {
+        create?: XOR<ChannelCreateWithoutTicketInput, ChannelUncheckedCreateWithoutTicketInput>
+        connectOrCreate?: ChannelCreateOrConnectWithoutTicketInput
+        connect?: ChannelWhereUniqueInput
+    }
+
+    export type UserCreateNestedOneWithoutTicketInput = {
+        create?: XOR<UserCreateWithoutTicketInput, UserUncheckedCreateWithoutTicketInput>
+        connectOrCreate?: UserCreateOrConnectWithoutTicketInput
+        connect?: UserWhereUniqueInput
+    }
+
+    export type ChannelUpdateOneRequiredWithoutTicketNestedInput = {
+        create?: XOR<ChannelCreateWithoutTicketInput, ChannelUncheckedCreateWithoutTicketInput>
+        connectOrCreate?: ChannelCreateOrConnectWithoutTicketInput
+        upsert?: ChannelUpsertWithoutTicketInput
+        connect?: ChannelWhereUniqueInput
+        update?: XOR<XOR<ChannelUpdateToOneWithWhereWithoutTicketInput, ChannelUpdateWithoutTicketInput>, ChannelUncheckedUpdateWithoutTicketInput>
+    }
+
+    export type UserUpdateOneWithoutTicketNestedInput = {
+        create?: XOR<UserCreateWithoutTicketInput, UserUncheckedCreateWithoutTicketInput>
+        connectOrCreate?: UserCreateOrConnectWithoutTicketInput
+        upsert?: UserUpsertWithoutTicketInput
+        disconnect?: UserWhereInput | boolean
+        delete?: UserWhereInput | boolean
+        connect?: UserWhereUniqueInput
+        update?: XOR<XOR<UserUpdateToOneWithWhereWithoutTicketInput, UserUpdateWithoutTicketInput>, UserUncheckedUpdateWithoutTicketInput>
+    }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[]
@@ -17145,6 +20236,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
+      search?: string
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
@@ -17164,6 +20256,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
+      search?: string
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
@@ -17205,6 +20298,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
+      search?: string
     not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedStringFilter<$PrismaModel>
@@ -17241,6 +20335,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
+      search?: string
     not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
@@ -17414,8 +20509,8 @@ export namespace Prisma {
 
   export type MessageCreateWithoutUserInput = {
     createdAt: Date | string
-    channelId: string
     content: Uint8Array
+      channel: ChannelCreateNestedOneWithoutMessageInput
   }
 
   export type MessageUncheckedCreateWithoutUserInput = {
@@ -17566,6 +20661,34 @@ export namespace Prisma {
     data: EventRegistrationCreateManyUserInput | EventRegistrationCreateManyUserInput[]
     skipDuplicates?: boolean
   }
+
+    export type TicketCreateWithoutUserInput = {
+        discordUserID: string
+        createdAt: Date | string
+        updatedAt: Date | string
+        type: string
+        channel: ChannelCreateNestedOneWithoutTicketInput
+    }
+
+    export type TicketUncheckedCreateWithoutUserInput = {
+        id?: number
+        discordUserID: string
+        channelId: string
+        channelName: string
+        createdAt: Date | string
+        updatedAt: Date | string
+        type: string
+    }
+
+    export type TicketCreateOrConnectWithoutUserInput = {
+        where: TicketWhereUniqueInput
+        create: XOR<TicketCreateWithoutUserInput, TicketUncheckedCreateWithoutUserInput>
+    }
+
+    export type TicketCreateManyUserInputEnvelope = {
+        data: TicketCreateManyUserInput | TicketCreateManyUserInput[]
+        skipDuplicates?: boolean
+    }
 
   export type AccountUpsertWithWhereUniqueWithoutUserInput = {
     where: AccountWhereUniqueInput
@@ -17800,6 +20923,36 @@ export namespace Prisma {
     eventId?: StringNullableFilter<"EventRegistration"> | string | null
   }
 
+    export type TicketUpsertWithWhereUniqueWithoutUserInput = {
+        where: TicketWhereUniqueInput
+        update: XOR<TicketUpdateWithoutUserInput, TicketUncheckedUpdateWithoutUserInput>
+        create: XOR<TicketCreateWithoutUserInput, TicketUncheckedCreateWithoutUserInput>
+    }
+
+    export type TicketUpdateWithWhereUniqueWithoutUserInput = {
+        where: TicketWhereUniqueInput
+        data: XOR<TicketUpdateWithoutUserInput, TicketUncheckedUpdateWithoutUserInput>
+    }
+
+    export type TicketUpdateManyWithWhereWithoutUserInput = {
+        where: TicketScalarWhereInput
+        data: XOR<TicketUpdateManyMutationInput, TicketUncheckedUpdateManyWithoutUserInput>
+    }
+
+    export type TicketScalarWhereInput = {
+        AND?: TicketScalarWhereInput | TicketScalarWhereInput[]
+        OR?: TicketScalarWhereInput[]
+        NOT?: TicketScalarWhereInput | TicketScalarWhereInput[]
+        id?: IntFilter<"Ticket"> | number
+        discordUserID?: StringFilter<"Ticket"> | string
+        channelId?: StringFilter<"Ticket"> | string
+        channelName?: StringFilter<"Ticket"> | string
+        createdAt?: DateTimeFilter<"Ticket"> | Date | string
+        updatedAt?: DateTimeFilter<"Ticket"> | Date | string
+        type?: StringFilter<"Ticket"> | string
+        assignedUserId?: StringNullableFilter<"Ticket"> | string | null
+    }
+
   export type UserCreateWithoutSessionsInput = {
     id: string
     name: string
@@ -17813,6 +20966,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
+      username?: string | null
+      displayUsername?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
     members?: MemberCreateNestedManyWithoutUserInput
@@ -17820,6 +20975,7 @@ export namespace Prisma {
     twofactors?: TwoFactorCreateNestedManyWithoutUserInput
     Event?: EventCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
+      Ticket?: TicketCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -17835,6 +20991,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
+      username?: string | null
+      displayUsername?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     members?: MemberUncheckedCreateNestedManyWithoutUserInput
@@ -17842,6 +21000,7 @@ export namespace Prisma {
     twofactors?: TwoFactorUncheckedCreateNestedManyWithoutUserInput
     Event?: EventUncheckedCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
+      Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -17873,6 +21032,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+      username?: NullableStringFieldUpdateOperationsInput | string | null
+      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
     members?: MemberUpdateManyWithoutUserNestedInput
@@ -17880,6 +21041,7 @@ export namespace Prisma {
     twofactors?: TwoFactorUpdateManyWithoutUserNestedInput
     Event?: EventUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
+      Ticket?: TicketUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -17895,6 +21057,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+      username?: NullableStringFieldUpdateOperationsInput | string | null
+      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     members?: MemberUncheckedUpdateManyWithoutUserNestedInput
@@ -17902,6 +21066,7 @@ export namespace Prisma {
     twofactors?: TwoFactorUncheckedUpdateManyWithoutUserNestedInput
     Event?: EventUncheckedUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
+      Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutAccountsInput = {
@@ -17917,6 +21082,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
+      username?: string | null
+      displayUsername?: string | null
     sessions?: SessionCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
     members?: MemberCreateNestedManyWithoutUserInput
@@ -17924,6 +21091,7 @@ export namespace Prisma {
     twofactors?: TwoFactorCreateNestedManyWithoutUserInput
     Event?: EventCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
+      Ticket?: TicketCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAccountsInput = {
@@ -17939,6 +21107,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
+      username?: string | null
+      displayUsername?: string | null
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     members?: MemberUncheckedCreateNestedManyWithoutUserInput
@@ -17946,6 +21116,7 @@ export namespace Prisma {
     twofactors?: TwoFactorUncheckedCreateNestedManyWithoutUserInput
     Event?: EventUncheckedCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
+      Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAccountsInput = {
@@ -17977,6 +21148,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+      username?: NullableStringFieldUpdateOperationsInput | string | null
+      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     sessions?: SessionUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
     members?: MemberUpdateManyWithoutUserNestedInput
@@ -17984,6 +21157,7 @@ export namespace Prisma {
     twofactors?: TwoFactorUpdateManyWithoutUserNestedInput
     Event?: EventUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
+      Ticket?: TicketUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -17999,6 +21173,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+      username?: NullableStringFieldUpdateOperationsInput | string | null
+      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     members?: MemberUncheckedUpdateManyWithoutUserNestedInput
@@ -18006,6 +21182,7 @@ export namespace Prisma {
     twofactors?: TwoFactorUncheckedUpdateManyWithoutUserNestedInput
     Event?: EventUncheckedUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
+      Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type MemberCreateWithoutOrganizationInput = {
@@ -18130,6 +21307,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
+      username?: string | null
+      displayUsername?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
@@ -18137,6 +21316,7 @@ export namespace Prisma {
     twofactors?: TwoFactorCreateNestedManyWithoutUserInput
     Event?: EventCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
+      Ticket?: TicketCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutMembersInput = {
@@ -18152,6 +21332,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
+      username?: string | null
+      displayUsername?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
@@ -18159,6 +21341,7 @@ export namespace Prisma {
     twofactors?: TwoFactorUncheckedCreateNestedManyWithoutUserInput
     Event?: EventUncheckedCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
+      Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutMembersInput = {
@@ -18221,6 +21404,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+      username?: NullableStringFieldUpdateOperationsInput | string | null
+      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
@@ -18228,6 +21413,7 @@ export namespace Prisma {
     twofactors?: TwoFactorUpdateManyWithoutUserNestedInput
     Event?: EventUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
+      Ticket?: TicketUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMembersInput = {
@@ -18243,6 +21429,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+      username?: NullableStringFieldUpdateOperationsInput | string | null
+      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
@@ -18250,6 +21438,7 @@ export namespace Prisma {
     twofactors?: TwoFactorUncheckedUpdateManyWithoutUserNestedInput
     Event?: EventUncheckedUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
+      Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type OrganizationCreateWithoutInvitationsInput = {
@@ -18290,6 +21479,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
+      username?: string | null
+      displayUsername?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
@@ -18297,6 +21488,7 @@ export namespace Prisma {
     twofactors?: TwoFactorCreateNestedManyWithoutUserInput
     Event?: EventCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
+      Ticket?: TicketCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutInvitationsInput = {
@@ -18312,6 +21504,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
+      username?: string | null
+      displayUsername?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
@@ -18319,6 +21513,7 @@ export namespace Prisma {
     twofactors?: TwoFactorUncheckedCreateNestedManyWithoutUserInput
     Event?: EventUncheckedCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
+      Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutInvitationsInput = {
@@ -18381,6 +21576,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+      username?: NullableStringFieldUpdateOperationsInput | string | null
+      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
@@ -18388,6 +21585,7 @@ export namespace Prisma {
     twofactors?: TwoFactorUpdateManyWithoutUserNestedInput
     Event?: EventUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
+      Ticket?: TicketUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutInvitationsInput = {
@@ -18403,6 +21601,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+      username?: NullableStringFieldUpdateOperationsInput | string | null
+      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
@@ -18410,6 +21610,7 @@ export namespace Prisma {
     twofactors?: TwoFactorUncheckedUpdateManyWithoutUserNestedInput
     Event?: EventUncheckedUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
+      Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutTwofactorsInput = {
@@ -18425,6 +21626,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
+      username?: string | null
+      displayUsername?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
@@ -18432,6 +21635,7 @@ export namespace Prisma {
     invitations?: InvitationCreateNestedManyWithoutUserInput
     Event?: EventCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
+      Ticket?: TicketCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutTwofactorsInput = {
@@ -18447,6 +21651,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
+      username?: string | null
+      displayUsername?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
@@ -18454,6 +21660,7 @@ export namespace Prisma {
     invitations?: InvitationUncheckedCreateNestedManyWithoutUserInput
     Event?: EventUncheckedCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
+      Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutTwofactorsInput = {
@@ -18485,6 +21692,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+      username?: NullableStringFieldUpdateOperationsInput | string | null
+      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
@@ -18492,6 +21701,7 @@ export namespace Prisma {
     invitations?: InvitationUpdateManyWithoutUserNestedInput
     Event?: EventUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
+      Ticket?: TicketUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutTwofactorsInput = {
@@ -18507,6 +21717,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+      username?: NullableStringFieldUpdateOperationsInput | string | null
+      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
@@ -18514,6 +21726,89 @@ export namespace Prisma {
     invitations?: InvitationUncheckedUpdateManyWithoutUserNestedInput
     Event?: EventUncheckedUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
+      Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+    export type MessageCreateWithoutChannelInput = {
+        createdAt: Date | string
+        content: Uint8Array
+        user: UserCreateNestedOneWithoutMessagesInput
+    }
+
+    export type MessageUncheckedCreateWithoutChannelInput = {
+        id?: number
+        createdAt: Date | string
+        userId: string
+        content: Uint8Array
+    }
+
+    export type MessageCreateOrConnectWithoutChannelInput = {
+        where: MessageWhereUniqueInput
+        create: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput>
+    }
+
+    export type MessageCreateManyChannelInputEnvelope = {
+        data: MessageCreateManyChannelInput | MessageCreateManyChannelInput[]
+        skipDuplicates?: boolean
+    }
+
+    export type TicketCreateWithoutChannelInput = {
+        discordUserID: string
+        createdAt: Date | string
+        updatedAt: Date | string
+        type: string
+        user?: UserCreateNestedOneWithoutTicketInput
+    }
+
+    export type TicketUncheckedCreateWithoutChannelInput = {
+        id?: number
+        discordUserID: string
+        createdAt: Date | string
+        updatedAt: Date | string
+        type: string
+        assignedUserId?: string | null
+    }
+
+    export type TicketCreateOrConnectWithoutChannelInput = {
+        where: TicketWhereUniqueInput
+        create: XOR<TicketCreateWithoutChannelInput, TicketUncheckedCreateWithoutChannelInput>
+    }
+
+    export type TicketCreateManyChannelInputEnvelope = {
+        data: TicketCreateManyChannelInput | TicketCreateManyChannelInput[]
+        skipDuplicates?: boolean
+    }
+
+    export type MessageUpsertWithWhereUniqueWithoutChannelInput = {
+        where: MessageWhereUniqueInput
+        update: XOR<MessageUpdateWithoutChannelInput, MessageUncheckedUpdateWithoutChannelInput>
+        create: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput>
+    }
+
+    export type MessageUpdateWithWhereUniqueWithoutChannelInput = {
+        where: MessageWhereUniqueInput
+        data: XOR<MessageUpdateWithoutChannelInput, MessageUncheckedUpdateWithoutChannelInput>
+    }
+
+    export type MessageUpdateManyWithWhereWithoutChannelInput = {
+        where: MessageScalarWhereInput
+        data: XOR<MessageUpdateManyMutationInput, MessageUncheckedUpdateManyWithoutChannelInput>
+    }
+
+    export type TicketUpsertWithWhereUniqueWithoutChannelInput = {
+        where: TicketWhereUniqueInput
+        update: XOR<TicketUpdateWithoutChannelInput, TicketUncheckedUpdateWithoutChannelInput>
+        create: XOR<TicketCreateWithoutChannelInput, TicketUncheckedCreateWithoutChannelInput>
+    }
+
+    export type TicketUpdateWithWhereUniqueWithoutChannelInput = {
+        where: TicketWhereUniqueInput
+        data: XOR<TicketUpdateWithoutChannelInput, TicketUncheckedUpdateWithoutChannelInput>
+    }
+
+    export type TicketUpdateManyWithWhereWithoutChannelInput = {
+        where: TicketScalarWhereInput
+        data: XOR<TicketUpdateManyMutationInput, TicketUncheckedUpdateManyWithoutChannelInput>
   }
 
   export type UserCreateWithoutMessagesInput = {
@@ -18529,6 +21824,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
+      username?: string | null
+      displayUsername?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     members?: MemberCreateNestedManyWithoutUserInput
@@ -18536,6 +21833,7 @@ export namespace Prisma {
     twofactors?: TwoFactorCreateNestedManyWithoutUserInput
     Event?: EventCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
+      Ticket?: TicketCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutMessagesInput = {
@@ -18551,6 +21849,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
+      username?: string | null
+      displayUsername?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     members?: MemberUncheckedCreateNestedManyWithoutUserInput
@@ -18558,12 +21858,30 @@ export namespace Prisma {
     twofactors?: TwoFactorUncheckedCreateNestedManyWithoutUserInput
     Event?: EventUncheckedCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
+      Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutMessagesInput = {
     where: UserWhereUniqueInput
     create: XOR<UserCreateWithoutMessagesInput, UserUncheckedCreateWithoutMessagesInput>
   }
+
+    export type ChannelCreateWithoutMessageInput = {
+        id?: string
+        name: string
+        Ticket?: TicketCreateNestedManyWithoutChannelInput
+    }
+
+    export type ChannelUncheckedCreateWithoutMessageInput = {
+        id?: string
+        name: string
+        Ticket?: TicketUncheckedCreateNestedManyWithoutChannelInput
+    }
+
+    export type ChannelCreateOrConnectWithoutMessageInput = {
+        where: ChannelWhereUniqueInput
+        create: XOR<ChannelCreateWithoutMessageInput, ChannelUncheckedCreateWithoutMessageInput>
+    }
 
   export type UserUpsertWithoutMessagesInput = {
     update: XOR<UserUpdateWithoutMessagesInput, UserUncheckedUpdateWithoutMessagesInput>
@@ -18589,6 +21907,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+      username?: NullableStringFieldUpdateOperationsInput | string | null
+      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     members?: MemberUpdateManyWithoutUserNestedInput
@@ -18596,6 +21916,7 @@ export namespace Prisma {
     twofactors?: TwoFactorUpdateManyWithoutUserNestedInput
     Event?: EventUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
+      Ticket?: TicketUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMessagesInput = {
@@ -18611,6 +21932,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+      username?: NullableStringFieldUpdateOperationsInput | string | null
+      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     members?: MemberUncheckedUpdateManyWithoutUserNestedInput
@@ -18618,6 +21941,30 @@ export namespace Prisma {
     twofactors?: TwoFactorUncheckedUpdateManyWithoutUserNestedInput
     Event?: EventUncheckedUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
+      Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+    export type ChannelUpsertWithoutMessageInput = {
+        update: XOR<ChannelUpdateWithoutMessageInput, ChannelUncheckedUpdateWithoutMessageInput>
+        create: XOR<ChannelCreateWithoutMessageInput, ChannelUncheckedCreateWithoutMessageInput>
+        where?: ChannelWhereInput
+    }
+
+    export type ChannelUpdateToOneWithWhereWithoutMessageInput = {
+        where?: ChannelWhereInput
+        data: XOR<ChannelUpdateWithoutMessageInput, ChannelUncheckedUpdateWithoutMessageInput>
+    }
+
+    export type ChannelUpdateWithoutMessageInput = {
+        id?: StringFieldUpdateOperationsInput | string
+        name?: StringFieldUpdateOperationsInput | string
+        Ticket?: TicketUpdateManyWithoutChannelNestedInput
+    }
+
+    export type ChannelUncheckedUpdateWithoutMessageInput = {
+        id?: StringFieldUpdateOperationsInput | string
+        name?: StringFieldUpdateOperationsInput | string
+        Ticket?: TicketUncheckedUpdateManyWithoutChannelNestedInput
   }
 
   export type UserCreateWithoutEventInput = {
@@ -18633,6 +21980,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
+      username?: string | null
+      displayUsername?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
@@ -18640,6 +21989,7 @@ export namespace Prisma {
     invitations?: InvitationCreateNestedManyWithoutUserInput
     twofactors?: TwoFactorCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
+      Ticket?: TicketCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutEventInput = {
@@ -18655,6 +22005,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
+      username?: string | null
+      displayUsername?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
@@ -18662,6 +22014,7 @@ export namespace Prisma {
     invitations?: InvitationUncheckedCreateNestedManyWithoutUserInput
     twofactors?: TwoFactorUncheckedCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
+      Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutEventInput = {
@@ -18741,6 +22094,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+      username?: NullableStringFieldUpdateOperationsInput | string | null
+      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
@@ -18748,6 +22103,7 @@ export namespace Prisma {
     invitations?: InvitationUpdateManyWithoutUserNestedInput
     twofactors?: TwoFactorUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
+      Ticket?: TicketUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEventInput = {
@@ -18763,6 +22119,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+      username?: NullableStringFieldUpdateOperationsInput | string | null
+      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
@@ -18770,6 +22128,7 @@ export namespace Prisma {
     invitations?: InvitationUncheckedUpdateManyWithoutUserNestedInput
     twofactors?: TwoFactorUncheckedUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
+      Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type RoleSlotUpsertWithWhereUniqueWithoutEventInput = {
@@ -18931,6 +22290,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
+      username?: string | null
+      displayUsername?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
@@ -18938,6 +22299,7 @@ export namespace Prisma {
     invitations?: InvitationCreateNestedManyWithoutUserInput
     twofactors?: TwoFactorCreateNestedManyWithoutUserInput
     Event?: EventCreateNestedManyWithoutUserInput
+      Ticket?: TicketCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutEventRegistrationInput = {
@@ -18953,6 +22315,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
+      username?: string | null
+      displayUsername?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
@@ -18960,6 +22324,7 @@ export namespace Prisma {
     invitations?: InvitationUncheckedCreateNestedManyWithoutUserInput
     twofactors?: TwoFactorUncheckedCreateNestedManyWithoutUserInput
     Event?: EventUncheckedCreateNestedManyWithoutUserInput
+      Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutEventRegistrationInput = {
@@ -19039,6 +22404,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+      username?: NullableStringFieldUpdateOperationsInput | string | null
+      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
@@ -19046,6 +22413,7 @@ export namespace Prisma {
     invitations?: InvitationUpdateManyWithoutUserNestedInput
     twofactors?: TwoFactorUpdateManyWithoutUserNestedInput
     Event?: EventUpdateManyWithoutUserNestedInput
+      Ticket?: TicketUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEventRegistrationInput = {
@@ -19061,6 +22429,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+      username?: NullableStringFieldUpdateOperationsInput | string | null
+      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
@@ -19068,6 +22438,7 @@ export namespace Prisma {
     invitations?: InvitationUncheckedUpdateManyWithoutUserNestedInput
     twofactors?: TwoFactorUncheckedUpdateManyWithoutUserNestedInput
     Event?: EventUncheckedUpdateManyWithoutUserNestedInput
+      Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type RoleSlotUpsertWithoutRegistrationsInput = {
@@ -19129,6 +22500,162 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     roleSlots?: RoleSlotUncheckedUpdateManyWithoutEventNestedInput
   }
+
+    export type ChannelCreateWithoutTicketInput = {
+        id?: string
+        name: string
+        Message?: MessageCreateNestedManyWithoutChannelInput
+    }
+
+    export type ChannelUncheckedCreateWithoutTicketInput = {
+        id?: string
+        name: string
+        Message?: MessageUncheckedCreateNestedManyWithoutChannelInput
+    }
+
+    export type ChannelCreateOrConnectWithoutTicketInput = {
+        where: ChannelWhereUniqueInput
+        create: XOR<ChannelCreateWithoutTicketInput, ChannelUncheckedCreateWithoutTicketInput>
+    }
+
+    export type UserCreateWithoutTicketInput = {
+        id: string
+        name: string
+        email: string
+        emailVerified: boolean
+        image?: string | null
+        createdAt: Date | string
+        updatedAt: Date | string
+        role?: string | null
+        banned?: boolean | null
+        banReason?: string | null
+        banExpires?: Date | string | null
+        twoFactorEnabled?: boolean | null
+        username?: string | null
+        displayUsername?: string | null
+        accounts?: AccountCreateNestedManyWithoutUserInput
+        sessions?: SessionCreateNestedManyWithoutUserInput
+        messages?: MessageCreateNestedManyWithoutUserInput
+        members?: MemberCreateNestedManyWithoutUserInput
+        invitations?: InvitationCreateNestedManyWithoutUserInput
+        twofactors?: TwoFactorCreateNestedManyWithoutUserInput
+        Event?: EventCreateNestedManyWithoutUserInput
+        EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
+    }
+
+    export type UserUncheckedCreateWithoutTicketInput = {
+        id: string
+        name: string
+        email: string
+        emailVerified: boolean
+        image?: string | null
+        createdAt: Date | string
+        updatedAt: Date | string
+        role?: string | null
+        banned?: boolean | null
+        banReason?: string | null
+        banExpires?: Date | string | null
+        twoFactorEnabled?: boolean | null
+        username?: string | null
+        displayUsername?: string | null
+        accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+        sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+        messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+        members?: MemberUncheckedCreateNestedManyWithoutUserInput
+        invitations?: InvitationUncheckedCreateNestedManyWithoutUserInput
+        twofactors?: TwoFactorUncheckedCreateNestedManyWithoutUserInput
+        Event?: EventUncheckedCreateNestedManyWithoutUserInput
+        EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
+    }
+
+    export type UserCreateOrConnectWithoutTicketInput = {
+        where: UserWhereUniqueInput
+        create: XOR<UserCreateWithoutTicketInput, UserUncheckedCreateWithoutTicketInput>
+    }
+
+    export type ChannelUpsertWithoutTicketInput = {
+        update: XOR<ChannelUpdateWithoutTicketInput, ChannelUncheckedUpdateWithoutTicketInput>
+        create: XOR<ChannelCreateWithoutTicketInput, ChannelUncheckedCreateWithoutTicketInput>
+        where?: ChannelWhereInput
+    }
+
+    export type ChannelUpdateToOneWithWhereWithoutTicketInput = {
+        where?: ChannelWhereInput
+        data: XOR<ChannelUpdateWithoutTicketInput, ChannelUncheckedUpdateWithoutTicketInput>
+    }
+
+    export type ChannelUpdateWithoutTicketInput = {
+        id?: StringFieldUpdateOperationsInput | string
+        name?: StringFieldUpdateOperationsInput | string
+        Message?: MessageUpdateManyWithoutChannelNestedInput
+    }
+
+    export type ChannelUncheckedUpdateWithoutTicketInput = {
+        id?: StringFieldUpdateOperationsInput | string
+        name?: StringFieldUpdateOperationsInput | string
+        Message?: MessageUncheckedUpdateManyWithoutChannelNestedInput
+    }
+
+    export type UserUpsertWithoutTicketInput = {
+        update: XOR<UserUpdateWithoutTicketInput, UserUncheckedUpdateWithoutTicketInput>
+        create: XOR<UserCreateWithoutTicketInput, UserUncheckedCreateWithoutTicketInput>
+        where?: UserWhereInput
+    }
+
+    export type UserUpdateToOneWithWhereWithoutTicketInput = {
+        where?: UserWhereInput
+        data: XOR<UserUpdateWithoutTicketInput, UserUncheckedUpdateWithoutTicketInput>
+    }
+
+    export type UserUpdateWithoutTicketInput = {
+        id?: StringFieldUpdateOperationsInput | string
+        name?: StringFieldUpdateOperationsInput | string
+        email?: StringFieldUpdateOperationsInput | string
+        emailVerified?: BoolFieldUpdateOperationsInput | boolean
+        image?: NullableStringFieldUpdateOperationsInput | string | null
+        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        role?: NullableStringFieldUpdateOperationsInput | string | null
+        banned?: NullableBoolFieldUpdateOperationsInput | boolean | null
+        banReason?: NullableStringFieldUpdateOperationsInput | string | null
+        banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+        twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+        username?: NullableStringFieldUpdateOperationsInput | string | null
+        displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
+        accounts?: AccountUpdateManyWithoutUserNestedInput
+        sessions?: SessionUpdateManyWithoutUserNestedInput
+        messages?: MessageUpdateManyWithoutUserNestedInput
+        members?: MemberUpdateManyWithoutUserNestedInput
+        invitations?: InvitationUpdateManyWithoutUserNestedInput
+        twofactors?: TwoFactorUpdateManyWithoutUserNestedInput
+        Event?: EventUpdateManyWithoutUserNestedInput
+        EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
+    }
+
+    export type UserUncheckedUpdateWithoutTicketInput = {
+        id?: StringFieldUpdateOperationsInput | string
+        name?: StringFieldUpdateOperationsInput | string
+        email?: StringFieldUpdateOperationsInput | string
+        emailVerified?: BoolFieldUpdateOperationsInput | boolean
+        image?: NullableStringFieldUpdateOperationsInput | string | null
+        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        role?: NullableStringFieldUpdateOperationsInput | string | null
+        banned?: NullableBoolFieldUpdateOperationsInput | boolean | null
+        banReason?: NullableStringFieldUpdateOperationsInput | string | null
+        banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+        twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+        username?: NullableStringFieldUpdateOperationsInput | string | null
+        displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
+        accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+        sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+        messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+        members?: MemberUncheckedUpdateManyWithoutUserNestedInput
+        invitations?: InvitationUncheckedUpdateManyWithoutUserNestedInput
+        twofactors?: TwoFactorUncheckedUpdateManyWithoutUserNestedInput
+        Event?: EventUncheckedUpdateManyWithoutUserNestedInput
+        EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
+    }
 
   export type AccountCreateManyUserInput = {
     id: string
@@ -19202,6 +22729,16 @@ export namespace Prisma {
     registeredAt?: Date | string
     eventId?: string | null
   }
+
+    export type TicketCreateManyUserInput = {
+        id?: number
+        discordUserID: string
+        channelId: string
+        channelName: string
+        createdAt: Date | string
+        updatedAt: Date | string
+        type: string
+    }
 
   export type AccountUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
@@ -19286,8 +22823,8 @@ export namespace Prisma {
 
   export type MessageUpdateWithoutUserInput = {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    channelId?: StringFieldUpdateOperationsInput | string
     content?: BytesFieldUpdateOperationsInput | Uint8Array
+      channel?: ChannelUpdateOneRequiredWithoutMessageNestedInput
   }
 
   export type MessageUncheckedUpdateWithoutUserInput = {
@@ -19425,6 +22962,34 @@ export namespace Prisma {
     eventId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
+    export type TicketUpdateWithoutUserInput = {
+        discordUserID?: StringFieldUpdateOperationsInput | string
+        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        type?: StringFieldUpdateOperationsInput | string
+        channel?: ChannelUpdateOneRequiredWithoutTicketNestedInput
+    }
+
+    export type TicketUncheckedUpdateWithoutUserInput = {
+        id?: IntFieldUpdateOperationsInput | number
+        discordUserID?: StringFieldUpdateOperationsInput | string
+        channelId?: StringFieldUpdateOperationsInput | string
+        channelName?: StringFieldUpdateOperationsInput | string
+        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        type?: StringFieldUpdateOperationsInput | string
+    }
+
+    export type TicketUncheckedUpdateManyWithoutUserInput = {
+        id?: IntFieldUpdateOperationsInput | number
+        discordUserID?: StringFieldUpdateOperationsInput | string
+        channelId?: StringFieldUpdateOperationsInput | string
+        channelName?: StringFieldUpdateOperationsInput | string
+        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        type?: StringFieldUpdateOperationsInput | string
+    }
+
   export type MemberCreateManyOrganizationInput = {
     id: string
     userId: string
@@ -19488,6 +23053,68 @@ export namespace Prisma {
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     inviterId?: StringFieldUpdateOperationsInput | string
   }
+
+    export type MessageCreateManyChannelInput = {
+        id?: number
+        createdAt: Date | string
+        userId: string
+        content: Uint8Array
+    }
+
+    export type TicketCreateManyChannelInput = {
+        id?: number
+        discordUserID: string
+        createdAt: Date | string
+        updatedAt: Date | string
+        type: string
+        assignedUserId?: string | null
+    }
+
+    export type MessageUpdateWithoutChannelInput = {
+        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        content?: BytesFieldUpdateOperationsInput | Uint8Array
+        user?: UserUpdateOneRequiredWithoutMessagesNestedInput
+    }
+
+    export type MessageUncheckedUpdateWithoutChannelInput = {
+        id?: IntFieldUpdateOperationsInput | number
+        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        userId?: StringFieldUpdateOperationsInput | string
+        content?: BytesFieldUpdateOperationsInput | Uint8Array
+    }
+
+    export type MessageUncheckedUpdateManyWithoutChannelInput = {
+        id?: IntFieldUpdateOperationsInput | number
+        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        userId?: StringFieldUpdateOperationsInput | string
+        content?: BytesFieldUpdateOperationsInput | Uint8Array
+    }
+
+    export type TicketUpdateWithoutChannelInput = {
+        discordUserID?: StringFieldUpdateOperationsInput | string
+        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        type?: StringFieldUpdateOperationsInput | string
+        user?: UserUpdateOneWithoutTicketNestedInput
+    }
+
+    export type TicketUncheckedUpdateWithoutChannelInput = {
+        id?: IntFieldUpdateOperationsInput | number
+        discordUserID?: StringFieldUpdateOperationsInput | string
+        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        type?: StringFieldUpdateOperationsInput | string
+        assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    }
+
+    export type TicketUncheckedUpdateManyWithoutChannelInput = {
+        id?: IntFieldUpdateOperationsInput | number
+        discordUserID?: StringFieldUpdateOperationsInput | string
+        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        type?: StringFieldUpdateOperationsInput | string
+        assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    }
 
   export type RoleSlotCreateManyEventInput = {
     id?: string

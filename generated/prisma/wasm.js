@@ -21,11 +21,11 @@ exports.$Enums = {}
 
 /**
  * Prisma Client JS version: 6.9.0
- * Query Engine version: 605197351a3c8bdd595af2d2a9bc3025bca48ea2
+ * Query Engine version: 81e4af48011447c3cc503a190e86995b66d2a28e
  */
 Prisma.prismaVersion = {
   client: "6.9.0",
-  engine: "605197351a3c8bdd595af2d2a9bc3025bca48ea2"
+    engine: "81e4af48011447c3cc503a190e86995b66d2a28e"
 }
 
 Prisma.PrismaClientKnownRequestError = () => {
@@ -132,7 +132,9 @@ exports.Prisma.UserScalarFieldEnum = {
   banned: 'banned',
   banReason: 'banReason',
   banExpires: 'banExpires',
-  twoFactorEnabled: 'twoFactorEnabled'
+    twoFactorEnabled: 'twoFactorEnabled',
+    username: 'username',
+    displayUsername: 'displayUsername'
 };
 
 exports.Prisma.SessionScalarFieldEnum = {
@@ -207,6 +209,11 @@ exports.Prisma.TwoFactorScalarFieldEnum = {
   userId: 'userId'
 };
 
+exports.Prisma.ChannelScalarFieldEnum = {
+    id: 'id',
+    name: 'name'
+};
+
 exports.Prisma.MessageScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
@@ -241,6 +248,17 @@ exports.Prisma.EventRegistrationScalarFieldEnum = {
   eventId: 'eventId'
 };
 
+exports.Prisma.TicketScalarFieldEnum = {
+    id: 'id',
+    discordUserID: 'discordUserID',
+    channelId: 'channelId',
+    channelName: 'channelName',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    type: 'type',
+    assignedUserId: 'assignedUserId'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -249,6 +267,114 @@ exports.Prisma.SortOrder = {
 exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
+};
+
+exports.Prisma.UserOrderByRelevanceFieldEnum = {
+    id: 'id',
+    name: 'name',
+    email: 'email',
+    image: 'image',
+    role: 'role',
+    banReason: 'banReason',
+    username: 'username',
+    displayUsername: 'displayUsername'
+};
+
+exports.Prisma.SessionOrderByRelevanceFieldEnum = {
+    id: 'id',
+    token: 'token',
+    ipAddress: 'ipAddress',
+    userAgent: 'userAgent',
+    userId: 'userId',
+    impersonatedBy: 'impersonatedBy',
+    activeOrganizationId: 'activeOrganizationId'
+};
+
+exports.Prisma.AccountOrderByRelevanceFieldEnum = {
+    id: 'id',
+    accountId: 'accountId',
+    providerId: 'providerId',
+    userId: 'userId',
+    accessToken: 'accessToken',
+    refreshToken: 'refreshToken',
+    idToken: 'idToken',
+    scope: 'scope',
+    password: 'password'
+};
+
+exports.Prisma.VerificationOrderByRelevanceFieldEnum = {
+    id: 'id',
+    identifier: 'identifier',
+    value: 'value'
+};
+
+exports.Prisma.OrganizationOrderByRelevanceFieldEnum = {
+    id: 'id',
+    name: 'name',
+    slug: 'slug',
+    logo: 'logo',
+    metadata: 'metadata'
+};
+
+exports.Prisma.MemberOrderByRelevanceFieldEnum = {
+    id: 'id',
+    organizationId: 'organizationId',
+    userId: 'userId',
+    role: 'role'
+};
+
+exports.Prisma.InvitationOrderByRelevanceFieldEnum = {
+    id: 'id',
+    organizationId: 'organizationId',
+    email: 'email',
+    role: 'role',
+    status: 'status',
+    inviterId: 'inviterId'
+};
+
+exports.Prisma.TwoFactorOrderByRelevanceFieldEnum = {
+    id: 'id',
+    secret: 'secret',
+    backupCodes: 'backupCodes',
+    userId: 'userId'
+};
+
+exports.Prisma.ChannelOrderByRelevanceFieldEnum = {
+    id: 'id',
+    name: 'name'
+};
+
+exports.Prisma.MessageOrderByRelevanceFieldEnum = {
+    userId: 'userId',
+    channelId: 'channelId'
+};
+
+exports.Prisma.EventOrderByRelevanceFieldEnum = {
+    id: 'id',
+    title: 'title',
+    description: 'description',
+    userId: 'userId'
+};
+
+exports.Prisma.RoleSlotOrderByRelevanceFieldEnum = {
+    id: 'id',
+    role: 'role',
+    eventId: 'eventId'
+};
+
+exports.Prisma.EventRegistrationOrderByRelevanceFieldEnum = {
+    id: 'id',
+    userId: 'userId',
+    roleSlotId: 'roleSlotId',
+    eventId: 'eventId'
+};
+
+exports.Prisma.TicketOrderByRelevanceFieldEnum = {
+    discordUserID: 'discordUserID',
+    channelId: 'channelId',
+    channelName: 'channelName',
+    type: 'type',
+    assignedUserId: 'assignedUserId'
 };
 
 
@@ -261,10 +387,12 @@ exports.Prisma.ModelName = {
   Member: 'Member',
   Invitation: 'Invitation',
   TwoFactor: 'TwoFactor',
+    Channel: 'Channel',
   Message: 'Message',
   Event: 'Event',
   RoleSlot: 'RoleSlot',
-  EventRegistration: 'EventRegistration'
+    EventRegistration: 'EventRegistration',
+    Ticket: 'Ticket'
 };
 
 /**

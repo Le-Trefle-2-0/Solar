@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -36,9 +35,10 @@ model User {
 
   username        String?
   displayUsername String? @db.Text
+  Ticket          Ticket[]
 
-  @@map("user")
   @@unique([username])
+  @@map("user")
 }
 
 model Session {
@@ -141,12 +141,23 @@ model TwoFactor {
   @@map("twoFactor")
 }
 
+model Channel {
+  id   String @id @default(cuid())
+  name String
+
+  Message Message[]
+  Ticket  Ticket[]
+
+  @@unique([id, name])
+}
+
 model Message {
   id        Int      @id @default(autoincrement())
   createdAt DateTime
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   channelId String
+  channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
   content   Bytes
 }
 
@@ -184,4 +195,17 @@ model EventRegistration {
   eventId      String?
 
   @@unique([userId, roleSlotId])
+}
+
+model Ticket {
+  id             Int      @id @default(autoincrement())
+  discordUserID  String
+  channelId      String
+  channelName    String
+  channel        Channel  @relation(fields: [channelId, channelName], references: [id, name], onDelete: Cascade)
+  createdAt      DateTime
+  updatedAt      DateTime
+  type           String
+  user           User?    @relation(fields: [assignedUserId], references: [id])
+  assignedUserId String?
 }

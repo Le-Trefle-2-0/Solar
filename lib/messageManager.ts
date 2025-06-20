@@ -8,7 +8,7 @@ export const saveMessage = async (msg: Msg) => {
             data: {
                 createdAt: new Date(),
                 userId: msg.author.id,
-                channelId: '1',
+                channelId: msg.channel.id,
                 content: Buffer.from(msg.content, "utf8"),
             }
         });

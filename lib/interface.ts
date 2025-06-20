@@ -24,3 +24,35 @@ export type EventInput = {
     userId: string;
     roleSlots: RoleSlotInput[];
 };
+
+export type EventRoleSlot = {
+    id: string;
+    role: string;
+    goalCount: number;
+    registrationsCount: number;
+};
+
+export type EventItem = {
+    id: string;
+    title: string;
+    description?: string;
+    start: string;
+    end: string;
+    roleSlots: EventRoleSlot[];
+};
+
+export type EventData = {
+    id: string;
+    title: string;
+    description?: string;
+    start: string;
+    end: string;
+    roleSlots: EventRoleSlot[];
+};
+
+export type EventModalProps = {
+    isOpen: boolean;
+    onClose: () => void;
+    event: EventData | null;
+    onUpdate?: (updated: EventData) => void;
+};

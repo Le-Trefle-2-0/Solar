@@ -22,7 +22,9 @@ export function Providers({children}: { children: ReactNode }) {
                 router.refresh()
             }}
             Link={Link}
-            settingsURL="/app/settings"
+            settings={{
+                url: "/app/settings"
+            }}
             additionalFields={{
                 newsletter: {
                     label: "Lettre d'actualité mensuelle",
@@ -34,10 +36,8 @@ export function Providers({children}: { children: ReactNode }) {
             twoFactor={["totp"]}
             localization={locale}
             signUp={true}
-            signInSocial={async () => {
-                await authClient.signIn.social({
-                    provider: "discord",
-                })
+            social={{
+                providers: ["discord"]
             }}
         >
             {children}
