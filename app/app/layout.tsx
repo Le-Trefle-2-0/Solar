@@ -1,5 +1,6 @@
 import type {Metadata} from "next";
-import Nav from "@/components/nav/sidebar"
+import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui";
+import {AppSidebar} from "@/components/app-sidebar";
 
 export const metadata: Metadata = {
     title: "Solar - Le Trèfle 2.0",
@@ -12,11 +13,15 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <div className="flex h-screen">
-            <Nav/>
-            <div className="overflow-auto w-full">
-                {children}
-            </div>
-        </div>
+
+        <SidebarProvider>
+            <AppSidebar/>
+            <SidebarInset>
+                <SidebarTrigger className="-ml-1"/>
+                <div className="max-h-full overflow-auto w-full">
+                    {children}
+                </div>
+            </SidebarInset>
+        </SidebarProvider>
     );
 }
