@@ -1,4 +1,5 @@
 import {betterAuth} from "better-auth";
+import {dashboardPlugin} from "better-auth-dashboard";
 import {prismaAdapter} from "better-auth/adapters/prisma";
 import {PrismaClient} from "@/generated/prisma";
 import {resend} from "@/lib/resend";
@@ -57,6 +58,7 @@ export const auth = betterAuth({
         }),
         jwt(),
         bearer(),
+        dashboardPlugin()
     ],
     account: {
         accountLinking: {
