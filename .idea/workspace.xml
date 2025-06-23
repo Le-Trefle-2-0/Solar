@@ -4,28 +4,32 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="install shadcn components">
-      <change afterPath="$PROJECT_DIR$/app/dashboard/[...all]/page.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/ui/index.ts" afterDir="false" />
+    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="components.json install">
+      <change afterPath="$PROJECT_DIR$/app/api/check-key/route.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/globals.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/ui/avatar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/avatar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/app/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/dashboard/[...all]/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/dashboard/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/app-sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/app-sidebar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/search-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/search-form.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/breadcrumb.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/breadcrumb.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/ui/button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/button.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/ui/checkbox.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/checkbox.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/ui/collapsible.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/collapsible.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/ui/dropdown-menu.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/dropdown-menu.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/ui/input.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/input.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/ui/label.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/label.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/ui/separator.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/separator.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/ui/sheet.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/sheet.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/ui/sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/sidebar.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/ui/skeleton.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/skeleton.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/ui/textarea.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/textarea.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/ui/tooltip.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/tooltip.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/auth.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/utils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/utils.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/prisma/edge.js" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/edge.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/prisma/index-browser.js" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/index-browser.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/prisma/index.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/index.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/prisma/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/schema.prisma" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/prisma/wasm.js" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/wasm.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/server.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,8 +42,8 @@
         <option value="tsconfig.json" />
         <option value="JavaScript File" />
         <option value="CSS File" />
-        <option value="TypeScript File" />
         <option value="TypeScript JSX File" />
+        <option value="TypeScript File" />
       </list>
     </option>
   </component>
@@ -151,7 +155,7 @@
       <workItem from="1750343385303" duration="1148000" />
       <workItem from="1750344542615" duration="13911000" />
       <workItem from="1750363667156" duration="9319000" />
-      <workItem from="1750427135972" duration="20063000" />
+      <workItem from="1750427135972" duration="32156000" />
     </task>
     <task id="LOCAL-00001" summary="Base setup">
       <option name="closed" value="true" />
@@ -449,7 +453,23 @@
       <option name="project" value="LOCAL" />
       <updated>1750683507543</updated>
     </task>
-    <option name="localTasksCounter" value="38" />
+    <task id="LOCAL-00038" summary="base ui setup">
+      <option name="closed" value="true" />
+      <created>1750684455908</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1750684455908</updated>
+    </task>
+    <task id="LOCAL-00039" summary="components.json install">
+      <option name="closed" value="true" />
+      <created>1750684924361</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1750684924361</updated>
+    </task>
+    <option name="localTasksCounter" value="40" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -467,8 +487,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="base app interface layout" />
-    <MESSAGE value="install socket.io" />
     <MESSAGE value="setup socket server" />
     <MESSAGE value="auth ui update" />
     <MESSAGE value="update prisma schema" />
@@ -492,7 +510,9 @@
     <MESSAGE value="remove placeholder dashboard page" />
     <MESSAGE value="adapt server and chat page to handle secure websocket connexion" />
     <MESSAGE value="install shadcn components" />
-    <option name="LAST_COMMIT_MESSAGE" value="install shadcn components" />
+    <MESSAGE value="base ui setup" />
+    <MESSAGE value="components.json install" />
+    <option name="LAST_COMMIT_MESSAGE" value="components.json install" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>

@@ -27,14 +27,15 @@ async function validateJWT(token) {
 
 async function validateAPIKey(token) {
     try {
-        const res = await fetch('http://localhost:3000/api/auth/api-key/verify', {
+        const res = await fetch('http://localhost:3000/api/check-key', {
             body: JSON.stringify({
                 key: token,
             }),
+            method: 'POST',
         });
 
-        console.log(res)
-        return res.body.valid
+        const valid = await res.json();
+        return valid;
     } catch (error) {
         return false;
     }
@@ -50,12 +51,9 @@ app.prepare().then(() => {
             console.log(socket.handshake.auth);
             const validJWT = await validateJWT(socket.handshake.auth.jwt);
             const validToken = await validateAPIKey(socket.handshake.auth.token);
-            console.log(validJWT);
-            console.log(validToken);
-            if (!validJWT) {
+            if (!validJWT && !validToken) {
                 throw new Error("Invalid API key");
             }
-            console.log('valid token')
             next();
         } catch (err) {
             next(new Error("Authentication error"));
