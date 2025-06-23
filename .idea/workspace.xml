@@ -4,20 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="update better-auth-ui to 2.0 and add Discord OAuth support">
-      <change afterPath="$PROJECT_DIR$/app/api/events/[id]/route.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/ui/modals/event.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/userManager.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/prisma/seed.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tailwind.config.ts" afterDir="false" />
+    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="add event management api endpoint">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/messages/[channel]/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/messages/[channel]/route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/app/planning/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/app/planning/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/auth/[pathname]/view.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/auth/[pathname]/view.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/globals.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/providers.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/providers.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/nav/link.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/nav/link.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/nav/sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/nav/sidebar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/app/chat/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/app/chat/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/app/settings/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/app/settings/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/generated/prisma/edge.js" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/edge.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/generated/prisma/index-browser.js" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/index-browser.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/generated/prisma/index.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/index.d.ts" afterDir="false" />
@@ -25,12 +15,12 @@
       <change beforePath="$PROJECT_DIR$/generated/prisma/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/generated/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/schema.prisma" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/generated/prisma/wasm.js" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/wasm.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/eventManager.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/eventManager.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/interface.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/interface.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/messageManager.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/messageManager.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/auth-client.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/auth-client.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/auth.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/schema.prisma" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/server.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,8 +33,8 @@
         <option value="tsconfig.json" />
         <option value="JavaScript File" />
         <option value="CSS File" />
-        <option value="TypeScript JSX File" />
         <option value="TypeScript File" />
+        <option value="TypeScript JSX File" />
       </list>
     </option>
   </component>
@@ -94,28 +84,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;remake&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/paul/WebstormProjects/Solar/components/ui/modals&quot;,
-    &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;/Users/paul/WebstormProjects/Solar/node_modules/typescript/lib&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "remake",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "/Users/paul/WebstormProjects/Solar/app/app/chat",
+    "list.type.of.created.stylesheet": "CSS",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "ts.external.directory.path": "/Users/paul/WebstormProjects/Solar/node_modules/typescript/lib",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/app/app/chat" />
       <recent name="$PROJECT_DIR$/components/ui/modals" />
       <recent name="$PROJECT_DIR$/lib" />
     </key>
@@ -154,7 +145,8 @@
       <workItem from="1750325497089" duration="5738000" />
       <workItem from="1750343385303" duration="1148000" />
       <workItem from="1750344542615" duration="13911000" />
-      <workItem from="1750363667156" duration="5829000" />
+      <workItem from="1750363667156" duration="9319000" />
+      <workItem from="1750427135972" duration="18729000" />
     </task>
     <task id="LOCAL-00001" summary="Base setup">
       <option name="closed" value="true" />
@@ -396,11 +388,50 @@
       <option name="project" value="LOCAL" />
       <updated>1750324502632</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="update better-auth-ui to 2.0 and add Discord OAuth support">
+      <option name="closed" value="true" />
+      <created>1750424112157</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1750424112157</updated>
+    </task>
+    <task id="LOCAL-00032" summary="fix message fetching">
+      <option name="closed" value="true" />
+      <created>1750424507773</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1750424507773</updated>
+    </task>
+    <task id="LOCAL-00033" summary="add dynamic ticket links in sidebar">
+      <option name="closed" value="true" />
+      <created>1750426899116</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1750426899116</updated>
+    </task>
+    <task id="LOCAL-00034" summary="add dynamic ticket page">
+      <option name="closed" value="true" />
+      <created>1750426910945</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1750426910945</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+    <option name="exactExcludedFiles">
+      <list>
+        <option value="$PROJECT_DIR$/app/app/chat/page.js" />
+        <option value="$PROJECT_DIR$/lib/permissions.js" />
+        <option value="$PROJECT_DIR$/lib/auth.js" />
+      </list>
+    </option>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -414,11 +445,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="prisma and better-auth full base setup" />
-    <MESSAGE value="update password recovery system" />
-    <MESSAGE value="autofix unused imports" />
-    <MESSAGE value="update auth style and translate pages to french" />
-    <MESSAGE value="install auth plugins" />
     <MESSAGE value="update prisma schema for plugins" />
     <MESSAGE value="base app layout" />
     <MESSAGE value="sidebar styling" />
@@ -439,7 +465,12 @@
     <MESSAGE value="remove double styling property" />
     <MESSAGE value="update database and text components to save long strings and line breaks" />
     <MESSAGE value="update better-auth-ui to 2.0 and add Discord OAuth support" />
-    <option name="LAST_COMMIT_MESSAGE" value="update better-auth-ui to 2.0 and add Discord OAuth support" />
+    <MESSAGE value="fix message fetching" />
+    <MESSAGE value="add dynamic ticket links in sidebar" />
+    <MESSAGE value="add dynamic ticket page" />
+    <MESSAGE value="update userManager" />
+    <MESSAGE value="add event management api endpoint" />
+    <option name="LAST_COMMIT_MESSAGE" value="add event management api endpoint" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>

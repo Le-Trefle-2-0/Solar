@@ -1,8 +1,6 @@
 "use client";
-
 import {FormEvent, useEffect, useRef, useState} from "react";
-import {socket} from "@/socket";
-import {authClient} from "@/lib/auth-client";
+import {useSession} from "@/lib/auth-client";
 import Image from "next/image";
 import {Msg} from "@/lib/interface"
 import {saveMessage} from "@/lib/messageManager";
@@ -13,9 +11,10 @@ import {faCircle} from "@fortawesome/free-solid-svg-icons";
 import {Textarea} from "@/components/ui/textarea";
 import {z, ZodError} from "zod";
 import {toast} from "sonner";
+import {io, Socket} from "socket.io-client";
 
-export default function Chat() {
-    const session = authClient.useSession();
+export default function MainChat() {
+    const {data: session} = useSession();
     const [isConnected, setIsConnected] = useState(false);
     const [emojiOpen, setEmojiOpen] = useState(false);
     const [showTyping, setShowTyping] = useState(false);
@@ -23,9 +22,91 @@ export default function Chat() {
     const [currentMsg, setCurrentMsg] = useState("");
     const [chat, setChat] = useState<Msg[]>([])
     const [opacity, setOpacity] = useState(25);
+    // const [sendMessage, setSendMessage] = useState<Function>(async (e: FormEvent<HTMLFormElement>) => {});
+    // const [sendTyping, setSendTyping] = useState<Function>();
     const formRef = useRef<HTMLFormElement>(null);
     const textRef = useRef<HTMLTextAreaElement>(null);
     const rootDivRef = useRef<HTMLDivElement>(null);
+    const socketRef = useRef<Socket | null>(null);
+
+    useEffect(() => {
+        fetch("/api/auth/token").then(async res => {
+            const body = await res.json();
+            if (body.token) {
+                socketRef.current = io({
+                    auth: {
+                        jwt: body.token
+                    }
+                })
+            }
+        })
+        rootDivRef.current?.focus();
+
+        if (socketRef.current?.connected) {
+            onConnect();
+        }
+
+        // setSendMessage(async (e: FormEvent<HTMLFormElement>) => {
+        //     e.preventDefault();
+        //
+        //     try {
+        //         messageSchema.parse(currentMsg);
+        //     } catch (error) {
+        //         if (error instanceof ZodError) {
+        //             return toast.error(error.errors[0].message);
+        //         }
+        //     }
+        //     if (currentMsg !== "") {
+        //         const msg: Msg = {
+        //             author: {
+        //                 id: session?.user.id as string,
+        //                 name: session?.user.name as string,
+        //                 image: session?.user.image as string
+        //             },
+        //             content: currentMsg,
+        //             timestamp: Date.now(),
+        //             channel: {
+        //                 id: '1'
+        //             }
+        //         }
+        //
+        //         saveMessage(msg)
+        //         socketRef.current?.emit("sendMessage", msg);
+        //         setCurrentMsg("");
+        //         setChat((pre) => [...pre, msg])
+        //     }
+        // }
+        // )
+
+        function onConnect() {
+            setIsConnected(true);
+            setTransport(socketRef.current?.io.engine.transport.name as string);
+
+            socketRef.current?.io.engine.on("upgrade", (transport) => {
+                setTransport(transport.name);
+            });
+        }
+
+        function onDisconnect() {
+            setIsConnected(false);
+            setTransport("N/A");
+        }
+
+        socketRef.current?.on("connect", onConnect);
+        socketRef.current?.on("disconnect", onDisconnect);
+        socketRef.current?.on("message", (data: Msg) => {
+            setChat((pre) => [...pre, data])
+        });
+        socketRef.current?.on('typingIndicator', () => {
+        });
+
+        socketRef.current?.emit('listen', {id: '1'})
+
+        return () => {
+            socketRef.current?.off("connect", onConnect);
+            socketRef.current?.off("disconnect", onDisconnect);
+        }
+    }, []);
 
     const messageSchema = z
         .string()
@@ -34,19 +115,18 @@ export default function Chat() {
             message: "Contenu du message non supporté",
         });
 
-    socket.emit('listen', {id: '1'})
     useEffect(() => {
         fetch('/api/messages/1')
             .then(res => res.json())
             .then(data => setChat(data))
     }, []);
     let oldMsg = currentMsg;
-    setInterval(() => {
-        if (oldMsg !== currentMsg) {
-            socket.emit('typing', {id: '1'});
-            oldMsg = currentMsg;
-        }
-    }, 1000)
+    // setInterval(() => {
+    //     if (oldMsg !== currentMsg) {
+    //         socketRef.current?.emit('typing', {id: '1'});
+    //         oldMsg = currentMsg;
+    //     }
+    // }, 1000)
 
     const sendMessage = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -61,9 +141,9 @@ export default function Chat() {
         if (currentMsg !== "") {
             const msg: Msg = {
                 author: {
-                    id: session.data?.user.id as string,
-                    name: session.data?.user.name as string,
-                    image: session.data?.user.image as string
+                    id: session?.user.id as string,
+                    name: session?.user.name as string,
+                    image: session?.user.image as string
                 },
                 content: currentMsg,
                 timestamp: Date.now(),
@@ -73,48 +153,15 @@ export default function Chat() {
             }
 
             saveMessage(msg)
-            socket.emit("sendMessage", msg);
+            socketRef.current?.emit("sendMessage", msg);
             setCurrentMsg("");
             setChat((pre) => [...pre, msg])
         }
     }
+
     const sendTyping = async () => {
-        await socket.emit('typing', {id: '1'});
+        // await socketRef.current?.emit('typing', {id: '1'});
     }
-
-    useEffect(() => {
-        rootDivRef.current?.focus();
-        if (socket.connected) {
-            onConnect();
-        }
-
-        function onConnect() {
-            setIsConnected(true);
-            setTransport(socket.io.engine.transport.name);
-
-            socket.io.engine.on("upgrade", (transport) => {
-                setTransport(transport.name);
-            });
-        }
-
-        function onDisconnect() {
-            setIsConnected(false);
-            setTransport("N/A");
-        }
-
-        socket.on("connect", onConnect);
-        socket.on("disconnect", onDisconnect);
-        socket.on("message", (data: Msg) => {
-            setChat((pre) => [...pre, data])
-        });
-        socket.on('typingIndicator', () => {
-        });
-
-        return () => {
-            socket.off("connect", onConnect);
-            socket.off("disconnect", onDisconnect);
-        };
-    }, []);
 
     return (
         <div onKeyDown={(e) => {

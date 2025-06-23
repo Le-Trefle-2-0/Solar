@@ -259,6 +259,37 @@ exports.Prisma.TicketScalarFieldEnum = {
     assignedUserId: 'assignedUserId'
 };
 
+exports.Prisma.ApikeyScalarFieldEnum = {
+    id: 'id',
+    name: 'name',
+    start: 'start',
+    prefix: 'prefix',
+    key: 'key',
+    userId: 'userId',
+    refillInterval: 'refillInterval',
+    refillAmount: 'refillAmount',
+    lastRefillAt: 'lastRefillAt',
+    enabled: 'enabled',
+    rateLimitEnabled: 'rateLimitEnabled',
+    rateLimitTimeWindow: 'rateLimitTimeWindow',
+    rateLimitMax: 'rateLimitMax',
+    requestCount: 'requestCount',
+    remaining: 'remaining',
+    lastRequest: 'lastRequest',
+    expiresAt: 'expiresAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    permissions: 'permissions',
+    metadata: 'metadata'
+};
+
+exports.Prisma.JwksScalarFieldEnum = {
+    id: 'id',
+    publicKey: 'publicKey',
+    privateKey: 'privateKey',
+    createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -377,6 +408,23 @@ exports.Prisma.TicketOrderByRelevanceFieldEnum = {
     assignedUserId: 'assignedUserId'
 };
 
+exports.Prisma.ApikeyOrderByRelevanceFieldEnum = {
+    id: 'id',
+    name: 'name',
+    start: 'start',
+    prefix: 'prefix',
+    key: 'key',
+    userId: 'userId',
+    permissions: 'permissions',
+    metadata: 'metadata'
+};
+
+exports.Prisma.JwksOrderByRelevanceFieldEnum = {
+    id: 'id',
+    publicKey: 'publicKey',
+    privateKey: 'privateKey'
+};
+
 
 exports.Prisma.ModelName = {
   User: 'User',
@@ -392,7 +440,9 @@ exports.Prisma.ModelName = {
   Event: 'Event',
   RoleSlot: 'RoleSlot',
     EventRegistration: 'EventRegistration',
-    Ticket: 'Ticket'
+    Ticket: 'Ticket',
+    Apikey: 'Apikey',
+    Jwks: 'Jwks'
 };
 
 /**

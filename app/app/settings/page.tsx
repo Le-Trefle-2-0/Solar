@@ -1,4 +1,5 @@
 import {
+    APIKeysCard,
     ChangeEmailCard,
     ChangePasswordCard,
     ProvidersCard,
@@ -20,6 +21,7 @@ export default function SettingsPage() {
                 <TwoFactorCard localization={locale}/>
                 <ProvidersCard localization={locale}/>
                 <SessionsCard localization={locale}/>
+                <APIKeysCard localization={locale}/>
             </div>
         </div>
     )
