@@ -36,7 +36,7 @@ export const getMessages = async (channelId: string) => {
             author: {
                 id: user.id,
                 image: user.image as string,
-                name: user.username || user.name
+                name: user.displayUsername || user.name
             },
             content: Buffer.from(new Uint8Array(Object.values(msg.content))).toString('utf8'),
             timestamp: new Date(msg.createdAt).getTime(),
