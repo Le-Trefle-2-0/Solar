@@ -8,13 +8,9 @@ export default async function Home() {
     });
 
     return (
-        <div>
-            <main className="flex flex-col gap-3 items-center justify-center p-10">
-                <div className="flex gap-3">
-                    <SignOut/>
-                </div>
-                <p>{!session ? "Not authenticated" : session.user.name}</p>
-            </main>
+        <div className="flex flex-col items-center justify-between h-full max-w-2xl">
+            <SignOut/>
+            <SignOut/>
         </div>
     );
 }

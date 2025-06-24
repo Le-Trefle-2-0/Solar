@@ -1,5 +1,5 @@
 import type {Metadata} from "next";
-import {SidebarInset, SidebarProvider} from "@/components/ui";
+import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui";
 import {AppSidebar} from "@/components/app-sidebar";
 
 export const metadata: Metadata = {
@@ -17,8 +17,8 @@ export default function RootLayout({
         <SidebarProvider>
             <AppSidebar/>
             <SidebarInset>
-                {/*<SidebarTrigger className="-ml-1"/>*/}
-                <div className="overflow-auto">
+                <SidebarTrigger className="-ml-1"/>
+                <div className="overflow-auto h-full">
                     {children}
                 </div>
             </SidebarInset>

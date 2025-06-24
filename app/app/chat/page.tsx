@@ -8,7 +8,6 @@ import EmojiPicker, {EmojiStyle} from 'emoji-picker-react';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faFaceSmileWink, faPaperPlane} from "@fortawesome/free-regular-svg-icons";
 import {faCircle} from "@fortawesome/free-solid-svg-icons";
-import {Textarea} from "@/components/ui/textarea";
 import {z, ZodError} from "zod";
 import {toast} from "sonner";
 import {io, Socket} from "socket.io-client";
@@ -102,7 +101,7 @@ export default function MainChat() {
             const msg: Msg = {
                 author: {
                     id: session?.user.id as string,
-                    name: session?.user.name as string,
+                    name: session?.user.displayUsername as string || session?.user.name as string,
                     image: session?.user.image as string
                 },
                 content: currentMsg,
@@ -124,34 +123,34 @@ export default function MainChat() {
     }
 
     return (
-        <div onKeyDown={(e) => {
+        <div className="flex flex-col justify-between h-full p-3 gap-4" onKeyDown={(e) => {
             if (e.key !== "Enter") {
                 textRef.current?.focus();
             }
         }} tabIndex={0} ref={rootDivRef}>
-            <div className="flex flex-col justify-between h-full p-3 gap-4">
-                <div className="flex flex-col justify-end h-full gap-6 overflow-auto">
-                    {chat.map(({author, content, timestamp}, key) => (
-                        <div className="w-full flex flex-row gap-2" key={key}>
-                            <Image src={(author.image ? author.image : '/logo.svg')} alt="Image de profil" width={48}
-                                   height={48} className="rounded-xl max-h-[48px]"/>
-                            <div>
-                                <div className="flex flex-row items-center gap-4">
-                                    <span className="font-semibold text-sm text-gray-900">
-                                        {author.name}
-                                    </span>
-                                    <span className="font-light text-sm text-gray-900">
-                                        {new Date(timestamp).toLocaleString('fr-FR')}
-                                    </span>
-                                </div>
-                                <h3 className="text-lg text-gray-900 whitespace-pre-wrap">
-                                    {content}
-                                </h3>
+            <div className="flex flex-col justify-end h-full gap-6 overflow-auto">
+                {chat.map(({author, content, timestamp}, key) => (
+                    <div className="w-full flex flex-row gap-2" key={key}>
+                        <Image src={(author.image ? author.image : '/logo.svg')} alt="Image de profil" width={48}
+                               height={48} className="rounded-xl max-h-[48px]"/>
+                        <div>
+                            <div className="flex flex-row items-center gap-4">
+                                <span className="font-semibold text-sm text-gray-900">
+                                    {author.name}
+                                </span>
+                                <span className="font-light text-sm text-gray-900">
+                                    {new Date(timestamp).toLocaleString('fr-FR')}
+                                </span>
                             </div>
+                            <h3 className="text-lg text-gray-900 whitespace-pre-wrap">
+                                {content}
+                            </h3>
                         </div>
-                    ))}
-                </div>
+                    </div>
+                ))}
+            </div>
 
+            <div className="relative bottom-0">
                 <div className="absolute right-2 bottom-15">
                     <EmojiPicker emojiStyle={EmojiStyle.TWITTER} onEmojiClick={(emoji) => {
                         setCurrentMsg(currentMsg + ' ' + emoji.emoji);
@@ -167,7 +166,7 @@ export default function MainChat() {
 
                 <form ref={formRef} onSubmit={(e) => sendMessage(e)}
                       className='flex flex-row w-full gap-2 items-center'>
-                    <Textarea
+                    <textarea
                         placeholder="Envoyer un message dans permanence"
                         onChange={(e) => {
                             setCurrentMsg(e.target.value)
