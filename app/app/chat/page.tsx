@@ -123,12 +123,12 @@ export default function MainChat() {
     }
 
     return (
-        <div className="flex flex-col justify-between h-full p-3 gap-4" onKeyDown={(e) => {
+        <div className="flex flex-col justify-between max-h-screen h-full p-3 gap-4 w-full" onKeyDown={(e) => {
             if (e.key !== "Enter") {
                 textRef.current?.focus();
             }
         }} tabIndex={0} ref={rootDivRef}>
-            <div className="flex flex-col justify-end h-full gap-6 overflow-auto">
+            <div className="flex flex-col justify-end max-h-screen gap-6 overflow-y-auto">
                 {chat.map(({author, content, timestamp}, key) => (
                     <div className="w-full flex flex-row gap-2" key={key}>
                         <Image src={(author.image ? author.image : '/logo.svg')} alt="Image de profil" width={48}
@@ -150,7 +150,7 @@ export default function MainChat() {
                 ))}
             </div>
 
-            <div className="relative bottom-0">
+            <div className="relative bottom-6 w-full">
                 <div className="absolute right-2 bottom-15">
                     <EmojiPicker emojiStyle={EmojiStyle.TWITTER} onEmojiClick={(emoji) => {
                         setCurrentMsg(currentMsg + ' ' + emoji.emoji);
@@ -179,6 +179,8 @@ export default function MainChat() {
                                 formRef.current?.requestSubmit();
                             }
                         }}
+                        spellCheck={true}
+                        data-ms-editor="true"
                         value={currentMsg}
                         className="w-full flex flex-row outline-main outline-1 p-2 rounded-lg resize-none"
                     />

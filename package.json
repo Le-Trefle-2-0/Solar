@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "node server.js",
     "build": "next build",
-    "start": "NODE_ENV=production node server.js",
+    "start": "node server.js NODE_ENV=production",
     "lint": "next lint",
     "postinstall": "flowbite-react patch"
   },

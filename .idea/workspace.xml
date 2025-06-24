@@ -4,12 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="update message retrieving including username">
+    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="remove old auth pages">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/app/chat/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/app/chat/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/app/layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/app/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/messageManager.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/messageManager.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,12 +55,12 @@
       </list>
     </option>
   </component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/Le-Trefle-2-0/Solar.git&quot;,
-    &quot;accountId&quot;: &quot;820c1bf6-b344-441a-90f1-2ca3f9c5498d&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/Le-Trefle-2-0/Solar.git",
+    "accountId": "aa84fc37-7a25-4061-a16d-6cd63ff7a22f"
   }
-}</component>
+}]]></component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="ProjectErrors" />
   </component>
@@ -78,7 +77,6 @@
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "remake",
     "ignore.virus.scanning.warn.message": "true",
     "last_opened_file_path": "/Users/paul/WebstormProjects/Solar/app/app/chat",
@@ -91,6 +89,11 @@
     "settings.editor.selected.configurable": "preferences.pluginManager",
     "ts.external.directory.path": "C:\\Users\\admin\\WebstormProjects\\Solar\\node_modules\\typescript\\lib",
     "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql"
+    ]
   }
 }]]></component>
   <component name="RecentsManager">
@@ -110,7 +113,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-822845ee3bb5-JavaScript-WS-243.23654.157" />
+        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-WS-243.25659.40" />
       </set>
     </attachedChunks>
   </component>
@@ -136,6 +139,7 @@
       <workItem from="1750344542615" duration="13911000" />
       <workItem from="1750363667156" duration="9319000" />
       <workItem from="1750427135972" duration="32156000" />
+      <workItem from="1750726875409" duration="2332000" />
     </task>
     <task id="LOCAL-00001" summary="Base setup">
       <option name="closed" value="true" />
@@ -465,7 +469,31 @@
       <option name="project" value="LOCAL" />
       <updated>1750724634772</updated>
     </task>
-    <option name="localTasksCounter" value="42" />
+    <task id="LOCAL-00042" summary="remove unused console.log">
+      <option name="closed" value="true" />
+      <created>1750725638026</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1750725638026</updated>
+    </task>
+    <task id="LOCAL-00043" summary="update app layout and chat ui styling">
+      <option name="closed" value="true" />
+      <created>1750725657844</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1750725657844</updated>
+    </task>
+    <task id="LOCAL-00044" summary="remove old auth pages">
+      <option name="closed" value="true" />
+      <created>1750727345697</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1750727345697</updated>
+    </task>
+    <option name="localTasksCounter" value="45" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -483,9 +511,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="update prisma schema" />
-    <MESSAGE value="prisma client update" />
-    <MESSAGE value="add typing interfaces" />
     <MESSAGE value="include message managing and fetching route" />
     <MESSAGE value="update sidebar width" />
     <MESSAGE value="chat page with instant socket messaging and database storage and fetching" />
@@ -508,7 +533,10 @@
     <MESSAGE value="components.json install" />
     <MESSAGE value="update responsive sidebar" />
     <MESSAGE value="update message retrieving including username" />
-    <option name="LAST_COMMIT_MESSAGE" value="update message retrieving including username" />
+    <MESSAGE value="remove unused console.log" />
+    <MESSAGE value="update app layout and chat ui styling" />
+    <MESSAGE value="remove old auth pages" />
+    <option name="LAST_COMMIT_MESSAGE" value="remove old auth pages" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>

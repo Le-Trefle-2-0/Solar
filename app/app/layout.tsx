@@ -17,10 +17,8 @@ export default function RootLayout({
         <SidebarProvider>
             <AppSidebar/>
             <SidebarInset>
-                <SidebarTrigger className="-ml-1"/>
-                <div className="overflow-auto h-full">
+                <SidebarTrigger className="fixed"/>
                     {children}
-                </div>
             </SidebarInset>
         </SidebarProvider>
     );
