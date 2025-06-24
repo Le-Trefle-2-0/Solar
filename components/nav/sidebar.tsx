@@ -6,15 +6,12 @@ import {auth} from "@/lib/auth";
 import {headers} from "next/headers";
 import {redirect} from "next/navigation";
 import {UserButton} from "@daveyplate/better-auth-ui";
-import {faCalendarDays, faComment, faEarListen, faHouse} from "@fortawesome/free-solid-svg-icons";
-import prisma from "@/lib/prisma";
+import {faCalendarDays, faComment, faHouse} from "@fortawesome/free-solid-svg-icons";
 
 export default async function Nav() {
     const session = await auth.api.getSession({
         headers: await headers()
     });
-
-    const tickets = await prisma.ticket.findMany()
 
     if (!session) return redirect("/auth/sign-in");
     return (
@@ -27,10 +24,6 @@ export default async function Nav() {
                 <NavLink link='/app' name='Accueil' icon={faHouse}/>
                 <NavLink link='/app/chat' name='Permanence' icon={faComment}/>
                 <NavLink link='/app/planning' name='Planning' icon={faCalendarDays}/>
-                {tickets.map(ticket => (
-                    <NavLink key={ticket.id} link={`/app/ticket/${ticket.channelId}`} name={ticket.channelName}
-                             icon={faEarListen}/>
-                ))}
             </ul>
             <UserButton
                 className="w-full rounded-none bg-white text-neutral-700 hover:bg-gray-50 border-t-1 border-main"/>

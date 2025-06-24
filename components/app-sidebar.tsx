@@ -1,8 +1,7 @@
 "use client"
-
 import * as React from "react"
-import {Frame, Map, PieChart,} from "lucide-react"
-import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage,} from "@/components/ui/breadcrumb"
+import {useEffect, useState} from "react"
+import {CalendarDays, House, MessageSquareLock, MessagesSquare} from "lucide-react"
 import {NavProjects} from "@/components/nav-projects"
 import {
     Sidebar,
@@ -17,32 +16,38 @@ import Image from "next/image";
 import logo from "@/public/logo.svg";
 import {UserButton} from "@daveyplate/better-auth-ui";
 
-const data = {
-    user: {
-        name: "shadcn",
-        email: "m@example.com",
-        avatar: "/avatars/shadcn.jpg",
-    },
-    projects: [
-        {
-            name: "Design Engineering",
-            url: "#",
-            icon: Frame,
-        },
-        {
-            name: "Sales & Marketing",
-            url: "#",
-            icon: PieChart,
-        },
-        {
-            name: "Travel",
-            url: "#",
-            icon: Map,
-        },
-    ],
-}
-
 export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
+    const [data, setData] = useState([
+        {
+            name: "Accueil",
+            url: "/app",
+            icon: House,
+        },
+        {
+            name: "Chat Permanence",
+            url: "/app/chat",
+            icon: MessagesSquare,
+        },
+        {
+            name: "Planning",
+            url: "/app/planning",
+            icon: CalendarDays,
+        },
+    ]);
+
+    useEffect(() => {
+        fetch('http://localhost:3000/api/tickets').then(async tickets => {
+            let ticketList = await tickets.json()
+            for (let ticket of ticketList) {
+                setData([...data, {
+                    name: ticket.channelName,
+                    url: '/app/ticket/' + ticket.channelId,
+                    icon: MessageSquareLock
+                }]);
+            }
+        })
+    }, []);
+
     return (
         <Sidebar variant="inset" {...props}>
             <SidebarHeader>
@@ -65,14 +70,7 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
                 </SidebarMenu>
             </SidebarHeader>
             <SidebarContent>
-                <Breadcrumb>
-                    <BreadcrumbList>
-                        <BreadcrumbItem>
-                            <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
-                </Breadcrumb>
-                <NavProjects projects={data.projects}/>
+                <NavProjects projects={data}/>
             </SidebarContent>
             <SidebarFooter>
                 <UserButton

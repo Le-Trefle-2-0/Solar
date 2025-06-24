@@ -5,31 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="components.json install">
-      <change afterPath="$PROJECT_DIR$/app/api/check-key/route.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/api/tickets/route.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/app/layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/dashboard/[...all]/page.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/dashboard/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/app/chat/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/app/chat/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/app-sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/app-sidebar.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/search-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/search-form.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/ui/breadcrumb.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/breadcrumb.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/ui/button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/button.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/ui/dropdown-menu.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/dropdown-menu.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/ui/input.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/input.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/ui/label.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/label.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/ui/separator.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/separator.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/ui/sheet.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/sheet.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/ui/skeleton.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/skeleton.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/ui/tooltip.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/tooltip.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/generated/prisma/edge.js" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/edge.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/generated/prisma/index-browser.js" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/index-browser.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/generated/prisma/index.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/index.d.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/generated/prisma/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/generated/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/schema.prisma" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/generated/prisma/wasm.js" beforeDir="false" afterPath="$PROJECT_DIR$/generated/prisma/wasm.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/server.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/nav-projects.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/nav-projects.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/nav/sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/nav/sidebar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/sidebar.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -109,7 +91,7 @@
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "preferences.pluginManager",
-    "ts.external.directory.path": "/Users/paul/WebstormProjects/Solar/node_modules/typescript/lib",
+    "ts.external.directory.path": "C:\\Users\\admin\\WebstormProjects\\Solar\\node_modules\\typescript\\lib",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>

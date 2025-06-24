@@ -169,8 +169,8 @@ export default function MainChat() {
                 textRef.current?.focus();
             }
         }} tabIndex={0} ref={rootDivRef}>
-            <div className="flex flex-col justify-between h-screen p-3 gap-4">
-                <div className="flex flex-col justify-end h-screen gap-6 overflow-auto">
+            <div className="flex flex-col justify-between h-full p-3 gap-4">
+                <div className="flex flex-col justify-end h-full gap-6 overflow-auto">
                     {chat.map(({author, content, timestamp}, key) => (
                         <div className="w-full flex flex-row gap-2" key={key}>
                             <Image src={(author.image ? author.image : '/logo.svg')} alt="Image de profil" width={48}
