@@ -4,14 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="components.json install">
-      <change afterPath="$PROJECT_DIR$/app/api/tickets/route.ts" afterDir="false" />
+    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="update responsive sidebar">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/app/chat/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/app/chat/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/app/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/app/settings/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/app/settings/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/app-sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/app-sidebar.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/nav-projects.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/nav-projects.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/nav/sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/nav/sidebar.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/ui/sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/sidebar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/messageManager.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/messageManager.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/server.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -451,7 +450,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750684924361</updated>
     </task>
-    <option name="localTasksCounter" value="40" />
+    <task id="LOCAL-00040" summary="update responsive sidebar">
+      <option name="closed" value="true" />
+      <created>1750723515593</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1750723515593</updated>
+    </task>
+    <option name="localTasksCounter" value="41" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -469,7 +476,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="setup socket server" />
     <MESSAGE value="auth ui update" />
     <MESSAGE value="update prisma schema" />
     <MESSAGE value="prisma client update" />
@@ -494,7 +500,8 @@
     <MESSAGE value="install shadcn components" />
     <MESSAGE value="base ui setup" />
     <MESSAGE value="components.json install" />
-    <option name="LAST_COMMIT_MESSAGE" value="components.json install" />
+    <MESSAGE value="update responsive sidebar" />
+    <option name="LAST_COMMIT_MESSAGE" value="update responsive sidebar" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>

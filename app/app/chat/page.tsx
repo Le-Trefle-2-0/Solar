@@ -22,8 +22,6 @@ export default function MainChat() {
     const [currentMsg, setCurrentMsg] = useState("");
     const [chat, setChat] = useState<Msg[]>([])
     const [opacity, setOpacity] = useState(25);
-    // const [sendMessage, setSendMessage] = useState<Function>(async (e: FormEvent<HTMLFormElement>) => {});
-    // const [sendTyping, setSendTyping] = useState<Function>();
     const formRef = useRef<HTMLFormElement>(null);
     const textRef = useRef<HTMLTextAreaElement>(null);
     const rootDivRef = useRef<HTMLDivElement>(null);
@@ -45,38 +43,6 @@ export default function MainChat() {
         if (socketRef.current?.connected) {
             onConnect();
         }
-
-        // setSendMessage(async (e: FormEvent<HTMLFormElement>) => {
-        //     e.preventDefault();
-        //
-        //     try {
-        //         messageSchema.parse(currentMsg);
-        //     } catch (error) {
-        //         if (error instanceof ZodError) {
-        //             return toast.error(error.errors[0].message);
-        //         }
-        //     }
-        //     if (currentMsg !== "") {
-        //         const msg: Msg = {
-        //             author: {
-        //                 id: session?.user.id as string,
-        //                 name: session?.user.name as string,
-        //                 image: session?.user.image as string
-        //             },
-        //             content: currentMsg,
-        //             timestamp: Date.now(),
-        //             channel: {
-        //                 id: '1'
-        //             }
-        //         }
-        //
-        //         saveMessage(msg)
-        //         socketRef.current?.emit("sendMessage", msg);
-        //         setCurrentMsg("");
-        //         setChat((pre) => [...pre, msg])
-        //     }
-        // }
-        // )
 
         function onConnect() {
             setIsConnected(true);
@@ -121,12 +87,6 @@ export default function MainChat() {
             .then(data => setChat(data))
     }, []);
     let oldMsg = currentMsg;
-    // setInterval(() => {
-    //     if (oldMsg !== currentMsg) {
-    //         socketRef.current?.emit('typing', {id: '1'});
-    //         oldMsg = currentMsg;
-    //     }
-    // }, 1000)
 
     const sendMessage = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
