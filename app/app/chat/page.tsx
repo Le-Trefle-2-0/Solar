@@ -141,8 +141,6 @@ export default function MainChat() {
             }
         }} tabIndex={0} ref={rootDivRef}>
             <div className="flex flex-col flex-grow overflow-y-auto gap-6">
-                Transport: {transport}
-                Connected: {isConnected}
                 {chat.map(({author, content, timestamp}, key) => (
                     <div className="w-full flex flex-row gap-2" key={key}>
                         <Image src={(author.image ? author.image : '/logo.svg')} alt="Image de profil" width={48}

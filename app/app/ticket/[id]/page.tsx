@@ -1,9 +1,6 @@
 "use client";
-
 import {FormEvent, useEffect, useRef, useState} from "react";
-import {useParams} from "next/navigation"
-import {socket} from "@/socket";
-import {authClient} from "@/lib/auth-client";
+import {useSession} from "@/lib/auth-client";
 import Image from "next/image";
 import {Msg} from "@/lib/interface"
 import {saveMessage} from "@/lib/messageManager";
@@ -11,13 +8,14 @@ import EmojiPicker, {EmojiStyle} from 'emoji-picker-react';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faFaceSmileWink, faPaperPlane} from "@fortawesome/free-regular-svg-icons";
 import {faCircle} from "@fortawesome/free-solid-svg-icons";
-import {Textarea} from "@/components/ui/textarea";
 import {z, ZodError} from "zod";
 import {toast} from "sonner";
+import {io, Socket} from "socket.io-client";
+import {useParams} from "next/navigation";
 
 export default function Chat() {
     const {id} = useParams();
-    const session = authClient.useSession();
+    const {data: session} = useSession();
     const [isConnected, setIsConnected] = useState(false);
     const [emojiOpen, setEmojiOpen] = useState(false);
     const [showTyping, setShowTyping] = useState(false);
@@ -28,6 +26,69 @@ export default function Chat() {
     const formRef = useRef<HTMLFormElement>(null);
     const textRef = useRef<HTMLTextAreaElement>(null);
     const rootDivRef = useRef<HTMLDivElement>(null);
+    const socketRef = useRef<Socket | null>(null);
+    const messagesListRef = useRef<HTMLDivElement>(null);
+
+    const scrollToBottom = () => {
+        messagesListRef.current?.scrollIntoView({behavior: "instant", block: "end"});
+    };
+
+    useEffect(() => {
+        fetch('/api/messages/1')
+            .then(res => res.json())
+            .then(data => {
+                setChat(data)
+                scrollToBottom()
+            });
+        fetch("/api/auth/token").then(async res => {
+            const body = await res.json();
+            if (body.token) {
+                socketRef.current = io({
+                    auth: {
+                        jwt: body.token
+                    }
+                });
+                if (socketRef.current?.connected) {
+                    onConnect();
+                }
+
+                function onConnect() {
+                    setIsConnected(true);
+                    setTransport(socketRef.current?.io.engine.transport.name as string);
+
+                    socketRef.current?.io.engine.on("upgrade", (transport) => {
+                        setTransport(transport.name);
+                    });
+                }
+
+                function onDisconnect() {
+                    setIsConnected(false);
+                    setTransport("N/A");
+                }
+
+                socketRef.current?.on("connect", onConnect);
+                socketRef.current?.on("disconnect", onDisconnect);
+                socketRef.current?.on("message", (data: Msg) => {
+                    setChat((pre) => [...pre, data])
+                });
+
+                let timer: NodeJS.Timeout;
+                socketRef.current?.on('typingIndicator', () => {
+                    setShowTyping(true);
+                    if (timer) clearTimeout(timer);
+                    timer = setTimeout(() => {
+                        setShowTyping(false);
+                    }, 5000)
+                });
+
+                socketRef.current?.emit('listen', {id})
+            }
+        })
+        rootDivRef.current?.focus();
+
+        return () => {
+        }
+    }, []);
 
     const messageSchema = z
         .string()
@@ -36,19 +97,9 @@ export default function Chat() {
             message: "Contenu du message non supporté",
         });
 
-    socket.emit('listen', {id})
     useEffect(() => {
-        fetch(`/api/messages/${id}`)
-            .then(res => res.json())
-            .then(data => setChat(data))
     }, []);
     let oldMsg = currentMsg;
-    setInterval(() => {
-        if (oldMsg !== currentMsg) {
-            socket.emit('typing', {id});
-            oldMsg = currentMsg;
-        }
-    }, 1000)
 
     const sendMessage = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -63,9 +114,9 @@ export default function Chat() {
         if (currentMsg !== "") {
             const msg: Msg = {
                 author: {
-                    id: session.data?.user.id as string,
-                    name: session.data?.user.name as string,
-                    image: session.data?.user.image as string
+                    id: session?.user.id as string,
+                    name: session?.user.displayUsername as string || session?.user.name as string,
+                    image: session?.user.image as string
                 },
                 content: currentMsg,
                 timestamp: Date.now(),
@@ -75,78 +126,51 @@ export default function Chat() {
             }
 
             saveMessage(msg)
-            socket.emit("sendMessage", msg);
+            socketRef.current?.emit("sendMessage", msg);
             setCurrentMsg("");
             setChat((pre) => [...pre, msg])
         }
     }
+
     const sendTyping = async () => {
-        await socket.emit('typing', {id});
+        await socketRef.current?.emit('typing', {id});
     }
 
-    useEffect(() => {
-        rootDivRef.current?.focus();
-        if (socket.connected) {
-            onConnect();
-        }
-
-        function onConnect() {
-            setIsConnected(true);
-            setTransport(socket.io.engine.transport.name);
-
-            socket.io.engine.on("upgrade", (transport) => {
-                setTransport(transport.name);
-            });
-        }
-
-        function onDisconnect() {
-            setIsConnected(false);
-            setTransport("N/A");
-        }
-
-        socket.on("connect", onConnect);
-        socket.on("disconnect", onDisconnect);
-        socket.on("message", (data: Msg) => {
-            setChat((pre) => [...pre, data])
-        });
-        socket.on('typingIndicator', () => {
-        });
-
-        return () => {
-            socket.off("connect", onConnect);
-            socket.off("disconnect", onDisconnect);
-        };
-    }, []);
-
     return (
-        <div onKeyDown={(e) => {
+        <div className="flex flex-col h-screen p-3 gap-4 w-full" onKeyDown={(e) => {
             if (e.key !== "Enter") {
                 textRef.current?.focus();
             }
         }} tabIndex={0} ref={rootDivRef}>
-            <div className="flex flex-col justify-between h-screen p-3 gap-4">
-                <div className="flex flex-col justify-end h-screen gap-6 overflow-auto">
-                    {chat.map(({author, content, timestamp}, key) => (
-                        <div className="w-full flex flex-row gap-2" key={key}>
-                            <Image src={(author.image ? author.image : '/logo.svg')} alt="Image de profil" width={48}
-                                   height={48} className="rounded-xl max-h-[48px]"/>
-                            <div>
-                                <div className="flex flex-row items-center gap-4">
-                                    <span className="font-semibold text-sm text-gray-900">
-                                        {author.name}
-                                    </span>
-                                    <span className="font-light text-sm text-gray-900">
-                                        {new Date(timestamp).toLocaleString('fr-FR')}
-                                    </span>
-                                </div>
-                                <h3 className="text-lg text-gray-900 whitespace-pre-wrap">
-                                    {content}
-                                </h3>
+            <div className="flex flex-col flex-grow overflow-y-auto gap-6">
+                {chat.map(({author, content, timestamp}, key) => (
+                    <div className="w-full flex flex-row gap-2" key={key}>
+                        <Image src={(author.image ? author.image : '/logo.svg')} alt="Image de profil" width={48}
+                               height={48} className="rounded-xl max-h-[48px]"/>
+                        <div>
+                            <div className="flex flex-row items-center gap-4">
+                                <span className="font-semibold text-sm text-gray-900">
+                                    {author.name}
+                                </span>
+                                <span className="font-light text-sm text-gray-900">
+                                    {new Date(timestamp).toLocaleString('fr-FR')}
+                                </span>
                             </div>
+                            <h3 className="text-lg text-gray-900 whitespace-pre-wrap">
+                                {content}
+                            </h3>
                         </div>
-                    ))}
-                </div>
+                    </div>
+                ))}
+                <div ref={messagesListRef} className="h-px"/>
+            </div>
+            <div className={showTyping ? 'flex flex-row gap-1 relative left-2 bottom-3' : 'hidden'}>
+                <FontAwesomeIcon icon={faCircle} className="text-gray-400 animate-opacityPulse1"/>
+                <FontAwesomeIcon icon={faCircle} className="text-gray-400 animate-opacityPulse2"/>
+                <FontAwesomeIcon icon={faCircle} className="text-gray-400 animate-opacityPulse3"/>
+            </div>
 
+            <div className="sticky bottom-0">
                 <div className="absolute right-2 bottom-15">
                     <EmojiPicker emojiStyle={EmojiStyle.TWITTER} onEmojiClick={(emoji) => {
                         setCurrentMsg(currentMsg + ' ' + emoji.emoji);
@@ -154,16 +178,11 @@ export default function Chat() {
                         textRef.current?.focus();
                     }} open={emojiOpen}/>
                 </div>
-                <div className={showTyping ? 'flex flex-row gap-1 relative left-2 bottom-3' : 'hidden'}>
-                    <FontAwesomeIcon icon={faCircle} className={`opacity-${opacity}`}/>
-                    <FontAwesomeIcon icon={faCircle} className={`opacity-${opacity}`}/>
-                    <FontAwesomeIcon icon={faCircle} className={`opacity-${opacity}`}/>
-                </div>
 
                 <form ref={formRef} onSubmit={(e) => sendMessage(e)}
                       className='flex flex-row w-full gap-2 items-center'>
-                    <Textarea
-                        placeholder="Envoyer un message dans l'écoute..."
+                    <textarea
+                        placeholder="Envoyer un message dans permanence"
                         onChange={(e) => {
                             setCurrentMsg(e.target.value)
                             sendTyping()
@@ -175,6 +194,8 @@ export default function Chat() {
                                 formRef.current?.requestSubmit();
                             }
                         }}
+                        spellCheck="true"
+                        data-ms-editor="true"
                         value={currentMsg}
                         className="w-full flex flex-row outline-main outline-1 p-2 rounded-lg resize-none"
                     />
