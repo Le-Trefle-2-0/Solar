@@ -1,19 +1,20 @@
 "use client";
 import {useEffect, useRef, useState} from 'react';
 import Peer from 'peerjs';
+import {useParams} from "next/navigation";
 
 const PeerPage = () => {
+    const {id} = useParams();
     const myVideoRef = useRef<HTMLVideoElement>(null);
     const callingVideoRef = useRef<HTMLVideoElement>(null);
     const [peerInstance, setPeerInstance] = useState<Peer | null>(null);
     const [myUniqueId, setMyUniqueId] = useState<string>("");
-    const [idToCall, setIdToCall] = useState('');
     const [localStream, setLocalStream] = useState<MediaStream | null>(null);
 
     const generateRandomString = () => Math.random().toString(36).substring(2);
 
     const requestMediaPermissions = () => {
-        navigator.mediaDevices.getUserMedia({video: true, audio: true})
+        navigator.mediaDevices.getUserMedia({video: false, audio: true})
             .then(stream => {
                 setLocalStream(stream);
                 if (myVideoRef.current) {
@@ -28,7 +29,7 @@ const PeerPage = () => {
 
     const handleCall = () => {
         if (localStream) {
-            const call = peerInstance?.call(idToCall, localStream);
+            const call = peerInstance?.call(id as string, localStream);
             if (call) {
                 call.on('stream', userVideoStream => {
                     if (callingVideoRef.current) {
@@ -71,16 +72,9 @@ const PeerPage = () => {
 
     return (
         <div className='flex flex-col justify-center items-center p-12'>
-            <p>Your ID: {myUniqueId}</p>
             <video className='w-72' playsInline ref={myVideoRef} autoPlay muted/>
             <button onClick={requestMediaPermissions}>Enable Camera and Microphone</button>
-            <input
-                className='text-black'
-                placeholder="ID to call"
-                value={idToCall}
-                onChange={e => setIdToCall(e.target.value)}
-            />
-            <button onClick={handleCall}>Call</button>
+            <button onClick={handleCall}>Rejoindre l'appel</button>
             <video className='w-72' playsInline ref={callingVideoRef} autoPlay/>
         </div>
     );

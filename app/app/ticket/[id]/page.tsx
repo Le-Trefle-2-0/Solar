@@ -12,6 +12,8 @@ import {z, ZodError} from "zod";
 import {toast} from "sonner";
 import {io, Socket} from "socket.io-client";
 import {useParams} from "next/navigation";
+import {PhoneCall} from "lucide-react";
+import Peer from "peerjs";
 
 export default function Chat() {
     const {id} = useParams();
@@ -28,6 +30,77 @@ export default function Chat() {
     const rootDivRef = useRef<HTMLDivElement>(null);
     const socketRef = useRef<Socket | null>(null);
     const messagesListRef = useRef<HTMLDivElement>(null);
+    const myVideoRef = useRef<HTMLVideoElement>(null);
+    const callingVideoRef = useRef<HTMLVideoElement>(null);
+    const [peerInstance, setPeerInstance] = useState<Peer | null>(null);
+    const [idToCall, setIdToCall] = useState('');
+    const [localStream, setLocalStream] = useState<MediaStream | null>(null);
+    const [callColor, setCallColor] = useState<string>("#000");
+
+    const requestMediaPermissions = async () => {
+        navigator.mediaDevices.getUserMedia({video: false, audio: true})
+            .then(stream => {
+                setLocalStream(stream);
+                if (myVideoRef.current) {
+                    myVideoRef.current.srcObject = stream;
+                }
+            })
+            .catch(error => {
+                console.error("Error accessing media devices:", error);
+                alert("Please allow access to the camera and microphone to use this feature.");
+            });
+    };
+
+    const handleCall = async () => {
+        navigator.mediaDevices.getUserMedia({video: false, audio: true})
+            .then(stream => {
+                if (myVideoRef.current) {
+                    myVideoRef.current.srcObject = stream;
+                }
+                const callID = Math.random().toString(36).substring(2);
+                const peer = new Peer(callID, {
+                    host: 'localhost',
+                    port: 9000,
+                    path: '/myapp',
+                });
+                setPeerInstance(peer);
+
+                peer.on('call', call => {
+                    call.answer(stream);
+                    call.on('stream', userVideoStream => {
+                        if (callingVideoRef.current) {
+                            callingVideoRef.current.srcObject = userVideoStream;
+                        }
+                    });
+                });
+
+                setCallColor("#5de03a")
+
+                const msg: Msg = {
+                    author: {
+                        id: session?.user.id as string,
+                        name: session?.user.displayUsername as string || session?.user.name as string,
+                        image: session?.user.image as string
+                    },
+                    content: `http://localhost:3000/webrtc/${callID}`,
+                    timestamp: Date.now(),
+                    channel: {
+                        id: id as string
+                    }
+                }
+
+                saveMessage(msg)
+                socketRef.current?.emit("sendMessage", msg);
+                setChat((pre) => [...pre, msg])
+            })
+            .catch(error => {
+                console.error("Error accessing media devices:", error);
+                alert("Please allow access to the camera and microphone to use this feature.");
+            });
+        if (localStream) {
+
+        }
+    };
 
     const scrollToBottom = () => {
         messagesListRef.current?.scrollIntoView({behavior: "instant", block: "end"});
@@ -97,8 +170,6 @@ export default function Chat() {
             message: "Contenu du message non supporté",
         });
 
-    useEffect(() => {
-    }, []);
     let oldMsg = currentMsg;
 
     const sendMessage = async (e: FormEvent<HTMLFormElement>) => {
@@ -170,6 +241,10 @@ export default function Chat() {
                 <FontAwesomeIcon icon={faCircle} className="text-gray-400 animate-opacityPulse3"/>
             </div>
 
+            <div className="fixed top-6 right-6">
+                <PhoneCall color={callColor} onClick={handleCall}/>
+            </div>
+
             <div className="sticky bottom-0">
                 <div className="absolute right-2 bottom-15">
                     <EmojiPicker emojiStyle={EmojiStyle.TWITTER} onEmojiClick={(emoji) => {
@@ -182,7 +257,7 @@ export default function Chat() {
                 <form ref={formRef} onSubmit={(e) => sendMessage(e)}
                       className='flex flex-row w-full gap-2 items-center'>
                     <textarea
-                        placeholder="Envoyer un message dans permanence"
+                        placeholder="Envoyer un message dans l'écoute"
                         onChange={(e) => {
                             setCurrentMsg(e.target.value)
                             sendTyping()

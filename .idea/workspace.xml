@@ -4,12 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="update ticket page to sync with chat update">
-      <change afterPath="$PROJECT_DIR$/app/webrtc/page.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/peer.js" afterDir="false" />
+    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="base audio calling feature with dynamic audio room creation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/app/ticket/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/app/ticket/[id]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/auth/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/auth/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/webrtc/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/webrtc/[id]/page.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,10 +19,10 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="tsconfig.json" />
-        <option value="CSS File" />
-        <option value="TypeScript File" />
-        <option value="TypeScript JSX File" />
         <option value="JavaScript File" />
+        <option value="CSS File" />
+        <option value="TypeScript JSX File" />
+        <option value="TypeScript File" />
       </list>
     </option>
   </component>
@@ -56,12 +55,12 @@
       </list>
     </option>
   </component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/Le-Trefle-2-0/Solar.git",
-    "accountId": "aa84fc37-7a25-4061-a16d-6cd63ff7a22f"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Le-Trefle-2-0/Solar.git&quot;,
+    &quot;accountId&quot;: &quot;820c1bf6-b344-441a-90f1-2ca3f9c5498d&quot;
   }
-}]]></component>
+}</component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="ProjectErrors" />
   </component>
@@ -76,11 +75,13 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Node.js.peer.js.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "remake",
     "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/admin/WebstormProjects/Solar/app/app/chat",
+    "last_opened_file_path": "/Users/paul/WebstormProjects/Solar/app/app/chat",
     "list.type.of.created.stylesheet": "CSS",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -88,34 +89,28 @@
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "preferences.pluginManager",
-    "ts.external.directory.path": "C:\\Users\\admin\\WebstormProjects\\Solar\\node_modules\\typescript\\lib",
+    "ts.external.directory.path": "/Users/paul/WebstormProjects/Solar/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
-  },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "mysql"
-    ]
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\admin\WebstormProjects\Solar\app\app\chat" />
       <recent name="$PROJECT_DIR$/app/app/chat" />
       <recent name="$PROJECT_DIR$/components/ui/modals" />
       <recent name="$PROJECT_DIR$/lib" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/app/webrtc/[id]" />
       <recent name="$PROJECT_DIR$/app" />
       <recent name="C:\Users\admin\WebstormProjects\Solar\app\api\messages" />
       <recent name="C:\Users\admin\WebstormProjects\Solar\lib" />
       <recent name="C:\Users\admin\WebstormProjects\Solar\public" />
-      <recent name="C:\Users\admin\WebstormProjects\Solar\app" />
     </key>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-WS-243.25659.40" />
+        <option value="bundled-js-predefined-d6986cc7102b-822845ee3bb5-JavaScript-WS-243.23654.157" />
       </set>
     </attachedChunks>
   </component>
@@ -141,7 +136,6 @@
       <workItem from="1750344542615" duration="13911000" />
       <workItem from="1750363667156" duration="9319000" />
       <workItem from="1750427135972" duration="32156000" />
-      <workItem from="1750726875409" duration="13460000" />
     </task>
     <task id="LOCAL-00001" summary="Base setup">
       <option name="closed" value="true" />
@@ -455,80 +449,11 @@
       <option name="project" value="LOCAL" />
       <updated>1750684924361</updated>
     </task>
-    <task id="LOCAL-00040" summary="update responsive sidebar">
-      <option name="closed" value="true" />
-      <created>1750723515593</created>
-      <option name="number" value="00040" />
-      <option name="presentableId" value="LOCAL-00040" />
-      <option name="project" value="LOCAL" />
-      <updated>1750723515593</updated>
-    </task>
-    <task id="LOCAL-00041" summary="update message retrieving including username">
-      <option name="closed" value="true" />
-      <created>1750724634772</created>
-      <option name="number" value="00041" />
-      <option name="presentableId" value="LOCAL-00041" />
-      <option name="project" value="LOCAL" />
-      <updated>1750724634772</updated>
-    </task>
-    <task id="LOCAL-00042" summary="remove unused console.log">
-      <option name="closed" value="true" />
-      <created>1750725638026</created>
-      <option name="number" value="00042" />
-      <option name="presentableId" value="LOCAL-00042" />
-      <option name="project" value="LOCAL" />
-      <updated>1750725638026</updated>
-    </task>
-    <task id="LOCAL-00043" summary="update app layout and chat ui styling">
-      <option name="closed" value="true" />
-      <created>1750725657844</created>
-      <option name="number" value="00043" />
-      <option name="presentableId" value="LOCAL-00043" />
-      <option name="project" value="LOCAL" />
-      <updated>1750725657844</updated>
-    </task>
-    <task id="LOCAL-00044" summary="remove old auth pages">
-      <option name="closed" value="true" />
-      <created>1750727345697</created>
-      <option name="number" value="00044" />
-      <option name="presentableId" value="LOCAL-00044" />
-      <option name="project" value="LOCAL" />
-      <updated>1750727345697</updated>
-    </task>
-    <task id="LOCAL-00045" summary="ui update">
-      <option name="closed" value="true" />
-      <created>1750729550940</created>
-      <option name="number" value="00045" />
-      <option name="presentableId" value="LOCAL-00045" />
-      <option name="project" value="LOCAL" />
-      <updated>1750729550940</updated>
-    </task>
-    <task id="LOCAL-00046" summary="update socket connection property in chat and ui update">
-      <option name="closed" value="true" />
-      <created>1750814061836</created>
-      <option name="number" value="00046" />
-      <option name="presentableId" value="LOCAL-00046" />
-      <option name="project" value="LOCAL" />
-      <updated>1750814061836</updated>
-    </task>
-    <task id="LOCAL-00047" summary="update ticket page to sync with chat update">
-      <option name="closed" value="true" />
-      <created>1750814234942</created>
-      <option name="number" value="00047" />
-      <option name="presentableId" value="LOCAL-00047" />
-      <option name="project" value="LOCAL" />
-      <updated>1750814234942</updated>
-    </task>
-    <option name="localTasksCounter" value="48" />
+    <option name="localTasksCounter" value="40" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
-    <option name="exactExcludedFiles">
-      <list>
-        <option value="$PROJECT_DIR$/app/app/chat/page.js" />
-      </list>
-    </option>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -542,6 +467,13 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <MESSAGE value="auth ui update" />
+    <MESSAGE value="update prisma schema" />
+    <MESSAGE value="prisma client update" />
+    <MESSAGE value="add typing interfaces" />
+    <MESSAGE value="include message managing and fetching route" />
+    <MESSAGE value="update sidebar width" />
+    <MESSAGE value="chat page with instant socket messaging and database storage and fetching" />
     <MESSAGE value="WebStorm update" />
     <MESSAGE value="add react-input-emoji package" />
     <MESSAGE value="add emoji selector to message sending" />
@@ -559,15 +491,8 @@
     <MESSAGE value="install shadcn components" />
     <MESSAGE value="base ui setup" />
     <MESSAGE value="components.json install" />
-    <MESSAGE value="update responsive sidebar" />
-    <MESSAGE value="update message retrieving including username" />
-    <MESSAGE value="remove unused console.log" />
-    <MESSAGE value="update app layout and chat ui styling" />
-    <MESSAGE value="remove old auth pages" />
-    <MESSAGE value="ui update" />
-    <MESSAGE value="update socket connection property in chat and ui update" />
-    <MESSAGE value="update ticket page to sync with chat update" />
-    <option name="LAST_COMMIT_MESSAGE" value="update ticket page to sync with chat update" />
+    <MESSAGE value="base audio calling feature with dynamic audio room creation" />
+    <option name="LAST_COMMIT_MESSAGE" value="base audio calling feature with dynamic audio room creation" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
