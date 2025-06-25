@@ -4,15 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="ui update">
-      <change afterPath="$PROJECT_DIR$/app/app/empty/page.tsx" afterDir="false" />
+    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="update ticket page to sync with chat update">
+      <change afterPath="$PROJECT_DIR$/app/webrtc/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/peer.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/app/chat/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/app/chat/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/app/layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/app/settings/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/app/settings/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/globals.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/ui/sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/sidebar.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tailwind.config.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,10 +20,10 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="tsconfig.json" />
-        <option value="JavaScript File" />
         <option value="CSS File" />
         <option value="TypeScript File" />
         <option value="TypeScript JSX File" />
+        <option value="JavaScript File" />
       </list>
     </option>
   </component>
@@ -144,7 +141,7 @@
       <workItem from="1750344542615" duration="13911000" />
       <workItem from="1750363667156" duration="9319000" />
       <workItem from="1750427135972" duration="32156000" />
-      <workItem from="1750726875409" duration="10407000" />
+      <workItem from="1750726875409" duration="13460000" />
     </task>
     <task id="LOCAL-00001" summary="Base setup">
       <option name="closed" value="true" />
@@ -506,7 +503,23 @@
       <option name="project" value="LOCAL" />
       <updated>1750729550940</updated>
     </task>
-    <option name="localTasksCounter" value="46" />
+    <task id="LOCAL-00046" summary="update socket connection property in chat and ui update">
+      <option name="closed" value="true" />
+      <created>1750814061836</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1750814061836</updated>
+    </task>
+    <task id="LOCAL-00047" summary="update ticket page to sync with chat update">
+      <option name="closed" value="true" />
+      <created>1750814234942</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1750814234942</updated>
+    </task>
+    <option name="localTasksCounter" value="48" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -529,8 +542,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="update sidebar width" />
-    <MESSAGE value="chat page with instant socket messaging and database storage and fetching" />
     <MESSAGE value="WebStorm update" />
     <MESSAGE value="add react-input-emoji package" />
     <MESSAGE value="add emoji selector to message sending" />
@@ -554,7 +565,9 @@
     <MESSAGE value="update app layout and chat ui styling" />
     <MESSAGE value="remove old auth pages" />
     <MESSAGE value="ui update" />
-    <option name="LAST_COMMIT_MESSAGE" value="ui update" />
+    <MESSAGE value="update socket connection property in chat and ui update" />
+    <MESSAGE value="update ticket page to sync with chat update" />
+    <option name="LAST_COMMIT_MESSAGE" value="update ticket page to sync with chat update" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
