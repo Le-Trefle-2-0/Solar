@@ -133,3 +133,45 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes opacityPulse1 {
+  0%, 100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+
+@keyframes opacityPulse2 {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes opacityPulse3 {
+  0%, 100% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.animate-opacityPulse1 {
+  animation: opacityPulse1 1.5s infinite ease-in-out;
+}
+
+.animate-opacityPulse2 {
+  animation: opacityPulse2 1.5s infinite ease-in-out;
+  animation-delay: 0.2s;
+}
+
+.animate-opacityPulse3 {
+  animation: opacityPulse3 1.5s infinite ease-in-out;
+  animation-delay: 0.4s;
+}
+

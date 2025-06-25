@@ -25,8 +25,19 @@ export default function MainChat() {
     const textRef = useRef<HTMLTextAreaElement>(null);
     const rootDivRef = useRef<HTMLDivElement>(null);
     const socketRef = useRef<Socket | null>(null);
+    const messagesListRef = useRef<HTMLDivElement>(null);
+
+    const scrollToBottom = () => {
+        messagesListRef.current?.scrollIntoView({behavior: "instant", block: "end"});
+    };
 
     useEffect(() => {
+        fetch('/api/messages/1')
+            .then(res => res.json())
+            .then(data => {
+                setChat(data)
+                scrollToBottom()
+            });
         fetch("/api/auth/token").then(async res => {
             const body = await res.json();
             if (body.token) {
@@ -34,42 +45,46 @@ export default function MainChat() {
                     auth: {
                         jwt: body.token
                     }
-                })
+                });
+                if (socketRef.current?.connected) {
+                    onConnect();
+                }
+
+                function onConnect() {
+                    setIsConnected(true);
+                    setTransport(socketRef.current?.io.engine.transport.name as string);
+
+                    socketRef.current?.io.engine.on("upgrade", (transport) => {
+                        setTransport(transport.name);
+                    });
+                }
+
+                function onDisconnect() {
+                    setIsConnected(false);
+                    setTransport("N/A");
+                }
+
+                socketRef.current?.on("connect", onConnect);
+                socketRef.current?.on("disconnect", onDisconnect);
+                socketRef.current?.on("message", (data: Msg) => {
+                    setChat((pre) => [...pre, data])
+                });
+
+                let timer: NodeJS.Timeout;
+                socketRef.current?.on('typingIndicator', () => {
+                    setShowTyping(true);
+                    if (timer) clearTimeout(timer);
+                    timer = setTimeout(() => {
+                        setShowTyping(false);
+                    }, 5000)
+                });
+
+                socketRef.current?.emit('listen', {id: '1'})
             }
         })
         rootDivRef.current?.focus();
 
-        if (socketRef.current?.connected) {
-            onConnect();
-        }
-
-        function onConnect() {
-            setIsConnected(true);
-            setTransport(socketRef.current?.io.engine.transport.name as string);
-
-            socketRef.current?.io.engine.on("upgrade", (transport) => {
-                setTransport(transport.name);
-            });
-        }
-
-        function onDisconnect() {
-            setIsConnected(false);
-            setTransport("N/A");
-        }
-
-        socketRef.current?.on("connect", onConnect);
-        socketRef.current?.on("disconnect", onDisconnect);
-        socketRef.current?.on("message", (data: Msg) => {
-            setChat((pre) => [...pre, data])
-        });
-        socketRef.current?.on('typingIndicator', () => {
-        });
-
-        socketRef.current?.emit('listen', {id: '1'})
-
         return () => {
-            socketRef.current?.off("connect", onConnect);
-            socketRef.current?.off("disconnect", onDisconnect);
         }
     }, []);
 
@@ -81,9 +96,6 @@ export default function MainChat() {
         });
 
     useEffect(() => {
-        fetch('/api/messages/1')
-            .then(res => res.json())
-            .then(data => setChat(data))
     }, []);
     let oldMsg = currentMsg;
 
@@ -119,16 +131,18 @@ export default function MainChat() {
     }
 
     const sendTyping = async () => {
-        // await socketRef.current?.emit('typing', {id: '1'});
+        await socketRef.current?.emit('typing', {id: '1'});
     }
 
     return (
-        <div className="flex flex-col justify-between max-h-screen h-full p-3 gap-4 w-full" onKeyDown={(e) => {
+        <div className="flex flex-col h-screen p-3 gap-4 w-full" onKeyDown={(e) => {
             if (e.key !== "Enter") {
                 textRef.current?.focus();
             }
         }} tabIndex={0} ref={rootDivRef}>
-            <div className="flex flex-col justify-end max-h-screen gap-6 overflow-y-auto">
+            <div className="flex flex-col flex-grow overflow-y-auto gap-6">
+                Transport: {transport}
+                Connected: {isConnected}
                 {chat.map(({author, content, timestamp}, key) => (
                     <div className="w-full flex flex-row gap-2" key={key}>
                         <Image src={(author.image ? author.image : '/logo.svg')} alt="Image de profil" width={48}
@@ -148,20 +162,21 @@ export default function MainChat() {
                         </div>
                     </div>
                 ))}
+                <div ref={messagesListRef} className="h-px"/>
+            </div>
+            <div className={showTyping ? 'flex flex-row gap-1 relative left-2 bottom-3' : 'hidden'}>
+                <FontAwesomeIcon icon={faCircle} className="text-gray-400 animate-opacityPulse1"/>
+                <FontAwesomeIcon icon={faCircle} className="text-gray-400 animate-opacityPulse2"/>
+                <FontAwesomeIcon icon={faCircle} className="text-gray-400 animate-opacityPulse3"/>
             </div>
 
-            <div className="relative bottom-6 w-full">
+            <div className="sticky bottom-0">
                 <div className="absolute right-2 bottom-15">
                     <EmojiPicker emojiStyle={EmojiStyle.TWITTER} onEmojiClick={(emoji) => {
                         setCurrentMsg(currentMsg + ' ' + emoji.emoji);
                         setEmojiOpen(false);
                         textRef.current?.focus();
                     }} open={emojiOpen}/>
-                </div>
-                <div className={showTyping ? 'flex flex-row gap-1 relative left-2 bottom-3' : 'hidden'}>
-                    <FontAwesomeIcon icon={faCircle} className={`opacity-${opacity}`}/>
-                    <FontAwesomeIcon icon={faCircle} className={`opacity-${opacity}`}/>
-                    <FontAwesomeIcon icon={faCircle} className={`opacity-${opacity}`}/>
                 </div>
 
                 <form ref={formRef} onSubmit={(e) => sendMessage(e)}
@@ -179,7 +194,7 @@ export default function MainChat() {
                                 formRef.current?.requestSubmit();
                             }
                         }}
-                        spellCheck={true}
+                        spellCheck="true"
                         data-ms-editor="true"
                         value={currentMsg}
                         className="w-full flex flex-row outline-main outline-1 p-2 rounded-lg resize-none"

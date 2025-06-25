@@ -1,5 +1,5 @@
 import type {Metadata} from "next";
-import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui";
+import {SidebarProvider, SidebarTrigger} from "@/components/ui";
 import {AppSidebar} from "@/components/app-sidebar";
 
 export const metadata: Metadata = {
@@ -13,13 +13,13 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-
         <SidebarProvider>
-            <AppSidebar/>
-            <SidebarInset>
+            <AppSidebar className="border-r-main border-r"/>
+            <div className="h-full w-full overflow-hidden">
                 <SidebarTrigger className="fixed"/>
                     {children}
-            </SidebarInset>
+            </div>
         </SidebarProvider>
+        // </div>
     );
 }
