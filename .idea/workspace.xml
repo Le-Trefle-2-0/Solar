@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="clean up server file">
+    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="add tenor gif display and dynamic voice system">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/chat.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/chat.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/next.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/next.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/server.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -136,7 +135,7 @@
       <workItem from="1750363667156" duration="9319000" />
       <workItem from="1750427135972" duration="32156000" />
       <workItem from="1750928772618" duration="4597000" />
-      <workItem from="1750935065163" duration="3712000" />
+      <workItem from="1750935065163" duration="6396000" />
     </task>
     <task id="LOCAL-00001" summary="Base setup">
       <option name="closed" value="true" />
@@ -490,7 +489,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750937198892</updated>
     </task>
-    <option name="localTasksCounter" value="45" />
+    <task id="LOCAL-00045" summary="add tenor gif display and dynamic voice system">
+      <option name="closed" value="true" />
+      <created>1750939105112</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1750939105112</updated>
+    </task>
+    <option name="localTasksCounter" value="46" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -508,7 +515,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="include message managing and fetching route" />
     <MESSAGE value="update sidebar width" />
     <MESSAGE value="chat page with instant socket messaging and database storage and fetching" />
     <MESSAGE value="WebStorm update" />
@@ -533,7 +539,8 @@
     <MESSAGE value="add channel info api endpoint" />
     <MESSAGE value="update chat with exported component" />
     <MESSAGE value="clean up server file" />
-    <option name="LAST_COMMIT_MESSAGE" value="clean up server file" />
+    <MESSAGE value="add tenor gif display and dynamic voice system" />
+    <option name="LAST_COMMIT_MESSAGE" value="add tenor gif display and dynamic voice system" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
