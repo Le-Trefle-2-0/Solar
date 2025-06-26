@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="add tenor gif display and dynamic voice system">
+    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="update dynamic and remote socket connexion on chat page">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/server.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/next.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/next.config.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -135,7 +135,7 @@
       <workItem from="1750363667156" duration="9319000" />
       <workItem from="1750427135972" duration="32156000" />
       <workItem from="1750928772618" duration="4597000" />
-      <workItem from="1750935065163" duration="6396000" />
+      <workItem from="1750935065163" duration="7070000" />
     </task>
     <task id="LOCAL-00001" summary="Base setup">
       <option name="closed" value="true" />
@@ -497,7 +497,23 @@
       <option name="project" value="LOCAL" />
       <updated>1750939105112</updated>
     </task>
-    <option name="localTasksCounter" value="46" />
+    <task id="LOCAL-00046" summary="update server auth verification on socket.io">
+      <option name="closed" value="true" />
+      <created>1750942923327</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1750942923327</updated>
+    </task>
+    <task id="LOCAL-00047" summary="update dynamic and remote socket connexion on chat page">
+      <option name="closed" value="true" />
+      <created>1750943208345</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1750943208345</updated>
+    </task>
+    <option name="localTasksCounter" value="48" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -515,8 +531,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="update sidebar width" />
-    <MESSAGE value="chat page with instant socket messaging and database storage and fetching" />
     <MESSAGE value="WebStorm update" />
     <MESSAGE value="add react-input-emoji package" />
     <MESSAGE value="add emoji selector to message sending" />
@@ -540,7 +554,9 @@
     <MESSAGE value="update chat with exported component" />
     <MESSAGE value="clean up server file" />
     <MESSAGE value="add tenor gif display and dynamic voice system" />
-    <option name="LAST_COMMIT_MESSAGE" value="add tenor gif display and dynamic voice system" />
+    <MESSAGE value="update server auth verification on socket.io" />
+    <MESSAGE value="update dynamic and remote socket connexion on chat page" />
+    <option name="LAST_COMMIT_MESSAGE" value="update dynamic and remote socket connexion on chat page" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
