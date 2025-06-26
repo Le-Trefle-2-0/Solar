@@ -230,7 +230,7 @@ export function Chat(props: { channelID: string }) {
                 textRef.current?.focus();
             }
         }} tabIndex={0} ref={rootDivRef}>
-            <video className='w-72' playsInline ref={callingVideoRef} autoPlay/>
+            <video className='w-0 h-0' playsInline ref={callingVideoRef} autoPlay/>
             <div className="flex flex-col flex-grow overflow-y-auto gap-6">
                 {chat.map(({author, content, timestamp}, key) => (
                     <div className="w-full flex flex-row gap-2" key={key}>

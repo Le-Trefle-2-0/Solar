@@ -76,7 +76,7 @@ const PeerPage = () => {
 
     return (
         <div className='flex flex-col justify-around h-full gap-6 items-center p-12'>
-            <video className='w-72' playsInline ref={myVideoRef} autoPlay muted/>
+            <video className='w-0 h-0' playsInline ref={myVideoRef} autoPlay muted/>
             <Button onClick={requestMediaPermissions}>Activer le micro</Button>
             <Button onClick={handleCall}>Rejoindre l'appel</Button>
             {
