@@ -4,7 +4,7 @@ import {Server} from "socket.io";
 import {createRemoteJWKSet, jwtVerify} from 'jose'
 
 const dev = process.env.NODE_ENV !== "production";
-const hostname = "localhost";
+const hostname = process.env.LOCAL_ADDRESS;
 const port = 3000;
 // when using middleware `hostname` and `port` must be provided below
 const app = next({dev, hostname, port});
@@ -13,11 +13,11 @@ const handler = app.getRequestHandler();
 async function validateJWT(token) {
     try {
         const JWKS = createRemoteJWKSet(
-            new URL('http://localhost:3000/api/auth/jwks')
+            new URL(`${process.env.NEXT_PUBLIC_APP_URL}/api/auth/jwks`)
         )
         const {payload} = await jwtVerify(token, JWKS, {
-            issuer: 'http://localhost:3000', // Should match your JWT issuer, which is the BASE_URL
-            audience: 'http://localhost:3000', // Should match your JWT audience, which is the BASE_URL by default
+            issuer: process.env.NEXT_PUBLIC_APP_URL, // Should match your JWT issuer, which is the BASE_URL
+            audience: process.env.NEXT_PUBLIC_APP_URL, // Should match your JWT audience, which is the BASE_URL by default
         })
         return payload
     } catch (error) {
@@ -27,7 +27,7 @@ async function validateJWT(token) {
 
 async function validateAPIKey(token) {
     try {
-        const res = await fetch('http://localhost:3000/api/check-key', {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/check-key`, {
             body: JSON.stringify({
                 key: token,
             }),
