@@ -94,7 +94,7 @@ export function Chat(props: { channelID: string }) {
                     }
                     const callID = Math.random().toString(36).substring(2);
                     const peer = new Peer(callID, {
-                        host: 'localhost',
+                        host: process.env.LOCAL_ADDRESS,
                         port: 9000,
                         path: '/myapp',
                     });

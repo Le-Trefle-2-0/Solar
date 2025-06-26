@@ -49,7 +49,7 @@ const PeerPage = () => {
     useEffect(() => {
         if (myUniqueId && localStream) {
             const peer = new Peer(myUniqueId, {
-                host: 'localhost',
+                host: process.env.LOCAL_ADDRESS,
                 port: 9000,
                 path: '/myapp',
             });

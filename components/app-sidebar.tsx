@@ -36,7 +36,7 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
     ]);
 
     useEffect(() => {
-        fetch('http://localhost:3000/api/tickets').then(async tickets => {
+        fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/tickets`).then(async tickets => {
             let ticketList = await tickets.json()
             for (let ticket of ticketList) {
                 setData([...data, {
