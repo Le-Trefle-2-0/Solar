@@ -55,6 +55,7 @@ const PeerPage = () => {
                 host: process.env.NEXT_PUBLIC_HOST,
                 port: 9000,
                 path: '/',
+                secure: true,
             });
             setPeerInstance(peer);
 
