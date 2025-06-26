@@ -22,7 +22,7 @@ const peerServer = ExpressPeerServer(server, {
     allow_discovery: true,
 });
 
-app.use("/myapp", peerServer);
+app.use("/", peerServer);
 
 server.listen(PORT, () => {
     console.log(`PeerJS server running on port ${PORT}`);
