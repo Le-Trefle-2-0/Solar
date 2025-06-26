@@ -7,7 +7,7 @@ import {createRemoteJWKSet, jwtVerify} from 'jose';
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = process.env.LOCAL_ADDRESS || 'localhost';
-const port = process.env.HTTPS_PORT || 3000;
+const port = process.env.HTTPS_PORT || 443;
 const httpPort = process.env.HTTP_PORT || 80;
 
 const app = next({dev, hostname, port});
