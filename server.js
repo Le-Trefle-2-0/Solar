@@ -48,7 +48,6 @@ app.prepare().then(() => {
 
     io.use(async (socket, next) => {
         try {
-            console.log(socket.handshake.auth);
             const validJWT = await validateJWT(socket.handshake.auth.jwt);
             let validToken = true;
             if (!validJWT) validToken = await validateAPIKey(socket.handshake.auth.token);
@@ -60,19 +59,6 @@ app.prepare().then(() => {
             next(new Error("Authentication error"));
         }
     });
-
-    // io.use(async (socket, next) => {
-    //     const session = await auth.api.getSession({
-    //         headers: fromNodeHeaders(socket.request.headers),
-    //     });
-    //
-    //     if (session) {
-    //         // socket.session = session;
-    //         next();
-    //     } else {
-    //         next(new Error("unauthorized"));
-    //     }
-    // });
 
     io.on("connection", async (socket) => {
         socket.on("listen", (data) => {
