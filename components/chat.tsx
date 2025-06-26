@@ -94,9 +94,9 @@ export function Chat(props: { channelID: string }) {
                     }
                     const callID = Math.random().toString(36).substring(2);
                     const peer = new Peer(callID, {
-                        host: process.env.LOCAL_ADDRESS,
+                        host: process.env.NEXT_PUBLIC_HOST,
                         port: 9000,
-                        path: '/myapp',
+                        path: '/',
                     });
                     setPeerInstance(peer);
 
@@ -140,7 +140,10 @@ export function Chat(props: { channelID: string }) {
                 socketRef.current = io(process.env.NEXT_PUBLIC_APP_URL, {
                     auth: {
                         jwt: body.token
-                    }
+                    },
+                    transports: ['websocket'],
+                    withCredentials: true,
+                    rejectUnauthorized: (process.env.NODE_ENV == 'production')
                 });
 
                 socketRef.current?.on("message", (data: Msg) => {

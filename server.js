@@ -7,7 +7,7 @@ import {Server} from 'socket.io';
 import {createRemoteJWKSet, jwtVerify} from 'jose';
 
 const dev = process.env.NODE_ENV !== "production";
-const hostname = process.env.LOCAL_ADDRESS || 'localhost';
+const hostname = process.env.NEXT_PUBLIC_HOST || 'localhost';
 const port = process.env.HTTPS_PORT || 443;
 const httpPort = process.env.HTTP_PORT || 80;
 
@@ -50,6 +50,14 @@ app.prepare().then(() => {
 
     const httpsServer = createHttpsServer(sslOptions, handler);
 
+    const httpServer = createHttpServer((req, res) => {
+        const redirectHost = `${hostname}:${port}`;
+        res.writeHead(301, {Location: `https://${redirectHost}${req.url}`});
+        res.end();
+    }).listen(httpPort, () => {
+        console.log(`🌐 HTTP redirect server running on http://${hostname}:${httpPort}`);
+    });
+
     const io = new Server(httpsServer);
 
     io.use(async (socket, next) => {
@@ -91,12 +99,4 @@ app.prepare().then(() => {
         .listen(port, () => {
             console.log(`✅ HTTPS server ready at https://${hostname}:${port}`);
         });
-
-    createHttpServer((req, res) => {
-        const redirectHost = `${hostname}:${port}`;
-        res.writeHead(301, {Location: `https://${redirectHost}${req.url}`});
-        res.end();
-    }).listen(httpPort, () => {
-        console.log(`🌐 HTTP redirect server running on http://${hostname}:${httpPort}`);
-    });
 });
