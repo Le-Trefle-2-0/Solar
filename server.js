@@ -43,10 +43,9 @@ async function validateAPIKey(token) {
 }
 
 app.prepare().then(() => {
-    // Load SSL certificate and key
     const sslOptions = {
-        key: fs.readFileSync("./ssl/key.pem"),
-        cert: fs.readFileSync("./ssl/cert.pem"),
+        key: fs.readFileSync(process.env.SSL_KEY_PATH),
+        cert: fs.readFileSync(process.env.SSL_CERT_PATH),
     };
 
     const httpsServer = createHttpsServer(sslOptions, handler);
@@ -93,7 +92,6 @@ app.prepare().then(() => {
             console.log(`✅ HTTPS server ready at https://${hostname}:${port}`);
         });
 
-    // Optional: HTTP server for redirecting to HTTPS
     createHttpServer((req, res) => {
         const redirectHost = `${hostname}:${port}`;
         res.writeHead(301, {Location: `https://${redirectHost}${req.url}`});
