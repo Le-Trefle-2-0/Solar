@@ -242,7 +242,7 @@ export function Chat(props: { channelID: string }) {
                             <h3 className="text-lg text-gray-900 whitespace-pre-wrap">
                                 {
                                     tenorGifRegex.test(content) ?
-                                        <Image src={content} alt={"gif"} height={256} width={256}/> :
+                                        <Image src={content} alt={"gif"} height={256} width={256} unoptimized/> :
                                         content
                                 }
                             </h3>
