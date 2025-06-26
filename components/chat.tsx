@@ -137,7 +137,7 @@ export function Chat(props: { channelID: string }) {
         fetch("/api/auth/token").then(async res => {
             const body = await res.json();
             if (body.token) {
-                socketRef.current = io({
+                socketRef.current = io(process.env.NEXT_PUBLIC_APP_URL, {
                     auth: {
                         jwt: body.token
                     }
