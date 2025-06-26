@@ -1,4 +1,5 @@
 import fs from 'fs';
+import 'dotenv/config'
 import {createServer as createHttpServer} from 'http';
 import {createServer as createHttpsServer} from 'https';
 import next from 'next';
