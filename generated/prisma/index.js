@@ -40,7 +40,7 @@ exports.$Enums = {}
  */
 Prisma.prismaVersion = {
   client: "6.9.0",
-    engine: "81e4af48011447c3cc503a190e86995b66d2a28e"
+  engine: "81e4af48011447c3cc503a190e86995b66d2a28e"
 }
 
 Prisma.PrismaClientKnownRequestError = PrismaClientKnownRequestError;
@@ -105,9 +105,9 @@ exports.Prisma.UserScalarFieldEnum = {
   banned: 'banned',
   banReason: 'banReason',
   banExpires: 'banExpires',
-    twoFactorEnabled: 'twoFactorEnabled',
-    username: 'username',
-    displayUsername: 'displayUsername'
+  twoFactorEnabled: 'twoFactorEnabled',
+  username: 'username',
+  displayUsername: 'displayUsername'
 };
 
 exports.Prisma.SessionScalarFieldEnum = {
@@ -183,8 +183,8 @@ exports.Prisma.TwoFactorScalarFieldEnum = {
 };
 
 exports.Prisma.ChannelScalarFieldEnum = {
-    id: 'id',
-    name: 'name'
+  id: 'id',
+  name: 'name'
 };
 
 exports.Prisma.MessageScalarFieldEnum = {
@@ -222,44 +222,44 @@ exports.Prisma.EventRegistrationScalarFieldEnum = {
 };
 
 exports.Prisma.TicketScalarFieldEnum = {
-    id: 'id',
-    discordUserID: 'discordUserID',
-    channelId: 'channelId',
-    channelName: 'channelName',
-    createdAt: 'createdAt',
-    updatedAt: 'updatedAt',
-    assignedUserId: 'assignedUserId'
+  id: 'id',
+  discordUserID: 'discordUserID',
+  channelId: 'channelId',
+  channelName: 'channelName',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  assignedUserId: 'assignedUserId'
 };
 
 exports.Prisma.ApikeyScalarFieldEnum = {
-    id: 'id',
-    name: 'name',
-    start: 'start',
-    prefix: 'prefix',
-    key: 'key',
-    userId: 'userId',
-    refillInterval: 'refillInterval',
-    refillAmount: 'refillAmount',
-    lastRefillAt: 'lastRefillAt',
-    enabled: 'enabled',
-    rateLimitEnabled: 'rateLimitEnabled',
-    rateLimitTimeWindow: 'rateLimitTimeWindow',
-    rateLimitMax: 'rateLimitMax',
-    requestCount: 'requestCount',
-    remaining: 'remaining',
-    lastRequest: 'lastRequest',
-    expiresAt: 'expiresAt',
-    createdAt: 'createdAt',
-    updatedAt: 'updatedAt',
-    permissions: 'permissions',
-    metadata: 'metadata'
+  id: 'id',
+  name: 'name',
+  start: 'start',
+  prefix: 'prefix',
+  key: 'key',
+  userId: 'userId',
+  refillInterval: 'refillInterval',
+  refillAmount: 'refillAmount',
+  lastRefillAt: 'lastRefillAt',
+  enabled: 'enabled',
+  rateLimitEnabled: 'rateLimitEnabled',
+  rateLimitTimeWindow: 'rateLimitTimeWindow',
+  rateLimitMax: 'rateLimitMax',
+  requestCount: 'requestCount',
+  remaining: 'remaining',
+  lastRequest: 'lastRequest',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  permissions: 'permissions',
+  metadata: 'metadata'
 };
 
 exports.Prisma.JwksScalarFieldEnum = {
-    id: 'id',
-    publicKey: 'publicKey',
-    privateKey: 'privateKey',
-    createdAt: 'createdAt'
+  id: 'id',
+  publicKey: 'publicKey',
+  privateKey: 'privateKey',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -273,127 +273,127 @@ exports.Prisma.NullsOrder = {
 };
 
 exports.Prisma.UserOrderByRelevanceFieldEnum = {
-    id: 'id',
-    name: 'name',
-    email: 'email',
-    image: 'image',
-    role: 'role',
-    banReason: 'banReason',
-    username: 'username',
-    displayUsername: 'displayUsername'
+  id: 'id',
+  name: 'name',
+  email: 'email',
+  image: 'image',
+  role: 'role',
+  banReason: 'banReason',
+  username: 'username',
+  displayUsername: 'displayUsername'
 };
 
 exports.Prisma.SessionOrderByRelevanceFieldEnum = {
-    id: 'id',
-    token: 'token',
-    ipAddress: 'ipAddress',
-    userAgent: 'userAgent',
-    userId: 'userId',
-    impersonatedBy: 'impersonatedBy',
-    activeOrganizationId: 'activeOrganizationId'
+  id: 'id',
+  token: 'token',
+  ipAddress: 'ipAddress',
+  userAgent: 'userAgent',
+  userId: 'userId',
+  impersonatedBy: 'impersonatedBy',
+  activeOrganizationId: 'activeOrganizationId'
 };
 
 exports.Prisma.AccountOrderByRelevanceFieldEnum = {
-    id: 'id',
-    accountId: 'accountId',
-    providerId: 'providerId',
-    userId: 'userId',
-    accessToken: 'accessToken',
-    refreshToken: 'refreshToken',
-    idToken: 'idToken',
-    scope: 'scope',
-    password: 'password'
+  id: 'id',
+  accountId: 'accountId',
+  providerId: 'providerId',
+  userId: 'userId',
+  accessToken: 'accessToken',
+  refreshToken: 'refreshToken',
+  idToken: 'idToken',
+  scope: 'scope',
+  password: 'password'
 };
 
 exports.Prisma.VerificationOrderByRelevanceFieldEnum = {
-    id: 'id',
-    identifier: 'identifier',
-    value: 'value'
+  id: 'id',
+  identifier: 'identifier',
+  value: 'value'
 };
 
 exports.Prisma.OrganizationOrderByRelevanceFieldEnum = {
-    id: 'id',
-    name: 'name',
-    slug: 'slug',
-    logo: 'logo',
-    metadata: 'metadata'
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  logo: 'logo',
+  metadata: 'metadata'
 };
 
 exports.Prisma.MemberOrderByRelevanceFieldEnum = {
-    id: 'id',
-    organizationId: 'organizationId',
-    userId: 'userId',
-    role: 'role'
+  id: 'id',
+  organizationId: 'organizationId',
+  userId: 'userId',
+  role: 'role'
 };
 
 exports.Prisma.InvitationOrderByRelevanceFieldEnum = {
-    id: 'id',
-    organizationId: 'organizationId',
-    email: 'email',
-    role: 'role',
-    status: 'status',
-    inviterId: 'inviterId'
+  id: 'id',
+  organizationId: 'organizationId',
+  email: 'email',
+  role: 'role',
+  status: 'status',
+  inviterId: 'inviterId'
 };
 
 exports.Prisma.TwoFactorOrderByRelevanceFieldEnum = {
-    id: 'id',
-    secret: 'secret',
-    backupCodes: 'backupCodes',
-    userId: 'userId'
+  id: 'id',
+  secret: 'secret',
+  backupCodes: 'backupCodes',
+  userId: 'userId'
 };
 
 exports.Prisma.ChannelOrderByRelevanceFieldEnum = {
-    id: 'id',
-    name: 'name'
+  id: 'id',
+  name: 'name'
 };
 
 exports.Prisma.MessageOrderByRelevanceFieldEnum = {
-    userId: 'userId',
-    channelId: 'channelId'
+  userId: 'userId',
+  channelId: 'channelId'
 };
 
 exports.Prisma.EventOrderByRelevanceFieldEnum = {
-    id: 'id',
-    title: 'title',
-    description: 'description',
-    userId: 'userId'
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  userId: 'userId'
 };
 
 exports.Prisma.RoleSlotOrderByRelevanceFieldEnum = {
-    id: 'id',
-    role: 'role',
-    eventId: 'eventId'
+  id: 'id',
+  role: 'role',
+  eventId: 'eventId'
 };
 
 exports.Prisma.EventRegistrationOrderByRelevanceFieldEnum = {
-    id: 'id',
-    userId: 'userId',
-    roleSlotId: 'roleSlotId',
-    eventId: 'eventId'
+  id: 'id',
+  userId: 'userId',
+  roleSlotId: 'roleSlotId',
+  eventId: 'eventId'
 };
 
 exports.Prisma.TicketOrderByRelevanceFieldEnum = {
-    discordUserID: 'discordUserID',
-    channelId: 'channelId',
-    channelName: 'channelName',
-    assignedUserId: 'assignedUserId'
+  discordUserID: 'discordUserID',
+  channelId: 'channelId',
+  channelName: 'channelName',
+  assignedUserId: 'assignedUserId'
 };
 
 exports.Prisma.ApikeyOrderByRelevanceFieldEnum = {
-    id: 'id',
-    name: 'name',
-    start: 'start',
-    prefix: 'prefix',
-    key: 'key',
-    userId: 'userId',
-    permissions: 'permissions',
-    metadata: 'metadata'
+  id: 'id',
+  name: 'name',
+  start: 'start',
+  prefix: 'prefix',
+  key: 'key',
+  userId: 'userId',
+  permissions: 'permissions',
+  metadata: 'metadata'
 };
 
 exports.Prisma.JwksOrderByRelevanceFieldEnum = {
-    id: 'id',
-    publicKey: 'publicKey',
-    privateKey: 'privateKey'
+  id: 'id',
+  publicKey: 'publicKey',
+  privateKey: 'privateKey'
 };
 
 
@@ -406,14 +406,14 @@ exports.Prisma.ModelName = {
   Member: 'Member',
   Invitation: 'Invitation',
   TwoFactor: 'TwoFactor',
-    Channel: 'Channel',
+  Channel: 'Channel',
   Message: 'Message',
   Event: 'Event',
   RoleSlot: 'RoleSlot',
-    EventRegistration: 'EventRegistration',
-    Ticket: 'Ticket',
-    Apikey: 'Apikey',
-    Jwks: 'Jwks'
+  EventRegistration: 'EventRegistration',
+  Ticket: 'Ticket',
+  Apikey: 'Apikey',
+  Jwks: 'Jwks'
 };
 /**
  * Create the Client
@@ -426,7 +426,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/Users/paul/WebstormProjects/Solar/generated/prisma",
+      "value": "/home/azureuser/Solar/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -435,12 +435,12 @@ const config = {
     "binaryTargets": [
       {
         "fromEnvVar": null,
-        "value": "darwin-arm64",
+        "value": "debian-openssl-3.0.x",
         "native": true
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/Users/paul/WebstormProjects/Solar/prisma/schema.prisma",
+    "sourceFilePath": "/home/azureuser/Solar/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -449,11 +449,12 @@ const config = {
   },
   "relativePath": "../../prisma",
   "clientVersion": "6.9.0",
-    "engineVersion": "81e4af48011447c3cc503a190e86995b66d2a28e",
+  "engineVersion": "81e4af48011447c3cc503a190e86995b66d2a28e",
   "datasourceNames": [
     "db"
   ],
   "activeProvider": "mysql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
@@ -462,8 +463,8 @@ const config = {
       }
     }
   },
-    "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id            String    @id\n  name          String    @db.Text\n  email         String    @unique\n  emailVerified Boolean\n  image         String?   @db.Text\n  createdAt     DateTime\n  updatedAt     DateTime\n  accounts      Account[]\n  sessions      Session[]\n  messages      Message[]\n\n  role       String?   @db.Text\n  banned     Boolean?\n  banReason  String?   @db.Text\n  banExpires DateTime?\n\n  members     Member[]\n  invitations Invitation[]\n\n  twoFactorEnabled  Boolean?\n  twofactors        TwoFactor[]\n  Event             Event[]\n  EventRegistration EventRegistration[]\n\n  username        String?\n  displayUsername String?  @db.Text\n  Ticket          Ticket[]\n\n  apikeys Apikey[]\n\n  @@unique([username])\n  @@map(\"user\")\n}\n\nmodel Session {\n  id        String   @id\n  expiresAt DateTime\n  token     String   @unique\n  createdAt DateTime\n  updatedAt DateTime\n  ipAddress String?  @db.Text\n  userAgent String?  @db.Text\n  userId    String\n  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n\n  impersonatedBy String? @db.Text\n\n  activeOrganizationId String? @db.Text\n\n  @@index([userId], map: \"session_userId_fkey\")\n  @@map(\"session\")\n}\n\nmodel Account {\n  id                    String    @id\n  accountId             String    @db.Text\n  providerId            String    @db.Text\n  userId                String\n  accessToken           String?   @db.Text\n  refreshToken          String?   @db.Text\n  idToken               String?   @db.Text\n  accessTokenExpiresAt  DateTime?\n  refreshTokenExpiresAt DateTime?\n  scope                 String?   @db.Text\n  password              String?   @db.Text\n  createdAt             DateTime\n  updatedAt             DateTime\n  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)\n\n  @@index([userId], map: \"account_userId_fkey\")\n  @@map(\"account\")\n}\n\nmodel Verification {\n  id         String    @id\n  identifier String    @db.Text\n  value      String    @db.Text\n  expiresAt  DateTime\n  createdAt  DateTime?\n  updatedAt  DateTime?\n\n  @@map(\"verification\")\n}\n\nmodel Organization {\n  id          String       @id\n  name        String       @db.Text\n  slug        String?\n  logo        String?      @db.Text\n  createdAt   DateTime\n  metadata    String?      @db.Text\n  members     Member[]\n  invitations Invitation[]\n\n  @@unique([slug])\n  @@map(\"organization\")\n}\n\nmodel Member {\n  id             String       @id\n  organizationId String\n  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)\n  userId         String\n  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)\n  role           String       @db.Text\n  createdAt      DateTime\n\n  @@map(\"member\")\n}\n\nmodel Invitation {\n  id             String       @id\n  organizationId String\n  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)\n  email          String       @db.Text\n  role           String?      @db.Text\n  status         String       @db.Text\n  expiresAt      DateTime\n  inviterId      String\n  user           User         @relation(fields: [inviterId], references: [id], onDelete: Cascade)\n\n  @@map(\"invitation\")\n}\n\nmodel TwoFactor {\n  id          String @id\n  secret      String @db.Text\n  backupCodes String @db.Text\n  userId      String\n  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)\n\n  @@map(\"twoFactor\")\n}\n\nmodel Channel {\n  id   String @id @default(cuid())\n  name String\n\n  Message Message[]\n  Ticket  Ticket[]\n\n  @@unique([id, name])\n}\n\nmodel Message {\n  id        Int      @id @default(autoincrement())\n  createdAt DateTime\n  userId    String\n  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n  channelId String\n  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)\n  content   Bytes\n}\n\nmodel Event {\n  id            String              @id @default(cuid())\n  title         String\n  description   String?\n  start         DateTime\n  end           DateTime\n  createdAt     DateTime            @default(now())\n  updatedAt     DateTime            @updatedAt\n  userId        String\n  user          User                @relation(fields: [userId], references: [id])\n  roleSlots     RoleSlot[]\n  registrations EventRegistration[]\n}\n\nmodel RoleSlot {\n  id            String              @id @default(cuid())\n  role          String\n  goalCount     Int\n  event         Event               @relation(fields: [eventId], references: [id])\n  eventId       String\n  registrations EventRegistration[]\n}\n\nmodel EventRegistration {\n  id           String   @id @default(cuid())\n  user         User     @relation(fields: [userId], references: [id])\n  userId       String\n  roleSlot     RoleSlot @relation(fields: [roleSlotId], references: [id])\n  roleSlotId   String\n  registeredAt DateTime @default(now())\n  Event        Event?   @relation(fields: [eventId], references: [id])\n  eventId      String?\n\n  @@unique([userId, roleSlotId])\n}\n\nmodel Ticket {\n  id             Int      @id @default(autoincrement())\n  discordUserID  String\n  channelId      String?\n  channelName    String?\n  channel        Channel? @relation(fields: [channelId, channelName], references: [id, name], onDelete: Cascade)\n  createdAt      DateTime\n  updatedAt      DateTime\n  user           User?    @relation(fields: [assignedUserId], references: [id])\n  assignedUserId String?\n}\n\nmodel Apikey {\n  id                  String    @id\n  name                String?   @db.Text\n  start               String?   @db.Text\n  prefix              String?   @db.Text\n  key                 String    @db.Text\n  userId              String\n  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)\n  refillInterval      Int?\n  refillAmount        Int?\n  lastRefillAt        DateTime?\n  enabled             Boolean?\n  rateLimitEnabled    Boolean?\n  rateLimitTimeWindow Int?\n  rateLimitMax        Int?\n  requestCount        Int?\n  remaining           Int?\n  lastRequest         DateTime?\n  expiresAt           DateTime?\n  createdAt           DateTime\n  updatedAt           DateTime\n  permissions         String?   @db.Text\n  metadata            String?   @db.Text\n\n  @@map(\"apikey\")\n}\n\nmodel Jwks {\n  id         String   @id\n  publicKey  String   @db.Text\n  privateKey String   @db.Text\n  createdAt  DateTime\n\n  @@map(\"jwks\")\n}\n",
-    "inlineSchemaHash": "7a2e8f05d51771ef9d41a432cd32f1e0f27efb1622e49b6ae1c264fa0c42a6f1",
+  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id            String    @id\n  name          String    @db.Text\n  email         String    @unique\n  emailVerified Boolean\n  image         String?   @db.Text\n  createdAt     DateTime\n  updatedAt     DateTime\n  accounts      Account[]\n  sessions      Session[]\n  messages      Message[]\n\n  role       String?   @db.Text\n  banned     Boolean?\n  banReason  String?   @db.Text\n  banExpires DateTime?\n\n  members     Member[]\n  invitations Invitation[]\n\n  twoFactorEnabled  Boolean?\n  twofactors        TwoFactor[]\n  Event             Event[]\n  EventRegistration EventRegistration[]\n\n  username        String?\n  displayUsername String?  @db.Text\n  Ticket          Ticket[]\n\n  apikeys Apikey[]\n\n  @@unique([username])\n  @@map(\"user\")\n}\n\nmodel Session {\n  id        String   @id\n  expiresAt DateTime\n  token     String   @unique\n  createdAt DateTime\n  updatedAt DateTime\n  ipAddress String?  @db.Text\n  userAgent String?  @db.Text\n  userId    String\n  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n\n  impersonatedBy String? @db.Text\n\n  activeOrganizationId String? @db.Text\n\n  @@index([userId], map: \"session_userId_fkey\")\n  @@map(\"session\")\n}\n\nmodel Account {\n  id                    String    @id\n  accountId             String    @db.Text\n  providerId            String    @db.Text\n  userId                String\n  accessToken           String?   @db.Text\n  refreshToken          String?   @db.Text\n  idToken               String?   @db.Text\n  accessTokenExpiresAt  DateTime?\n  refreshTokenExpiresAt DateTime?\n  scope                 String?   @db.Text\n  password              String?   @db.Text\n  createdAt             DateTime\n  updatedAt             DateTime\n  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)\n\n  @@index([userId], map: \"account_userId_fkey\")\n  @@map(\"account\")\n}\n\nmodel Verification {\n  id         String    @id\n  identifier String    @db.Text\n  value      String    @db.Text\n  expiresAt  DateTime\n  createdAt  DateTime?\n  updatedAt  DateTime?\n\n  @@map(\"verification\")\n}\n\nmodel Organization {\n  id          String       @id\n  name        String       @db.Text\n  slug        String?\n  logo        String?      @db.Text\n  createdAt   DateTime\n  metadata    String?      @db.Text\n  members     Member[]\n  invitations Invitation[]\n\n  @@unique([slug])\n  @@map(\"organization\")\n}\n\nmodel Member {\n  id             String       @id\n  organizationId String\n  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)\n  userId         String\n  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)\n  role           String       @db.Text\n  createdAt      DateTime\n\n  @@map(\"member\")\n}\n\nmodel Invitation {\n  id             String       @id\n  organizationId String\n  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)\n  email          String       @db.Text\n  role           String?      @db.Text\n  status         String       @db.Text\n  expiresAt      DateTime\n  inviterId      String\n  user           User         @relation(fields: [inviterId], references: [id], onDelete: Cascade)\n\n  @@map(\"invitation\")\n}\n\nmodel TwoFactor {\n  id          String @id\n  secret      String @db.Text\n  backupCodes String @db.Text\n  userId      String\n  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)\n\n  @@map(\"twoFactor\")\n}\n\nmodel Channel {\n  id   String @id @default(cuid())\n  name String\n\n  Message Message[]\n  Ticket  Ticket[]\n\n  @@unique([id, name])\n}\n\nmodel Message {\n  id        Int      @id @default(autoincrement())\n  createdAt DateTime\n  userId    String\n  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n  channelId String\n  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)\n  content   Bytes\n}\n\nmodel Event {\n  id            String              @id @default(cuid())\n  title         String\n  description   String?\n  start         DateTime\n  end           DateTime\n  createdAt     DateTime            @default(now())\n  updatedAt     DateTime            @updatedAt\n  userId        String\n  user          User                @relation(fields: [userId], references: [id])\n  roleSlots     RoleSlot[]\n  registrations EventRegistration[]\n}\n\nmodel RoleSlot {\n  id            String              @id @default(cuid())\n  role          String\n  goalCount     Int\n  event         Event               @relation(fields: [eventId], references: [id])\n  eventId       String\n  registrations EventRegistration[]\n}\n\nmodel EventRegistration {\n  id           String   @id @default(cuid())\n  user         User     @relation(fields: [userId], references: [id])\n  userId       String\n  roleSlot     RoleSlot @relation(fields: [roleSlotId], references: [id])\n  roleSlotId   String\n  registeredAt DateTime @default(now())\n  Event        Event?   @relation(fields: [eventId], references: [id])\n  eventId      String?\n\n  @@unique([userId, roleSlotId])\n}\n\nmodel Ticket {\n  id             Int      @id @default(autoincrement())\n  discordUserID  String\n  channelId      String?\n  channelName    String?\n  channel        Channel? @relation(fields: [channelId, channelName], references: [id, name], onDelete: Cascade)\n  createdAt      DateTime\n  updatedAt      DateTime\n  user           User?    @relation(fields: [assignedUserId], references: [id])\n  assignedUserId String?\n}\n\nmodel Apikey {\n  id                  String    @id\n  name                String?   @db.Text\n  start               String?   @db.Text\n  prefix              String?   @db.Text\n  key                 String    @db.Text\n  userId              String\n  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)\n  refillInterval      Int?\n  refillAmount        Int?\n  lastRefillAt        DateTime?\n  enabled             Boolean?\n  rateLimitEnabled    Boolean?\n  rateLimitTimeWindow Int?\n  rateLimitMax        Int?\n  requestCount        Int?\n  remaining           Int?\n  lastRequest         DateTime?\n  expiresAt           DateTime?\n  createdAt           DateTime\n  updatedAt           DateTime\n  permissions         String?   @db.Text\n  metadata            String?   @db.Text\n\n  @@map(\"apikey\")\n}\n\nmodel Jwks {\n  id         String   @id\n  publicKey  String   @db.Text\n  privateKey String   @db.Text\n  createdAt  DateTime\n\n  @@map(\"jwks\")\n}\n",
+  "inlineSchemaHash": "7a2e8f05d51771ef9d41a432cd32f1e0f27efb1622e49b6ae1c264fa0c42a6f1",
   "copyEngine": true
 }
 
@@ -502,8 +503,8 @@ exports.PrismaClient = PrismaClient
 Object.assign(exports, Prisma)
 
 // file annotations for bundling tools to include these files
-path.join(__dirname, "libquery_engine-darwin-arm64.dylib.node");
-path.join(process.cwd(), "generated/prisma/libquery_engine-darwin-arm64.dylib.node")
+path.join(__dirname, "libquery_engine-debian-openssl-3.0.x.so.node");
+path.join(process.cwd(), "generated/prisma/libquery_engine-debian-openssl-3.0.x.so.node")
 // file annotations for bundling tools to include these files
 path.join(__dirname, "schema.prisma");
 path.join(process.cwd(), "generated/prisma/schema.prisma")

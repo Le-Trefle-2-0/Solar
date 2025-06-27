@@ -24,7 +24,6 @@ async function main() {
             channelName: listenChannel.name,
             createdAt: new Date(),
             updatedAt: new Date(),
-            type: 'ecoute'
         }
     })
 }

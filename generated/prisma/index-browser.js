@@ -25,7 +25,7 @@ exports.$Enums = {}
  */
 Prisma.prismaVersion = {
   client: "6.9.0",
-    engine: "81e4af48011447c3cc503a190e86995b66d2a28e"
+  engine: "81e4af48011447c3cc503a190e86995b66d2a28e"
 }
 
 Prisma.PrismaClientKnownRequestError = () => {
@@ -132,9 +132,9 @@ exports.Prisma.UserScalarFieldEnum = {
   banned: 'banned',
   banReason: 'banReason',
   banExpires: 'banExpires',
-    twoFactorEnabled: 'twoFactorEnabled',
-    username: 'username',
-    displayUsername: 'displayUsername'
+  twoFactorEnabled: 'twoFactorEnabled',
+  username: 'username',
+  displayUsername: 'displayUsername'
 };
 
 exports.Prisma.SessionScalarFieldEnum = {
@@ -210,8 +210,8 @@ exports.Prisma.TwoFactorScalarFieldEnum = {
 };
 
 exports.Prisma.ChannelScalarFieldEnum = {
-    id: 'id',
-    name: 'name'
+  id: 'id',
+  name: 'name'
 };
 
 exports.Prisma.MessageScalarFieldEnum = {
@@ -249,44 +249,44 @@ exports.Prisma.EventRegistrationScalarFieldEnum = {
 };
 
 exports.Prisma.TicketScalarFieldEnum = {
-    id: 'id',
-    discordUserID: 'discordUserID',
-    channelId: 'channelId',
-    channelName: 'channelName',
-    createdAt: 'createdAt',
-    updatedAt: 'updatedAt',
-    assignedUserId: 'assignedUserId'
+  id: 'id',
+  discordUserID: 'discordUserID',
+  channelId: 'channelId',
+  channelName: 'channelName',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  assignedUserId: 'assignedUserId'
 };
 
 exports.Prisma.ApikeyScalarFieldEnum = {
-    id: 'id',
-    name: 'name',
-    start: 'start',
-    prefix: 'prefix',
-    key: 'key',
-    userId: 'userId',
-    refillInterval: 'refillInterval',
-    refillAmount: 'refillAmount',
-    lastRefillAt: 'lastRefillAt',
-    enabled: 'enabled',
-    rateLimitEnabled: 'rateLimitEnabled',
-    rateLimitTimeWindow: 'rateLimitTimeWindow',
-    rateLimitMax: 'rateLimitMax',
-    requestCount: 'requestCount',
-    remaining: 'remaining',
-    lastRequest: 'lastRequest',
-    expiresAt: 'expiresAt',
-    createdAt: 'createdAt',
-    updatedAt: 'updatedAt',
-    permissions: 'permissions',
-    metadata: 'metadata'
+  id: 'id',
+  name: 'name',
+  start: 'start',
+  prefix: 'prefix',
+  key: 'key',
+  userId: 'userId',
+  refillInterval: 'refillInterval',
+  refillAmount: 'refillAmount',
+  lastRefillAt: 'lastRefillAt',
+  enabled: 'enabled',
+  rateLimitEnabled: 'rateLimitEnabled',
+  rateLimitTimeWindow: 'rateLimitTimeWindow',
+  rateLimitMax: 'rateLimitMax',
+  requestCount: 'requestCount',
+  remaining: 'remaining',
+  lastRequest: 'lastRequest',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  permissions: 'permissions',
+  metadata: 'metadata'
 };
 
 exports.Prisma.JwksScalarFieldEnum = {
-    id: 'id',
-    publicKey: 'publicKey',
-    privateKey: 'privateKey',
-    createdAt: 'createdAt'
+  id: 'id',
+  publicKey: 'publicKey',
+  privateKey: 'privateKey',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -300,127 +300,127 @@ exports.Prisma.NullsOrder = {
 };
 
 exports.Prisma.UserOrderByRelevanceFieldEnum = {
-    id: 'id',
-    name: 'name',
-    email: 'email',
-    image: 'image',
-    role: 'role',
-    banReason: 'banReason',
-    username: 'username',
-    displayUsername: 'displayUsername'
+  id: 'id',
+  name: 'name',
+  email: 'email',
+  image: 'image',
+  role: 'role',
+  banReason: 'banReason',
+  username: 'username',
+  displayUsername: 'displayUsername'
 };
 
 exports.Prisma.SessionOrderByRelevanceFieldEnum = {
-    id: 'id',
-    token: 'token',
-    ipAddress: 'ipAddress',
-    userAgent: 'userAgent',
-    userId: 'userId',
-    impersonatedBy: 'impersonatedBy',
-    activeOrganizationId: 'activeOrganizationId'
+  id: 'id',
+  token: 'token',
+  ipAddress: 'ipAddress',
+  userAgent: 'userAgent',
+  userId: 'userId',
+  impersonatedBy: 'impersonatedBy',
+  activeOrganizationId: 'activeOrganizationId'
 };
 
 exports.Prisma.AccountOrderByRelevanceFieldEnum = {
-    id: 'id',
-    accountId: 'accountId',
-    providerId: 'providerId',
-    userId: 'userId',
-    accessToken: 'accessToken',
-    refreshToken: 'refreshToken',
-    idToken: 'idToken',
-    scope: 'scope',
-    password: 'password'
+  id: 'id',
+  accountId: 'accountId',
+  providerId: 'providerId',
+  userId: 'userId',
+  accessToken: 'accessToken',
+  refreshToken: 'refreshToken',
+  idToken: 'idToken',
+  scope: 'scope',
+  password: 'password'
 };
 
 exports.Prisma.VerificationOrderByRelevanceFieldEnum = {
-    id: 'id',
-    identifier: 'identifier',
-    value: 'value'
+  id: 'id',
+  identifier: 'identifier',
+  value: 'value'
 };
 
 exports.Prisma.OrganizationOrderByRelevanceFieldEnum = {
-    id: 'id',
-    name: 'name',
-    slug: 'slug',
-    logo: 'logo',
-    metadata: 'metadata'
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  logo: 'logo',
+  metadata: 'metadata'
 };
 
 exports.Prisma.MemberOrderByRelevanceFieldEnum = {
-    id: 'id',
-    organizationId: 'organizationId',
-    userId: 'userId',
-    role: 'role'
+  id: 'id',
+  organizationId: 'organizationId',
+  userId: 'userId',
+  role: 'role'
 };
 
 exports.Prisma.InvitationOrderByRelevanceFieldEnum = {
-    id: 'id',
-    organizationId: 'organizationId',
-    email: 'email',
-    role: 'role',
-    status: 'status',
-    inviterId: 'inviterId'
+  id: 'id',
+  organizationId: 'organizationId',
+  email: 'email',
+  role: 'role',
+  status: 'status',
+  inviterId: 'inviterId'
 };
 
 exports.Prisma.TwoFactorOrderByRelevanceFieldEnum = {
-    id: 'id',
-    secret: 'secret',
-    backupCodes: 'backupCodes',
-    userId: 'userId'
+  id: 'id',
+  secret: 'secret',
+  backupCodes: 'backupCodes',
+  userId: 'userId'
 };
 
 exports.Prisma.ChannelOrderByRelevanceFieldEnum = {
-    id: 'id',
-    name: 'name'
+  id: 'id',
+  name: 'name'
 };
 
 exports.Prisma.MessageOrderByRelevanceFieldEnum = {
-    userId: 'userId',
-    channelId: 'channelId'
+  userId: 'userId',
+  channelId: 'channelId'
 };
 
 exports.Prisma.EventOrderByRelevanceFieldEnum = {
-    id: 'id',
-    title: 'title',
-    description: 'description',
-    userId: 'userId'
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  userId: 'userId'
 };
 
 exports.Prisma.RoleSlotOrderByRelevanceFieldEnum = {
-    id: 'id',
-    role: 'role',
-    eventId: 'eventId'
+  id: 'id',
+  role: 'role',
+  eventId: 'eventId'
 };
 
 exports.Prisma.EventRegistrationOrderByRelevanceFieldEnum = {
-    id: 'id',
-    userId: 'userId',
-    roleSlotId: 'roleSlotId',
-    eventId: 'eventId'
+  id: 'id',
+  userId: 'userId',
+  roleSlotId: 'roleSlotId',
+  eventId: 'eventId'
 };
 
 exports.Prisma.TicketOrderByRelevanceFieldEnum = {
-    discordUserID: 'discordUserID',
-    channelId: 'channelId',
-    channelName: 'channelName',
-    assignedUserId: 'assignedUserId'
+  discordUserID: 'discordUserID',
+  channelId: 'channelId',
+  channelName: 'channelName',
+  assignedUserId: 'assignedUserId'
 };
 
 exports.Prisma.ApikeyOrderByRelevanceFieldEnum = {
-    id: 'id',
-    name: 'name',
-    start: 'start',
-    prefix: 'prefix',
-    key: 'key',
-    userId: 'userId',
-    permissions: 'permissions',
-    metadata: 'metadata'
+  id: 'id',
+  name: 'name',
+  start: 'start',
+  prefix: 'prefix',
+  key: 'key',
+  userId: 'userId',
+  permissions: 'permissions',
+  metadata: 'metadata'
 };
 
 exports.Prisma.JwksOrderByRelevanceFieldEnum = {
-    id: 'id',
-    publicKey: 'publicKey',
-    privateKey: 'privateKey'
+  id: 'id',
+  publicKey: 'publicKey',
+  privateKey: 'privateKey'
 };
 
 
@@ -433,14 +433,14 @@ exports.Prisma.ModelName = {
   Member: 'Member',
   Invitation: 'Invitation',
   TwoFactor: 'TwoFactor',
-    Channel: 'Channel',
+  Channel: 'Channel',
   Message: 'Message',
   Event: 'Event',
   RoleSlot: 'RoleSlot',
-    EventRegistration: 'EventRegistration',
-    Ticket: 'Ticket',
-    Apikey: 'Apikey',
-    Jwks: 'Jwks'
+  EventRegistration: 'EventRegistration',
+  Ticket: 'Ticket',
+  Apikey: 'Apikey',
+  Jwks: 'Jwks'
 };
 
 /**

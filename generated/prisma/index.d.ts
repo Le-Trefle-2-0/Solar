@@ -4,10 +4,11 @@
 **/
 
 import * as runtime from './runtime/library.js';
-import $Public = runtime.Types.Public;
-import $Utils = runtime.Types.Utils;
-import $Extensions = runtime.Types.Extensions;
-import $Result = runtime.Types.Result;
+import $Types = runtime.Types // general types
+import $Public = runtime.Types.Public
+import $Utils = runtime.Types.Utils
+import $Extensions = runtime.Types.Extensions
+import $Result = runtime.Types.Result
 
 export type PrismaPromise<T> = $Public.PrismaPromise<T>
 
@@ -298,15 +299,15 @@ export class PrismaClient<
    */
   get twoFactor(): Prisma.TwoFactorDelegate<ExtArgs, ClientOptions>;
 
-    /**
-     * `prisma.channel`: Exposes CRUD operations for the **Channel** model.
-     * Example usage:
-     * ```ts
-     * // Fetch zero or more Channels
-     * const channels = await prisma.channel.findMany()
-     * ```
-     */
-    get channel(): Prisma.ChannelDelegate<ExtArgs, ClientOptions>;
+  /**
+   * `prisma.channel`: Exposes CRUD operations for the **Channel** model.
+   * Example usage:
+   * ```ts
+   * // Fetch zero or more Channels
+   * const channels = await prisma.channel.findMany()
+   * ```
+   */
+  get channel(): Prisma.ChannelDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.message`: Exposes CRUD operations for the **Message** model.
@@ -348,80 +349,71 @@ export class PrismaClient<
    */
   get eventRegistration(): Prisma.EventRegistrationDelegate<ExtArgs, ClientOptions>;
 
-    /**
-     * `prisma.ticket`: Exposes CRUD operations for the **Ticket** model.
-     * Example usage:
-     * ```ts
-     * // Fetch zero or more Tickets
-     * const tickets = await prisma.ticket.findMany()
-     * ```
-     */
-    get ticket(): Prisma.TicketDelegate<ExtArgs, ClientOptions>;
+  /**
+   * `prisma.ticket`: Exposes CRUD operations for the **Ticket** model.
+   * Example usage:
+   * ```ts
+   * // Fetch zero or more Tickets
+   * const tickets = await prisma.ticket.findMany()
+   * ```
+   */
+  get ticket(): Prisma.TicketDelegate<ExtArgs, ClientOptions>;
 
-    /**
-     * `prisma.apikey`: Exposes CRUD operations for the **Apikey** model.
-     * Example usage:
-     * ```ts
-     * // Fetch zero or more Apikeys
-     * const apikeys = await prisma.apikey.findMany()
-     * ```
-     */
-    get apikey(): Prisma.ApikeyDelegate<ExtArgs, ClientOptions>;
+  /**
+   * `prisma.apikey`: Exposes CRUD operations for the **Apikey** model.
+   * Example usage:
+   * ```ts
+   * // Fetch zero or more Apikeys
+   * const apikeys = await prisma.apikey.findMany()
+   * ```
+   */
+  get apikey(): Prisma.ApikeyDelegate<ExtArgs, ClientOptions>;
 
-    /**
-     * `prisma.jwks`: Exposes CRUD operations for the **Jwks** model.
-     * Example usage:
-     * ```ts
-     * // Fetch zero or more Jwks
-     * const jwks = await prisma.jwks.findMany()
-     * ```
-     */
-    get jwks(): Prisma.JwksDelegate<ExtArgs, ClientOptions>;
+  /**
+   * `prisma.jwks`: Exposes CRUD operations for the **Jwks** model.
+   * Example usage:
+   * ```ts
+   * // Fetch zero or more Jwks
+   * const jwks = await prisma.jwks.findMany()
+   * ```
+   */
+  get jwks(): Prisma.JwksDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
-  export import DMMF = runtime.DMMF;
+  export import DMMF = runtime.DMMF
+
+  export type PrismaPromise<T> = $Public.PrismaPromise<T>
+
   /**
    * Validator
    */
-  export import validator = runtime.Public.validator;
+  export import validator = runtime.Public.validator
+
   /**
    * Prisma Errors
    */
-  export import PrismaClientKnownRequestError = runtime.PrismaClientKnownRequestError;
-  export import PrismaClientUnknownRequestError = runtime.PrismaClientUnknownRequestError;
-  export import PrismaClientRustPanicError = runtime.PrismaClientRustPanicError;
-  export import PrismaClientInitializationError = runtime.PrismaClientInitializationError;
-  export import PrismaClientValidationError = runtime.PrismaClientValidationError;
+  export import PrismaClientKnownRequestError = runtime.PrismaClientKnownRequestError
+  export import PrismaClientUnknownRequestError = runtime.PrismaClientUnknownRequestError
+  export import PrismaClientRustPanicError = runtime.PrismaClientRustPanicError
+  export import PrismaClientInitializationError = runtime.PrismaClientInitializationError
+  export import PrismaClientValidationError = runtime.PrismaClientValidationError
+
   /**
    * Re-export of sql-template-tag
    */
-  export import sql = runtime.sqltag;
-  export import empty = runtime.empty;
-  export import join = runtime.join;
-  export import raw = runtime.raw;
-  export import Sql = runtime.Sql;
+  export import sql = runtime.sqltag
+  export import empty = runtime.empty
+  export import join = runtime.join
+  export import raw = runtime.raw
+  export import Sql = runtime.Sql
+
+
+
   /**
    * Decimal.js
    */
-  export import Decimal = runtime.Decimal;
-  /**
-   * Extensions
-   */
-  export import Extension = $Extensions.UserArgs;
-  export import getExtensionContext = runtime.Extensions.getExtensionContext;
-  export import Args = $Public.Args;
-  export import Payload = $Public.Payload;
-  export import Result = $Public.Result;
-  export import Exact = $Public.Exact;
-  export import JsonObject = runtime.JsonObject;
-  export import JsonArray = runtime.JsonArray;
-  export import JsonValue = runtime.JsonValue;
-  export import InputJsonObject = runtime.InputJsonObject;
-  export import InputJsonArray = runtime.InputJsonArray;
-  export import InputJsonValue = runtime.InputJsonValue;
-
-  export type PrismaPromise<T> = $Public.PrismaPromise<T>
+  export import Decimal = runtime.Decimal
 
   export type DecimalJsLike = runtime.DecimalJsLike
 
@@ -433,6 +425,15 @@ export namespace Prisma {
   export type MetricHistogram = runtime.MetricHistogram
   export type MetricHistogramBucket = runtime.MetricHistogramBucket
 
+  /**
+   * Extensions
+   */
+  export import Extension = $Extensions.UserArgs
+  export import getExtensionContext = runtime.Extensions.getExtensionContext
+  export import Args = $Public.Args
+  export import Payload = $Public.Payload
+  export import Result = $Public.Result
+  export import Exact = $Public.Exact
 
   /**
    * Prisma Client JS version: 6.9.0
@@ -444,6 +445,17 @@ export namespace Prisma {
 
   export const prismaVersion: PrismaVersion
 
+  /**
+   * Utility Types
+   */
+
+
+  export import JsonObject = runtime.JsonObject
+  export import JsonArray = runtime.JsonArray
+  export import JsonValue = runtime.JsonValue
+  export import InputJsonObject = runtime.InputJsonObject
+  export import InputJsonArray = runtime.InputJsonArray
+  export import InputJsonValue = runtime.InputJsonValue
 
   /**
    * Types of the values used to represent different kinds of `null` values when working with JSON fields.
@@ -814,14 +826,14 @@ export namespace Prisma {
     Member: 'Member',
     Invitation: 'Invitation',
     TwoFactor: 'TwoFactor',
-      Channel: 'Channel',
+    Channel: 'Channel',
     Message: 'Message',
     Event: 'Event',
     RoleSlot: 'RoleSlot',
-      EventRegistration: 'EventRegistration',
-      Ticket: 'Ticket',
-      Apikey: 'Apikey',
-      Jwks: 'Jwks'
+    EventRegistration: 'EventRegistration',
+    Ticket: 'Ticket',
+    Apikey: 'Apikey',
+    Jwks: 'Jwks'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -840,7 +852,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-        modelProps: "user" | "session" | "account" | "verification" | "organization" | "member" | "invitation" | "twoFactor" | "channel" | "message" | "event" | "roleSlot" | "eventRegistration" | "ticket" | "apikey" | "jwks"
+      modelProps: "user" | "session" | "account" | "verification" | "organization" | "member" | "invitation" | "twoFactor" | "channel" | "message" | "event" | "roleSlot" | "eventRegistration" | "ticket" | "apikey" | "jwks"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1372,72 +1384,72 @@ export namespace Prisma {
           }
         }
       }
-        Channel: {
-            payload: Prisma.$ChannelPayload<ExtArgs>
-            fields: Prisma.ChannelFieldRefs
-            operations: {
-                findUnique: {
-                    args: Prisma.ChannelFindUniqueArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$ChannelPayload> | null
-                }
-                findUniqueOrThrow: {
-                    args: Prisma.ChannelFindUniqueOrThrowArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$ChannelPayload>
-                }
-                findFirst: {
-                    args: Prisma.ChannelFindFirstArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$ChannelPayload> | null
-                }
-                findFirstOrThrow: {
-                    args: Prisma.ChannelFindFirstOrThrowArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$ChannelPayload>
-                }
-                findMany: {
-                    args: Prisma.ChannelFindManyArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$ChannelPayload>[]
-                }
-                create: {
-                    args: Prisma.ChannelCreateArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$ChannelPayload>
-                }
-                createMany: {
-                    args: Prisma.ChannelCreateManyArgs<ExtArgs>
-                    result: BatchPayload
-                }
-                delete: {
-                    args: Prisma.ChannelDeleteArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$ChannelPayload>
-                }
-                update: {
-                    args: Prisma.ChannelUpdateArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$ChannelPayload>
-                }
-                deleteMany: {
-                    args: Prisma.ChannelDeleteManyArgs<ExtArgs>
-                    result: BatchPayload
-                }
-                updateMany: {
-                    args: Prisma.ChannelUpdateManyArgs<ExtArgs>
-                    result: BatchPayload
-                }
-                upsert: {
-                    args: Prisma.ChannelUpsertArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$ChannelPayload>
-                }
-                aggregate: {
-                    args: Prisma.ChannelAggregateArgs<ExtArgs>
-                    result: $Utils.Optional<AggregateChannel>
-                }
-                groupBy: {
-                    args: Prisma.ChannelGroupByArgs<ExtArgs>
-                    result: $Utils.Optional<ChannelGroupByOutputType>[]
-                }
-                count: {
-                    args: Prisma.ChannelCountArgs<ExtArgs>
-                    result: $Utils.Optional<ChannelCountAggregateOutputType> | number
-                }
-            }
+      Channel: {
+        payload: Prisma.$ChannelPayload<ExtArgs>
+        fields: Prisma.ChannelFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ChannelFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChannelPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ChannelFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChannelPayload>
+          }
+          findFirst: {
+            args: Prisma.ChannelFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChannelPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ChannelFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChannelPayload>
+          }
+          findMany: {
+            args: Prisma.ChannelFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChannelPayload>[]
+          }
+          create: {
+            args: Prisma.ChannelCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChannelPayload>
+          }
+          createMany: {
+            args: Prisma.ChannelCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.ChannelDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChannelPayload>
+          }
+          update: {
+            args: Prisma.ChannelUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChannelPayload>
+          }
+          deleteMany: {
+            args: Prisma.ChannelDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ChannelUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.ChannelUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChannelPayload>
+          }
+          aggregate: {
+            args: Prisma.ChannelAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateChannel>
+          }
+          groupBy: {
+            args: Prisma.ChannelGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ChannelGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ChannelCountArgs<ExtArgs>
+            result: $Utils.Optional<ChannelCountAggregateOutputType> | number
+          }
         }
+      }
       Message: {
         payload: Prisma.$MessagePayload<ExtArgs>
         fields: Prisma.MessageFieldRefs
@@ -1702,204 +1714,204 @@ export namespace Prisma {
           }
         }
       }
-        Ticket: {
-            payload: Prisma.$TicketPayload<ExtArgs>
-            fields: Prisma.TicketFieldRefs
-            operations: {
-                findUnique: {
-                    args: Prisma.TicketFindUniqueArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$TicketPayload> | null
-                }
-                findUniqueOrThrow: {
-                    args: Prisma.TicketFindUniqueOrThrowArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$TicketPayload>
-                }
-                findFirst: {
-                    args: Prisma.TicketFindFirstArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$TicketPayload> | null
-                }
-                findFirstOrThrow: {
-                    args: Prisma.TicketFindFirstOrThrowArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$TicketPayload>
-                }
-                findMany: {
-                    args: Prisma.TicketFindManyArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$TicketPayload>[]
-                }
-                create: {
-                    args: Prisma.TicketCreateArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$TicketPayload>
-                }
-                createMany: {
-                    args: Prisma.TicketCreateManyArgs<ExtArgs>
-                    result: BatchPayload
-                }
-                delete: {
-                    args: Prisma.TicketDeleteArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$TicketPayload>
-                }
-                update: {
-                    args: Prisma.TicketUpdateArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$TicketPayload>
-                }
-                deleteMany: {
-                    args: Prisma.TicketDeleteManyArgs<ExtArgs>
-                    result: BatchPayload
-                }
-                updateMany: {
-                    args: Prisma.TicketUpdateManyArgs<ExtArgs>
-                    result: BatchPayload
-                }
-                upsert: {
-                    args: Prisma.TicketUpsertArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$TicketPayload>
-                }
-                aggregate: {
-                    args: Prisma.TicketAggregateArgs<ExtArgs>
-                    result: $Utils.Optional<AggregateTicket>
-                }
-                groupBy: {
-                    args: Prisma.TicketGroupByArgs<ExtArgs>
-                    result: $Utils.Optional<TicketGroupByOutputType>[]
-                }
-                count: {
-                    args: Prisma.TicketCountArgs<ExtArgs>
-                    result: $Utils.Optional<TicketCountAggregateOutputType> | number
-                }
-            }
+      Ticket: {
+        payload: Prisma.$TicketPayload<ExtArgs>
+        fields: Prisma.TicketFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.TicketFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TicketPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TicketFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TicketPayload>
+          }
+          findFirst: {
+            args: Prisma.TicketFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TicketPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TicketFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TicketPayload>
+          }
+          findMany: {
+            args: Prisma.TicketFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TicketPayload>[]
+          }
+          create: {
+            args: Prisma.TicketCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TicketPayload>
+          }
+          createMany: {
+            args: Prisma.TicketCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.TicketDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TicketPayload>
+          }
+          update: {
+            args: Prisma.TicketUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TicketPayload>
+          }
+          deleteMany: {
+            args: Prisma.TicketDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TicketUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.TicketUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TicketPayload>
+          }
+          aggregate: {
+            args: Prisma.TicketAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTicket>
+          }
+          groupBy: {
+            args: Prisma.TicketGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TicketGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TicketCountArgs<ExtArgs>
+            result: $Utils.Optional<TicketCountAggregateOutputType> | number
+          }
         }
-        Apikey: {
-            payload: Prisma.$ApikeyPayload<ExtArgs>
-            fields: Prisma.ApikeyFieldRefs
-            operations: {
-                findUnique: {
-                    args: Prisma.ApikeyFindUniqueArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$ApikeyPayload> | null
-                }
-                findUniqueOrThrow: {
-                    args: Prisma.ApikeyFindUniqueOrThrowArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$ApikeyPayload>
-                }
-                findFirst: {
-                    args: Prisma.ApikeyFindFirstArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$ApikeyPayload> | null
-                }
-                findFirstOrThrow: {
-                    args: Prisma.ApikeyFindFirstOrThrowArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$ApikeyPayload>
-                }
-                findMany: {
-                    args: Prisma.ApikeyFindManyArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$ApikeyPayload>[]
-                }
-                create: {
-                    args: Prisma.ApikeyCreateArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$ApikeyPayload>
-                }
-                createMany: {
-                    args: Prisma.ApikeyCreateManyArgs<ExtArgs>
-                    result: BatchPayload
-                }
-                delete: {
-                    args: Prisma.ApikeyDeleteArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$ApikeyPayload>
-                }
-                update: {
-                    args: Prisma.ApikeyUpdateArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$ApikeyPayload>
-                }
-                deleteMany: {
-                    args: Prisma.ApikeyDeleteManyArgs<ExtArgs>
-                    result: BatchPayload
-                }
-                updateMany: {
-                    args: Prisma.ApikeyUpdateManyArgs<ExtArgs>
-                    result: BatchPayload
-                }
-                upsert: {
-                    args: Prisma.ApikeyUpsertArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$ApikeyPayload>
-                }
-                aggregate: {
-                    args: Prisma.ApikeyAggregateArgs<ExtArgs>
-                    result: $Utils.Optional<AggregateApikey>
-                }
-                groupBy: {
-                    args: Prisma.ApikeyGroupByArgs<ExtArgs>
-                    result: $Utils.Optional<ApikeyGroupByOutputType>[]
-                }
-                count: {
-                    args: Prisma.ApikeyCountArgs<ExtArgs>
-                    result: $Utils.Optional<ApikeyCountAggregateOutputType> | number
-                }
-            }
+      }
+      Apikey: {
+        payload: Prisma.$ApikeyPayload<ExtArgs>
+        fields: Prisma.ApikeyFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ApikeyFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ApikeyPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ApikeyFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ApikeyPayload>
+          }
+          findFirst: {
+            args: Prisma.ApikeyFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ApikeyPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ApikeyFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ApikeyPayload>
+          }
+          findMany: {
+            args: Prisma.ApikeyFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ApikeyPayload>[]
+          }
+          create: {
+            args: Prisma.ApikeyCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ApikeyPayload>
+          }
+          createMany: {
+            args: Prisma.ApikeyCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.ApikeyDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ApikeyPayload>
+          }
+          update: {
+            args: Prisma.ApikeyUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ApikeyPayload>
+          }
+          deleteMany: {
+            args: Prisma.ApikeyDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ApikeyUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.ApikeyUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ApikeyPayload>
+          }
+          aggregate: {
+            args: Prisma.ApikeyAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateApikey>
+          }
+          groupBy: {
+            args: Prisma.ApikeyGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ApikeyGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ApikeyCountArgs<ExtArgs>
+            result: $Utils.Optional<ApikeyCountAggregateOutputType> | number
+          }
         }
-        Jwks: {
-            payload: Prisma.$JwksPayload<ExtArgs>
-            fields: Prisma.JwksFieldRefs
-            operations: {
-                findUnique: {
-                    args: Prisma.JwksFindUniqueArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$JwksPayload> | null
-                }
-                findUniqueOrThrow: {
-                    args: Prisma.JwksFindUniqueOrThrowArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$JwksPayload>
-                }
-                findFirst: {
-                    args: Prisma.JwksFindFirstArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$JwksPayload> | null
-                }
-                findFirstOrThrow: {
-                    args: Prisma.JwksFindFirstOrThrowArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$JwksPayload>
-                }
-                findMany: {
-                    args: Prisma.JwksFindManyArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$JwksPayload>[]
-                }
-                create: {
-                    args: Prisma.JwksCreateArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$JwksPayload>
-                }
-                createMany: {
-                    args: Prisma.JwksCreateManyArgs<ExtArgs>
-                    result: BatchPayload
-                }
-                delete: {
-                    args: Prisma.JwksDeleteArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$JwksPayload>
-                }
-                update: {
-                    args: Prisma.JwksUpdateArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$JwksPayload>
-                }
-                deleteMany: {
-                    args: Prisma.JwksDeleteManyArgs<ExtArgs>
-                    result: BatchPayload
-                }
-                updateMany: {
-                    args: Prisma.JwksUpdateManyArgs<ExtArgs>
-                    result: BatchPayload
-                }
-                upsert: {
-                    args: Prisma.JwksUpsertArgs<ExtArgs>
-                    result: $Utils.PayloadToResult<Prisma.$JwksPayload>
-                }
-                aggregate: {
-                    args: Prisma.JwksAggregateArgs<ExtArgs>
-                    result: $Utils.Optional<AggregateJwks>
-                }
-                groupBy: {
-                    args: Prisma.JwksGroupByArgs<ExtArgs>
-                    result: $Utils.Optional<JwksGroupByOutputType>[]
-                }
-                count: {
-                    args: Prisma.JwksCountArgs<ExtArgs>
-                    result: $Utils.Optional<JwksCountAggregateOutputType> | number
-                }
-            }
+      }
+      Jwks: {
+        payload: Prisma.$JwksPayload<ExtArgs>
+        fields: Prisma.JwksFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.JwksFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JwksPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.JwksFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JwksPayload>
+          }
+          findFirst: {
+            args: Prisma.JwksFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JwksPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.JwksFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JwksPayload>
+          }
+          findMany: {
+            args: Prisma.JwksFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JwksPayload>[]
+          }
+          create: {
+            args: Prisma.JwksCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JwksPayload>
+          }
+          createMany: {
+            args: Prisma.JwksCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.JwksDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JwksPayload>
+          }
+          update: {
+            args: Prisma.JwksUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JwksPayload>
+          }
+          deleteMany: {
+            args: Prisma.JwksDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.JwksUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.JwksUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JwksPayload>
+          }
+          aggregate: {
+            args: Prisma.JwksAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateJwks>
+          }
+          groupBy: {
+            args: Prisma.JwksGroupByArgs<ExtArgs>
+            result: $Utils.Optional<JwksGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.JwksCountArgs<ExtArgs>
+            result: $Utils.Optional<JwksCountAggregateOutputType> | number
+          }
         }
+      }
     }
   } & {
     other: {
@@ -1945,7 +1957,7 @@ export namespace Prisma {
      * ```
      * // Defaults to stdout
      * log: ['query', 'info', 'warn', 'error']
-     *
+     * 
      * // Emit as events
      * log: [
      *   { emit: 'stdout', level: 'query' },
@@ -1969,7 +1981,7 @@ export namespace Prisma {
     }
     /**
      * Global configuration for omitting model fields by default.
-     *
+     * 
      * @example
      * ```
      * const prisma = new PrismaClient({
@@ -1992,14 +2004,14 @@ export namespace Prisma {
     member?: MemberOmit
     invitation?: InvitationOmit
     twoFactor?: TwoFactorOmit
-      channel?: ChannelOmit
+    channel?: ChannelOmit
     message?: MessageOmit
     event?: EventOmit
     roleSlot?: RoleSlotOmit
     eventRegistration?: EventRegistrationOmit
-      ticket?: TicketOmit
-      apikey?: ApikeyOmit
-      jwks?: JwksOmit
+    ticket?: TicketOmit
+    apikey?: ApikeyOmit
+    jwks?: JwksOmit
   }
 
   /* Types for Logging */
@@ -2102,8 +2114,8 @@ export namespace Prisma {
     twofactors: number
     Event: number
     EventRegistration: number
-      Ticket: number
-      apikeys: number
+    Ticket: number
+    apikeys: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2115,8 +2127,8 @@ export namespace Prisma {
     twofactors?: boolean | UserCountOutputTypeCountTwofactorsArgs
     Event?: boolean | UserCountOutputTypeCountEventArgs
     EventRegistration?: boolean | UserCountOutputTypeCountEventRegistrationArgs
-      Ticket?: boolean | UserCountOutputTypeCountTicketArgs
-      apikeys?: boolean | UserCountOutputTypeCountApikeysArgs
+    Ticket?: boolean | UserCountOutputTypeCountTicketArgs
+    apikeys?: boolean | UserCountOutputTypeCountApikeysArgs
   }
 
   // Custom InputTypes
@@ -2186,19 +2198,19 @@ export namespace Prisma {
     where?: EventRegistrationWhereInput
   }
 
-    /**
-     * UserCountOutputType without action
-     */
-    export type UserCountOutputTypeCountTicketArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        where?: TicketWhereInput
-    }
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountTicketArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TicketWhereInput
+  }
 
-    /**
-     * UserCountOutputType without action
-     */
-    export type UserCountOutputTypeCountApikeysArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        where?: ApikeyWhereInput
-    }
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountApikeysArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ApikeyWhereInput
+  }
 
 
   /**
@@ -2241,44 +2253,44 @@ export namespace Prisma {
   }
 
 
+  /**
+   * Count Type ChannelCountOutputType
+   */
+
+  export type ChannelCountOutputType = {
+    Message: number
+    Ticket: number
+  }
+
+  export type ChannelCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    Message?: boolean | ChannelCountOutputTypeCountMessageArgs
+    Ticket?: boolean | ChannelCountOutputTypeCountTicketArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * ChannelCountOutputType without action
+   */
+  export type ChannelCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Count Type ChannelCountOutputType
+     * Select specific fields to fetch from the ChannelCountOutputType
      */
+    select?: ChannelCountOutputTypeSelect<ExtArgs> | null
+  }
 
-    export type ChannelCountOutputType = {
-        Message: number
-        Ticket: number
-    }
+  /**
+   * ChannelCountOutputType without action
+   */
+  export type ChannelCountOutputTypeCountMessageArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MessageWhereInput
+  }
 
-    export type ChannelCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        Message?: boolean | ChannelCountOutputTypeCountMessageArgs
-        Ticket?: boolean | ChannelCountOutputTypeCountTicketArgs
-    }
-
-    // Custom InputTypes
-    /**
-     * ChannelCountOutputType without action
-     */
-    export type ChannelCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the ChannelCountOutputType
-         */
-        select?: ChannelCountOutputTypeSelect<ExtArgs> | null
-    }
-
-    /**
-     * ChannelCountOutputType without action
-     */
-    export type ChannelCountOutputTypeCountMessageArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        where?: MessageWhereInput
-    }
-
-    /**
-     * ChannelCountOutputType without action
-     */
-    export type ChannelCountOutputTypeCountTicketArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        where?: TicketWhereInput
-    }
+  /**
+   * ChannelCountOutputType without action
+   */
+  export type ChannelCountOutputTypeCountTicketArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TicketWhereInput
+  }
 
 
   /**
@@ -2379,8 +2391,8 @@ export namespace Prisma {
     banReason: string | null
     banExpires: Date | null
     twoFactorEnabled: boolean | null
-      username: string | null
-      displayUsername: string | null
+    username: string | null
+    displayUsername: string | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -2396,8 +2408,8 @@ export namespace Prisma {
     banReason: string | null
     banExpires: Date | null
     twoFactorEnabled: boolean | null
-      username: string | null
-      displayUsername: string | null
+    username: string | null
+    displayUsername: string | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -2413,8 +2425,8 @@ export namespace Prisma {
     banReason: number
     banExpires: number
     twoFactorEnabled: number
-      username: number
-      displayUsername: number
+    username: number
+    displayUsername: number
     _all: number
   }
 
@@ -2432,8 +2444,8 @@ export namespace Prisma {
     banReason?: true
     banExpires?: true
     twoFactorEnabled?: true
-      username?: true
-      displayUsername?: true
+    username?: true
+    displayUsername?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -2449,8 +2461,8 @@ export namespace Prisma {
     banReason?: true
     banExpires?: true
     twoFactorEnabled?: true
-      username?: true
-      displayUsername?: true
+    username?: true
+    displayUsername?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -2466,8 +2478,8 @@ export namespace Prisma {
     banReason?: true
     banExpires?: true
     twoFactorEnabled?: true
-      username?: true
-      displayUsername?: true
+    username?: true
+    displayUsername?: true
     _all?: true
   }
 
@@ -2478,43 +2490,43 @@ export namespace Prisma {
     where?: UserWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Users to fetch.
      */
     orderBy?: UserOrderByWithRelationInput | UserOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the start position
      */
     cursor?: UserWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Users from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Users.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Count returned Users
     **/
     _count?: true | UserCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: UserMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Select which fields to find the maximum value
     **/
     _max?: UserMaxAggregateInputType
@@ -2556,8 +2568,8 @@ export namespace Prisma {
     banReason: string | null
     banExpires: Date | null
     twoFactorEnabled: boolean | null
-      username: string | null
-      displayUsername: string | null
+    username: string | null
+    displayUsername: string | null
     _count: UserCountAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
@@ -2590,8 +2602,8 @@ export namespace Prisma {
     banReason?: boolean
     banExpires?: boolean
     twoFactorEnabled?: boolean
-      username?: boolean
-      displayUsername?: boolean
+    username?: boolean
+    displayUsername?: boolean
     accounts?: boolean | User$accountsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     messages?: boolean | User$messagesArgs<ExtArgs>
@@ -2600,8 +2612,8 @@ export namespace Prisma {
     twofactors?: boolean | User$twofactorsArgs<ExtArgs>
     Event?: boolean | User$EventArgs<ExtArgs>
     EventRegistration?: boolean | User$EventRegistrationArgs<ExtArgs>
-      Ticket?: boolean | User$TicketArgs<ExtArgs>
-      apikeys?: boolean | User$apikeysArgs<ExtArgs>
+    Ticket?: boolean | User$TicketArgs<ExtArgs>
+    apikeys?: boolean | User$apikeysArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -2620,11 +2632,11 @@ export namespace Prisma {
     banReason?: boolean
     banExpires?: boolean
     twoFactorEnabled?: boolean
-      username?: boolean
-      displayUsername?: boolean
+    username?: boolean
+    displayUsername?: boolean
   }
 
-    export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "createdAt" | "updatedAt" | "role" | "banned" | "banReason" | "banExpires" | "twoFactorEnabled" | "username" | "displayUsername", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "createdAt" | "updatedAt" | "role" | "banned" | "banReason" | "banExpires" | "twoFactorEnabled" | "username" | "displayUsername", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     accounts?: boolean | User$accountsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
@@ -2634,8 +2646,8 @@ export namespace Prisma {
     twofactors?: boolean | User$twofactorsArgs<ExtArgs>
     Event?: boolean | User$EventArgs<ExtArgs>
     EventRegistration?: boolean | User$EventRegistrationArgs<ExtArgs>
-      Ticket?: boolean | User$TicketArgs<ExtArgs>
-      apikeys?: boolean | User$apikeysArgs<ExtArgs>
+    Ticket?: boolean | User$TicketArgs<ExtArgs>
+    apikeys?: boolean | User$apikeysArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -2650,8 +2662,8 @@ export namespace Prisma {
       twofactors: Prisma.$TwoFactorPayload<ExtArgs>[]
       Event: Prisma.$EventPayload<ExtArgs>[]
       EventRegistration: Prisma.$EventRegistrationPayload<ExtArgs>[]
-        Ticket: Prisma.$TicketPayload<ExtArgs>[]
-        apikeys: Prisma.$ApikeyPayload<ExtArgs>[]
+      Ticket: Prisma.$TicketPayload<ExtArgs>[]
+      apikeys: Prisma.$ApikeyPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -2666,8 +2678,8 @@ export namespace Prisma {
       banReason: string | null
       banExpires: Date | null
       twoFactorEnabled: boolean | null
-        username: string | null
-        displayUsername: string | null
+      username: string | null
+      displayUsername: string | null
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -2747,13 +2759,13 @@ export namespace Prisma {
      * @example
      * // Get all Users
      * const users = await prisma.user.findMany()
-     *
+     * 
      * // Get first 10 Users
      * const users = await prisma.user.findMany({ take: 10 })
-     *
+     * 
      * // Only select the `id`
      * const userWithIdOnly = await prisma.user.findMany({ select: { id: true } })
-     *
+     * 
      */
     findMany<T extends UserFindManyArgs>(args?: SelectSubset<T, UserFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -2767,7 +2779,7 @@ export namespace Prisma {
      *     // ... data to create a User
      *   }
      * })
-     *
+     * 
      */
     create<T extends UserCreateArgs>(args: SelectSubset<T, UserCreateArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -2781,7 +2793,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *
+     *     
      */
     createMany<T extends UserCreateManyArgs>(args?: SelectSubset<T, UserCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -2795,7 +2807,7 @@ export namespace Prisma {
      *     // ... filter to delete one User
      *   }
      * })
-     *
+     * 
      */
     delete<T extends UserDeleteArgs>(args: SelectSubset<T, UserDeleteArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -2812,7 +2824,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     *
+     * 
      */
     update<T extends UserUpdateArgs>(args: SelectSubset<T, UserUpdateArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -2826,7 +2838,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     *
+     * 
      */
     deleteMany<T extends UserDeleteManyArgs>(args?: SelectSubset<T, UserDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -2845,7 +2857,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     *
+     * 
      */
     updateMany<T extends UserUpdateManyArgs>(args: SelectSubset<T, UserUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -2934,7 +2946,7 @@ export namespace Prisma {
      *     _all: true
      *   },
      * })
-     *
+     * 
     **/
     groupBy<
       T extends UserGroupByArgs,
@@ -3017,9 +3029,9 @@ export namespace Prisma {
     Event<T extends User$EventArgs<ExtArgs> = {}>(args?: Subset<T, User$EventArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     EventRegistration<T extends User$EventRegistrationArgs<ExtArgs> = {}>(args?: Subset<T, User$EventRegistrationArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventRegistrationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
 
-      Ticket<T extends User$TicketArgs<ExtArgs> = {}>(args?: Subset<T, User$TicketArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    Ticket<T extends User$TicketArgs<ExtArgs> = {}>(args?: Subset<T, User$TicketArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
 
-      apikeys<T extends User$apikeysArgs<ExtArgs> = {}>(args?: Subset<T, User$apikeysArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ApikeyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    apikeys<T extends User$apikeysArgs<ExtArgs> = {}>(args?: Subset<T, User$apikeysArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ApikeyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3061,12 +3073,12 @@ export namespace Prisma {
     readonly banReason: FieldRef<"User", 'String'>
     readonly banExpires: FieldRef<"User", 'DateTime'>
     readonly twoFactorEnabled: FieldRef<"User", 'Boolean'>
-      readonly username: FieldRef<"User", 'String'>
-      readonly displayUsername: FieldRef<"User", 'String'>
+    readonly username: FieldRef<"User", 'String'>
+    readonly displayUsername: FieldRef<"User", 'String'>
   }
 
 
-    // Custom InputTypes
+  // Custom InputTypes
   /**
    * User findUnique
    */
@@ -3133,31 +3145,31 @@ export namespace Prisma {
     where?: UserWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Users to fetch.
      */
     orderBy?: UserOrderByWithRelationInput | UserOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for searching for Users.
      */
     cursor?: UserWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Users from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Users.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     *
+     * 
      * Filter by unique combinations of Users.
      */
     distinct?: UserScalarFieldEnum | UserScalarFieldEnum[]
@@ -3185,31 +3197,31 @@ export namespace Prisma {
     where?: UserWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Users to fetch.
      */
     orderBy?: UserOrderByWithRelationInput | UserOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for searching for Users.
      */
     cursor?: UserWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Users from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Users.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     *
+     * 
      * Filter by unique combinations of Users.
      */
     distinct?: UserScalarFieldEnum | UserScalarFieldEnum[]
@@ -3237,25 +3249,25 @@ export namespace Prisma {
     where?: UserWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Users to fetch.
      */
     orderBy?: UserOrderByWithRelationInput | UserOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for listing Users.
      */
     cursor?: UserWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Users from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Users.
      */
     skip?: number
@@ -3333,10 +3345,10 @@ export namespace Prisma {
      * Filter which Users to update
      */
     where?: UserWhereInput
-      /**
-       * Limit how many Users to update.
-       */
-      limit?: number
+    /**
+     * Limit how many Users to update.
+     */
+    limit?: number
   }
 
   /**
@@ -3399,10 +3411,10 @@ export namespace Prisma {
      * Filter which Users to delete
      */
     where?: UserWhereInput
-      /**
-       * Limit how many Users to delete.
-       */
-      limit?: number
+    /**
+     * Limit how many Users to delete.
+     */
+    limit?: number
   }
 
   /**
@@ -3597,53 +3609,53 @@ export namespace Prisma {
     distinct?: EventRegistrationScalarFieldEnum | EventRegistrationScalarFieldEnum[]
   }
 
+  /**
+   * User.Ticket
+   */
+  export type User$TicketArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * User.Ticket
+     * Select specific fields to fetch from the Ticket
      */
-    export type User$TicketArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Ticket
-         */
-        select?: TicketSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Ticket
-         */
-        omit?: TicketOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: TicketInclude<ExtArgs> | null
-        where?: TicketWhereInput
-        orderBy?: TicketOrderByWithRelationInput | TicketOrderByWithRelationInput[]
-        cursor?: TicketWhereUniqueInput
-        take?: number
-        skip?: number
-        distinct?: TicketScalarFieldEnum | TicketScalarFieldEnum[]
-    }
+    select?: TicketSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ticket
+     */
+    omit?: TicketOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TicketInclude<ExtArgs> | null
+    where?: TicketWhereInput
+    orderBy?: TicketOrderByWithRelationInput | TicketOrderByWithRelationInput[]
+    cursor?: TicketWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TicketScalarFieldEnum | TicketScalarFieldEnum[]
+  }
 
+  /**
+   * User.apikeys
+   */
+  export type User$apikeysArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * User.apikeys
+     * Select specific fields to fetch from the Apikey
      */
-    export type User$apikeysArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Apikey
-         */
-        select?: ApikeySelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Apikey
-         */
-        omit?: ApikeyOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: ApikeyInclude<ExtArgs> | null
-        where?: ApikeyWhereInput
-        orderBy?: ApikeyOrderByWithRelationInput | ApikeyOrderByWithRelationInput[]
-        cursor?: ApikeyWhereUniqueInput
-        take?: number
-        skip?: number
-        distinct?: ApikeyScalarFieldEnum | ApikeyScalarFieldEnum[]
-    }
+    select?: ApikeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Apikey
+     */
+    omit?: ApikeyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApikeyInclude<ExtArgs> | null
+    where?: ApikeyWhereInput
+    orderBy?: ApikeyOrderByWithRelationInput | ApikeyOrderByWithRelationInput[]
+    cursor?: ApikeyWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ApikeyScalarFieldEnum | ApikeyScalarFieldEnum[]
+  }
 
   /**
    * User without action
@@ -3762,43 +3774,43 @@ export namespace Prisma {
     where?: SessionWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Sessions to fetch.
      */
     orderBy?: SessionOrderByWithRelationInput | SessionOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the start position
      */
     cursor?: SessionWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Sessions from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Sessions.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Count returned Sessions
     **/
     _count?: true | SessionCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: SessionMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Select which fields to find the maximum value
     **/
     _max?: SessionMaxAggregateInputType
@@ -3986,13 +3998,13 @@ export namespace Prisma {
      * @example
      * // Get all Sessions
      * const sessions = await prisma.session.findMany()
-     *
+     * 
      * // Get first 10 Sessions
      * const sessions = await prisma.session.findMany({ take: 10 })
-     *
+     * 
      * // Only select the `id`
      * const sessionWithIdOnly = await prisma.session.findMany({ select: { id: true } })
-     *
+     * 
      */
     findMany<T extends SessionFindManyArgs>(args?: SelectSubset<T, SessionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -4006,7 +4018,7 @@ export namespace Prisma {
      *     // ... data to create a Session
      *   }
      * })
-     *
+     * 
      */
     create<T extends SessionCreateArgs>(args: SelectSubset<T, SessionCreateArgs<ExtArgs>>): Prisma__SessionClient<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -4020,7 +4032,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *
+     *     
      */
     createMany<T extends SessionCreateManyArgs>(args?: SelectSubset<T, SessionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -4034,7 +4046,7 @@ export namespace Prisma {
      *     // ... filter to delete one Session
      *   }
      * })
-     *
+     * 
      */
     delete<T extends SessionDeleteArgs>(args: SelectSubset<T, SessionDeleteArgs<ExtArgs>>): Prisma__SessionClient<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -4051,7 +4063,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     *
+     * 
      */
     update<T extends SessionUpdateArgs>(args: SelectSubset<T, SessionUpdateArgs<ExtArgs>>): Prisma__SessionClient<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -4065,7 +4077,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     *
+     * 
      */
     deleteMany<T extends SessionDeleteManyArgs>(args?: SelectSubset<T, SessionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -4084,7 +4096,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     *
+     * 
      */
     updateMany<T extends SessionUpdateManyArgs>(args: SelectSubset<T, SessionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -4173,7 +4185,7 @@ export namespace Prisma {
      *     _all: true
      *   },
      * })
-     *
+     * 
     **/
     groupBy<
       T extends SessionGroupByArgs,
@@ -4290,7 +4302,7 @@ export namespace Prisma {
   }
 
 
-    // Custom InputTypes
+  // Custom InputTypes
   /**
    * Session findUnique
    */
@@ -4357,31 +4369,31 @@ export namespace Prisma {
     where?: SessionWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Sessions to fetch.
      */
     orderBy?: SessionOrderByWithRelationInput | SessionOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for searching for Sessions.
      */
     cursor?: SessionWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Sessions from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Sessions.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     *
+     * 
      * Filter by unique combinations of Sessions.
      */
     distinct?: SessionScalarFieldEnum | SessionScalarFieldEnum[]
@@ -4409,31 +4421,31 @@ export namespace Prisma {
     where?: SessionWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Sessions to fetch.
      */
     orderBy?: SessionOrderByWithRelationInput | SessionOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for searching for Sessions.
      */
     cursor?: SessionWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Sessions from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Sessions.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     *
+     * 
      * Filter by unique combinations of Sessions.
      */
     distinct?: SessionScalarFieldEnum | SessionScalarFieldEnum[]
@@ -4461,25 +4473,25 @@ export namespace Prisma {
     where?: SessionWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Sessions to fetch.
      */
     orderBy?: SessionOrderByWithRelationInput | SessionOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for listing Sessions.
      */
     cursor?: SessionWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Sessions from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Sessions.
      */
     skip?: number
@@ -4557,10 +4569,10 @@ export namespace Prisma {
      * Filter which Sessions to update
      */
     where?: SessionWhereInput
-      /**
-       * Limit how many Sessions to update.
-       */
-      limit?: number
+    /**
+     * Limit how many Sessions to update.
+     */
+    limit?: number
   }
 
   /**
@@ -4623,10 +4635,10 @@ export namespace Prisma {
      * Filter which Sessions to delete
      */
     where?: SessionWhereInput
-      /**
-       * Limit how many Sessions to delete.
-       */
-      limit?: number
+    /**
+     * Limit how many Sessions to delete.
+     */
+    limit?: number
   }
 
   /**
@@ -4764,43 +4776,43 @@ export namespace Prisma {
     where?: AccountWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Accounts to fetch.
      */
     orderBy?: AccountOrderByWithRelationInput | AccountOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the start position
      */
     cursor?: AccountWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Accounts from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Accounts.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Count returned Accounts
     **/
     _count?: true | AccountCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: AccountMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Select which fields to find the maximum value
     **/
     _max?: AccountMaxAggregateInputType
@@ -5000,13 +5012,13 @@ export namespace Prisma {
      * @example
      * // Get all Accounts
      * const accounts = await prisma.account.findMany()
-     *
+     * 
      * // Get first 10 Accounts
      * const accounts = await prisma.account.findMany({ take: 10 })
-     *
+     * 
      * // Only select the `id`
      * const accountWithIdOnly = await prisma.account.findMany({ select: { id: true } })
-     *
+     * 
      */
     findMany<T extends AccountFindManyArgs>(args?: SelectSubset<T, AccountFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -5020,7 +5032,7 @@ export namespace Prisma {
      *     // ... data to create a Account
      *   }
      * })
-     *
+     * 
      */
     create<T extends AccountCreateArgs>(args: SelectSubset<T, AccountCreateArgs<ExtArgs>>): Prisma__AccountClient<$Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -5034,7 +5046,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *
+     *     
      */
     createMany<T extends AccountCreateManyArgs>(args?: SelectSubset<T, AccountCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -5048,7 +5060,7 @@ export namespace Prisma {
      *     // ... filter to delete one Account
      *   }
      * })
-     *
+     * 
      */
     delete<T extends AccountDeleteArgs>(args: SelectSubset<T, AccountDeleteArgs<ExtArgs>>): Prisma__AccountClient<$Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -5065,7 +5077,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     *
+     * 
      */
     update<T extends AccountUpdateArgs>(args: SelectSubset<T, AccountUpdateArgs<ExtArgs>>): Prisma__AccountClient<$Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -5079,7 +5091,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     *
+     * 
      */
     deleteMany<T extends AccountDeleteManyArgs>(args?: SelectSubset<T, AccountDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -5098,7 +5110,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     *
+     * 
      */
     updateMany<T extends AccountUpdateManyArgs>(args: SelectSubset<T, AccountUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -5187,7 +5199,7 @@ export namespace Prisma {
      *     _all: true
      *   },
      * })
-     *
+     * 
     **/
     groupBy<
       T extends AccountGroupByArgs,
@@ -5307,7 +5319,7 @@ export namespace Prisma {
   }
 
 
-    // Custom InputTypes
+  // Custom InputTypes
   /**
    * Account findUnique
    */
@@ -5374,31 +5386,31 @@ export namespace Prisma {
     where?: AccountWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Accounts to fetch.
      */
     orderBy?: AccountOrderByWithRelationInput | AccountOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for searching for Accounts.
      */
     cursor?: AccountWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Accounts from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Accounts.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     *
+     * 
      * Filter by unique combinations of Accounts.
      */
     distinct?: AccountScalarFieldEnum | AccountScalarFieldEnum[]
@@ -5426,31 +5438,31 @@ export namespace Prisma {
     where?: AccountWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Accounts to fetch.
      */
     orderBy?: AccountOrderByWithRelationInput | AccountOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for searching for Accounts.
      */
     cursor?: AccountWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Accounts from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Accounts.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     *
+     * 
      * Filter by unique combinations of Accounts.
      */
     distinct?: AccountScalarFieldEnum | AccountScalarFieldEnum[]
@@ -5478,25 +5490,25 @@ export namespace Prisma {
     where?: AccountWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Accounts to fetch.
      */
     orderBy?: AccountOrderByWithRelationInput | AccountOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for listing Accounts.
      */
     cursor?: AccountWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Accounts from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Accounts.
      */
     skip?: number
@@ -5574,10 +5586,10 @@ export namespace Prisma {
      * Filter which Accounts to update
      */
     where?: AccountWhereInput
-      /**
-       * Limit how many Accounts to update.
-       */
-      limit?: number
+    /**
+     * Limit how many Accounts to update.
+     */
+    limit?: number
   }
 
   /**
@@ -5640,10 +5652,10 @@ export namespace Prisma {
      * Filter which Accounts to delete
      */
     where?: AccountWhereInput
-      /**
-       * Limit how many Accounts to delete.
-       */
-      limit?: number
+    /**
+     * Limit how many Accounts to delete.
+     */
+    limit?: number
   }
 
   /**
@@ -5739,43 +5751,43 @@ export namespace Prisma {
     where?: VerificationWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Verifications to fetch.
      */
     orderBy?: VerificationOrderByWithRelationInput | VerificationOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the start position
      */
     cursor?: VerificationWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Verifications from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Verifications.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Count returned Verifications
     **/
     _count?: true | VerificationCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: VerificationMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Select which fields to find the maximum value
     **/
     _max?: VerificationMaxAggregateInputType
@@ -5941,13 +5953,13 @@ export namespace Prisma {
      * @example
      * // Get all Verifications
      * const verifications = await prisma.verification.findMany()
-     *
+     * 
      * // Get first 10 Verifications
      * const verifications = await prisma.verification.findMany({ take: 10 })
-     *
+     * 
      * // Only select the `id`
      * const verificationWithIdOnly = await prisma.verification.findMany({ select: { id: true } })
-     *
+     * 
      */
     findMany<T extends VerificationFindManyArgs>(args?: SelectSubset<T, VerificationFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$VerificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -5961,7 +5973,7 @@ export namespace Prisma {
      *     // ... data to create a Verification
      *   }
      * })
-     *
+     * 
      */
     create<T extends VerificationCreateArgs>(args: SelectSubset<T, VerificationCreateArgs<ExtArgs>>): Prisma__VerificationClient<$Result.GetResult<Prisma.$VerificationPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -5975,7 +5987,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *
+     *     
      */
     createMany<T extends VerificationCreateManyArgs>(args?: SelectSubset<T, VerificationCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -5989,7 +6001,7 @@ export namespace Prisma {
      *     // ... filter to delete one Verification
      *   }
      * })
-     *
+     * 
      */
     delete<T extends VerificationDeleteArgs>(args: SelectSubset<T, VerificationDeleteArgs<ExtArgs>>): Prisma__VerificationClient<$Result.GetResult<Prisma.$VerificationPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -6006,7 +6018,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     *
+     * 
      */
     update<T extends VerificationUpdateArgs>(args: SelectSubset<T, VerificationUpdateArgs<ExtArgs>>): Prisma__VerificationClient<$Result.GetResult<Prisma.$VerificationPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -6020,7 +6032,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     *
+     * 
      */
     deleteMany<T extends VerificationDeleteManyArgs>(args?: SelectSubset<T, VerificationDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -6039,7 +6051,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     *
+     * 
      */
     updateMany<T extends VerificationUpdateManyArgs>(args: SelectSubset<T, VerificationUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -6128,7 +6140,7 @@ export namespace Prisma {
      *     _all: true
      *   },
      * })
-     *
+     * 
     **/
     groupBy<
       T extends VerificationGroupByArgs,
@@ -6240,7 +6252,7 @@ export namespace Prisma {
   }
 
 
-    // Custom InputTypes
+  // Custom InputTypes
   /**
    * Verification findUnique
    */
@@ -6295,31 +6307,31 @@ export namespace Prisma {
     where?: VerificationWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Verifications to fetch.
      */
     orderBy?: VerificationOrderByWithRelationInput | VerificationOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for searching for Verifications.
      */
     cursor?: VerificationWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Verifications from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Verifications.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     *
+     * 
      * Filter by unique combinations of Verifications.
      */
     distinct?: VerificationScalarFieldEnum | VerificationScalarFieldEnum[]
@@ -6343,31 +6355,31 @@ export namespace Prisma {
     where?: VerificationWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Verifications to fetch.
      */
     orderBy?: VerificationOrderByWithRelationInput | VerificationOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for searching for Verifications.
      */
     cursor?: VerificationWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Verifications from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Verifications.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     *
+     * 
      * Filter by unique combinations of Verifications.
      */
     distinct?: VerificationScalarFieldEnum | VerificationScalarFieldEnum[]
@@ -6391,25 +6403,25 @@ export namespace Prisma {
     where?: VerificationWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Verifications to fetch.
      */
     orderBy?: VerificationOrderByWithRelationInput | VerificationOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for listing Verifications.
      */
     cursor?: VerificationWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Verifications from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Verifications.
      */
     skip?: number
@@ -6479,10 +6491,10 @@ export namespace Prisma {
      * Filter which Verifications to update
      */
     where?: VerificationWhereInput
-      /**
-       * Limit how many Verifications to update.
-       */
-      limit?: number
+    /**
+     * Limit how many Verifications to update.
+     */
+    limit?: number
   }
 
   /**
@@ -6537,10 +6549,10 @@ export namespace Prisma {
      * Filter which Verifications to delete
      */
     where?: VerificationWhereInput
-      /**
-       * Limit how many Verifications to delete.
-       */
-      limit?: number
+    /**
+     * Limit how many Verifications to delete.
+     */
+    limit?: number
   }
 
   /**
@@ -6632,43 +6644,43 @@ export namespace Prisma {
     where?: OrganizationWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Organizations to fetch.
      */
     orderBy?: OrganizationOrderByWithRelationInput | OrganizationOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the start position
      */
     cursor?: OrganizationWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Organizations from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Organizations.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Count returned Organizations
      **/
     _count?: true | OrganizationCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Select which fields to find the minimum value
      **/
     _min?: OrganizationMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Select which fields to find the maximum value
      **/
     _max?: OrganizationMaxAggregateInputType
@@ -6676,14 +6688,14 @@ export namespace Prisma {
 
   export type GetOrganizationAggregateType<T extends OrganizationAggregateArgs> = {
         [P in keyof T & keyof AggregateOrganization]: P extends '_count' | 'count'
-          ? T[P] extends true
-              ? number
-              : GetScalarType<T[P], AggregateOrganization[P]>
-          : GetScalarType<T[P], AggregateOrganization[P]>
+        ? T[P] extends true
+            ? number
+            : GetScalarType<T[P], AggregateOrganization[P]>
+        : GetScalarType<T[P], AggregateOrganization[P]>
   }
 
 
-    export type OrganizationGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type OrganizationGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: OrganizationWhereInput
     orderBy?: OrganizationOrderByWithAggregationInput | OrganizationOrderByWithAggregationInput[]
     by: OrganizationScalarFieldEnum[] | OrganizationScalarFieldEnum
@@ -6711,7 +6723,7 @@ export namespace Prisma {
       Array<
           PickEnumerable<OrganizationGroupByOutputType, T['by']> &
           {
-              [P in ((keyof T) & (keyof OrganizationGroupByOutputType))]: P extends '_count'
+            [P in ((keyof T) & (keyof OrganizationGroupByOutputType))]: P extends '_count'
               ? T[P] extends boolean
                   ? number
                   : GetScalarType<T[P], OrganizationGroupByOutputType[P]>
@@ -6843,13 +6855,13 @@ export namespace Prisma {
      * @example
      * // Get all Organizations
      * const organizations = await prisma.organization.findMany()
-     *
+     * 
      * // Get first 10 Organizations
      * const organizations = await prisma.organization.findMany({ take: 10 })
-     *
+     * 
      * // Only select the `id`
      * const organizationWithIdOnly = await prisma.organization.findMany({ select: { id: true } })
-     *
+     * 
      */
     findMany<T extends OrganizationFindManyArgs>(args?: SelectSubset<T, OrganizationFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -6863,7 +6875,7 @@ export namespace Prisma {
      *     // ... data to create a Organization
      *   }
      * })
-     *
+     * 
      */
     create<T extends OrganizationCreateArgs>(args: SelectSubset<T, OrganizationCreateArgs<ExtArgs>>): Prisma__OrganizationClient<$Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -6877,7 +6889,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *
+     *     
      */
     createMany<T extends OrganizationCreateManyArgs>(args?: SelectSubset<T, OrganizationCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -6891,7 +6903,7 @@ export namespace Prisma {
      *     // ... filter to delete one Organization
      *   }
      * })
-     *
+     * 
      */
     delete<T extends OrganizationDeleteArgs>(args: SelectSubset<T, OrganizationDeleteArgs<ExtArgs>>): Prisma__OrganizationClient<$Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -6908,7 +6920,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     *
+     * 
      */
     update<T extends OrganizationUpdateArgs>(args: SelectSubset<T, OrganizationUpdateArgs<ExtArgs>>): Prisma__OrganizationClient<$Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -6922,7 +6934,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     *
+     * 
      */
     deleteMany<T extends OrganizationDeleteManyArgs>(args?: SelectSubset<T, OrganizationDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -6941,7 +6953,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     *
+     * 
      */
     updateMany<T extends OrganizationUpdateManyArgs>(args: SelectSubset<T, OrganizationUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -7051,25 +7063,25 @@ export namespace Prisma {
             ? `Error: "by" must not be empty.`
             : HavingValid extends False
                 ? {
-                    [P in HavingFields]: P extends ByFields
-                        ? never
-                        : P extends string
-                            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-                            : [
-                                Error,
-                                'Field ',
-                                P,
-                                ` in "having" needs to be provided in "by"`,
-                            ]
+                  [P in HavingFields]: P extends ByFields
+                      ? never
+                      : P extends string
+                          ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+                          : [
+                            Error,
+                            'Field ',
+                            P,
+                            ` in "having" needs to be provided in "by"`,
+                          ]
                 }[HavingFields]
                 : 'take' extends Keys<T>
                     ? 'orderBy' extends Keys<T>
                         ? ByValid extends True
                             ? {}
                             : {
-                                [P in OrderFields]: P extends ByFields
-                                    ? never
-                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                              [P in OrderFields]: P extends ByFields
+                                  ? never
+                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
                         : 'Error: If you provide "take", you also need to provide "orderBy"'
                     : 'skip' extends Keys<T>
@@ -7077,24 +7089,24 @@ export namespace Prisma {
                             ? ByValid extends True
                                 ? {}
                                 : {
-                                    [P in OrderFields]: P extends ByFields
-                                        ? never
-                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                  [P in OrderFields]: P extends ByFields
+                                      ? never
+                                      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                                 }[OrderFields]
                             : 'Error: If you provide "skip", you also need to provide "orderBy"'
                         : ByValid extends True
                             ? {}
                             : {
-                                [P in OrderFields]: P extends ByFields
-                                    ? never
-                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                              [P in OrderFields]: P extends ByFields
+                                  ? never
+                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
     >(args: SubsetIntersection<T, OrganizationGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetOrganizationGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
 
-      /**
-       * Fields of the Organization model
-       */
-      readonly fields: OrganizationFieldRefs;
+    /**
+     * Fields of the Organization model
+     */
+    readonly fields: OrganizationFieldRefs;
   }
 
   /**
@@ -7130,7 +7142,7 @@ export namespace Prisma {
   }
 
 
-    /**
+  /**
    * Fields of the Organization model
    */
   interface OrganizationFieldRefs {
@@ -7143,7 +7155,7 @@ export namespace Prisma {
   }
 
 
-    // Custom InputTypes
+  // Custom InputTypes
   /**
    * Organization findUnique
    */
@@ -7210,31 +7222,31 @@ export namespace Prisma {
     where?: OrganizationWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Organizations to fetch.
      */
     orderBy?: OrganizationOrderByWithRelationInput | OrganizationOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for searching for Organizations.
      */
     cursor?: OrganizationWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Organizations from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Organizations.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     *
+     * 
      * Filter by unique combinations of Organizations.
      */
     distinct?: OrganizationScalarFieldEnum | OrganizationScalarFieldEnum[]
@@ -7262,31 +7274,31 @@ export namespace Prisma {
     where?: OrganizationWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Organizations to fetch.
      */
     orderBy?: OrganizationOrderByWithRelationInput | OrganizationOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for searching for Organizations.
      */
     cursor?: OrganizationWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Organizations from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Organizations.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     *
+     * 
      * Filter by unique combinations of Organizations.
      */
     distinct?: OrganizationScalarFieldEnum | OrganizationScalarFieldEnum[]
@@ -7314,25 +7326,25 @@ export namespace Prisma {
     where?: OrganizationWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Organizations to fetch.
      */
     orderBy?: OrganizationOrderByWithRelationInput | OrganizationOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for listing Organizations.
      */
     cursor?: OrganizationWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Organizations from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Organizations.
      */
     skip?: number
@@ -7410,10 +7422,10 @@ export namespace Prisma {
      * Filter which Organizations to update
      */
     where?: OrganizationWhereInput
-      /**
-       * Limit how many Organizations to update.
-       */
-      limit?: number
+    /**
+     * Limit how many Organizations to update.
+     */
+    limit?: number
   }
 
   /**
@@ -7476,10 +7488,10 @@ export namespace Prisma {
      * Filter which Organizations to delete
      */
     where?: OrganizationWhereInput
-      /**
-       * Limit how many Organizations to delete.
-       */
-      limit?: number
+    /**
+     * Limit how many Organizations to delete.
+     */
+    limit?: number
   }
 
   /**
@@ -7617,43 +7629,43 @@ export namespace Prisma {
     where?: MemberWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Members to fetch.
      */
     orderBy?: MemberOrderByWithRelationInput | MemberOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the start position
      */
     cursor?: MemberWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Members from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Members.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Count returned Members
      **/
     _count?: true | MemberCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Select which fields to find the minimum value
      **/
     _min?: MemberMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Select which fields to find the maximum value
      **/
     _max?: MemberMaxAggregateInputType
@@ -7661,14 +7673,14 @@ export namespace Prisma {
 
   export type GetMemberAggregateType<T extends MemberAggregateArgs> = {
         [P in keyof T & keyof AggregateMember]: P extends '_count' | 'count'
-          ? T[P] extends true
-              ? number
-              : GetScalarType<T[P], AggregateMember[P]>
-          : GetScalarType<T[P], AggregateMember[P]>
+        ? T[P] extends true
+            ? number
+            : GetScalarType<T[P], AggregateMember[P]>
+        : GetScalarType<T[P], AggregateMember[P]>
   }
 
 
-    export type MemberGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type MemberGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: MemberWhereInput
     orderBy?: MemberOrderByWithAggregationInput | MemberOrderByWithAggregationInput[]
     by: MemberScalarFieldEnum[] | MemberScalarFieldEnum
@@ -7695,7 +7707,7 @@ export namespace Prisma {
       Array<
           PickEnumerable<MemberGroupByOutputType, T['by']> &
           {
-              [P in ((keyof T) & (keyof MemberGroupByOutputType))]: P extends '_count'
+            [P in ((keyof T) & (keyof MemberGroupByOutputType))]: P extends '_count'
               ? T[P] extends boolean
                   ? number
                   : GetScalarType<T[P], MemberGroupByOutputType[P]>
@@ -7822,13 +7834,13 @@ export namespace Prisma {
      * @example
      * // Get all Members
      * const members = await prisma.member.findMany()
-     *
+     * 
      * // Get first 10 Members
      * const members = await prisma.member.findMany({ take: 10 })
-     *
+     * 
      * // Only select the `id`
      * const memberWithIdOnly = await prisma.member.findMany({ select: { id: true } })
-     *
+     * 
      */
     findMany<T extends MemberFindManyArgs>(args?: SelectSubset<T, MemberFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -7842,7 +7854,7 @@ export namespace Prisma {
      *     // ... data to create a Member
      *   }
      * })
-     *
+     * 
      */
     create<T extends MemberCreateArgs>(args: SelectSubset<T, MemberCreateArgs<ExtArgs>>): Prisma__MemberClient<$Result.GetResult<Prisma.$MemberPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -7856,7 +7868,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *
+     *     
      */
     createMany<T extends MemberCreateManyArgs>(args?: SelectSubset<T, MemberCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -7870,7 +7882,7 @@ export namespace Prisma {
      *     // ... filter to delete one Member
      *   }
      * })
-     *
+     * 
      */
     delete<T extends MemberDeleteArgs>(args: SelectSubset<T, MemberDeleteArgs<ExtArgs>>): Prisma__MemberClient<$Result.GetResult<Prisma.$MemberPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -7887,7 +7899,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     *
+     * 
      */
     update<T extends MemberUpdateArgs>(args: SelectSubset<T, MemberUpdateArgs<ExtArgs>>): Prisma__MemberClient<$Result.GetResult<Prisma.$MemberPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -7901,7 +7913,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     *
+     * 
      */
     deleteMany<T extends MemberDeleteManyArgs>(args?: SelectSubset<T, MemberDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -7920,7 +7932,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     *
+     * 
      */
     updateMany<T extends MemberUpdateManyArgs>(args: SelectSubset<T, MemberUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -8030,25 +8042,25 @@ export namespace Prisma {
             ? `Error: "by" must not be empty.`
             : HavingValid extends False
                 ? {
-                    [P in HavingFields]: P extends ByFields
-                        ? never
-                        : P extends string
-                            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-                            : [
-                                Error,
-                                'Field ',
-                                P,
-                                ` in "having" needs to be provided in "by"`,
-                            ]
+                  [P in HavingFields]: P extends ByFields
+                      ? never
+                      : P extends string
+                          ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+                          : [
+                            Error,
+                            'Field ',
+                            P,
+                            ` in "having" needs to be provided in "by"`,
+                          ]
                 }[HavingFields]
                 : 'take' extends Keys<T>
                     ? 'orderBy' extends Keys<T>
                         ? ByValid extends True
                             ? {}
                             : {
-                                [P in OrderFields]: P extends ByFields
-                                    ? never
-                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                              [P in OrderFields]: P extends ByFields
+                                  ? never
+                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
                         : 'Error: If you provide "take", you also need to provide "orderBy"'
                     : 'skip' extends Keys<T>
@@ -8056,24 +8068,24 @@ export namespace Prisma {
                             ? ByValid extends True
                                 ? {}
                                 : {
-                                    [P in OrderFields]: P extends ByFields
-                                        ? never
-                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                  [P in OrderFields]: P extends ByFields
+                                      ? never
+                                      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                                 }[OrderFields]
                             : 'Error: If you provide "skip", you also need to provide "orderBy"'
                         : ByValid extends True
                             ? {}
                             : {
-                                [P in OrderFields]: P extends ByFields
-                                    ? never
-                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                              [P in OrderFields]: P extends ByFields
+                                  ? never
+                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
     >(args: SubsetIntersection<T, MemberGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMemberGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
 
-      /**
-       * Fields of the Member model
-       */
-      readonly fields: MemberFieldRefs;
+    /**
+     * Fields of the Member model
+     */
+    readonly fields: MemberFieldRefs;
   }
 
   /**
@@ -8109,7 +8121,7 @@ export namespace Prisma {
   }
 
 
-    /**
+  /**
    * Fields of the Member model
    */
   interface MemberFieldRefs {
@@ -8121,7 +8133,7 @@ export namespace Prisma {
   }
 
 
-    // Custom InputTypes
+  // Custom InputTypes
   /**
    * Member findUnique
    */
@@ -8188,31 +8200,31 @@ export namespace Prisma {
     where?: MemberWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Members to fetch.
      */
     orderBy?: MemberOrderByWithRelationInput | MemberOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for searching for Members.
      */
     cursor?: MemberWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Members from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Members.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     *
+     * 
      * Filter by unique combinations of Members.
      */
     distinct?: MemberScalarFieldEnum | MemberScalarFieldEnum[]
@@ -8240,31 +8252,31 @@ export namespace Prisma {
     where?: MemberWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Members to fetch.
      */
     orderBy?: MemberOrderByWithRelationInput | MemberOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for searching for Members.
      */
     cursor?: MemberWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Members from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Members.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     *
+     * 
      * Filter by unique combinations of Members.
      */
     distinct?: MemberScalarFieldEnum | MemberScalarFieldEnum[]
@@ -8292,25 +8304,25 @@ export namespace Prisma {
     where?: MemberWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Members to fetch.
      */
     orderBy?: MemberOrderByWithRelationInput | MemberOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for listing Members.
      */
     cursor?: MemberWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Members from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Members.
      */
     skip?: number
@@ -8388,10 +8400,10 @@ export namespace Prisma {
      * Filter which Members to update
      */
     where?: MemberWhereInput
-      /**
-       * Limit how many Members to update.
-       */
-      limit?: number
+    /**
+     * Limit how many Members to update.
+     */
+    limit?: number
   }
 
   /**
@@ -8454,10 +8466,10 @@ export namespace Prisma {
      * Filter which Members to delete
      */
     where?: MemberWhereInput
-      /**
-       * Limit how many Members to delete.
-       */
-      limit?: number
+    /**
+     * Limit how many Members to delete.
+     */
+    limit?: number
   }
 
   /**
@@ -8559,43 +8571,43 @@ export namespace Prisma {
     where?: InvitationWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Invitations to fetch.
      */
     orderBy?: InvitationOrderByWithRelationInput | InvitationOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the start position
      */
     cursor?: InvitationWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Invitations from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Invitations.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Count returned Invitations
      **/
     _count?: true | InvitationCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Select which fields to find the minimum value
      **/
     _min?: InvitationMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Select which fields to find the maximum value
      **/
     _max?: InvitationMaxAggregateInputType
@@ -8603,14 +8615,14 @@ export namespace Prisma {
 
   export type GetInvitationAggregateType<T extends InvitationAggregateArgs> = {
         [P in keyof T & keyof AggregateInvitation]: P extends '_count' | 'count'
-          ? T[P] extends true
-              ? number
-              : GetScalarType<T[P], AggregateInvitation[P]>
-          : GetScalarType<T[P], AggregateInvitation[P]>
+        ? T[P] extends true
+            ? number
+            : GetScalarType<T[P], AggregateInvitation[P]>
+        : GetScalarType<T[P], AggregateInvitation[P]>
   }
 
 
-    export type InvitationGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type InvitationGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: InvitationWhereInput
     orderBy?: InvitationOrderByWithAggregationInput | InvitationOrderByWithAggregationInput[]
     by: InvitationScalarFieldEnum[] | InvitationScalarFieldEnum
@@ -8639,7 +8651,7 @@ export namespace Prisma {
       Array<
           PickEnumerable<InvitationGroupByOutputType, T['by']> &
           {
-              [P in ((keyof T) & (keyof InvitationGroupByOutputType))]: P extends '_count'
+            [P in ((keyof T) & (keyof InvitationGroupByOutputType))]: P extends '_count'
               ? T[P] extends boolean
                   ? number
                   : GetScalarType<T[P], InvitationGroupByOutputType[P]>
@@ -8772,13 +8784,13 @@ export namespace Prisma {
      * @example
      * // Get all Invitations
      * const invitations = await prisma.invitation.findMany()
-     *
+     * 
      * // Get first 10 Invitations
      * const invitations = await prisma.invitation.findMany({ take: 10 })
-     *
+     * 
      * // Only select the `id`
      * const invitationWithIdOnly = await prisma.invitation.findMany({ select: { id: true } })
-     *
+     * 
      */
     findMany<T extends InvitationFindManyArgs>(args?: SelectSubset<T, InvitationFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -8792,7 +8804,7 @@ export namespace Prisma {
      *     // ... data to create a Invitation
      *   }
      * })
-     *
+     * 
      */
     create<T extends InvitationCreateArgs>(args: SelectSubset<T, InvitationCreateArgs<ExtArgs>>): Prisma__InvitationClient<$Result.GetResult<Prisma.$InvitationPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -8806,7 +8818,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *
+     *     
      */
     createMany<T extends InvitationCreateManyArgs>(args?: SelectSubset<T, InvitationCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -8820,7 +8832,7 @@ export namespace Prisma {
      *     // ... filter to delete one Invitation
      *   }
      * })
-     *
+     * 
      */
     delete<T extends InvitationDeleteArgs>(args: SelectSubset<T, InvitationDeleteArgs<ExtArgs>>): Prisma__InvitationClient<$Result.GetResult<Prisma.$InvitationPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -8837,7 +8849,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     *
+     * 
      */
     update<T extends InvitationUpdateArgs>(args: SelectSubset<T, InvitationUpdateArgs<ExtArgs>>): Prisma__InvitationClient<$Result.GetResult<Prisma.$InvitationPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -8851,7 +8863,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     *
+     * 
      */
     deleteMany<T extends InvitationDeleteManyArgs>(args?: SelectSubset<T, InvitationDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -8870,7 +8882,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     *
+     * 
      */
     updateMany<T extends InvitationUpdateManyArgs>(args: SelectSubset<T, InvitationUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -8980,25 +8992,25 @@ export namespace Prisma {
             ? `Error: "by" must not be empty.`
             : HavingValid extends False
                 ? {
-                    [P in HavingFields]: P extends ByFields
-                        ? never
-                        : P extends string
-                            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-                            : [
-                                Error,
-                                'Field ',
-                                P,
-                                ` in "having" needs to be provided in "by"`,
-                            ]
+                  [P in HavingFields]: P extends ByFields
+                      ? never
+                      : P extends string
+                          ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+                          : [
+                            Error,
+                            'Field ',
+                            P,
+                            ` in "having" needs to be provided in "by"`,
+                          ]
                 }[HavingFields]
                 : 'take' extends Keys<T>
                     ? 'orderBy' extends Keys<T>
                         ? ByValid extends True
                             ? {}
                             : {
-                                [P in OrderFields]: P extends ByFields
-                                    ? never
-                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                              [P in OrderFields]: P extends ByFields
+                                  ? never
+                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
                         : 'Error: If you provide "take", you also need to provide "orderBy"'
                     : 'skip' extends Keys<T>
@@ -9006,24 +9018,24 @@ export namespace Prisma {
                             ? ByValid extends True
                                 ? {}
                                 : {
-                                    [P in OrderFields]: P extends ByFields
-                                        ? never
-                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                  [P in OrderFields]: P extends ByFields
+                                      ? never
+                                      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                                 }[OrderFields]
                             : 'Error: If you provide "skip", you also need to provide "orderBy"'
                         : ByValid extends True
                             ? {}
                             : {
-                                [P in OrderFields]: P extends ByFields
-                                    ? never
-                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                              [P in OrderFields]: P extends ByFields
+                                  ? never
+                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
     >(args: SubsetIntersection<T, InvitationGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetInvitationGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
 
-      /**
-       * Fields of the Invitation model
-       */
-      readonly fields: InvitationFieldRefs;
+    /**
+     * Fields of the Invitation model
+     */
+    readonly fields: InvitationFieldRefs;
   }
 
   /**
@@ -9059,7 +9071,7 @@ export namespace Prisma {
   }
 
 
-    /**
+  /**
    * Fields of the Invitation model
    */
   interface InvitationFieldRefs {
@@ -9073,7 +9085,7 @@ export namespace Prisma {
   }
 
 
-    // Custom InputTypes
+  // Custom InputTypes
   /**
    * Invitation findUnique
    */
@@ -9140,31 +9152,31 @@ export namespace Prisma {
     where?: InvitationWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Invitations to fetch.
      */
     orderBy?: InvitationOrderByWithRelationInput | InvitationOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for searching for Invitations.
      */
     cursor?: InvitationWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Invitations from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Invitations.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     *
+     * 
      * Filter by unique combinations of Invitations.
      */
     distinct?: InvitationScalarFieldEnum | InvitationScalarFieldEnum[]
@@ -9192,31 +9204,31 @@ export namespace Prisma {
     where?: InvitationWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Invitations to fetch.
      */
     orderBy?: InvitationOrderByWithRelationInput | InvitationOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for searching for Invitations.
      */
     cursor?: InvitationWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Invitations from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Invitations.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     *
+     * 
      * Filter by unique combinations of Invitations.
      */
     distinct?: InvitationScalarFieldEnum | InvitationScalarFieldEnum[]
@@ -9244,25 +9256,25 @@ export namespace Prisma {
     where?: InvitationWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Invitations to fetch.
      */
     orderBy?: InvitationOrderByWithRelationInput | InvitationOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for listing Invitations.
      */
     cursor?: InvitationWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Invitations from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Invitations.
      */
     skip?: number
@@ -9340,10 +9352,10 @@ export namespace Prisma {
      * Filter which Invitations to update
      */
     where?: InvitationWhereInput
-      /**
-       * Limit how many Invitations to update.
-       */
-      limit?: number
+    /**
+     * Limit how many Invitations to update.
+     */
+    limit?: number
   }
 
   /**
@@ -9406,10 +9418,10 @@ export namespace Prisma {
      * Filter which Invitations to delete
      */
     where?: InvitationWhereInput
-      /**
-       * Limit how many Invitations to delete.
-       */
-      limit?: number
+    /**
+     * Limit how many Invitations to delete.
+     */
+    limit?: number
   }
 
   /**
@@ -9493,43 +9505,43 @@ export namespace Prisma {
     where?: TwoFactorWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of TwoFactors to fetch.
      */
     orderBy?: TwoFactorOrderByWithRelationInput | TwoFactorOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the start position
      */
     cursor?: TwoFactorWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` TwoFactors from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` TwoFactors.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Count returned TwoFactors
      **/
     _count?: true | TwoFactorCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Select which fields to find the minimum value
      **/
     _min?: TwoFactorMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Select which fields to find the maximum value
      **/
     _max?: TwoFactorMaxAggregateInputType
@@ -9537,14 +9549,14 @@ export namespace Prisma {
 
   export type GetTwoFactorAggregateType<T extends TwoFactorAggregateArgs> = {
         [P in keyof T & keyof AggregateTwoFactor]: P extends '_count' | 'count'
-          ? T[P] extends true
-              ? number
-              : GetScalarType<T[P], AggregateTwoFactor[P]>
-          : GetScalarType<T[P], AggregateTwoFactor[P]>
+        ? T[P] extends true
+            ? number
+            : GetScalarType<T[P], AggregateTwoFactor[P]>
+        : GetScalarType<T[P], AggregateTwoFactor[P]>
   }
 
 
-    export type TwoFactorGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TwoFactorGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: TwoFactorWhereInput
     orderBy?: TwoFactorOrderByWithAggregationInput | TwoFactorOrderByWithAggregationInput[]
     by: TwoFactorScalarFieldEnum[] | TwoFactorScalarFieldEnum
@@ -9570,7 +9582,7 @@ export namespace Prisma {
       Array<
           PickEnumerable<TwoFactorGroupByOutputType, T['by']> &
           {
-              [P in ((keyof T) & (keyof TwoFactorGroupByOutputType))]: P extends '_count'
+            [P in ((keyof T) & (keyof TwoFactorGroupByOutputType))]: P extends '_count'
               ? T[P] extends boolean
                   ? number
                   : GetScalarType<T[P], TwoFactorGroupByOutputType[P]>
@@ -9691,13 +9703,13 @@ export namespace Prisma {
      * @example
      * // Get all TwoFactors
      * const twoFactors = await prisma.twoFactor.findMany()
-     *
+     * 
      * // Get first 10 TwoFactors
      * const twoFactors = await prisma.twoFactor.findMany({ take: 10 })
-     *
+     * 
      * // Only select the `id`
      * const twoFactorWithIdOnly = await prisma.twoFactor.findMany({ select: { id: true } })
-     *
+     * 
      */
     findMany<T extends TwoFactorFindManyArgs>(args?: SelectSubset<T, TwoFactorFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TwoFactorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -9711,7 +9723,7 @@ export namespace Prisma {
      *     // ... data to create a TwoFactor
      *   }
      * })
-     *
+     * 
      */
     create<T extends TwoFactorCreateArgs>(args: SelectSubset<T, TwoFactorCreateArgs<ExtArgs>>): Prisma__TwoFactorClient<$Result.GetResult<Prisma.$TwoFactorPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -9725,7 +9737,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *
+     *     
      */
     createMany<T extends TwoFactorCreateManyArgs>(args?: SelectSubset<T, TwoFactorCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -9739,7 +9751,7 @@ export namespace Prisma {
      *     // ... filter to delete one TwoFactor
      *   }
      * })
-     *
+     * 
      */
     delete<T extends TwoFactorDeleteArgs>(args: SelectSubset<T, TwoFactorDeleteArgs<ExtArgs>>): Prisma__TwoFactorClient<$Result.GetResult<Prisma.$TwoFactorPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -9756,7 +9768,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     *
+     * 
      */
     update<T extends TwoFactorUpdateArgs>(args: SelectSubset<T, TwoFactorUpdateArgs<ExtArgs>>): Prisma__TwoFactorClient<$Result.GetResult<Prisma.$TwoFactorPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -9770,7 +9782,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     *
+     * 
      */
     deleteMany<T extends TwoFactorDeleteManyArgs>(args?: SelectSubset<T, TwoFactorDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -9789,7 +9801,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     *
+     * 
      */
     updateMany<T extends TwoFactorUpdateManyArgs>(args: SelectSubset<T, TwoFactorUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -9899,25 +9911,25 @@ export namespace Prisma {
             ? `Error: "by" must not be empty.`
             : HavingValid extends False
                 ? {
-                    [P in HavingFields]: P extends ByFields
-                        ? never
-                        : P extends string
-                            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-                            : [
-                                Error,
-                                'Field ',
-                                P,
-                                ` in "having" needs to be provided in "by"`,
-                            ]
+                  [P in HavingFields]: P extends ByFields
+                      ? never
+                      : P extends string
+                          ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+                          : [
+                            Error,
+                            'Field ',
+                            P,
+                            ` in "having" needs to be provided in "by"`,
+                          ]
                 }[HavingFields]
                 : 'take' extends Keys<T>
                     ? 'orderBy' extends Keys<T>
                         ? ByValid extends True
                             ? {}
                             : {
-                                [P in OrderFields]: P extends ByFields
-                                    ? never
-                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                              [P in OrderFields]: P extends ByFields
+                                  ? never
+                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
                         : 'Error: If you provide "take", you also need to provide "orderBy"'
                     : 'skip' extends Keys<T>
@@ -9925,24 +9937,24 @@ export namespace Prisma {
                             ? ByValid extends True
                                 ? {}
                                 : {
-                                    [P in OrderFields]: P extends ByFields
-                                        ? never
-                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                  [P in OrderFields]: P extends ByFields
+                                      ? never
+                                      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                                 }[OrderFields]
                             : 'Error: If you provide "skip", you also need to provide "orderBy"'
                         : ByValid extends True
                             ? {}
                             : {
-                                [P in OrderFields]: P extends ByFields
-                                    ? never
-                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                              [P in OrderFields]: P extends ByFields
+                                  ? never
+                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
     >(args: SubsetIntersection<T, TwoFactorGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTwoFactorGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
 
-      /**
-       * Fields of the TwoFactor model
-       */
-      readonly fields: TwoFactorFieldRefs;
+    /**
+     * Fields of the TwoFactor model
+     */
+    readonly fields: TwoFactorFieldRefs;
   }
 
   /**
@@ -9977,7 +9989,7 @@ export namespace Prisma {
   }
 
 
-    /**
+  /**
    * Fields of the TwoFactor model
    */
   interface TwoFactorFieldRefs {
@@ -9988,7 +10000,7 @@ export namespace Prisma {
   }
 
 
-    // Custom InputTypes
+  // Custom InputTypes
   /**
    * TwoFactor findUnique
    */
@@ -10055,31 +10067,31 @@ export namespace Prisma {
     where?: TwoFactorWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of TwoFactors to fetch.
      */
     orderBy?: TwoFactorOrderByWithRelationInput | TwoFactorOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for searching for TwoFactors.
      */
     cursor?: TwoFactorWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` TwoFactors from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` TwoFactors.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     *
+     * 
      * Filter by unique combinations of TwoFactors.
      */
     distinct?: TwoFactorScalarFieldEnum | TwoFactorScalarFieldEnum[]
@@ -10107,31 +10119,31 @@ export namespace Prisma {
     where?: TwoFactorWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of TwoFactors to fetch.
      */
     orderBy?: TwoFactorOrderByWithRelationInput | TwoFactorOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for searching for TwoFactors.
      */
     cursor?: TwoFactorWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` TwoFactors from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` TwoFactors.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     *
+     * 
      * Filter by unique combinations of TwoFactors.
      */
     distinct?: TwoFactorScalarFieldEnum | TwoFactorScalarFieldEnum[]
@@ -10159,25 +10171,25 @@ export namespace Prisma {
     where?: TwoFactorWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of TwoFactors to fetch.
      */
     orderBy?: TwoFactorOrderByWithRelationInput | TwoFactorOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for listing TwoFactors.
      */
     cursor?: TwoFactorWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` TwoFactors from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` TwoFactors.
      */
     skip?: number
@@ -10255,10 +10267,10 @@ export namespace Prisma {
      * Filter which TwoFactors to update
      */
     where?: TwoFactorWhereInput
-      /**
-       * Limit how many TwoFactors to update.
-       */
-      limit?: number
+    /**
+     * Limit how many TwoFactors to update.
+     */
+    limit?: number
   }
 
   /**
@@ -10321,10 +10333,10 @@ export namespace Prisma {
      * Filter which TwoFactors to delete
      */
     where?: TwoFactorWhereInput
-      /**
-       * Limit how many TwoFactors to delete.
-       */
-      limit?: number
+    /**
+     * Limit how many TwoFactors to delete.
+     */
+    limit?: number
   }
 
   /**
@@ -10346,956 +10358,956 @@ export namespace Prisma {
   }
 
 
+  /**
+   * Model Channel
+   */
+
+  export type AggregateChannel = {
+    _count: ChannelCountAggregateOutputType | null
+    _min: ChannelMinAggregateOutputType | null
+    _max: ChannelMaxAggregateOutputType | null
+  }
+
+  export type ChannelMinAggregateOutputType = {
+    id: string | null
+    name: string | null
+  }
+
+  export type ChannelMaxAggregateOutputType = {
+    id: string | null
+    name: string | null
+  }
+
+  export type ChannelCountAggregateOutputType = {
+    id: number
+    name: number
+    _all: number
+  }
+
+
+  export type ChannelMinAggregateInputType = {
+    id?: true
+    name?: true
+  }
+
+  export type ChannelMaxAggregateInputType = {
+    id?: true
+    name?: true
+  }
+
+  export type ChannelCountAggregateInputType = {
+    id?: true
+    name?: true
+    _all?: true
+  }
+
+  export type ChannelAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Model Channel
+     * Filter which Channel to aggregate.
      */
+    where?: ChannelWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Channels to fetch.
+     */
+    orderBy?: ChannelOrderByWithRelationInput | ChannelOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the start position
+     */
+    cursor?: ChannelWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Channels from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Channels.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Count returned Channels
+     **/
+    _count?: true | ChannelCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the minimum value
+     **/
+    _min?: ChannelMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the maximum value
+     **/
+    _max?: ChannelMaxAggregateInputType
+  }
 
-    export type AggregateChannel = {
-        _count: ChannelCountAggregateOutputType | null
-        _min: ChannelMinAggregateOutputType | null
-        _max: ChannelMaxAggregateOutputType | null
-    }
-
-    export type ChannelMinAggregateOutputType = {
-        id: string | null
-        name: string | null
-    }
-
-    export type ChannelMaxAggregateOutputType = {
-        id: string | null
-        name: string | null
-    }
-
-    export type ChannelCountAggregateOutputType = {
-        id: number
-        name: number
-        _all: number
-    }
-
-
-    export type ChannelMinAggregateInputType = {
-        id?: true
-        name?: true
-    }
-
-    export type ChannelMaxAggregateInputType = {
-        id?: true
-        name?: true
-    }
-
-    export type ChannelCountAggregateInputType = {
-        id?: true
-        name?: true
-        _all?: true
-    }
-
-    export type ChannelAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Filter which Channel to aggregate.
-         */
-        where?: ChannelWhereInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-         *
-         * Determine the order of Channels to fetch.
-         */
-        orderBy?: ChannelOrderByWithRelationInput | ChannelOrderByWithRelationInput[]
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-         *
-         * Sets the start position
-         */
-        cursor?: ChannelWhereUniqueInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Take `±n` Channels from the position of the cursor.
-         */
-        take?: number
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Skip the first `n` Channels.
-         */
-        skip?: number
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-         *
-         * Count returned Channels
-         **/
-        _count?: true | ChannelCountAggregateInputType
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-         *
-         * Select which fields to find the minimum value
-         **/
-        _min?: ChannelMinAggregateInputType
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-         *
-         * Select which fields to find the maximum value
-         **/
-        _max?: ChannelMaxAggregateInputType
-    }
-
-    export type GetChannelAggregateType<T extends ChannelAggregateArgs> = {
+  export type GetChannelAggregateType<T extends ChannelAggregateArgs> = {
         [P in keyof T & keyof AggregateChannel]: P extends '_count' | 'count'
-            ? T[P] extends true
-                ? number
-                : GetScalarType<T[P], AggregateChannel[P]>
+        ? T[P] extends true
+            ? number
             : GetScalarType<T[P], AggregateChannel[P]>
-    }
+        : GetScalarType<T[P], AggregateChannel[P]>
+  }
 
 
-    export type ChannelGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        where?: ChannelWhereInput
-        orderBy?: ChannelOrderByWithAggregationInput | ChannelOrderByWithAggregationInput[]
-        by: ChannelScalarFieldEnum[] | ChannelScalarFieldEnum
-        having?: ChannelScalarWhereWithAggregatesInput
-        take?: number
-        skip?: number
-        _count?: ChannelCountAggregateInputType | true
-        _min?: ChannelMinAggregateInputType
-        _max?: ChannelMaxAggregateInputType
-    }
+  export type ChannelGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ChannelWhereInput
+    orderBy?: ChannelOrderByWithAggregationInput | ChannelOrderByWithAggregationInput[]
+    by: ChannelScalarFieldEnum[] | ChannelScalarFieldEnum
+    having?: ChannelScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ChannelCountAggregateInputType | true
+    _min?: ChannelMinAggregateInputType
+    _max?: ChannelMaxAggregateInputType
+  }
 
-    export type ChannelGroupByOutputType = {
-        id: string
-        name: string
-        _count: ChannelCountAggregateOutputType | null
-        _min: ChannelMinAggregateOutputType | null
-        _max: ChannelMaxAggregateOutputType | null
-    }
+  export type ChannelGroupByOutputType = {
+    id: string
+    name: string
+    _count: ChannelCountAggregateOutputType | null
+    _min: ChannelMinAggregateOutputType | null
+    _max: ChannelMaxAggregateOutputType | null
+  }
 
-    type GetChannelGroupByPayload<T extends ChannelGroupByArgs> = Prisma.PrismaPromise<
-        Array<
-            PickEnumerable<ChannelGroupByOutputType, T['by']> &
-            {
-                [P in ((keyof T) & (keyof ChannelGroupByOutputType))]: P extends '_count'
-                ? T[P] extends boolean
-                    ? number
-                    : GetScalarType<T[P], ChannelGroupByOutputType[P]>
-                : GetScalarType<T[P], ChannelGroupByOutputType[P]>
-            }
-        >
+  type GetChannelGroupByPayload<T extends ChannelGroupByArgs> = Prisma.PrismaPromise<
+      Array<
+          PickEnumerable<ChannelGroupByOutputType, T['by']> &
+          {
+            [P in ((keyof T) & (keyof ChannelGroupByOutputType))]: P extends '_count'
+              ? T[P] extends boolean
+                  ? number
+                  : GetScalarType<T[P], ChannelGroupByOutputType[P]>
+              : GetScalarType<T[P], ChannelGroupByOutputType[P]>
+          }
+      >
     >
 
 
-    export type ChannelSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-        id?: boolean
-        name?: boolean
-        Message?: boolean | Channel$MessageArgs<ExtArgs>
-        Ticket?: boolean | Channel$TicketArgs<ExtArgs>
-        _count?: boolean | ChannelCountOutputTypeDefaultArgs<ExtArgs>
+  export type ChannelSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    Message?: boolean | Channel$MessageArgs<ExtArgs>
+    Ticket?: boolean | Channel$TicketArgs<ExtArgs>
+    _count?: boolean | ChannelCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["channel"]>
+
+
+  export type ChannelSelectScalar = {
+    id?: boolean
+    name?: boolean
+  }
+
+  export type ChannelOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name", ExtArgs["result"]["channel"]>
+  export type ChannelInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    Message?: boolean | Channel$MessageArgs<ExtArgs>
+    Ticket?: boolean | Channel$TicketArgs<ExtArgs>
+    _count?: boolean | ChannelCountOutputTypeDefaultArgs<ExtArgs>
+  }
+
+  export type $ChannelPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Channel"
+    objects: {
+      Message: Prisma.$MessagePayload<ExtArgs>[]
+      Ticket: Prisma.$TicketPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      name: string
     }, ExtArgs["result"]["channel"]>
+    composites: {}
+  }
 
+  type ChannelGetPayload<S extends boolean | null | undefined | ChannelDefaultArgs> = $Result.GetResult<Prisma.$ChannelPayload, S>
 
-    export type ChannelSelectScalar = {
-        id?: boolean
-        name?: boolean
+  type ChannelCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+      Omit<ChannelFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+    select?: ChannelCountAggregateInputType | true
     }
 
-    export type ChannelOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name", ExtArgs["result"]["channel"]>
-    export type ChannelInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        Message?: boolean | Channel$MessageArgs<ExtArgs>
-        Ticket?: boolean | Channel$TicketArgs<ExtArgs>
-        _count?: boolean | ChannelCountOutputTypeDefaultArgs<ExtArgs>
-    }
+  export interface ChannelDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Channel'], meta: { name: 'Channel' } }
 
-    export type $ChannelPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        name: "Channel"
-        objects: {
-            Message: Prisma.$MessagePayload<ExtArgs>[]
-            Ticket: Prisma.$TicketPayload<ExtArgs>[]
-        }
-        scalars: $Extensions.GetPayloadResult<{
-            id: string
-            name: string
-        }, ExtArgs["result"]["channel"]>
-        composites: {}
-    }
+    /**
+     * Find zero or one Channel that matches the filter.
+     * @param {ChannelFindUniqueArgs} args - Arguments to find a Channel
+     * @example
+     * // Get one Channel
+     * const channel = await prisma.channel.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ChannelFindUniqueArgs>(args: SelectSubset<T, ChannelFindUniqueArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
-    type ChannelGetPayload<S extends boolean | null | undefined | ChannelDefaultArgs> = $Result.GetResult<Prisma.$ChannelPayload, S>
+    /**
+     * Find one Channel that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ChannelFindUniqueOrThrowArgs} args - Arguments to find a Channel
+     * @example
+     * // Get one Channel
+     * const channel = await prisma.channel.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ChannelFindUniqueOrThrowArgs>(args: SelectSubset<T, ChannelFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
-    type ChannelCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-        Omit<ChannelFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-        select?: ChannelCountAggregateInputType | true
-    }
+    /**
+     * Find the first Channel that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChannelFindFirstArgs} args - Arguments to find a Channel
+     * @example
+     * // Get one Channel
+     * const channel = await prisma.channel.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ChannelFindFirstArgs>(args?: SelectSubset<T, ChannelFindFirstArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
-    export interface ChannelDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-        [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Channel'], meta: { name: 'Channel' } }
+    /**
+     * Find the first Channel that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChannelFindFirstOrThrowArgs} args - Arguments to find a Channel
+     * @example
+     * // Get one Channel
+     * const channel = await prisma.channel.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ChannelFindFirstOrThrowArgs>(args?: SelectSubset<T, ChannelFindFirstOrThrowArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
-        /**
-         * Find zero or one Channel that matches the filter.
-         * @param {ChannelFindUniqueArgs} args - Arguments to find a Channel
-         * @example
-         * // Get one Channel
-         * const channel = await prisma.channel.findUnique({
-         *   where: {
-         *     // ... provide filter here
-         *   }
-         * })
-         */
-        findUnique<T extends ChannelFindUniqueArgs>(args: SelectSubset<T, ChannelFindUniqueArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Find zero or more Channels that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChannelFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Channels
+     * const channels = await prisma.channel.findMany()
+     *
+     * // Get first 10 Channels
+     * const channels = await prisma.channel.findMany({ take: 10 })
+     *
+     * // Only select the `id`
+     * const channelWithIdOnly = await prisma.channel.findMany({ select: { id: true } })
+     *
+     */
+    findMany<T extends ChannelFindManyArgs>(args?: SelectSubset<T, ChannelFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
-        /**
-         * Find one Channel that matches the filter or throw an error with `error.code='P2025'`
-         * if no matches were found.
-         * @param {ChannelFindUniqueOrThrowArgs} args - Arguments to find a Channel
-         * @example
-         * // Get one Channel
-         * const channel = await prisma.channel.findUniqueOrThrow({
-         *   where: {
-         *     // ... provide filter here
-         *   }
-         * })
-         */
-        findUniqueOrThrow<T extends ChannelFindUniqueOrThrowArgs>(args: SelectSubset<T, ChannelFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    /**
+     * Create a Channel.
+     * @param {ChannelCreateArgs} args - Arguments to create a Channel.
+     * @example
+     * // Create one Channel
+     * const Channel = await prisma.channel.create({
+     *   data: {
+     *     // ... data to create a Channel
+     *   }
+     * })
+     *
+     */
+    create<T extends ChannelCreateArgs>(args: SelectSubset<T, ChannelCreateArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
-        /**
-         * Find the first Channel that matches the filter.
-         * Note, that providing `undefined` is treated as the value not being there.
-         * Read more here: https://pris.ly/d/null-undefined
-         * @param {ChannelFindFirstArgs} args - Arguments to find a Channel
-         * @example
-         * // Get one Channel
-         * const channel = await prisma.channel.findFirst({
-         *   where: {
-         *     // ... provide filter here
-         *   }
-         * })
-         */
-        findFirst<T extends ChannelFindFirstArgs>(args?: SelectSubset<T, ChannelFindFirstArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Create many Channels.
+     * @param {ChannelCreateManyArgs} args - Arguments to create many Channels.
+     * @example
+     * // Create many Channels
+     * const channel = await prisma.channel.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     */
+    createMany<T extends ChannelCreateManyArgs>(args?: SelectSubset<T, ChannelCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
-        /**
-         * Find the first Channel that matches the filter or
-         * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-         * Note, that providing `undefined` is treated as the value not being there.
-         * Read more here: https://pris.ly/d/null-undefined
-         * @param {ChannelFindFirstOrThrowArgs} args - Arguments to find a Channel
-         * @example
-         * // Get one Channel
-         * const channel = await prisma.channel.findFirstOrThrow({
-         *   where: {
-         *     // ... provide filter here
-         *   }
-         * })
-         */
-        findFirstOrThrow<T extends ChannelFindFirstOrThrowArgs>(args?: SelectSubset<T, ChannelFindFirstOrThrowArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    /**
+     * Delete a Channel.
+     * @param {ChannelDeleteArgs} args - Arguments to delete one Channel.
+     * @example
+     * // Delete one Channel
+     * const Channel = await prisma.channel.delete({
+     *   where: {
+     *     // ... filter to delete one Channel
+     *   }
+     * })
+     *
+     */
+    delete<T extends ChannelDeleteArgs>(args: SelectSubset<T, ChannelDeleteArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
-        /**
-         * Find zero or more Channels that matches the filter.
-         * Note, that providing `undefined` is treated as the value not being there.
-         * Read more here: https://pris.ly/d/null-undefined
-         * @param {ChannelFindManyArgs} args - Arguments to filter and select certain fields only.
-         * @example
-         * // Get all Channels
-         * const channels = await prisma.channel.findMany()
-         *
-         * // Get first 10 Channels
-         * const channels = await prisma.channel.findMany({ take: 10 })
-         *
-         * // Only select the `id`
-         * const channelWithIdOnly = await prisma.channel.findMany({ select: { id: true } })
-         *
-         */
-        findMany<T extends ChannelFindManyArgs>(args?: SelectSubset<T, ChannelFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+    /**
+     * Update one Channel.
+     * @param {ChannelUpdateArgs} args - Arguments to update one Channel.
+     * @example
+     * // Update one Channel
+     * const channel = await prisma.channel.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    update<T extends ChannelUpdateArgs>(args: SelectSubset<T, ChannelUpdateArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
-        /**
-         * Create a Channel.
-         * @param {ChannelCreateArgs} args - Arguments to create a Channel.
-         * @example
-         * // Create one Channel
-         * const Channel = await prisma.channel.create({
-         *   data: {
-         *     // ... data to create a Channel
-         *   }
-         * })
-         *
-         */
-        create<T extends ChannelCreateArgs>(args: SelectSubset<T, ChannelCreateArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    /**
+     * Delete zero or more Channels.
+     * @param {ChannelDeleteManyArgs} args - Arguments to filter Channels to delete.
+     * @example
+     * // Delete a few Channels
+     * const { count } = await prisma.channel.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     *
+     */
+    deleteMany<T extends ChannelDeleteManyArgs>(args?: SelectSubset<T, ChannelDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
-        /**
-         * Create many Channels.
-         * @param {ChannelCreateManyArgs} args - Arguments to create many Channels.
-         * @example
-         * // Create many Channels
-         * const channel = await prisma.channel.createMany({
-         *   data: [
-         *     // ... provide data here
-         *   ]
-         * })
-         *
-         */
-        createMany<T extends ChannelCreateManyArgs>(args?: SelectSubset<T, ChannelCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    /**
+     * Update zero or more Channels.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChannelUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Channels
+     * const channel = await prisma.channel.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    updateMany<T extends ChannelUpdateManyArgs>(args: SelectSubset<T, ChannelUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
-        /**
-         * Delete a Channel.
-         * @param {ChannelDeleteArgs} args - Arguments to delete one Channel.
-         * @example
-         * // Delete one Channel
-         * const Channel = await prisma.channel.delete({
-         *   where: {
-         *     // ... filter to delete one Channel
-         *   }
-         * })
-         *
-         */
-        delete<T extends ChannelDeleteArgs>(args: SelectSubset<T, ChannelDeleteArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-        /**
-         * Update one Channel.
-         * @param {ChannelUpdateArgs} args - Arguments to update one Channel.
-         * @example
-         * // Update one Channel
-         * const channel = await prisma.channel.update({
-         *   where: {
-         *     // ... provide filter here
-         *   },
-         *   data: {
-         *     // ... provide data here
-         *   }
-         * })
-         *
-         */
-        update<T extends ChannelUpdateArgs>(args: SelectSubset<T, ChannelUpdateArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-        /**
-         * Delete zero or more Channels.
-         * @param {ChannelDeleteManyArgs} args - Arguments to filter Channels to delete.
-         * @example
-         * // Delete a few Channels
-         * const { count } = await prisma.channel.deleteMany({
-         *   where: {
-         *     // ... provide filter here
-         *   }
-         * })
-         *
-         */
-        deleteMany<T extends ChannelDeleteManyArgs>(args?: SelectSubset<T, ChannelDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-        /**
-         * Update zero or more Channels.
-         * Note, that providing `undefined` is treated as the value not being there.
-         * Read more here: https://pris.ly/d/null-undefined
-         * @param {ChannelUpdateManyArgs} args - Arguments to update one or more rows.
-         * @example
-         * // Update many Channels
-         * const channel = await prisma.channel.updateMany({
-         *   where: {
-         *     // ... provide filter here
-         *   },
-         *   data: {
-         *     // ... provide data here
-         *   }
-         * })
-         *
-         */
-        updateMany<T extends ChannelUpdateManyArgs>(args: SelectSubset<T, ChannelUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-        /**
-         * Create or update one Channel.
-         * @param {ChannelUpsertArgs} args - Arguments to update or create a Channel.
-         * @example
-         * // Update or create a Channel
-         * const channel = await prisma.channel.upsert({
-         *   create: {
-         *     // ... data to create a Channel
-         *   },
-         *   update: {
-         *     // ... in case it already exists, update
-         *   },
-         *   where: {
-         *     // ... the filter for the Channel we want to update
-         *   }
-         * })
-         */
-        upsert<T extends ChannelUpsertArgs>(args: SelectSubset<T, ChannelUpsertArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    /**
+     * Create or update one Channel.
+     * @param {ChannelUpsertArgs} args - Arguments to update or create a Channel.
+     * @example
+     * // Update or create a Channel
+     * const channel = await prisma.channel.upsert({
+     *   create: {
+     *     // ... data to create a Channel
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Channel we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ChannelUpsertArgs>(args: SelectSubset<T, ChannelUpsertArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
-        /**
-         * Count the number of Channels.
-         * Note, that providing `undefined` is treated as the value not being there.
-         * Read more here: https://pris.ly/d/null-undefined
-         * @param {ChannelCountArgs} args - Arguments to filter Channels to count.
-         * @example
-         * // Count the number of Channels
-         * const count = await prisma.channel.count({
-         *   where: {
-         *     // ... the filter for the Channels we want to count
-         *   }
-         * })
-         **/
-        count<T extends ChannelCountArgs>(
-            args?: Subset<T, ChannelCountArgs>,
-        ): Prisma.PrismaPromise<
-            T extends $Utils.Record<'select', any>
-                ? T['select'] extends true
-                    ? number
-                    : GetScalarType<T['select'], ChannelCountAggregateOutputType>
-                : number
-        >
+    /**
+     * Count the number of Channels.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChannelCountArgs} args - Arguments to filter Channels to count.
+     * @example
+     * // Count the number of Channels
+     * const count = await prisma.channel.count({
+     *   where: {
+     *     // ... the filter for the Channels we want to count
+     *   }
+     * })
+     **/
+    count<T extends ChannelCountArgs>(
+        args?: Subset<T, ChannelCountArgs>,
+    ): Prisma.PrismaPromise<
+        T extends $Utils.Record<'select', any>
+            ? T['select'] extends true
+                ? number
+                : GetScalarType<T['select'], ChannelCountAggregateOutputType>
+            : number
+    >
 
-        /**
-         * Allows you to perform aggregations operations on a Channel.
-         * Note, that providing `undefined` is treated as the value not being there.
-         * Read more here: https://pris.ly/d/null-undefined
-         * @param {ChannelAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-         * @example
-         * // Ordered by age ascending
-         * // Where email contains prisma.io
-         * // Limited to the 10 users
-         * const aggregations = await prisma.user.aggregate({
-         *   _avg: {
-         *     age: true,
-         *   },
-         *   where: {
-         *     email: {
-         *       contains: "prisma.io",
-         *     },
-         *   },
-         *   orderBy: {
-         *     age: "asc",
-         *   },
-         *   take: 10,
-         * })
-         **/
-        aggregate<T extends ChannelAggregateArgs>(args: Subset<T, ChannelAggregateArgs>): Prisma.PrismaPromise<GetChannelAggregateType<T>>
+    /**
+     * Allows you to perform aggregations operations on a Channel.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChannelAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+     **/
+    aggregate<T extends ChannelAggregateArgs>(args: Subset<T, ChannelAggregateArgs>): Prisma.PrismaPromise<GetChannelAggregateType<T>>
 
-        /**
-         * Group by Channel.
-         * Note, that providing `undefined` is treated as the value not being there.
-         * Read more here: https://pris.ly/d/null-undefined
-         * @param {ChannelGroupByArgs} args - Group by arguments.
-         * @example
-         * // Group by city, order by createdAt, get count
-         * const result = await prisma.user.groupBy({
-         *   by: ['city', 'createdAt'],
-         *   orderBy: {
-         *     createdAt: true
-         *   },
-         *   _count: {
-         *     _all: true
-         *   },
-         * })
-         *
-         **/
-        groupBy<
-            T extends ChannelGroupByArgs,
-            HasSelectOrTake extends Or<
-                Extends<'skip', Keys<T>>,
-                Extends<'take', Keys<T>>
-            >,
-            OrderByArg extends True extends HasSelectOrTake
-                ? { orderBy: ChannelGroupByArgs['orderBy'] }
-                : { orderBy?: ChannelGroupByArgs['orderBy'] },
-            OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-            ByFields extends MaybeTupleToUnion<T['by']>,
-            ByValid extends Has<ByFields, OrderFields>,
-            HavingFields extends GetHavingFields<T['having']>,
-            HavingValid extends Has<ByFields, HavingFields>,
-            ByEmpty extends T['by'] extends never[] ? True : False,
-            InputErrors extends ByEmpty extends True
-                ? `Error: "by" must not be empty.`
-                : HavingValid extends False
-                    ? {
-                        [P in HavingFields]: P extends ByFields
-                            ? never
-                            : P extends string
-                                ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-                                : [
-                                    Error,
-                                    'Field ',
-                                    P,
-                                    ` in "having" needs to be provided in "by"`,
-                                ]
-                    }[HavingFields]
-                    : 'take' extends Keys<T>
+    /**
+     * Group by Channel.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChannelGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     *
+     **/
+    groupBy<
+        T extends ChannelGroupByArgs,
+        HasSelectOrTake extends Or<
+            Extends<'skip', Keys<T>>,
+            Extends<'take', Keys<T>>
+        >,
+        OrderByArg extends True extends HasSelectOrTake
+            ? { orderBy: ChannelGroupByArgs['orderBy'] }
+            : { orderBy?: ChannelGroupByArgs['orderBy'] },
+        OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+        ByFields extends MaybeTupleToUnion<T['by']>,
+        ByValid extends Has<ByFields, OrderFields>,
+        HavingFields extends GetHavingFields<T['having']>,
+        HavingValid extends Has<ByFields, HavingFields>,
+        ByEmpty extends T['by'] extends never[] ? True : False,
+        InputErrors extends ByEmpty extends True
+            ? `Error: "by" must not be empty.`
+            : HavingValid extends False
+                ? {
+                  [P in HavingFields]: P extends ByFields
+                      ? never
+                      : P extends string
+                          ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+                          : [
+                            Error,
+                            'Field ',
+                            P,
+                            ` in "having" needs to be provided in "by"`,
+                          ]
+                }[HavingFields]
+                : 'take' extends Keys<T>
+                    ? 'orderBy' extends Keys<T>
+                        ? ByValid extends True
+                            ? {}
+                            : {
+                              [P in OrderFields]: P extends ByFields
+                                  ? never
+                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                            }[OrderFields]
+                        : 'Error: If you provide "take", you also need to provide "orderBy"'
+                    : 'skip' extends Keys<T>
                         ? 'orderBy' extends Keys<T>
                             ? ByValid extends True
                                 ? {}
                                 : {
-                                    [P in OrderFields]: P extends ByFields
-                                        ? never
-                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                  [P in OrderFields]: P extends ByFields
+                                      ? never
+                                      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                                 }[OrderFields]
-                            : 'Error: If you provide "take", you also need to provide "orderBy"'
-                        : 'skip' extends Keys<T>
-                            ? 'orderBy' extends Keys<T>
-                                ? ByValid extends True
-                                    ? {}
-                                    : {
-                                        [P in OrderFields]: P extends ByFields
-                                            ? never
-                                            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-                                    }[OrderFields]
-                                : 'Error: If you provide "skip", you also need to provide "orderBy"'
-                            : ByValid extends True
-                                ? {}
-                                : {
-                                    [P in OrderFields]: P extends ByFields
-                                        ? never
-                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-                                }[OrderFields]
-        >(args: SubsetIntersection<T, ChannelGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetChannelGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-
-        /**
-         * Fields of the Channel model
-         */
-        readonly fields: ChannelFieldRefs;
-    }
-
-    /**
-     * The delegate class that acts as a "Promise-like" for Channel.
-     * Why is this prefixed with `Prisma__`?
-     * Because we want to prevent naming conflicts as mentioned in
-     * https://github.com/prisma/prisma-client-js/issues/707
-     */
-    export interface Prisma__ChannelClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
-        readonly [Symbol.toStringTag]: "PrismaPromise"
-
-        Message<T extends Channel$MessageArgs<ExtArgs> = {}>(args?: Subset<T, Channel$MessageArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-
-        Ticket<T extends Channel$TicketArgs<ExtArgs> = {}>(args?: Subset<T, Channel$TicketArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-
-        /**
-         * Attaches callbacks for the resolution and/or rejection of the Promise.
-         * @param onfulfilled The callback to execute when the Promise is resolved.
-         * @param onrejected The callback to execute when the Promise is rejected.
-         * @returns A Promise for the completion of which ever callback is executed.
-         */
-        then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-
-        /**
-         * Attaches a callback for only the rejection of the Promise.
-         * @param onrejected The callback to execute when the Promise is rejected.
-         * @returns A Promise for the completion of the callback.
-         */
-        catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-
-        /**
-         * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-         * resolved value cannot be modified from the callback.
-         * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-         * @returns A Promise for the completion of the callback.
-         */
-        finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-    }
-
+                            : 'Error: If you provide "skip", you also need to provide "orderBy"'
+                        : ByValid extends True
+                            ? {}
+                            : {
+                              [P in OrderFields]: P extends ByFields
+                                  ? never
+                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                            }[OrderFields]
+    >(args: SubsetIntersection<T, ChannelGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetChannelGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
 
     /**
      * Fields of the Channel model
      */
-    interface ChannelFieldRefs {
-        readonly id: FieldRef<"Channel", 'String'>
-        readonly name: FieldRef<"Channel", 'String'>
-    }
+    readonly fields: ChannelFieldRefs;
+  }
 
+  /**
+   * The delegate class that acts as a "Promise-like" for Channel.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ChannelClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
 
-    // Custom InputTypes
-    /**
-     * Channel findUnique
-     */
-    export type ChannelFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Channel
-         */
-        select?: ChannelSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Channel
-         */
-        omit?: ChannelOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: ChannelInclude<ExtArgs> | null
-        /**
-         * Filter, which Channel to fetch.
-         */
-        where: ChannelWhereUniqueInput
-    }
+    Message<T extends Channel$MessageArgs<ExtArgs> = {}>(args?: Subset<T, Channel$MessageArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+
+    Ticket<T extends Channel$TicketArgs<ExtArgs> = {}>(args?: Subset<T, Channel$TicketArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
 
     /**
-     * Channel findUniqueOrThrow
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
      */
-    export type ChannelFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Channel
-         */
-        select?: ChannelSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Channel
-         */
-        omit?: ChannelOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: ChannelInclude<ExtArgs> | null
-        /**
-         * Filter, which Channel to fetch.
-         */
-        where: ChannelWhereUniqueInput
-    }
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
 
     /**
-     * Channel findFirst
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
      */
-    export type ChannelFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Channel
-         */
-        select?: ChannelSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Channel
-         */
-        omit?: ChannelOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: ChannelInclude<ExtArgs> | null
-        /**
-         * Filter, which Channel to fetch.
-         */
-        where?: ChannelWhereInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-         *
-         * Determine the order of Channels to fetch.
-         */
-        orderBy?: ChannelOrderByWithRelationInput | ChannelOrderByWithRelationInput[]
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-         *
-         * Sets the position for searching for Channels.
-         */
-        cursor?: ChannelWhereUniqueInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Take `±n` Channels from the position of the cursor.
-         */
-        take?: number
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Skip the first `n` Channels.
-         */
-        skip?: number
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-         *
-         * Filter by unique combinations of Channels.
-         */
-        distinct?: ChannelScalarFieldEnum | ChannelScalarFieldEnum[]
-    }
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
 
     /**
-     * Channel findFirstOrThrow
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
      */
-    export type ChannelFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Channel
-         */
-        select?: ChannelSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Channel
-         */
-        omit?: ChannelOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: ChannelInclude<ExtArgs> | null
-        /**
-         * Filter, which Channel to fetch.
-         */
-        where?: ChannelWhereInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-         *
-         * Determine the order of Channels to fetch.
-         */
-        orderBy?: ChannelOrderByWithRelationInput | ChannelOrderByWithRelationInput[]
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-         *
-         * Sets the position for searching for Channels.
-         */
-        cursor?: ChannelWhereUniqueInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Take `±n` Channels from the position of the cursor.
-         */
-        take?: number
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Skip the first `n` Channels.
-         */
-        skip?: number
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-         *
-         * Filter by unique combinations of Channels.
-         */
-        distinct?: ChannelScalarFieldEnum | ChannelScalarFieldEnum[]
-    }
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
 
-    /**
-     * Channel findMany
-     */
-    export type ChannelFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Channel
-         */
-        select?: ChannelSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Channel
-         */
-        omit?: ChannelOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: ChannelInclude<ExtArgs> | null
-        /**
-         * Filter, which Channels to fetch.
-         */
-        where?: ChannelWhereInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-         *
-         * Determine the order of Channels to fetch.
-         */
-        orderBy?: ChannelOrderByWithRelationInput | ChannelOrderByWithRelationInput[]
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-         *
-         * Sets the position for listing Channels.
-         */
-        cursor?: ChannelWhereUniqueInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Take `±n` Channels from the position of the cursor.
-         */
-        take?: number
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Skip the first `n` Channels.
-         */
-        skip?: number
-        distinct?: ChannelScalarFieldEnum | ChannelScalarFieldEnum[]
-    }
 
-    /**
-     * Channel create
-     */
-    export type ChannelCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Channel
-         */
-        select?: ChannelSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Channel
-         */
-        omit?: ChannelOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: ChannelInclude<ExtArgs> | null
-        /**
-         * The data needed to create a Channel.
-         */
-        data: XOR<ChannelCreateInput, ChannelUncheckedCreateInput>
-    }
+  /**
+   * Fields of the Channel model
+   */
+  interface ChannelFieldRefs {
+    readonly id: FieldRef<"Channel", 'String'>
+    readonly name: FieldRef<"Channel", 'String'>
+  }
 
-    /**
-     * Channel createMany
-     */
-    export type ChannelCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * The data used to create many Channels.
-         */
-        data: ChannelCreateManyInput | ChannelCreateManyInput[]
-        skipDuplicates?: boolean
-    }
 
+  // Custom InputTypes
+  /**
+   * Channel findUnique
+   */
+  export type ChannelFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Channel update
+     * Select specific fields to fetch from the Channel
      */
-    export type ChannelUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Channel
-         */
-        select?: ChannelSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Channel
-         */
-        omit?: ChannelOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: ChannelInclude<ExtArgs> | null
-        /**
-         * The data needed to update a Channel.
-         */
-        data: XOR<ChannelUpdateInput, ChannelUncheckedUpdateInput>
-        /**
-         * Choose, which Channel to update.
-         */
-        where: ChannelWhereUniqueInput
-    }
+    select?: ChannelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Channel
+     */
+    omit?: ChannelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChannelInclude<ExtArgs> | null
+    /**
+     * Filter, which Channel to fetch.
+     */
+    where: ChannelWhereUniqueInput
+  }
 
+  /**
+   * Channel findUniqueOrThrow
+   */
+  export type ChannelFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Channel updateMany
+     * Select specific fields to fetch from the Channel
      */
-    export type ChannelUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * The data used to update Channels.
-         */
-        data: XOR<ChannelUpdateManyMutationInput, ChannelUncheckedUpdateManyInput>
-        /**
-         * Filter which Channels to update
-         */
-        where?: ChannelWhereInput
-        /**
-         * Limit how many Channels to update.
-         */
-        limit?: number
-    }
+    select?: ChannelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Channel
+     */
+    omit?: ChannelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChannelInclude<ExtArgs> | null
+    /**
+     * Filter, which Channel to fetch.
+     */
+    where: ChannelWhereUniqueInput
+  }
 
+  /**
+   * Channel findFirst
+   */
+  export type ChannelFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Channel upsert
+     * Select specific fields to fetch from the Channel
      */
-    export type ChannelUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Channel
-         */
-        select?: ChannelSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Channel
-         */
-        omit?: ChannelOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: ChannelInclude<ExtArgs> | null
-        /**
-         * The filter to search for the Channel to update in case it exists.
-         */
-        where: ChannelWhereUniqueInput
-        /**
-         * In case the Channel found by the `where` argument doesn't exist, create a new Channel with this data.
-         */
-        create: XOR<ChannelCreateInput, ChannelUncheckedCreateInput>
-        /**
-         * In case the Channel was found with the provided `where` argument, update it with this data.
-         */
-        update: XOR<ChannelUpdateInput, ChannelUncheckedUpdateInput>
-    }
+    select?: ChannelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Channel
+     */
+    omit?: ChannelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChannelInclude<ExtArgs> | null
+    /**
+     * Filter, which Channel to fetch.
+     */
+    where?: ChannelWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Channels to fetch.
+     */
+    orderBy?: ChannelOrderByWithRelationInput | ChannelOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for Channels.
+     */
+    cursor?: ChannelWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Channels from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Channels.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of Channels.
+     */
+    distinct?: ChannelScalarFieldEnum | ChannelScalarFieldEnum[]
+  }
 
+  /**
+   * Channel findFirstOrThrow
+   */
+  export type ChannelFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Channel delete
+     * Select specific fields to fetch from the Channel
      */
-    export type ChannelDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Channel
-         */
-        select?: ChannelSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Channel
-         */
-        omit?: ChannelOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: ChannelInclude<ExtArgs> | null
-        /**
-         * Filter which Channel to delete.
-         */
-        where: ChannelWhereUniqueInput
-    }
+    select?: ChannelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Channel
+     */
+    omit?: ChannelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChannelInclude<ExtArgs> | null
+    /**
+     * Filter, which Channel to fetch.
+     */
+    where?: ChannelWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Channels to fetch.
+     */
+    orderBy?: ChannelOrderByWithRelationInput | ChannelOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for Channels.
+     */
+    cursor?: ChannelWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Channels from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Channels.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of Channels.
+     */
+    distinct?: ChannelScalarFieldEnum | ChannelScalarFieldEnum[]
+  }
 
+  /**
+   * Channel findMany
+   */
+  export type ChannelFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Channel deleteMany
+     * Select specific fields to fetch from the Channel
      */
-    export type ChannelDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Filter which Channels to delete
-         */
-        where?: ChannelWhereInput
-        /**
-         * Limit how many Channels to delete.
-         */
-        limit?: number
-    }
+    select?: ChannelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Channel
+     */
+    omit?: ChannelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChannelInclude<ExtArgs> | null
+    /**
+     * Filter, which Channels to fetch.
+     */
+    where?: ChannelWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Channels to fetch.
+     */
+    orderBy?: ChannelOrderByWithRelationInput | ChannelOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for listing Channels.
+     */
+    cursor?: ChannelWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Channels from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Channels.
+     */
+    skip?: number
+    distinct?: ChannelScalarFieldEnum | ChannelScalarFieldEnum[]
+  }
 
+  /**
+   * Channel create
+   */
+  export type ChannelCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Channel.Message
+     * Select specific fields to fetch from the Channel
      */
-    export type Channel$MessageArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Message
-         */
-        select?: MessageSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Message
-         */
-        omit?: MessageOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: MessageInclude<ExtArgs> | null
-        where?: MessageWhereInput
-        orderBy?: MessageOrderByWithRelationInput | MessageOrderByWithRelationInput[]
-        cursor?: MessageWhereUniqueInput
-        take?: number
-        skip?: number
-        distinct?: MessageScalarFieldEnum | MessageScalarFieldEnum[]
-    }
+    select?: ChannelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Channel
+     */
+    omit?: ChannelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChannelInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Channel.
+     */
+    data: XOR<ChannelCreateInput, ChannelUncheckedCreateInput>
+  }
 
+  /**
+   * Channel createMany
+   */
+  export type ChannelCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Channel.Ticket
+     * The data used to create many Channels.
      */
-    export type Channel$TicketArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Ticket
-         */
-        select?: TicketSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Ticket
-         */
-        omit?: TicketOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: TicketInclude<ExtArgs> | null
-        where?: TicketWhereInput
-        orderBy?: TicketOrderByWithRelationInput | TicketOrderByWithRelationInput[]
-        cursor?: TicketWhereUniqueInput
-        take?: number
-        skip?: number
-        distinct?: TicketScalarFieldEnum | TicketScalarFieldEnum[]
-    }
+    data: ChannelCreateManyInput | ChannelCreateManyInput[]
+    skipDuplicates?: boolean
+  }
 
+  /**
+   * Channel update
+   */
+  export type ChannelUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Channel without action
+     * Select specific fields to fetch from the Channel
      */
-    export type ChannelDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Channel
-         */
-        select?: ChannelSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Channel
-         */
-        omit?: ChannelOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: ChannelInclude<ExtArgs> | null
-    }
+    select?: ChannelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Channel
+     */
+    omit?: ChannelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChannelInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Channel.
+     */
+    data: XOR<ChannelUpdateInput, ChannelUncheckedUpdateInput>
+    /**
+     * Choose, which Channel to update.
+     */
+    where: ChannelWhereUniqueInput
+  }
+
+  /**
+   * Channel updateMany
+   */
+  export type ChannelUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Channels.
+     */
+    data: XOR<ChannelUpdateManyMutationInput, ChannelUncheckedUpdateManyInput>
+    /**
+     * Filter which Channels to update
+     */
+    where?: ChannelWhereInput
+    /**
+     * Limit how many Channels to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Channel upsert
+   */
+  export type ChannelUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Channel
+     */
+    select?: ChannelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Channel
+     */
+    omit?: ChannelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChannelInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Channel to update in case it exists.
+     */
+    where: ChannelWhereUniqueInput
+    /**
+     * In case the Channel found by the `where` argument doesn't exist, create a new Channel with this data.
+     */
+    create: XOR<ChannelCreateInput, ChannelUncheckedCreateInput>
+    /**
+     * In case the Channel was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ChannelUpdateInput, ChannelUncheckedUpdateInput>
+  }
+
+  /**
+   * Channel delete
+   */
+  export type ChannelDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Channel
+     */
+    select?: ChannelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Channel
+     */
+    omit?: ChannelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChannelInclude<ExtArgs> | null
+    /**
+     * Filter which Channel to delete.
+     */
+    where: ChannelWhereUniqueInput
+  }
+
+  /**
+   * Channel deleteMany
+   */
+  export type ChannelDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Channels to delete
+     */
+    where?: ChannelWhereInput
+    /**
+     * Limit how many Channels to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Channel.Message
+   */
+  export type Channel$MessageArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Message
+     */
+    select?: MessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Message
+     */
+    omit?: MessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MessageInclude<ExtArgs> | null
+    where?: MessageWhereInput
+    orderBy?: MessageOrderByWithRelationInput | MessageOrderByWithRelationInput[]
+    cursor?: MessageWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MessageScalarFieldEnum | MessageScalarFieldEnum[]
+  }
+
+  /**
+   * Channel.Ticket
+   */
+  export type Channel$TicketArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ticket
+     */
+    select?: TicketSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ticket
+     */
+    omit?: TicketOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TicketInclude<ExtArgs> | null
+    where?: TicketWhereInput
+    orderBy?: TicketOrderByWithRelationInput | TicketOrderByWithRelationInput[]
+    cursor?: TicketWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TicketScalarFieldEnum | TicketScalarFieldEnum[]
+  }
+
+  /**
+   * Channel without action
+   */
+  export type ChannelDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Channel
+     */
+    select?: ChannelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Channel
+     */
+    omit?: ChannelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChannelInclude<ExtArgs> | null
+  }
 
 
   /**
@@ -11384,55 +11396,55 @@ export namespace Prisma {
     where?: MessageWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Messages to fetch.
      */
     orderBy?: MessageOrderByWithRelationInput | MessageOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the start position
      */
     cursor?: MessageWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Messages from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Messages.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Count returned Messages
      **/
     _count?: true | MessageCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Select which fields to average
      **/
     _avg?: MessageAvgAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Select which fields to sum
      **/
     _sum?: MessageSumAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Select which fields to find the minimum value
      **/
     _min?: MessageMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Select which fields to find the maximum value
      **/
     _max?: MessageMaxAggregateInputType
@@ -11440,14 +11452,14 @@ export namespace Prisma {
 
   export type GetMessageAggregateType<T extends MessageAggregateArgs> = {
         [P in keyof T & keyof AggregateMessage]: P extends '_count' | 'count'
-          ? T[P] extends true
-              ? number
-              : GetScalarType<T[P], AggregateMessage[P]>
-          : GetScalarType<T[P], AggregateMessage[P]>
+        ? T[P] extends true
+            ? number
+            : GetScalarType<T[P], AggregateMessage[P]>
+        : GetScalarType<T[P], AggregateMessage[P]>
   }
 
 
-    export type MessageGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type MessageGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: MessageWhereInput
     orderBy?: MessageOrderByWithAggregationInput | MessageOrderByWithAggregationInput[]
     by: MessageScalarFieldEnum[] | MessageScalarFieldEnum
@@ -11478,7 +11490,7 @@ export namespace Prisma {
       Array<
           PickEnumerable<MessageGroupByOutputType, T['by']> &
           {
-              [P in ((keyof T) & (keyof MessageGroupByOutputType))]: P extends '_count'
+            [P in ((keyof T) & (keyof MessageGroupByOutputType))]: P extends '_count'
               ? T[P] extends boolean
                   ? number
                   : GetScalarType<T[P], MessageGroupByOutputType[P]>
@@ -11495,7 +11507,7 @@ export namespace Prisma {
     channelId?: boolean
     content?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
-      channel?: boolean | ChannelDefaultArgs<ExtArgs>
+    channel?: boolean | ChannelDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["message"]>
 
 
@@ -11511,14 +11523,14 @@ export namespace Prisma {
   export type MessageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "userId" | "channelId" | "content", ExtArgs["result"]["message"]>
   export type MessageInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
-      channel?: boolean | ChannelDefaultArgs<ExtArgs>
+    channel?: boolean | ChannelDefaultArgs<ExtArgs>
   }
 
   export type $MessagePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Message"
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
-        channel: Prisma.$ChannelPayload<ExtArgs>
+      channel: Prisma.$ChannelPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -11605,13 +11617,13 @@ export namespace Prisma {
      * @example
      * // Get all Messages
      * const messages = await prisma.message.findMany()
-     *
+     * 
      * // Get first 10 Messages
      * const messages = await prisma.message.findMany({ take: 10 })
-     *
+     * 
      * // Only select the `id`
      * const messageWithIdOnly = await prisma.message.findMany({ select: { id: true } })
-     *
+     * 
      */
     findMany<T extends MessageFindManyArgs>(args?: SelectSubset<T, MessageFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -11625,7 +11637,7 @@ export namespace Prisma {
      *     // ... data to create a Message
      *   }
      * })
-     *
+     * 
      */
     create<T extends MessageCreateArgs>(args: SelectSubset<T, MessageCreateArgs<ExtArgs>>): Prisma__MessageClient<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -11639,7 +11651,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *
+     *     
      */
     createMany<T extends MessageCreateManyArgs>(args?: SelectSubset<T, MessageCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -11653,7 +11665,7 @@ export namespace Prisma {
      *     // ... filter to delete one Message
      *   }
      * })
-     *
+     * 
      */
     delete<T extends MessageDeleteArgs>(args: SelectSubset<T, MessageDeleteArgs<ExtArgs>>): Prisma__MessageClient<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -11670,7 +11682,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     *
+     * 
      */
     update<T extends MessageUpdateArgs>(args: SelectSubset<T, MessageUpdateArgs<ExtArgs>>): Prisma__MessageClient<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -11684,7 +11696,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     *
+     * 
      */
     deleteMany<T extends MessageDeleteManyArgs>(args?: SelectSubset<T, MessageDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -11703,7 +11715,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     *
+     * 
      */
     updateMany<T extends MessageUpdateManyArgs>(args: SelectSubset<T, MessageUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -11813,25 +11825,25 @@ export namespace Prisma {
             ? `Error: "by" must not be empty.`
             : HavingValid extends False
                 ? {
-                    [P in HavingFields]: P extends ByFields
-                        ? never
-                        : P extends string
-                            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-                            : [
-                                Error,
-                                'Field ',
-                                P,
-                                ` in "having" needs to be provided in "by"`,
-                            ]
+                  [P in HavingFields]: P extends ByFields
+                      ? never
+                      : P extends string
+                          ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+                          : [
+                            Error,
+                            'Field ',
+                            P,
+                            ` in "having" needs to be provided in "by"`,
+                          ]
                 }[HavingFields]
                 : 'take' extends Keys<T>
                     ? 'orderBy' extends Keys<T>
                         ? ByValid extends True
                             ? {}
                             : {
-                                [P in OrderFields]: P extends ByFields
-                                    ? never
-                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                              [P in OrderFields]: P extends ByFields
+                                  ? never
+                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
                         : 'Error: If you provide "take", you also need to provide "orderBy"'
                     : 'skip' extends Keys<T>
@@ -11839,24 +11851,24 @@ export namespace Prisma {
                             ? ByValid extends True
                                 ? {}
                                 : {
-                                    [P in OrderFields]: P extends ByFields
-                                        ? never
-                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                  [P in OrderFields]: P extends ByFields
+                                      ? never
+                                      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                                 }[OrderFields]
                             : 'Error: If you provide "skip", you also need to provide "orderBy"'
                         : ByValid extends True
                             ? {}
                             : {
-                                [P in OrderFields]: P extends ByFields
-                                    ? never
-                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                              [P in OrderFields]: P extends ByFields
+                                  ? never
+                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
     >(args: SubsetIntersection<T, MessageGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMessageGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
 
-      /**
-       * Fields of the Message model
-       */
-      readonly fields: MessageFieldRefs;
+    /**
+     * Fields of the Message model
+     */
+    readonly fields: MessageFieldRefs;
   }
 
   /**
@@ -11869,7 +11881,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
 
-      channel<T extends ChannelDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ChannelDefaultArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    channel<T extends ChannelDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ChannelDefaultArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -11893,7 +11905,7 @@ export namespace Prisma {
   }
 
 
-    /**
+  /**
    * Fields of the Message model
    */
   interface MessageFieldRefs {
@@ -11905,7 +11917,7 @@ export namespace Prisma {
   }
 
 
-    // Custom InputTypes
+  // Custom InputTypes
   /**
    * Message findUnique
    */
@@ -11972,31 +11984,31 @@ export namespace Prisma {
     where?: MessageWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Messages to fetch.
      */
     orderBy?: MessageOrderByWithRelationInput | MessageOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for searching for Messages.
      */
     cursor?: MessageWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Messages from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Messages.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     *
+     * 
      * Filter by unique combinations of Messages.
      */
     distinct?: MessageScalarFieldEnum | MessageScalarFieldEnum[]
@@ -12024,31 +12036,31 @@ export namespace Prisma {
     where?: MessageWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Messages to fetch.
      */
     orderBy?: MessageOrderByWithRelationInput | MessageOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for searching for Messages.
      */
     cursor?: MessageWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Messages from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Messages.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     *
+     * 
      * Filter by unique combinations of Messages.
      */
     distinct?: MessageScalarFieldEnum | MessageScalarFieldEnum[]
@@ -12076,25 +12088,25 @@ export namespace Prisma {
     where?: MessageWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Messages to fetch.
      */
     orderBy?: MessageOrderByWithRelationInput | MessageOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for listing Messages.
      */
     cursor?: MessageWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Messages from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Messages.
      */
     skip?: number
@@ -12172,10 +12184,10 @@ export namespace Prisma {
      * Filter which Messages to update
      */
     where?: MessageWhereInput
-      /**
-       * Limit how many Messages to update.
-       */
-      limit?: number
+    /**
+     * Limit how many Messages to update.
+     */
+    limit?: number
   }
 
   /**
@@ -12238,10 +12250,10 @@ export namespace Prisma {
      * Filter which Messages to delete
      */
     where?: MessageWhereInput
-      /**
-       * Limit how many Messages to delete.
-       */
-      limit?: number
+    /**
+     * Limit how many Messages to delete.
+     */
+    limit?: number
   }
 
   /**
@@ -12349,43 +12361,43 @@ export namespace Prisma {
     where?: EventWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Events to fetch.
      */
     orderBy?: EventOrderByWithRelationInput | EventOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the start position
      */
     cursor?: EventWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Events from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Events.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Count returned Events
      **/
     _count?: true | EventCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Select which fields to find the minimum value
      **/
     _min?: EventMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Select which fields to find the maximum value
      **/
     _max?: EventMaxAggregateInputType
@@ -12393,14 +12405,14 @@ export namespace Prisma {
 
   export type GetEventAggregateType<T extends EventAggregateArgs> = {
         [P in keyof T & keyof AggregateEvent]: P extends '_count' | 'count'
-          ? T[P] extends true
-              ? number
-              : GetScalarType<T[P], AggregateEvent[P]>
-          : GetScalarType<T[P], AggregateEvent[P]>
+        ? T[P] extends true
+            ? number
+            : GetScalarType<T[P], AggregateEvent[P]>
+        : GetScalarType<T[P], AggregateEvent[P]>
   }
 
 
-    export type EventGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type EventGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: EventWhereInput
     orderBy?: EventOrderByWithAggregationInput | EventOrderByWithAggregationInput[]
     by: EventScalarFieldEnum[] | EventScalarFieldEnum
@@ -12430,7 +12442,7 @@ export namespace Prisma {
       Array<
           PickEnumerable<EventGroupByOutputType, T['by']> &
           {
-              [P in ((keyof T) & (keyof EventGroupByOutputType))]: P extends '_count'
+            [P in ((keyof T) & (keyof EventGroupByOutputType))]: P extends '_count'
               ? T[P] extends boolean
                   ? number
                   : GetScalarType<T[P], EventGroupByOutputType[P]>
@@ -12571,13 +12583,13 @@ export namespace Prisma {
      * @example
      * // Get all Events
      * const events = await prisma.event.findMany()
-     *
+     * 
      * // Get first 10 Events
      * const events = await prisma.event.findMany({ take: 10 })
-     *
+     * 
      * // Only select the `id`
      * const eventWithIdOnly = await prisma.event.findMany({ select: { id: true } })
-     *
+     * 
      */
     findMany<T extends EventFindManyArgs>(args?: SelectSubset<T, EventFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -12591,7 +12603,7 @@ export namespace Prisma {
      *     // ... data to create a Event
      *   }
      * })
-     *
+     * 
      */
     create<T extends EventCreateArgs>(args: SelectSubset<T, EventCreateArgs<ExtArgs>>): Prisma__EventClient<$Result.GetResult<Prisma.$EventPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -12605,7 +12617,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *
+     *     
      */
     createMany<T extends EventCreateManyArgs>(args?: SelectSubset<T, EventCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -12619,7 +12631,7 @@ export namespace Prisma {
      *     // ... filter to delete one Event
      *   }
      * })
-     *
+     * 
      */
     delete<T extends EventDeleteArgs>(args: SelectSubset<T, EventDeleteArgs<ExtArgs>>): Prisma__EventClient<$Result.GetResult<Prisma.$EventPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -12636,7 +12648,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     *
+     * 
      */
     update<T extends EventUpdateArgs>(args: SelectSubset<T, EventUpdateArgs<ExtArgs>>): Prisma__EventClient<$Result.GetResult<Prisma.$EventPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -12650,7 +12662,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     *
+     * 
      */
     deleteMany<T extends EventDeleteManyArgs>(args?: SelectSubset<T, EventDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -12669,7 +12681,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     *
+     * 
      */
     updateMany<T extends EventUpdateManyArgs>(args: SelectSubset<T, EventUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -12779,25 +12791,25 @@ export namespace Prisma {
             ? `Error: "by" must not be empty.`
             : HavingValid extends False
                 ? {
-                    [P in HavingFields]: P extends ByFields
-                        ? never
-                        : P extends string
-                            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-                            : [
-                                Error,
-                                'Field ',
-                                P,
-                                ` in "having" needs to be provided in "by"`,
-                            ]
+                  [P in HavingFields]: P extends ByFields
+                      ? never
+                      : P extends string
+                          ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+                          : [
+                            Error,
+                            'Field ',
+                            P,
+                            ` in "having" needs to be provided in "by"`,
+                          ]
                 }[HavingFields]
                 : 'take' extends Keys<T>
                     ? 'orderBy' extends Keys<T>
                         ? ByValid extends True
                             ? {}
                             : {
-                                [P in OrderFields]: P extends ByFields
-                                    ? never
-                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                              [P in OrderFields]: P extends ByFields
+                                  ? never
+                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
                         : 'Error: If you provide "take", you also need to provide "orderBy"'
                     : 'skip' extends Keys<T>
@@ -12805,24 +12817,24 @@ export namespace Prisma {
                             ? ByValid extends True
                                 ? {}
                                 : {
-                                    [P in OrderFields]: P extends ByFields
-                                        ? never
-                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                  [P in OrderFields]: P extends ByFields
+                                      ? never
+                                      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                                 }[OrderFields]
                             : 'Error: If you provide "skip", you also need to provide "orderBy"'
                         : ByValid extends True
                             ? {}
                             : {
-                                [P in OrderFields]: P extends ByFields
-                                    ? never
-                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                              [P in OrderFields]: P extends ByFields
+                                  ? never
+                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
     >(args: SubsetIntersection<T, EventGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetEventGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
 
-      /**
-       * Fields of the Event model
-       */
-      readonly fields: EventFieldRefs;
+    /**
+     * Fields of the Event model
+     */
+    readonly fields: EventFieldRefs;
   }
 
   /**
@@ -12859,7 +12871,7 @@ export namespace Prisma {
   }
 
 
-    /**
+  /**
    * Fields of the Event model
    */
   interface EventFieldRefs {
@@ -12874,7 +12886,7 @@ export namespace Prisma {
   }
 
 
-    // Custom InputTypes
+  // Custom InputTypes
   /**
    * Event findUnique
    */
@@ -12941,31 +12953,31 @@ export namespace Prisma {
     where?: EventWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Events to fetch.
      */
     orderBy?: EventOrderByWithRelationInput | EventOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for searching for Events.
      */
     cursor?: EventWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Events from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Events.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     *
+     * 
      * Filter by unique combinations of Events.
      */
     distinct?: EventScalarFieldEnum | EventScalarFieldEnum[]
@@ -12993,31 +13005,31 @@ export namespace Prisma {
     where?: EventWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Events to fetch.
      */
     orderBy?: EventOrderByWithRelationInput | EventOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for searching for Events.
      */
     cursor?: EventWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Events from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Events.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     *
+     * 
      * Filter by unique combinations of Events.
      */
     distinct?: EventScalarFieldEnum | EventScalarFieldEnum[]
@@ -13045,25 +13057,25 @@ export namespace Prisma {
     where?: EventWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of Events to fetch.
      */
     orderBy?: EventOrderByWithRelationInput | EventOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for listing Events.
      */
     cursor?: EventWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` Events from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` Events.
      */
     skip?: number
@@ -13141,10 +13153,10 @@ export namespace Prisma {
      * Filter which Events to update
      */
     where?: EventWhereInput
-      /**
-       * Limit how many Events to update.
-       */
-      limit?: number
+    /**
+     * Limit how many Events to update.
+     */
+    limit?: number
   }
 
   /**
@@ -13207,10 +13219,10 @@ export namespace Prisma {
      * Filter which Events to delete
      */
     where?: EventWhereInput
-      /**
-       * Limit how many Events to delete.
-       */
-      limit?: number
+    /**
+     * Limit how many Events to delete.
+     */
+    limit?: number
   }
 
   /**
@@ -13360,55 +13372,55 @@ export namespace Prisma {
     where?: RoleSlotWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of RoleSlots to fetch.
      */
     orderBy?: RoleSlotOrderByWithRelationInput | RoleSlotOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the start position
      */
     cursor?: RoleSlotWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` RoleSlots from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` RoleSlots.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Count returned RoleSlots
      **/
     _count?: true | RoleSlotCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Select which fields to average
      **/
     _avg?: RoleSlotAvgAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Select which fields to sum
      **/
     _sum?: RoleSlotSumAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Select which fields to find the minimum value
      **/
     _min?: RoleSlotMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Select which fields to find the maximum value
      **/
     _max?: RoleSlotMaxAggregateInputType
@@ -13416,14 +13428,14 @@ export namespace Prisma {
 
   export type GetRoleSlotAggregateType<T extends RoleSlotAggregateArgs> = {
         [P in keyof T & keyof AggregateRoleSlot]: P extends '_count' | 'count'
-          ? T[P] extends true
-              ? number
-              : GetScalarType<T[P], AggregateRoleSlot[P]>
-          : GetScalarType<T[P], AggregateRoleSlot[P]>
+        ? T[P] extends true
+            ? number
+            : GetScalarType<T[P], AggregateRoleSlot[P]>
+        : GetScalarType<T[P], AggregateRoleSlot[P]>
   }
 
 
-    export type RoleSlotGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type RoleSlotGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: RoleSlotWhereInput
     orderBy?: RoleSlotOrderByWithAggregationInput | RoleSlotOrderByWithAggregationInput[]
     by: RoleSlotScalarFieldEnum[] | RoleSlotScalarFieldEnum
@@ -13453,7 +13465,7 @@ export namespace Prisma {
       Array<
           PickEnumerable<RoleSlotGroupByOutputType, T['by']> &
           {
-              [P in ((keyof T) & (keyof RoleSlotGroupByOutputType))]: P extends '_count'
+            [P in ((keyof T) & (keyof RoleSlotGroupByOutputType))]: P extends '_count'
               ? T[P] extends boolean
                   ? number
                   : GetScalarType<T[P], RoleSlotGroupByOutputType[P]>
@@ -13579,13 +13591,13 @@ export namespace Prisma {
      * @example
      * // Get all RoleSlots
      * const roleSlots = await prisma.roleSlot.findMany()
-     *
+     * 
      * // Get first 10 RoleSlots
      * const roleSlots = await prisma.roleSlot.findMany({ take: 10 })
-     *
+     * 
      * // Only select the `id`
      * const roleSlotWithIdOnly = await prisma.roleSlot.findMany({ select: { id: true } })
-     *
+     * 
      */
     findMany<T extends RoleSlotFindManyArgs>(args?: SelectSubset<T, RoleSlotFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoleSlotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -13599,7 +13611,7 @@ export namespace Prisma {
      *     // ... data to create a RoleSlot
      *   }
      * })
-     *
+     * 
      */
     create<T extends RoleSlotCreateArgs>(args: SelectSubset<T, RoleSlotCreateArgs<ExtArgs>>): Prisma__RoleSlotClient<$Result.GetResult<Prisma.$RoleSlotPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -13613,7 +13625,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *
+     *     
      */
     createMany<T extends RoleSlotCreateManyArgs>(args?: SelectSubset<T, RoleSlotCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -13627,7 +13639,7 @@ export namespace Prisma {
      *     // ... filter to delete one RoleSlot
      *   }
      * })
-     *
+     * 
      */
     delete<T extends RoleSlotDeleteArgs>(args: SelectSubset<T, RoleSlotDeleteArgs<ExtArgs>>): Prisma__RoleSlotClient<$Result.GetResult<Prisma.$RoleSlotPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -13644,7 +13656,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     *
+     * 
      */
     update<T extends RoleSlotUpdateArgs>(args: SelectSubset<T, RoleSlotUpdateArgs<ExtArgs>>): Prisma__RoleSlotClient<$Result.GetResult<Prisma.$RoleSlotPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -13658,7 +13670,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     *
+     * 
      */
     deleteMany<T extends RoleSlotDeleteManyArgs>(args?: SelectSubset<T, RoleSlotDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -13677,7 +13689,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     *
+     * 
      */
     updateMany<T extends RoleSlotUpdateManyArgs>(args: SelectSubset<T, RoleSlotUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -13787,25 +13799,25 @@ export namespace Prisma {
             ? `Error: "by" must not be empty.`
             : HavingValid extends False
                 ? {
-                    [P in HavingFields]: P extends ByFields
-                        ? never
-                        : P extends string
-                            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-                            : [
-                                Error,
-                                'Field ',
-                                P,
-                                ` in "having" needs to be provided in "by"`,
-                            ]
+                  [P in HavingFields]: P extends ByFields
+                      ? never
+                      : P extends string
+                          ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+                          : [
+                            Error,
+                            'Field ',
+                            P,
+                            ` in "having" needs to be provided in "by"`,
+                          ]
                 }[HavingFields]
                 : 'take' extends Keys<T>
                     ? 'orderBy' extends Keys<T>
                         ? ByValid extends True
                             ? {}
                             : {
-                                [P in OrderFields]: P extends ByFields
-                                    ? never
-                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                              [P in OrderFields]: P extends ByFields
+                                  ? never
+                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
                         : 'Error: If you provide "take", you also need to provide "orderBy"'
                     : 'skip' extends Keys<T>
@@ -13813,24 +13825,24 @@ export namespace Prisma {
                             ? ByValid extends True
                                 ? {}
                                 : {
-                                    [P in OrderFields]: P extends ByFields
-                                        ? never
-                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                  [P in OrderFields]: P extends ByFields
+                                      ? never
+                                      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                                 }[OrderFields]
                             : 'Error: If you provide "skip", you also need to provide "orderBy"'
                         : ByValid extends True
                             ? {}
                             : {
-                                [P in OrderFields]: P extends ByFields
-                                    ? never
-                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                              [P in OrderFields]: P extends ByFields
+                                  ? never
+                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
     >(args: SubsetIntersection<T, RoleSlotGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetRoleSlotGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
 
-      /**
-       * Fields of the RoleSlot model
-       */
-      readonly fields: RoleSlotFieldRefs;
+    /**
+     * Fields of the RoleSlot model
+     */
+    readonly fields: RoleSlotFieldRefs;
   }
 
   /**
@@ -13866,7 +13878,7 @@ export namespace Prisma {
   }
 
 
-    /**
+  /**
    * Fields of the RoleSlot model
    */
   interface RoleSlotFieldRefs {
@@ -13877,7 +13889,7 @@ export namespace Prisma {
   }
 
 
-    // Custom InputTypes
+  // Custom InputTypes
   /**
    * RoleSlot findUnique
    */
@@ -13944,31 +13956,31 @@ export namespace Prisma {
     where?: RoleSlotWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of RoleSlots to fetch.
      */
     orderBy?: RoleSlotOrderByWithRelationInput | RoleSlotOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for searching for RoleSlots.
      */
     cursor?: RoleSlotWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` RoleSlots from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` RoleSlots.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     *
+     * 
      * Filter by unique combinations of RoleSlots.
      */
     distinct?: RoleSlotScalarFieldEnum | RoleSlotScalarFieldEnum[]
@@ -13996,31 +14008,31 @@ export namespace Prisma {
     where?: RoleSlotWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of RoleSlots to fetch.
      */
     orderBy?: RoleSlotOrderByWithRelationInput | RoleSlotOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for searching for RoleSlots.
      */
     cursor?: RoleSlotWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` RoleSlots from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` RoleSlots.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     *
+     * 
      * Filter by unique combinations of RoleSlots.
      */
     distinct?: RoleSlotScalarFieldEnum | RoleSlotScalarFieldEnum[]
@@ -14048,25 +14060,25 @@ export namespace Prisma {
     where?: RoleSlotWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of RoleSlots to fetch.
      */
     orderBy?: RoleSlotOrderByWithRelationInput | RoleSlotOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for listing RoleSlots.
      */
     cursor?: RoleSlotWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` RoleSlots from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` RoleSlots.
      */
     skip?: number
@@ -14144,10 +14156,10 @@ export namespace Prisma {
      * Filter which RoleSlots to update
      */
     where?: RoleSlotWhereInput
-      /**
-       * Limit how many RoleSlots to update.
-       */
-      limit?: number
+    /**
+     * Limit how many RoleSlots to update.
+     */
+    limit?: number
   }
 
   /**
@@ -14210,10 +14222,10 @@ export namespace Prisma {
      * Filter which RoleSlots to delete
      */
     where?: RoleSlotWhereInput
-      /**
-       * Limit how many RoleSlots to delete.
-       */
-      limit?: number
+    /**
+     * Limit how many RoleSlots to delete.
+     */
+    limit?: number
   }
 
   /**
@@ -14327,43 +14339,43 @@ export namespace Prisma {
     where?: EventRegistrationWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of EventRegistrations to fetch.
      */
     orderBy?: EventRegistrationOrderByWithRelationInput | EventRegistrationOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the start position
      */
     cursor?: EventRegistrationWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` EventRegistrations from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` EventRegistrations.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Count returned EventRegistrations
      **/
     _count?: true | EventRegistrationCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Select which fields to find the minimum value
      **/
     _min?: EventRegistrationMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     *
+     * 
      * Select which fields to find the maximum value
      **/
     _max?: EventRegistrationMaxAggregateInputType
@@ -14371,14 +14383,14 @@ export namespace Prisma {
 
   export type GetEventRegistrationAggregateType<T extends EventRegistrationAggregateArgs> = {
         [P in keyof T & keyof AggregateEventRegistration]: P extends '_count' | 'count'
-          ? T[P] extends true
-              ? number
-              : GetScalarType<T[P], AggregateEventRegistration[P]>
-          : GetScalarType<T[P], AggregateEventRegistration[P]>
+        ? T[P] extends true
+            ? number
+            : GetScalarType<T[P], AggregateEventRegistration[P]>
+        : GetScalarType<T[P], AggregateEventRegistration[P]>
   }
 
 
-    export type EventRegistrationGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type EventRegistrationGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: EventRegistrationWhereInput
     orderBy?: EventRegistrationOrderByWithAggregationInput | EventRegistrationOrderByWithAggregationInput[]
     by: EventRegistrationScalarFieldEnum[] | EventRegistrationScalarFieldEnum
@@ -14405,7 +14417,7 @@ export namespace Prisma {
       Array<
           PickEnumerable<EventRegistrationGroupByOutputType, T['by']> &
           {
-              [P in ((keyof T) & (keyof EventRegistrationGroupByOutputType))]: P extends '_count'
+            [P in ((keyof T) & (keyof EventRegistrationGroupByOutputType))]: P extends '_count'
               ? T[P] extends boolean
                   ? number
                   : GetScalarType<T[P], EventRegistrationGroupByOutputType[P]>
@@ -14535,13 +14547,13 @@ export namespace Prisma {
      * @example
      * // Get all EventRegistrations
      * const eventRegistrations = await prisma.eventRegistration.findMany()
-     *
+     * 
      * // Get first 10 EventRegistrations
      * const eventRegistrations = await prisma.eventRegistration.findMany({ take: 10 })
-     *
+     * 
      * // Only select the `id`
      * const eventRegistrationWithIdOnly = await prisma.eventRegistration.findMany({ select: { id: true } })
-     *
+     * 
      */
     findMany<T extends EventRegistrationFindManyArgs>(args?: SelectSubset<T, EventRegistrationFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventRegistrationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -14555,7 +14567,7 @@ export namespace Prisma {
      *     // ... data to create a EventRegistration
      *   }
      * })
-     *
+     * 
      */
     create<T extends EventRegistrationCreateArgs>(args: SelectSubset<T, EventRegistrationCreateArgs<ExtArgs>>): Prisma__EventRegistrationClient<$Result.GetResult<Prisma.$EventRegistrationPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -14569,7 +14581,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *
+     *     
      */
     createMany<T extends EventRegistrationCreateManyArgs>(args?: SelectSubset<T, EventRegistrationCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -14583,7 +14595,7 @@ export namespace Prisma {
      *     // ... filter to delete one EventRegistration
      *   }
      * })
-     *
+     * 
      */
     delete<T extends EventRegistrationDeleteArgs>(args: SelectSubset<T, EventRegistrationDeleteArgs<ExtArgs>>): Prisma__EventRegistrationClient<$Result.GetResult<Prisma.$EventRegistrationPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -14600,7 +14612,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     *
+     * 
      */
     update<T extends EventRegistrationUpdateArgs>(args: SelectSubset<T, EventRegistrationUpdateArgs<ExtArgs>>): Prisma__EventRegistrationClient<$Result.GetResult<Prisma.$EventRegistrationPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -14614,7 +14626,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     *
+     * 
      */
     deleteMany<T extends EventRegistrationDeleteManyArgs>(args?: SelectSubset<T, EventRegistrationDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -14633,7 +14645,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     *
+     * 
      */
     updateMany<T extends EventRegistrationUpdateManyArgs>(args: SelectSubset<T, EventRegistrationUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -14743,25 +14755,25 @@ export namespace Prisma {
             ? `Error: "by" must not be empty.`
             : HavingValid extends False
                 ? {
-                    [P in HavingFields]: P extends ByFields
-                        ? never
-                        : P extends string
-                            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-                            : [
-                                Error,
-                                'Field ',
-                                P,
-                                ` in "having" needs to be provided in "by"`,
-                            ]
+                  [P in HavingFields]: P extends ByFields
+                      ? never
+                      : P extends string
+                          ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+                          : [
+                            Error,
+                            'Field ',
+                            P,
+                            ` in "having" needs to be provided in "by"`,
+                          ]
                 }[HavingFields]
                 : 'take' extends Keys<T>
                     ? 'orderBy' extends Keys<T>
                         ? ByValid extends True
                             ? {}
                             : {
-                                [P in OrderFields]: P extends ByFields
-                                    ? never
-                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                              [P in OrderFields]: P extends ByFields
+                                  ? never
+                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
                         : 'Error: If you provide "take", you also need to provide "orderBy"'
                     : 'skip' extends Keys<T>
@@ -14769,24 +14781,24 @@ export namespace Prisma {
                             ? ByValid extends True
                                 ? {}
                                 : {
-                                    [P in OrderFields]: P extends ByFields
-                                        ? never
-                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                  [P in OrderFields]: P extends ByFields
+                                      ? never
+                                      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                                 }[OrderFields]
                             : 'Error: If you provide "skip", you also need to provide "orderBy"'
                         : ByValid extends True
                             ? {}
                             : {
-                                [P in OrderFields]: P extends ByFields
-                                    ? never
-                                    : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                              [P in OrderFields]: P extends ByFields
+                                  ? never
+                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                             }[OrderFields]
     >(args: SubsetIntersection<T, EventRegistrationGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetEventRegistrationGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
 
-      /**
-       * Fields of the EventRegistration model
-       */
-      readonly fields: EventRegistrationFieldRefs;
+    /**
+     * Fields of the EventRegistration model
+     */
+    readonly fields: EventRegistrationFieldRefs;
   }
 
   /**
@@ -14823,7 +14835,7 @@ export namespace Prisma {
   }
 
 
-    /**
+  /**
    * Fields of the EventRegistration model
    */
   interface EventRegistrationFieldRefs {
@@ -14835,7 +14847,7 @@ export namespace Prisma {
   }
 
 
-    // Custom InputTypes
+  // Custom InputTypes
   /**
    * EventRegistration findUnique
    */
@@ -14902,31 +14914,31 @@ export namespace Prisma {
     where?: EventRegistrationWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of EventRegistrations to fetch.
      */
     orderBy?: EventRegistrationOrderByWithRelationInput | EventRegistrationOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for searching for EventRegistrations.
      */
     cursor?: EventRegistrationWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` EventRegistrations from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` EventRegistrations.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     *
+     * 
      * Filter by unique combinations of EventRegistrations.
      */
     distinct?: EventRegistrationScalarFieldEnum | EventRegistrationScalarFieldEnum[]
@@ -14954,31 +14966,31 @@ export namespace Prisma {
     where?: EventRegistrationWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of EventRegistrations to fetch.
      */
     orderBy?: EventRegistrationOrderByWithRelationInput | EventRegistrationOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for searching for EventRegistrations.
      */
     cursor?: EventRegistrationWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` EventRegistrations from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` EventRegistrations.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     *
+     * 
      * Filter by unique combinations of EventRegistrations.
      */
     distinct?: EventRegistrationScalarFieldEnum | EventRegistrationScalarFieldEnum[]
@@ -15006,25 +15018,25 @@ export namespace Prisma {
     where?: EventRegistrationWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     *
+     * 
      * Determine the order of EventRegistrations to fetch.
      */
     orderBy?: EventRegistrationOrderByWithRelationInput | EventRegistrationOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     *
+     * 
      * Sets the position for listing EventRegistrations.
      */
     cursor?: EventRegistrationWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Take `±n` EventRegistrations from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     *
+     * 
      * Skip the first `n` EventRegistrations.
      */
     skip?: number
@@ -15102,10 +15114,10 @@ export namespace Prisma {
      * Filter which EventRegistrations to update
      */
     where?: EventRegistrationWhereInput
-      /**
-       * Limit how many EventRegistrations to update.
-       */
-      limit?: number
+    /**
+     * Limit how many EventRegistrations to update.
+     */
+    limit?: number
   }
 
   /**
@@ -15168,10 +15180,10 @@ export namespace Prisma {
      * Filter which EventRegistrations to delete
      */
     where?: EventRegistrationWhereInput
-      /**
-       * Limit how many EventRegistrations to delete.
-       */
-      limit?: number
+    /**
+     * Limit how many EventRegistrations to delete.
+     */
+    limit?: number
   }
 
   /**
@@ -15212,3064 +15224,3064 @@ export namespace Prisma {
   }
 
 
+  /**
+   * Model Ticket
+   */
+
+  export type AggregateTicket = {
+    _count: TicketCountAggregateOutputType | null
+    _avg: TicketAvgAggregateOutputType | null
+    _sum: TicketSumAggregateOutputType | null
+    _min: TicketMinAggregateOutputType | null
+    _max: TicketMaxAggregateOutputType | null
+  }
+
+  export type TicketAvgAggregateOutputType = {
+    id: number | null
+  }
+
+  export type TicketSumAggregateOutputType = {
+    id: number | null
+  }
+
+  export type TicketMinAggregateOutputType = {
+    id: number | null
+    discordUserID: string | null
+    channelId: string | null
+    channelName: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    assignedUserId: string | null
+  }
+
+  export type TicketMaxAggregateOutputType = {
+    id: number | null
+    discordUserID: string | null
+    channelId: string | null
+    channelName: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    assignedUserId: string | null
+  }
+
+  export type TicketCountAggregateOutputType = {
+    id: number
+    discordUserID: number
+    channelId: number
+    channelName: number
+    createdAt: number
+    updatedAt: number
+    assignedUserId: number
+    _all: number
+  }
+
+
+  export type TicketAvgAggregateInputType = {
+    id?: true
+  }
+
+  export type TicketSumAggregateInputType = {
+    id?: true
+  }
+
+  export type TicketMinAggregateInputType = {
+    id?: true
+    discordUserID?: true
+    channelId?: true
+    channelName?: true
+    createdAt?: true
+    updatedAt?: true
+    assignedUserId?: true
+  }
+
+  export type TicketMaxAggregateInputType = {
+    id?: true
+    discordUserID?: true
+    channelId?: true
+    channelName?: true
+    createdAt?: true
+    updatedAt?: true
+    assignedUserId?: true
+  }
+
+  export type TicketCountAggregateInputType = {
+    id?: true
+    discordUserID?: true
+    channelId?: true
+    channelName?: true
+    createdAt?: true
+    updatedAt?: true
+    assignedUserId?: true
+    _all?: true
+  }
+
+  export type TicketAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Model Ticket
+     * Filter which Ticket to aggregate.
      */
+    where?: TicketWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Tickets to fetch.
+     */
+    orderBy?: TicketOrderByWithRelationInput | TicketOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the start position
+     */
+    cursor?: TicketWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Tickets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Tickets.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Count returned Tickets
+     **/
+    _count?: true | TicketCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to average
+     **/
+    _avg?: TicketAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to sum
+     **/
+    _sum?: TicketSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the minimum value
+     **/
+    _min?: TicketMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the maximum value
+     **/
+    _max?: TicketMaxAggregateInputType
+  }
 
-    export type AggregateTicket = {
-        _count: TicketCountAggregateOutputType | null
-        _avg: TicketAvgAggregateOutputType | null
-        _sum: TicketSumAggregateOutputType | null
-        _min: TicketMinAggregateOutputType | null
-        _max: TicketMaxAggregateOutputType | null
-    }
-
-    export type TicketAvgAggregateOutputType = {
-        id: number | null
-    }
-
-    export type TicketSumAggregateOutputType = {
-        id: number | null
-    }
-
-    export type TicketMinAggregateOutputType = {
-        id: number | null
-        discordUserID: string | null
-        channelId: string | null
-        channelName: string | null
-        createdAt: Date | null
-        updatedAt: Date | null
-        assignedUserId: string | null
-    }
-
-    export type TicketMaxAggregateOutputType = {
-        id: number | null
-        discordUserID: string | null
-        channelId: string | null
-        channelName: string | null
-        createdAt: Date | null
-        updatedAt: Date | null
-        assignedUserId: string | null
-    }
-
-    export type TicketCountAggregateOutputType = {
-        id: number
-        discordUserID: number
-        channelId: number
-        channelName: number
-        createdAt: number
-        updatedAt: number
-        assignedUserId: number
-        _all: number
-    }
-
-
-    export type TicketAvgAggregateInputType = {
-        id?: true
-    }
-
-    export type TicketSumAggregateInputType = {
-        id?: true
-    }
-
-    export type TicketMinAggregateInputType = {
-        id?: true
-        discordUserID?: true
-        channelId?: true
-        channelName?: true
-        createdAt?: true
-        updatedAt?: true
-        assignedUserId?: true
-    }
-
-    export type TicketMaxAggregateInputType = {
-        id?: true
-        discordUserID?: true
-        channelId?: true
-        channelName?: true
-        createdAt?: true
-        updatedAt?: true
-        assignedUserId?: true
-    }
-
-    export type TicketCountAggregateInputType = {
-        id?: true
-        discordUserID?: true
-        channelId?: true
-        channelName?: true
-        createdAt?: true
-        updatedAt?: true
-        assignedUserId?: true
-        _all?: true
-    }
-
-    export type TicketAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Filter which Ticket to aggregate.
-         */
-        where?: TicketWhereInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-         *
-         * Determine the order of Tickets to fetch.
-         */
-        orderBy?: TicketOrderByWithRelationInput | TicketOrderByWithRelationInput[]
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-         *
-         * Sets the start position
-         */
-        cursor?: TicketWhereUniqueInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Take `±n` Tickets from the position of the cursor.
-         */
-        take?: number
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Skip the first `n` Tickets.
-         */
-        skip?: number
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-         *
-         * Count returned Tickets
-         **/
-        _count?: true | TicketCountAggregateInputType
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-         *
-         * Select which fields to average
-         **/
-        _avg?: TicketAvgAggregateInputType
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-         *
-         * Select which fields to sum
-         **/
-        _sum?: TicketSumAggregateInputType
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-         *
-         * Select which fields to find the minimum value
-         **/
-        _min?: TicketMinAggregateInputType
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-         *
-         * Select which fields to find the maximum value
-         **/
-        _max?: TicketMaxAggregateInputType
-    }
-
-    export type GetTicketAggregateType<T extends TicketAggregateArgs> = {
+  export type GetTicketAggregateType<T extends TicketAggregateArgs> = {
         [P in keyof T & keyof AggregateTicket]: P extends '_count' | 'count'
-            ? T[P] extends true
-                ? number
-                : GetScalarType<T[P], AggregateTicket[P]>
+        ? T[P] extends true
+            ? number
             : GetScalarType<T[P], AggregateTicket[P]>
-    }
+        : GetScalarType<T[P], AggregateTicket[P]>
+  }
 
 
-    export type TicketGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        where?: TicketWhereInput
-        orderBy?: TicketOrderByWithAggregationInput | TicketOrderByWithAggregationInput[]
-        by: TicketScalarFieldEnum[] | TicketScalarFieldEnum
-        having?: TicketScalarWhereWithAggregatesInput
-        take?: number
-        skip?: number
-        _count?: TicketCountAggregateInputType | true
-        _avg?: TicketAvgAggregateInputType
-        _sum?: TicketSumAggregateInputType
-        _min?: TicketMinAggregateInputType
-        _max?: TicketMaxAggregateInputType
-    }
+  export type TicketGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TicketWhereInput
+    orderBy?: TicketOrderByWithAggregationInput | TicketOrderByWithAggregationInput[]
+    by: TicketScalarFieldEnum[] | TicketScalarFieldEnum
+    having?: TicketScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: TicketCountAggregateInputType | true
+    _avg?: TicketAvgAggregateInputType
+    _sum?: TicketSumAggregateInputType
+    _min?: TicketMinAggregateInputType
+    _max?: TicketMaxAggregateInputType
+  }
 
-    export type TicketGroupByOutputType = {
-        id: number
-        discordUserID: string
-        channelId: string | null
-        channelName: string | null
-        createdAt: Date
-        updatedAt: Date
-        assignedUserId: string | null
-        _count: TicketCountAggregateOutputType | null
-        _avg: TicketAvgAggregateOutputType | null
-        _sum: TicketSumAggregateOutputType | null
-        _min: TicketMinAggregateOutputType | null
-        _max: TicketMaxAggregateOutputType | null
-    }
+  export type TicketGroupByOutputType = {
+    id: number
+    discordUserID: string
+    channelId: string | null
+    channelName: string | null
+    createdAt: Date
+    updatedAt: Date
+    assignedUserId: string | null
+    _count: TicketCountAggregateOutputType | null
+    _avg: TicketAvgAggregateOutputType | null
+    _sum: TicketSumAggregateOutputType | null
+    _min: TicketMinAggregateOutputType | null
+    _max: TicketMaxAggregateOutputType | null
+  }
 
-    type GetTicketGroupByPayload<T extends TicketGroupByArgs> = Prisma.PrismaPromise<
-        Array<
-            PickEnumerable<TicketGroupByOutputType, T['by']> &
-            {
-                [P in ((keyof T) & (keyof TicketGroupByOutputType))]: P extends '_count'
-                ? T[P] extends boolean
-                    ? number
-                    : GetScalarType<T[P], TicketGroupByOutputType[P]>
-                : GetScalarType<T[P], TicketGroupByOutputType[P]>
-            }
-        >
+  type GetTicketGroupByPayload<T extends TicketGroupByArgs> = Prisma.PrismaPromise<
+      Array<
+          PickEnumerable<TicketGroupByOutputType, T['by']> &
+          {
+            [P in ((keyof T) & (keyof TicketGroupByOutputType))]: P extends '_count'
+              ? T[P] extends boolean
+                  ? number
+                  : GetScalarType<T[P], TicketGroupByOutputType[P]>
+              : GetScalarType<T[P], TicketGroupByOutputType[P]>
+          }
+      >
     >
 
 
-    export type TicketSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-        id?: boolean
-        discordUserID?: boolean
-        channelId?: boolean
-        channelName?: boolean
-        createdAt?: boolean
-        updatedAt?: boolean
-        assignedUserId?: boolean
-        channel?: boolean | Ticket$channelArgs<ExtArgs>
-        user?: boolean | Ticket$userArgs<ExtArgs>
+  export type TicketSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    discordUserID?: boolean
+    channelId?: boolean
+    channelName?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    assignedUserId?: boolean
+    channel?: boolean | Ticket$channelArgs<ExtArgs>
+    user?: boolean | Ticket$userArgs<ExtArgs>
+  }, ExtArgs["result"]["ticket"]>
+
+
+  export type TicketSelectScalar = {
+    id?: boolean
+    discordUserID?: boolean
+    channelId?: boolean
+    channelName?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    assignedUserId?: boolean
+  }
+
+  export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "discordUserID" | "channelId" | "channelName" | "createdAt" | "updatedAt" | "assignedUserId", ExtArgs["result"]["ticket"]>
+  export type TicketInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    channel?: boolean | Ticket$channelArgs<ExtArgs>
+    user?: boolean | Ticket$userArgs<ExtArgs>
+  }
+
+  export type $TicketPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Ticket"
+    objects: {
+      channel: Prisma.$ChannelPayload<ExtArgs> | null
+      user: Prisma.$UserPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      discordUserID: string
+      channelId: string | null
+      channelName: string | null
+      createdAt: Date
+      updatedAt: Date
+      assignedUserId: string | null
     }, ExtArgs["result"]["ticket"]>
+    composites: {}
+  }
 
+  type TicketGetPayload<S extends boolean | null | undefined | TicketDefaultArgs> = $Result.GetResult<Prisma.$TicketPayload, S>
 
-    export type TicketSelectScalar = {
-        id?: boolean
-        discordUserID?: boolean
-        channelId?: boolean
-        channelName?: boolean
-        createdAt?: boolean
-        updatedAt?: boolean
-        assignedUserId?: boolean
+  type TicketCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+      Omit<TicketFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+    select?: TicketCountAggregateInputType | true
     }
 
-    export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "discordUserID" | "channelId" | "channelName" | "createdAt" | "updatedAt" | "assignedUserId", ExtArgs["result"]["ticket"]>
-    export type TicketInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        channel?: boolean | Ticket$channelArgs<ExtArgs>
-        user?: boolean | Ticket$userArgs<ExtArgs>
-    }
+  export interface TicketDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Ticket'], meta: { name: 'Ticket' } }
 
-    export type $TicketPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        name: "Ticket"
-        objects: {
-            channel: Prisma.$ChannelPayload<ExtArgs> | null
-            user: Prisma.$UserPayload<ExtArgs> | null
-        }
-        scalars: $Extensions.GetPayloadResult<{
-            id: number
-            discordUserID: string
-            channelId: string | null
-            channelName: string | null
-            createdAt: Date
-            updatedAt: Date
-            assignedUserId: string | null
-        }, ExtArgs["result"]["ticket"]>
-        composites: {}
-    }
+    /**
+     * Find zero or one Ticket that matches the filter.
+     * @param {TicketFindUniqueArgs} args - Arguments to find a Ticket
+     * @example
+     * // Get one Ticket
+     * const ticket = await prisma.ticket.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TicketFindUniqueArgs>(args: SelectSubset<T, TicketFindUniqueArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
-    type TicketGetPayload<S extends boolean | null | undefined | TicketDefaultArgs> = $Result.GetResult<Prisma.$TicketPayload, S>
+    /**
+     * Find one Ticket that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {TicketFindUniqueOrThrowArgs} args - Arguments to find a Ticket
+     * @example
+     * // Get one Ticket
+     * const ticket = await prisma.ticket.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TicketFindUniqueOrThrowArgs>(args: SelectSubset<T, TicketFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
-    type TicketCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-        Omit<TicketFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-        select?: TicketCountAggregateInputType | true
-    }
+    /**
+     * Find the first Ticket that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TicketFindFirstArgs} args - Arguments to find a Ticket
+     * @example
+     * // Get one Ticket
+     * const ticket = await prisma.ticket.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TicketFindFirstArgs>(args?: SelectSubset<T, TicketFindFirstArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
-    export interface TicketDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-        [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Ticket'], meta: { name: 'Ticket' } }
+    /**
+     * Find the first Ticket that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TicketFindFirstOrThrowArgs} args - Arguments to find a Ticket
+     * @example
+     * // Get one Ticket
+     * const ticket = await prisma.ticket.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TicketFindFirstOrThrowArgs>(args?: SelectSubset<T, TicketFindFirstOrThrowArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
-        /**
-         * Find zero or one Ticket that matches the filter.
-         * @param {TicketFindUniqueArgs} args - Arguments to find a Ticket
-         * @example
-         * // Get one Ticket
-         * const ticket = await prisma.ticket.findUnique({
-         *   where: {
-         *     // ... provide filter here
-         *   }
-         * })
-         */
-        findUnique<T extends TicketFindUniqueArgs>(args: SelectSubset<T, TicketFindUniqueArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Find zero or more Tickets that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TicketFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Tickets
+     * const tickets = await prisma.ticket.findMany()
+     *
+     * // Get first 10 Tickets
+     * const tickets = await prisma.ticket.findMany({ take: 10 })
+     *
+     * // Only select the `id`
+     * const ticketWithIdOnly = await prisma.ticket.findMany({ select: { id: true } })
+     *
+     */
+    findMany<T extends TicketFindManyArgs>(args?: SelectSubset<T, TicketFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
-        /**
-         * Find one Ticket that matches the filter or throw an error with `error.code='P2025'`
-         * if no matches were found.
-         * @param {TicketFindUniqueOrThrowArgs} args - Arguments to find a Ticket
-         * @example
-         * // Get one Ticket
-         * const ticket = await prisma.ticket.findUniqueOrThrow({
-         *   where: {
-         *     // ... provide filter here
-         *   }
-         * })
-         */
-        findUniqueOrThrow<T extends TicketFindUniqueOrThrowArgs>(args: SelectSubset<T, TicketFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    /**
+     * Create a Ticket.
+     * @param {TicketCreateArgs} args - Arguments to create a Ticket.
+     * @example
+     * // Create one Ticket
+     * const Ticket = await prisma.ticket.create({
+     *   data: {
+     *     // ... data to create a Ticket
+     *   }
+     * })
+     *
+     */
+    create<T extends TicketCreateArgs>(args: SelectSubset<T, TicketCreateArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
-        /**
-         * Find the first Ticket that matches the filter.
-         * Note, that providing `undefined` is treated as the value not being there.
-         * Read more here: https://pris.ly/d/null-undefined
-         * @param {TicketFindFirstArgs} args - Arguments to find a Ticket
-         * @example
-         * // Get one Ticket
-         * const ticket = await prisma.ticket.findFirst({
-         *   where: {
-         *     // ... provide filter here
-         *   }
-         * })
-         */
-        findFirst<T extends TicketFindFirstArgs>(args?: SelectSubset<T, TicketFindFirstArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Create many Tickets.
+     * @param {TicketCreateManyArgs} args - Arguments to create many Tickets.
+     * @example
+     * // Create many Tickets
+     * const ticket = await prisma.ticket.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     */
+    createMany<T extends TicketCreateManyArgs>(args?: SelectSubset<T, TicketCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
-        /**
-         * Find the first Ticket that matches the filter or
-         * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-         * Note, that providing `undefined` is treated as the value not being there.
-         * Read more here: https://pris.ly/d/null-undefined
-         * @param {TicketFindFirstOrThrowArgs} args - Arguments to find a Ticket
-         * @example
-         * // Get one Ticket
-         * const ticket = await prisma.ticket.findFirstOrThrow({
-         *   where: {
-         *     // ... provide filter here
-         *   }
-         * })
-         */
-        findFirstOrThrow<T extends TicketFindFirstOrThrowArgs>(args?: SelectSubset<T, TicketFindFirstOrThrowArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    /**
+     * Delete a Ticket.
+     * @param {TicketDeleteArgs} args - Arguments to delete one Ticket.
+     * @example
+     * // Delete one Ticket
+     * const Ticket = await prisma.ticket.delete({
+     *   where: {
+     *     // ... filter to delete one Ticket
+     *   }
+     * })
+     *
+     */
+    delete<T extends TicketDeleteArgs>(args: SelectSubset<T, TicketDeleteArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
-        /**
-         * Find zero or more Tickets that matches the filter.
-         * Note, that providing `undefined` is treated as the value not being there.
-         * Read more here: https://pris.ly/d/null-undefined
-         * @param {TicketFindManyArgs} args - Arguments to filter and select certain fields only.
-         * @example
-         * // Get all Tickets
-         * const tickets = await prisma.ticket.findMany()
-         *
-         * // Get first 10 Tickets
-         * const tickets = await prisma.ticket.findMany({ take: 10 })
-         *
-         * // Only select the `id`
-         * const ticketWithIdOnly = await prisma.ticket.findMany({ select: { id: true } })
-         *
-         */
-        findMany<T extends TicketFindManyArgs>(args?: SelectSubset<T, TicketFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+    /**
+     * Update one Ticket.
+     * @param {TicketUpdateArgs} args - Arguments to update one Ticket.
+     * @example
+     * // Update one Ticket
+     * const ticket = await prisma.ticket.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    update<T extends TicketUpdateArgs>(args: SelectSubset<T, TicketUpdateArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
-        /**
-         * Create a Ticket.
-         * @param {TicketCreateArgs} args - Arguments to create a Ticket.
-         * @example
-         * // Create one Ticket
-         * const Ticket = await prisma.ticket.create({
-         *   data: {
-         *     // ... data to create a Ticket
-         *   }
-         * })
-         *
-         */
-        create<T extends TicketCreateArgs>(args: SelectSubset<T, TicketCreateArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    /**
+     * Delete zero or more Tickets.
+     * @param {TicketDeleteManyArgs} args - Arguments to filter Tickets to delete.
+     * @example
+     * // Delete a few Tickets
+     * const { count } = await prisma.ticket.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     *
+     */
+    deleteMany<T extends TicketDeleteManyArgs>(args?: SelectSubset<T, TicketDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
-        /**
-         * Create many Tickets.
-         * @param {TicketCreateManyArgs} args - Arguments to create many Tickets.
-         * @example
-         * // Create many Tickets
-         * const ticket = await prisma.ticket.createMany({
-         *   data: [
-         *     // ... provide data here
-         *   ]
-         * })
-         *
-         */
-        createMany<T extends TicketCreateManyArgs>(args?: SelectSubset<T, TicketCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    /**
+     * Update zero or more Tickets.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TicketUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Tickets
+     * const ticket = await prisma.ticket.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    updateMany<T extends TicketUpdateManyArgs>(args: SelectSubset<T, TicketUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
-        /**
-         * Delete a Ticket.
-         * @param {TicketDeleteArgs} args - Arguments to delete one Ticket.
-         * @example
-         * // Delete one Ticket
-         * const Ticket = await prisma.ticket.delete({
-         *   where: {
-         *     // ... filter to delete one Ticket
-         *   }
-         * })
-         *
-         */
-        delete<T extends TicketDeleteArgs>(args: SelectSubset<T, TicketDeleteArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-        /**
-         * Update one Ticket.
-         * @param {TicketUpdateArgs} args - Arguments to update one Ticket.
-         * @example
-         * // Update one Ticket
-         * const ticket = await prisma.ticket.update({
-         *   where: {
-         *     // ... provide filter here
-         *   },
-         *   data: {
-         *     // ... provide data here
-         *   }
-         * })
-         *
-         */
-        update<T extends TicketUpdateArgs>(args: SelectSubset<T, TicketUpdateArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-        /**
-         * Delete zero or more Tickets.
-         * @param {TicketDeleteManyArgs} args - Arguments to filter Tickets to delete.
-         * @example
-         * // Delete a few Tickets
-         * const { count } = await prisma.ticket.deleteMany({
-         *   where: {
-         *     // ... provide filter here
-         *   }
-         * })
-         *
-         */
-        deleteMany<T extends TicketDeleteManyArgs>(args?: SelectSubset<T, TicketDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-        /**
-         * Update zero or more Tickets.
-         * Note, that providing `undefined` is treated as the value not being there.
-         * Read more here: https://pris.ly/d/null-undefined
-         * @param {TicketUpdateManyArgs} args - Arguments to update one or more rows.
-         * @example
-         * // Update many Tickets
-         * const ticket = await prisma.ticket.updateMany({
-         *   where: {
-         *     // ... provide filter here
-         *   },
-         *   data: {
-         *     // ... provide data here
-         *   }
-         * })
-         *
-         */
-        updateMany<T extends TicketUpdateManyArgs>(args: SelectSubset<T, TicketUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-        /**
-         * Create or update one Ticket.
-         * @param {TicketUpsertArgs} args - Arguments to update or create a Ticket.
-         * @example
-         * // Update or create a Ticket
-         * const ticket = await prisma.ticket.upsert({
-         *   create: {
-         *     // ... data to create a Ticket
-         *   },
-         *   update: {
-         *     // ... in case it already exists, update
-         *   },
-         *   where: {
-         *     // ... the filter for the Ticket we want to update
-         *   }
-         * })
-         */
-        upsert<T extends TicketUpsertArgs>(args: SelectSubset<T, TicketUpsertArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    /**
+     * Create or update one Ticket.
+     * @param {TicketUpsertArgs} args - Arguments to update or create a Ticket.
+     * @example
+     * // Update or create a Ticket
+     * const ticket = await prisma.ticket.upsert({
+     *   create: {
+     *     // ... data to create a Ticket
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Ticket we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TicketUpsertArgs>(args: SelectSubset<T, TicketUpsertArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
-        /**
-         * Count the number of Tickets.
-         * Note, that providing `undefined` is treated as the value not being there.
-         * Read more here: https://pris.ly/d/null-undefined
-         * @param {TicketCountArgs} args - Arguments to filter Tickets to count.
-         * @example
-         * // Count the number of Tickets
-         * const count = await prisma.ticket.count({
-         *   where: {
-         *     // ... the filter for the Tickets we want to count
-         *   }
-         * })
-         **/
-        count<T extends TicketCountArgs>(
-            args?: Subset<T, TicketCountArgs>,
-        ): Prisma.PrismaPromise<
-            T extends $Utils.Record<'select', any>
-                ? T['select'] extends true
-                    ? number
-                    : GetScalarType<T['select'], TicketCountAggregateOutputType>
-                : number
-        >
+    /**
+     * Count the number of Tickets.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TicketCountArgs} args - Arguments to filter Tickets to count.
+     * @example
+     * // Count the number of Tickets
+     * const count = await prisma.ticket.count({
+     *   where: {
+     *     // ... the filter for the Tickets we want to count
+     *   }
+     * })
+     **/
+    count<T extends TicketCountArgs>(
+        args?: Subset<T, TicketCountArgs>,
+    ): Prisma.PrismaPromise<
+        T extends $Utils.Record<'select', any>
+            ? T['select'] extends true
+                ? number
+                : GetScalarType<T['select'], TicketCountAggregateOutputType>
+            : number
+    >
 
-        /**
-         * Allows you to perform aggregations operations on a Ticket.
-         * Note, that providing `undefined` is treated as the value not being there.
-         * Read more here: https://pris.ly/d/null-undefined
-         * @param {TicketAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-         * @example
-         * // Ordered by age ascending
-         * // Where email contains prisma.io
-         * // Limited to the 10 users
-         * const aggregations = await prisma.user.aggregate({
-         *   _avg: {
-         *     age: true,
-         *   },
-         *   where: {
-         *     email: {
-         *       contains: "prisma.io",
-         *     },
-         *   },
-         *   orderBy: {
-         *     age: "asc",
-         *   },
-         *   take: 10,
-         * })
-         **/
-        aggregate<T extends TicketAggregateArgs>(args: Subset<T, TicketAggregateArgs>): Prisma.PrismaPromise<GetTicketAggregateType<T>>
+    /**
+     * Allows you to perform aggregations operations on a Ticket.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TicketAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+     **/
+    aggregate<T extends TicketAggregateArgs>(args: Subset<T, TicketAggregateArgs>): Prisma.PrismaPromise<GetTicketAggregateType<T>>
 
-        /**
-         * Group by Ticket.
-         * Note, that providing `undefined` is treated as the value not being there.
-         * Read more here: https://pris.ly/d/null-undefined
-         * @param {TicketGroupByArgs} args - Group by arguments.
-         * @example
-         * // Group by city, order by createdAt, get count
-         * const result = await prisma.user.groupBy({
-         *   by: ['city', 'createdAt'],
-         *   orderBy: {
-         *     createdAt: true
-         *   },
-         *   _count: {
-         *     _all: true
-         *   },
-         * })
-         *
-         **/
-        groupBy<
-            T extends TicketGroupByArgs,
-            HasSelectOrTake extends Or<
-                Extends<'skip', Keys<T>>,
-                Extends<'take', Keys<T>>
-            >,
-            OrderByArg extends True extends HasSelectOrTake
-                ? { orderBy: TicketGroupByArgs['orderBy'] }
-                : { orderBy?: TicketGroupByArgs['orderBy'] },
-            OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-            ByFields extends MaybeTupleToUnion<T['by']>,
-            ByValid extends Has<ByFields, OrderFields>,
-            HavingFields extends GetHavingFields<T['having']>,
-            HavingValid extends Has<ByFields, HavingFields>,
-            ByEmpty extends T['by'] extends never[] ? True : False,
-            InputErrors extends ByEmpty extends True
-                ? `Error: "by" must not be empty.`
-                : HavingValid extends False
-                    ? {
-                        [P in HavingFields]: P extends ByFields
-                            ? never
-                            : P extends string
-                                ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-                                : [
-                                    Error,
-                                    'Field ',
-                                    P,
-                                    ` in "having" needs to be provided in "by"`,
-                                ]
-                    }[HavingFields]
-                    : 'take' extends Keys<T>
+    /**
+     * Group by Ticket.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TicketGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     *
+     **/
+    groupBy<
+        T extends TicketGroupByArgs,
+        HasSelectOrTake extends Or<
+            Extends<'skip', Keys<T>>,
+            Extends<'take', Keys<T>>
+        >,
+        OrderByArg extends True extends HasSelectOrTake
+            ? { orderBy: TicketGroupByArgs['orderBy'] }
+            : { orderBy?: TicketGroupByArgs['orderBy'] },
+        OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+        ByFields extends MaybeTupleToUnion<T['by']>,
+        ByValid extends Has<ByFields, OrderFields>,
+        HavingFields extends GetHavingFields<T['having']>,
+        HavingValid extends Has<ByFields, HavingFields>,
+        ByEmpty extends T['by'] extends never[] ? True : False,
+        InputErrors extends ByEmpty extends True
+            ? `Error: "by" must not be empty.`
+            : HavingValid extends False
+                ? {
+                  [P in HavingFields]: P extends ByFields
+                      ? never
+                      : P extends string
+                          ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+                          : [
+                            Error,
+                            'Field ',
+                            P,
+                            ` in "having" needs to be provided in "by"`,
+                          ]
+                }[HavingFields]
+                : 'take' extends Keys<T>
+                    ? 'orderBy' extends Keys<T>
+                        ? ByValid extends True
+                            ? {}
+                            : {
+                              [P in OrderFields]: P extends ByFields
+                                  ? never
+                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                            }[OrderFields]
+                        : 'Error: If you provide "take", you also need to provide "orderBy"'
+                    : 'skip' extends Keys<T>
                         ? 'orderBy' extends Keys<T>
                             ? ByValid extends True
                                 ? {}
                                 : {
-                                    [P in OrderFields]: P extends ByFields
-                                        ? never
-                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                  [P in OrderFields]: P extends ByFields
+                                      ? never
+                                      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                                 }[OrderFields]
-                            : 'Error: If you provide "take", you also need to provide "orderBy"'
-                        : 'skip' extends Keys<T>
-                            ? 'orderBy' extends Keys<T>
-                                ? ByValid extends True
-                                    ? {}
-                                    : {
-                                        [P in OrderFields]: P extends ByFields
-                                            ? never
-                                            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-                                    }[OrderFields]
-                                : 'Error: If you provide "skip", you also need to provide "orderBy"'
-                            : ByValid extends True
-                                ? {}
-                                : {
-                                    [P in OrderFields]: P extends ByFields
-                                        ? never
-                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-                                }[OrderFields]
-        >(args: SubsetIntersection<T, TicketGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTicketGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-
-        /**
-         * Fields of the Ticket model
-         */
-        readonly fields: TicketFieldRefs;
-    }
-
-    /**
-     * The delegate class that acts as a "Promise-like" for Ticket.
-     * Why is this prefixed with `Prisma__`?
-     * Because we want to prevent naming conflicts as mentioned in
-     * https://github.com/prisma/prisma-client-js/issues/707
-     */
-    export interface Prisma__TicketClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
-        readonly [Symbol.toStringTag]: "PrismaPromise"
-
-        channel<T extends Ticket$channelArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$channelArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-        user<T extends Ticket$userArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$userArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-        /**
-         * Attaches callbacks for the resolution and/or rejection of the Promise.
-         * @param onfulfilled The callback to execute when the Promise is resolved.
-         * @param onrejected The callback to execute when the Promise is rejected.
-         * @returns A Promise for the completion of which ever callback is executed.
-         */
-        then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-
-        /**
-         * Attaches a callback for only the rejection of the Promise.
-         * @param onrejected The callback to execute when the Promise is rejected.
-         * @returns A Promise for the completion of the callback.
-         */
-        catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-
-        /**
-         * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-         * resolved value cannot be modified from the callback.
-         * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-         * @returns A Promise for the completion of the callback.
-         */
-        finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-    }
-
+                            : 'Error: If you provide "skip", you also need to provide "orderBy"'
+                        : ByValid extends True
+                            ? {}
+                            : {
+                              [P in OrderFields]: P extends ByFields
+                                  ? never
+                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                            }[OrderFields]
+    >(args: SubsetIntersection<T, TicketGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTicketGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
 
     /**
      * Fields of the Ticket model
      */
-    interface TicketFieldRefs {
-        readonly id: FieldRef<"Ticket", 'Int'>
-        readonly discordUserID: FieldRef<"Ticket", 'String'>
-        readonly channelId: FieldRef<"Ticket", 'String'>
-        readonly channelName: FieldRef<"Ticket", 'String'>
-        readonly createdAt: FieldRef<"Ticket", 'DateTime'>
-        readonly updatedAt: FieldRef<"Ticket", 'DateTime'>
-        readonly assignedUserId: FieldRef<"Ticket", 'String'>
-    }
+    readonly fields: TicketFieldRefs;
+  }
 
+  /**
+   * The delegate class that acts as a "Promise-like" for Ticket.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__TicketClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
 
-    // Custom InputTypes
-    /**
-     * Ticket findUnique
-     */
-    export type TicketFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Ticket
-         */
-        select?: TicketSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Ticket
-         */
-        omit?: TicketOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: TicketInclude<ExtArgs> | null
-        /**
-         * Filter, which Ticket to fetch.
-         */
-        where: TicketWhereUniqueInput
-    }
+    channel<T extends Ticket$channelArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$channelArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    user<T extends Ticket$userArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$userArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Ticket findUniqueOrThrow
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
      */
-    export type TicketFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Ticket
-         */
-        select?: TicketSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Ticket
-         */
-        omit?: TicketOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: TicketInclude<ExtArgs> | null
-        /**
-         * Filter, which Ticket to fetch.
-         */
-        where: TicketWhereUniqueInput
-    }
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
 
     /**
-     * Ticket findFirst
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
      */
-    export type TicketFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Ticket
-         */
-        select?: TicketSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Ticket
-         */
-        omit?: TicketOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: TicketInclude<ExtArgs> | null
-        /**
-         * Filter, which Ticket to fetch.
-         */
-        where?: TicketWhereInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-         *
-         * Determine the order of Tickets to fetch.
-         */
-        orderBy?: TicketOrderByWithRelationInput | TicketOrderByWithRelationInput[]
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-         *
-         * Sets the position for searching for Tickets.
-         */
-        cursor?: TicketWhereUniqueInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Take `±n` Tickets from the position of the cursor.
-         */
-        take?: number
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Skip the first `n` Tickets.
-         */
-        skip?: number
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-         *
-         * Filter by unique combinations of Tickets.
-         */
-        distinct?: TicketScalarFieldEnum | TicketScalarFieldEnum[]
-    }
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
 
     /**
-     * Ticket findFirstOrThrow
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
      */
-    export type TicketFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Ticket
-         */
-        select?: TicketSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Ticket
-         */
-        omit?: TicketOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: TicketInclude<ExtArgs> | null
-        /**
-         * Filter, which Ticket to fetch.
-         */
-        where?: TicketWhereInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-         *
-         * Determine the order of Tickets to fetch.
-         */
-        orderBy?: TicketOrderByWithRelationInput | TicketOrderByWithRelationInput[]
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-         *
-         * Sets the position for searching for Tickets.
-         */
-        cursor?: TicketWhereUniqueInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Take `±n` Tickets from the position of the cursor.
-         */
-        take?: number
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Skip the first `n` Tickets.
-         */
-        skip?: number
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-         *
-         * Filter by unique combinations of Tickets.
-         */
-        distinct?: TicketScalarFieldEnum | TicketScalarFieldEnum[]
-    }
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
 
+
+  /**
+   * Fields of the Ticket model
+   */
+  interface TicketFieldRefs {
+    readonly id: FieldRef<"Ticket", 'Int'>
+    readonly discordUserID: FieldRef<"Ticket", 'String'>
+    readonly channelId: FieldRef<"Ticket", 'String'>
+    readonly channelName: FieldRef<"Ticket", 'String'>
+    readonly createdAt: FieldRef<"Ticket", 'DateTime'>
+    readonly updatedAt: FieldRef<"Ticket", 'DateTime'>
+    readonly assignedUserId: FieldRef<"Ticket", 'String'>
+  }
+
+
+  // Custom InputTypes
+  /**
+   * Ticket findUnique
+   */
+  export type TicketFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Ticket findMany
+     * Select specific fields to fetch from the Ticket
      */
-    export type TicketFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Ticket
-         */
-        select?: TicketSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Ticket
-         */
-        omit?: TicketOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: TicketInclude<ExtArgs> | null
-        /**
-         * Filter, which Tickets to fetch.
-         */
-        where?: TicketWhereInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-         *
-         * Determine the order of Tickets to fetch.
-         */
-        orderBy?: TicketOrderByWithRelationInput | TicketOrderByWithRelationInput[]
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-         *
-         * Sets the position for listing Tickets.
-         */
-        cursor?: TicketWhereUniqueInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Take `±n` Tickets from the position of the cursor.
-         */
-        take?: number
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Skip the first `n` Tickets.
-         */
-        skip?: number
-        distinct?: TicketScalarFieldEnum | TicketScalarFieldEnum[]
-    }
-
+    select?: TicketSelect<ExtArgs> | null
     /**
-     * Ticket create
+     * Omit specific fields from the Ticket
      */
-    export type TicketCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Ticket
-         */
-        select?: TicketSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Ticket
-         */
-        omit?: TicketOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: TicketInclude<ExtArgs> | null
-        /**
-         * The data needed to create a Ticket.
-         */
-        data: XOR<TicketCreateInput, TicketUncheckedCreateInput>
-    }
-
+    omit?: TicketOmit<ExtArgs> | null
     /**
-     * Ticket createMany
+     * Choose, which related nodes to fetch as well
      */
-    export type TicketCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * The data used to create many Tickets.
-         */
-        data: TicketCreateManyInput | TicketCreateManyInput[]
-        skipDuplicates?: boolean
-    }
-
+    include?: TicketInclude<ExtArgs> | null
     /**
-     * Ticket update
+     * Filter, which Ticket to fetch.
      */
-    export type TicketUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Ticket
-         */
-        select?: TicketSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Ticket
-         */
-        omit?: TicketOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: TicketInclude<ExtArgs> | null
-        /**
-         * The data needed to update a Ticket.
-         */
-        data: XOR<TicketUpdateInput, TicketUncheckedUpdateInput>
-        /**
-         * Choose, which Ticket to update.
-         */
-        where: TicketWhereUniqueInput
-    }
+    where: TicketWhereUniqueInput
+  }
 
+  /**
+   * Ticket findUniqueOrThrow
+   */
+  export type TicketFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Ticket updateMany
+     * Select specific fields to fetch from the Ticket
      */
-    export type TicketUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * The data used to update Tickets.
-         */
-        data: XOR<TicketUpdateManyMutationInput, TicketUncheckedUpdateManyInput>
-        /**
-         * Filter which Tickets to update
-         */
-        where?: TicketWhereInput
-        /**
-         * Limit how many Tickets to update.
-         */
-        limit?: number
-    }
-
+    select?: TicketSelect<ExtArgs> | null
     /**
-     * Ticket upsert
+     * Omit specific fields from the Ticket
      */
-    export type TicketUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Ticket
-         */
-        select?: TicketSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Ticket
-         */
-        omit?: TicketOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: TicketInclude<ExtArgs> | null
-        /**
-         * The filter to search for the Ticket to update in case it exists.
-         */
-        where: TicketWhereUniqueInput
-        /**
-         * In case the Ticket found by the `where` argument doesn't exist, create a new Ticket with this data.
-         */
-        create: XOR<TicketCreateInput, TicketUncheckedCreateInput>
-        /**
-         * In case the Ticket was found with the provided `where` argument, update it with this data.
-         */
-        update: XOR<TicketUpdateInput, TicketUncheckedUpdateInput>
-    }
-
+    omit?: TicketOmit<ExtArgs> | null
     /**
-     * Ticket delete
+     * Choose, which related nodes to fetch as well
      */
-    export type TicketDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Ticket
-         */
-        select?: TicketSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Ticket
-         */
-        omit?: TicketOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: TicketInclude<ExtArgs> | null
-        /**
-         * Filter which Ticket to delete.
-         */
-        where: TicketWhereUniqueInput
-    }
-
+    include?: TicketInclude<ExtArgs> | null
     /**
-     * Ticket deleteMany
+     * Filter, which Ticket to fetch.
      */
-    export type TicketDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Filter which Tickets to delete
-         */
-        where?: TicketWhereInput
-        /**
-         * Limit how many Tickets to delete.
-         */
-        limit?: number
-    }
+    where: TicketWhereUniqueInput
+  }
 
+  /**
+   * Ticket findFirst
+   */
+  export type TicketFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Ticket.channel
+     * Select specific fields to fetch from the Ticket
      */
-    export type Ticket$channelArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Channel
-         */
-        select?: ChannelSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Channel
-         */
-        omit?: ChannelOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: ChannelInclude<ExtArgs> | null
-        where?: ChannelWhereInput
-    }
-
+    select?: TicketSelect<ExtArgs> | null
     /**
-     * Ticket.user
+     * Omit specific fields from the Ticket
      */
-    export type Ticket$userArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the User
-         */
-        select?: UserSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the User
-         */
-        omit?: UserOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: UserInclude<ExtArgs> | null
-        where?: UserWhereInput
-    }
-
+    omit?: TicketOmit<ExtArgs> | null
     /**
-     * Ticket without action
+     * Choose, which related nodes to fetch as well
      */
-    export type TicketDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Ticket
-         */
-        select?: TicketSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Ticket
-         */
-        omit?: TicketOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: TicketInclude<ExtArgs> | null
-    }
-
-
+    include?: TicketInclude<ExtArgs> | null
     /**
-     * Model Apikey
+     * Filter, which Ticket to fetch.
      */
+    where?: TicketWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Tickets to fetch.
+     */
+    orderBy?: TicketOrderByWithRelationInput | TicketOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for Tickets.
+     */
+    cursor?: TicketWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Tickets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Tickets.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of Tickets.
+     */
+    distinct?: TicketScalarFieldEnum | TicketScalarFieldEnum[]
+  }
 
-    export type AggregateApikey = {
-        _count: ApikeyCountAggregateOutputType | null
-        _avg: ApikeyAvgAggregateOutputType | null
-        _sum: ApikeySumAggregateOutputType | null
-        _min: ApikeyMinAggregateOutputType | null
-        _max: ApikeyMaxAggregateOutputType | null
-    }
+  /**
+   * Ticket findFirstOrThrow
+   */
+  export type TicketFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ticket
+     */
+    select?: TicketSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ticket
+     */
+    omit?: TicketOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TicketInclude<ExtArgs> | null
+    /**
+     * Filter, which Ticket to fetch.
+     */
+    where?: TicketWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Tickets to fetch.
+     */
+    orderBy?: TicketOrderByWithRelationInput | TicketOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for Tickets.
+     */
+    cursor?: TicketWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Tickets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Tickets.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of Tickets.
+     */
+    distinct?: TicketScalarFieldEnum | TicketScalarFieldEnum[]
+  }
 
-    export type ApikeyAvgAggregateOutputType = {
-        refillInterval: number | null
-        refillAmount: number | null
-        rateLimitTimeWindow: number | null
-        rateLimitMax: number | null
-        requestCount: number | null
-        remaining: number | null
-    }
+  /**
+   * Ticket findMany
+   */
+  export type TicketFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ticket
+     */
+    select?: TicketSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ticket
+     */
+    omit?: TicketOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TicketInclude<ExtArgs> | null
+    /**
+     * Filter, which Tickets to fetch.
+     */
+    where?: TicketWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Tickets to fetch.
+     */
+    orderBy?: TicketOrderByWithRelationInput | TicketOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for listing Tickets.
+     */
+    cursor?: TicketWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Tickets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Tickets.
+     */
+    skip?: number
+    distinct?: TicketScalarFieldEnum | TicketScalarFieldEnum[]
+  }
 
-    export type ApikeySumAggregateOutputType = {
-        refillInterval: number | null
-        refillAmount: number | null
-        rateLimitTimeWindow: number | null
-        rateLimitMax: number | null
-        requestCount: number | null
-        remaining: number | null
-    }
+  /**
+   * Ticket create
+   */
+  export type TicketCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ticket
+     */
+    select?: TicketSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ticket
+     */
+    omit?: TicketOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TicketInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Ticket.
+     */
+    data: XOR<TicketCreateInput, TicketUncheckedCreateInput>
+  }
 
-    export type ApikeyMinAggregateOutputType = {
-        id: string | null
-        name: string | null
-        start: string | null
-        prefix: string | null
-        key: string | null
-        userId: string | null
-        refillInterval: number | null
-        refillAmount: number | null
-        lastRefillAt: Date | null
-        enabled: boolean | null
-        rateLimitEnabled: boolean | null
-        rateLimitTimeWindow: number | null
-        rateLimitMax: number | null
-        requestCount: number | null
-        remaining: number | null
-        lastRequest: Date | null
-        expiresAt: Date | null
-        createdAt: Date | null
-        updatedAt: Date | null
-        permissions: string | null
-        metadata: string | null
-    }
+  /**
+   * Ticket createMany
+   */
+  export type TicketCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Tickets.
+     */
+    data: TicketCreateManyInput | TicketCreateManyInput[]
+    skipDuplicates?: boolean
+  }
 
-    export type ApikeyMaxAggregateOutputType = {
-        id: string | null
-        name: string | null
-        start: string | null
-        prefix: string | null
-        key: string | null
-        userId: string | null
-        refillInterval: number | null
-        refillAmount: number | null
-        lastRefillAt: Date | null
-        enabled: boolean | null
-        rateLimitEnabled: boolean | null
-        rateLimitTimeWindow: number | null
-        rateLimitMax: number | null
-        requestCount: number | null
-        remaining: number | null
-        lastRequest: Date | null
-        expiresAt: Date | null
-        createdAt: Date | null
-        updatedAt: Date | null
-        permissions: string | null
-        metadata: string | null
-    }
+  /**
+   * Ticket update
+   */
+  export type TicketUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ticket
+     */
+    select?: TicketSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ticket
+     */
+    omit?: TicketOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TicketInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Ticket.
+     */
+    data: XOR<TicketUpdateInput, TicketUncheckedUpdateInput>
+    /**
+     * Choose, which Ticket to update.
+     */
+    where: TicketWhereUniqueInput
+  }
 
-    export type ApikeyCountAggregateOutputType = {
-        id: number
-        name: number
-        start: number
-        prefix: number
-        key: number
-        userId: number
-        refillInterval: number
-        refillAmount: number
-        lastRefillAt: number
-        enabled: number
-        rateLimitEnabled: number
-        rateLimitTimeWindow: number
-        rateLimitMax: number
-        requestCount: number
-        remaining: number
-        lastRequest: number
-        expiresAt: number
-        createdAt: number
-        updatedAt: number
-        permissions: number
-        metadata: number
-        _all: number
-    }
+  /**
+   * Ticket updateMany
+   */
+  export type TicketUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Tickets.
+     */
+    data: XOR<TicketUpdateManyMutationInput, TicketUncheckedUpdateManyInput>
+    /**
+     * Filter which Tickets to update
+     */
+    where?: TicketWhereInput
+    /**
+     * Limit how many Tickets to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Ticket upsert
+   */
+  export type TicketUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ticket
+     */
+    select?: TicketSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ticket
+     */
+    omit?: TicketOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TicketInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Ticket to update in case it exists.
+     */
+    where: TicketWhereUniqueInput
+    /**
+     * In case the Ticket found by the `where` argument doesn't exist, create a new Ticket with this data.
+     */
+    create: XOR<TicketCreateInput, TicketUncheckedCreateInput>
+    /**
+     * In case the Ticket was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TicketUpdateInput, TicketUncheckedUpdateInput>
+  }
+
+  /**
+   * Ticket delete
+   */
+  export type TicketDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ticket
+     */
+    select?: TicketSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ticket
+     */
+    omit?: TicketOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TicketInclude<ExtArgs> | null
+    /**
+     * Filter which Ticket to delete.
+     */
+    where: TicketWhereUniqueInput
+  }
+
+  /**
+   * Ticket deleteMany
+   */
+  export type TicketDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Tickets to delete
+     */
+    where?: TicketWhereInput
+    /**
+     * Limit how many Tickets to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Ticket.channel
+   */
+  export type Ticket$channelArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Channel
+     */
+    select?: ChannelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Channel
+     */
+    omit?: ChannelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChannelInclude<ExtArgs> | null
+    where?: ChannelWhereInput
+  }
+
+  /**
+   * Ticket.user
+   */
+  export type Ticket$userArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * Ticket without action
+   */
+  export type TicketDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ticket
+     */
+    select?: TicketSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ticket
+     */
+    omit?: TicketOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TicketInclude<ExtArgs> | null
+  }
 
 
-    export type ApikeyAvgAggregateInputType = {
-        refillInterval?: true
-        refillAmount?: true
-        rateLimitTimeWindow?: true
-        rateLimitMax?: true
-        requestCount?: true
-        remaining?: true
-    }
+  /**
+   * Model Apikey
+   */
 
-    export type ApikeySumAggregateInputType = {
-        refillInterval?: true
-        refillAmount?: true
-        rateLimitTimeWindow?: true
-        rateLimitMax?: true
-        requestCount?: true
-        remaining?: true
-    }
+  export type AggregateApikey = {
+    _count: ApikeyCountAggregateOutputType | null
+    _avg: ApikeyAvgAggregateOutputType | null
+    _sum: ApikeySumAggregateOutputType | null
+    _min: ApikeyMinAggregateOutputType | null
+    _max: ApikeyMaxAggregateOutputType | null
+  }
 
-    export type ApikeyMinAggregateInputType = {
-        id?: true
-        name?: true
-        start?: true
-        prefix?: true
-        key?: true
-        userId?: true
-        refillInterval?: true
-        refillAmount?: true
-        lastRefillAt?: true
-        enabled?: true
-        rateLimitEnabled?: true
-        rateLimitTimeWindow?: true
-        rateLimitMax?: true
-        requestCount?: true
-        remaining?: true
-        lastRequest?: true
-        expiresAt?: true
-        createdAt?: true
-        updatedAt?: true
-        permissions?: true
-        metadata?: true
-    }
+  export type ApikeyAvgAggregateOutputType = {
+    refillInterval: number | null
+    refillAmount: number | null
+    rateLimitTimeWindow: number | null
+    rateLimitMax: number | null
+    requestCount: number | null
+    remaining: number | null
+  }
 
-    export type ApikeyMaxAggregateInputType = {
-        id?: true
-        name?: true
-        start?: true
-        prefix?: true
-        key?: true
-        userId?: true
-        refillInterval?: true
-        refillAmount?: true
-        lastRefillAt?: true
-        enabled?: true
-        rateLimitEnabled?: true
-        rateLimitTimeWindow?: true
-        rateLimitMax?: true
-        requestCount?: true
-        remaining?: true
-        lastRequest?: true
-        expiresAt?: true
-        createdAt?: true
-        updatedAt?: true
-        permissions?: true
-        metadata?: true
-    }
+  export type ApikeySumAggregateOutputType = {
+    refillInterval: number | null
+    refillAmount: number | null
+    rateLimitTimeWindow: number | null
+    rateLimitMax: number | null
+    requestCount: number | null
+    remaining: number | null
+  }
 
-    export type ApikeyCountAggregateInputType = {
-        id?: true
-        name?: true
-        start?: true
-        prefix?: true
-        key?: true
-        userId?: true
-        refillInterval?: true
-        refillAmount?: true
-        lastRefillAt?: true
-        enabled?: true
-        rateLimitEnabled?: true
-        rateLimitTimeWindow?: true
-        rateLimitMax?: true
-        requestCount?: true
-        remaining?: true
-        lastRequest?: true
-        expiresAt?: true
-        createdAt?: true
-        updatedAt?: true
-        permissions?: true
-        metadata?: true
-        _all?: true
-    }
+  export type ApikeyMinAggregateOutputType = {
+    id: string | null
+    name: string | null
+    start: string | null
+    prefix: string | null
+    key: string | null
+    userId: string | null
+    refillInterval: number | null
+    refillAmount: number | null
+    lastRefillAt: Date | null
+    enabled: boolean | null
+    rateLimitEnabled: boolean | null
+    rateLimitTimeWindow: number | null
+    rateLimitMax: number | null
+    requestCount: number | null
+    remaining: number | null
+    lastRequest: Date | null
+    expiresAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    permissions: string | null
+    metadata: string | null
+  }
 
-    export type ApikeyAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Filter which Apikey to aggregate.
-         */
-        where?: ApikeyWhereInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-         *
-         * Determine the order of Apikeys to fetch.
-         */
-        orderBy?: ApikeyOrderByWithRelationInput | ApikeyOrderByWithRelationInput[]
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-         *
-         * Sets the start position
-         */
-        cursor?: ApikeyWhereUniqueInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Take `±n` Apikeys from the position of the cursor.
-         */
-        take?: number
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Skip the first `n` Apikeys.
-         */
-        skip?: number
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-         *
-         * Count returned Apikeys
-         **/
-        _count?: true | ApikeyCountAggregateInputType
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-         *
-         * Select which fields to average
-         **/
-        _avg?: ApikeyAvgAggregateInputType
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-         *
-         * Select which fields to sum
-         **/
-        _sum?: ApikeySumAggregateInputType
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-         *
-         * Select which fields to find the minimum value
-         **/
-        _min?: ApikeyMinAggregateInputType
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-         *
-         * Select which fields to find the maximum value
-         **/
-        _max?: ApikeyMaxAggregateInputType
-    }
+  export type ApikeyMaxAggregateOutputType = {
+    id: string | null
+    name: string | null
+    start: string | null
+    prefix: string | null
+    key: string | null
+    userId: string | null
+    refillInterval: number | null
+    refillAmount: number | null
+    lastRefillAt: Date | null
+    enabled: boolean | null
+    rateLimitEnabled: boolean | null
+    rateLimitTimeWindow: number | null
+    rateLimitMax: number | null
+    requestCount: number | null
+    remaining: number | null
+    lastRequest: Date | null
+    expiresAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    permissions: string | null
+    metadata: string | null
+  }
 
-    export type GetApikeyAggregateType<T extends ApikeyAggregateArgs> = {
+  export type ApikeyCountAggregateOutputType = {
+    id: number
+    name: number
+    start: number
+    prefix: number
+    key: number
+    userId: number
+    refillInterval: number
+    refillAmount: number
+    lastRefillAt: number
+    enabled: number
+    rateLimitEnabled: number
+    rateLimitTimeWindow: number
+    rateLimitMax: number
+    requestCount: number
+    remaining: number
+    lastRequest: number
+    expiresAt: number
+    createdAt: number
+    updatedAt: number
+    permissions: number
+    metadata: number
+    _all: number
+  }
+
+
+  export type ApikeyAvgAggregateInputType = {
+    refillInterval?: true
+    refillAmount?: true
+    rateLimitTimeWindow?: true
+    rateLimitMax?: true
+    requestCount?: true
+    remaining?: true
+  }
+
+  export type ApikeySumAggregateInputType = {
+    refillInterval?: true
+    refillAmount?: true
+    rateLimitTimeWindow?: true
+    rateLimitMax?: true
+    requestCount?: true
+    remaining?: true
+  }
+
+  export type ApikeyMinAggregateInputType = {
+    id?: true
+    name?: true
+    start?: true
+    prefix?: true
+    key?: true
+    userId?: true
+    refillInterval?: true
+    refillAmount?: true
+    lastRefillAt?: true
+    enabled?: true
+    rateLimitEnabled?: true
+    rateLimitTimeWindow?: true
+    rateLimitMax?: true
+    requestCount?: true
+    remaining?: true
+    lastRequest?: true
+    expiresAt?: true
+    createdAt?: true
+    updatedAt?: true
+    permissions?: true
+    metadata?: true
+  }
+
+  export type ApikeyMaxAggregateInputType = {
+    id?: true
+    name?: true
+    start?: true
+    prefix?: true
+    key?: true
+    userId?: true
+    refillInterval?: true
+    refillAmount?: true
+    lastRefillAt?: true
+    enabled?: true
+    rateLimitEnabled?: true
+    rateLimitTimeWindow?: true
+    rateLimitMax?: true
+    requestCount?: true
+    remaining?: true
+    lastRequest?: true
+    expiresAt?: true
+    createdAt?: true
+    updatedAt?: true
+    permissions?: true
+    metadata?: true
+  }
+
+  export type ApikeyCountAggregateInputType = {
+    id?: true
+    name?: true
+    start?: true
+    prefix?: true
+    key?: true
+    userId?: true
+    refillInterval?: true
+    refillAmount?: true
+    lastRefillAt?: true
+    enabled?: true
+    rateLimitEnabled?: true
+    rateLimitTimeWindow?: true
+    rateLimitMax?: true
+    requestCount?: true
+    remaining?: true
+    lastRequest?: true
+    expiresAt?: true
+    createdAt?: true
+    updatedAt?: true
+    permissions?: true
+    metadata?: true
+    _all?: true
+  }
+
+  export type ApikeyAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Apikey to aggregate.
+     */
+    where?: ApikeyWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Apikeys to fetch.
+     */
+    orderBy?: ApikeyOrderByWithRelationInput | ApikeyOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the start position
+     */
+    cursor?: ApikeyWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Apikeys from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Apikeys.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Count returned Apikeys
+     **/
+    _count?: true | ApikeyCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to average
+     **/
+    _avg?: ApikeyAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to sum
+     **/
+    _sum?: ApikeySumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the minimum value
+     **/
+    _min?: ApikeyMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the maximum value
+     **/
+    _max?: ApikeyMaxAggregateInputType
+  }
+
+  export type GetApikeyAggregateType<T extends ApikeyAggregateArgs> = {
         [P in keyof T & keyof AggregateApikey]: P extends '_count' | 'count'
-            ? T[P] extends true
-                ? number
-                : GetScalarType<T[P], AggregateApikey[P]>
+        ? T[P] extends true
+            ? number
             : GetScalarType<T[P], AggregateApikey[P]>
-    }
+        : GetScalarType<T[P], AggregateApikey[P]>
+  }
 
 
-    export type ApikeyGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        where?: ApikeyWhereInput
-        orderBy?: ApikeyOrderByWithAggregationInput | ApikeyOrderByWithAggregationInput[]
-        by: ApikeyScalarFieldEnum[] | ApikeyScalarFieldEnum
-        having?: ApikeyScalarWhereWithAggregatesInput
-        take?: number
-        skip?: number
-        _count?: ApikeyCountAggregateInputType | true
-        _avg?: ApikeyAvgAggregateInputType
-        _sum?: ApikeySumAggregateInputType
-        _min?: ApikeyMinAggregateInputType
-        _max?: ApikeyMaxAggregateInputType
-    }
+  export type ApikeyGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ApikeyWhereInput
+    orderBy?: ApikeyOrderByWithAggregationInput | ApikeyOrderByWithAggregationInput[]
+    by: ApikeyScalarFieldEnum[] | ApikeyScalarFieldEnum
+    having?: ApikeyScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ApikeyCountAggregateInputType | true
+    _avg?: ApikeyAvgAggregateInputType
+    _sum?: ApikeySumAggregateInputType
+    _min?: ApikeyMinAggregateInputType
+    _max?: ApikeyMaxAggregateInputType
+  }
 
-    export type ApikeyGroupByOutputType = {
-        id: string
-        name: string | null
-        start: string | null
-        prefix: string | null
-        key: string
-        userId: string
-        refillInterval: number | null
-        refillAmount: number | null
-        lastRefillAt: Date | null
-        enabled: boolean | null
-        rateLimitEnabled: boolean | null
-        rateLimitTimeWindow: number | null
-        rateLimitMax: number | null
-        requestCount: number | null
-        remaining: number | null
-        lastRequest: Date | null
-        expiresAt: Date | null
-        createdAt: Date
-        updatedAt: Date
-        permissions: string | null
-        metadata: string | null
-        _count: ApikeyCountAggregateOutputType | null
-        _avg: ApikeyAvgAggregateOutputType | null
-        _sum: ApikeySumAggregateOutputType | null
-        _min: ApikeyMinAggregateOutputType | null
-        _max: ApikeyMaxAggregateOutputType | null
-    }
+  export type ApikeyGroupByOutputType = {
+    id: string
+    name: string | null
+    start: string | null
+    prefix: string | null
+    key: string
+    userId: string
+    refillInterval: number | null
+    refillAmount: number | null
+    lastRefillAt: Date | null
+    enabled: boolean | null
+    rateLimitEnabled: boolean | null
+    rateLimitTimeWindow: number | null
+    rateLimitMax: number | null
+    requestCount: number | null
+    remaining: number | null
+    lastRequest: Date | null
+    expiresAt: Date | null
+    createdAt: Date
+    updatedAt: Date
+    permissions: string | null
+    metadata: string | null
+    _count: ApikeyCountAggregateOutputType | null
+    _avg: ApikeyAvgAggregateOutputType | null
+    _sum: ApikeySumAggregateOutputType | null
+    _min: ApikeyMinAggregateOutputType | null
+    _max: ApikeyMaxAggregateOutputType | null
+  }
 
-    type GetApikeyGroupByPayload<T extends ApikeyGroupByArgs> = Prisma.PrismaPromise<
-        Array<
-            PickEnumerable<ApikeyGroupByOutputType, T['by']> &
-            {
-                [P in ((keyof T) & (keyof ApikeyGroupByOutputType))]: P extends '_count'
-                ? T[P] extends boolean
-                    ? number
-                    : GetScalarType<T[P], ApikeyGroupByOutputType[P]>
-                : GetScalarType<T[P], ApikeyGroupByOutputType[P]>
-            }
-        >
+  type GetApikeyGroupByPayload<T extends ApikeyGroupByArgs> = Prisma.PrismaPromise<
+      Array<
+          PickEnumerable<ApikeyGroupByOutputType, T['by']> &
+          {
+            [P in ((keyof T) & (keyof ApikeyGroupByOutputType))]: P extends '_count'
+              ? T[P] extends boolean
+                  ? number
+                  : GetScalarType<T[P], ApikeyGroupByOutputType[P]>
+              : GetScalarType<T[P], ApikeyGroupByOutputType[P]>
+          }
+      >
     >
 
 
-    export type ApikeySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-        id?: boolean
-        name?: boolean
-        start?: boolean
-        prefix?: boolean
-        key?: boolean
-        userId?: boolean
-        refillInterval?: boolean
-        refillAmount?: boolean
-        lastRefillAt?: boolean
-        enabled?: boolean
-        rateLimitEnabled?: boolean
-        rateLimitTimeWindow?: boolean
-        rateLimitMax?: boolean
-        requestCount?: boolean
-        remaining?: boolean
-        lastRequest?: boolean
-        expiresAt?: boolean
-        createdAt?: boolean
-        updatedAt?: boolean
-        permissions?: boolean
-        metadata?: boolean
-        user?: boolean | UserDefaultArgs<ExtArgs>
+  export type ApikeySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    start?: boolean
+    prefix?: boolean
+    key?: boolean
+    userId?: boolean
+    refillInterval?: boolean
+    refillAmount?: boolean
+    lastRefillAt?: boolean
+    enabled?: boolean
+    rateLimitEnabled?: boolean
+    rateLimitTimeWindow?: boolean
+    rateLimitMax?: boolean
+    requestCount?: boolean
+    remaining?: boolean
+    lastRequest?: boolean
+    expiresAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    permissions?: boolean
+    metadata?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["apikey"]>
+
+
+  export type ApikeySelectScalar = {
+    id?: boolean
+    name?: boolean
+    start?: boolean
+    prefix?: boolean
+    key?: boolean
+    userId?: boolean
+    refillInterval?: boolean
+    refillAmount?: boolean
+    lastRefillAt?: boolean
+    enabled?: boolean
+    rateLimitEnabled?: boolean
+    rateLimitTimeWindow?: boolean
+    rateLimitMax?: boolean
+    requestCount?: boolean
+    remaining?: boolean
+    lastRequest?: boolean
+    expiresAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    permissions?: boolean
+    metadata?: boolean
+  }
+
+  export type ApikeyOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "start" | "prefix" | "key" | "userId" | "refillInterval" | "refillAmount" | "lastRefillAt" | "enabled" | "rateLimitEnabled" | "rateLimitTimeWindow" | "rateLimitMax" | "requestCount" | "remaining" | "lastRequest" | "expiresAt" | "createdAt" | "updatedAt" | "permissions" | "metadata", ExtArgs["result"]["apikey"]>
+  export type ApikeyInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $ApikeyPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Apikey"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      name: string | null
+      start: string | null
+      prefix: string | null
+      key: string
+      userId: string
+      refillInterval: number | null
+      refillAmount: number | null
+      lastRefillAt: Date | null
+      enabled: boolean | null
+      rateLimitEnabled: boolean | null
+      rateLimitTimeWindow: number | null
+      rateLimitMax: number | null
+      requestCount: number | null
+      remaining: number | null
+      lastRequest: Date | null
+      expiresAt: Date | null
+      createdAt: Date
+      updatedAt: Date
+      permissions: string | null
+      metadata: string | null
     }, ExtArgs["result"]["apikey"]>
+    composites: {}
+  }
 
+  type ApikeyGetPayload<S extends boolean | null | undefined | ApikeyDefaultArgs> = $Result.GetResult<Prisma.$ApikeyPayload, S>
 
-    export type ApikeySelectScalar = {
-        id?: boolean
-        name?: boolean
-        start?: boolean
-        prefix?: boolean
-        key?: boolean
-        userId?: boolean
-        refillInterval?: boolean
-        refillAmount?: boolean
-        lastRefillAt?: boolean
-        enabled?: boolean
-        rateLimitEnabled?: boolean
-        rateLimitTimeWindow?: boolean
-        rateLimitMax?: boolean
-        requestCount?: boolean
-        remaining?: boolean
-        lastRequest?: boolean
-        expiresAt?: boolean
-        createdAt?: boolean
-        updatedAt?: boolean
-        permissions?: boolean
-        metadata?: boolean
+  type ApikeyCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+      Omit<ApikeyFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+    select?: ApikeyCountAggregateInputType | true
     }
 
-    export type ApikeyOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "start" | "prefix" | "key" | "userId" | "refillInterval" | "refillAmount" | "lastRefillAt" | "enabled" | "rateLimitEnabled" | "rateLimitTimeWindow" | "rateLimitMax" | "requestCount" | "remaining" | "lastRequest" | "expiresAt" | "createdAt" | "updatedAt" | "permissions" | "metadata", ExtArgs["result"]["apikey"]>
-    export type ApikeyInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        user?: boolean | UserDefaultArgs<ExtArgs>
-    }
+  export interface ApikeyDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Apikey'], meta: { name: 'Apikey' } }
 
-    export type $ApikeyPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        name: "Apikey"
-        objects: {
-            user: Prisma.$UserPayload<ExtArgs>
-        }
-        scalars: $Extensions.GetPayloadResult<{
-            id: string
-            name: string | null
-            start: string | null
-            prefix: string | null
-            key: string
-            userId: string
-            refillInterval: number | null
-            refillAmount: number | null
-            lastRefillAt: Date | null
-            enabled: boolean | null
-            rateLimitEnabled: boolean | null
-            rateLimitTimeWindow: number | null
-            rateLimitMax: number | null
-            requestCount: number | null
-            remaining: number | null
-            lastRequest: Date | null
-            expiresAt: Date | null
-            createdAt: Date
-            updatedAt: Date
-            permissions: string | null
-            metadata: string | null
-        }, ExtArgs["result"]["apikey"]>
-        composites: {}
-    }
+    /**
+     * Find zero or one Apikey that matches the filter.
+     * @param {ApikeyFindUniqueArgs} args - Arguments to find a Apikey
+     * @example
+     * // Get one Apikey
+     * const apikey = await prisma.apikey.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ApikeyFindUniqueArgs>(args: SelectSubset<T, ApikeyFindUniqueArgs<ExtArgs>>): Prisma__ApikeyClient<$Result.GetResult<Prisma.$ApikeyPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
-    type ApikeyGetPayload<S extends boolean | null | undefined | ApikeyDefaultArgs> = $Result.GetResult<Prisma.$ApikeyPayload, S>
+    /**
+     * Find one Apikey that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ApikeyFindUniqueOrThrowArgs} args - Arguments to find a Apikey
+     * @example
+     * // Get one Apikey
+     * const apikey = await prisma.apikey.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ApikeyFindUniqueOrThrowArgs>(args: SelectSubset<T, ApikeyFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ApikeyClient<$Result.GetResult<Prisma.$ApikeyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
-    type ApikeyCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-        Omit<ApikeyFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-        select?: ApikeyCountAggregateInputType | true
-    }
+    /**
+     * Find the first Apikey that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ApikeyFindFirstArgs} args - Arguments to find a Apikey
+     * @example
+     * // Get one Apikey
+     * const apikey = await prisma.apikey.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ApikeyFindFirstArgs>(args?: SelectSubset<T, ApikeyFindFirstArgs<ExtArgs>>): Prisma__ApikeyClient<$Result.GetResult<Prisma.$ApikeyPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
-    export interface ApikeyDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-        [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Apikey'], meta: { name: 'Apikey' } }
+    /**
+     * Find the first Apikey that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ApikeyFindFirstOrThrowArgs} args - Arguments to find a Apikey
+     * @example
+     * // Get one Apikey
+     * const apikey = await prisma.apikey.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ApikeyFindFirstOrThrowArgs>(args?: SelectSubset<T, ApikeyFindFirstOrThrowArgs<ExtArgs>>): Prisma__ApikeyClient<$Result.GetResult<Prisma.$ApikeyPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
-        /**
-         * Find zero or one Apikey that matches the filter.
-         * @param {ApikeyFindUniqueArgs} args - Arguments to find a Apikey
-         * @example
-         * // Get one Apikey
-         * const apikey = await prisma.apikey.findUnique({
-         *   where: {
-         *     // ... provide filter here
-         *   }
-         * })
-         */
-        findUnique<T extends ApikeyFindUniqueArgs>(args: SelectSubset<T, ApikeyFindUniqueArgs<ExtArgs>>): Prisma__ApikeyClient<$Result.GetResult<Prisma.$ApikeyPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Find zero or more Apikeys that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ApikeyFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Apikeys
+     * const apikeys = await prisma.apikey.findMany()
+     *
+     * // Get first 10 Apikeys
+     * const apikeys = await prisma.apikey.findMany({ take: 10 })
+     *
+     * // Only select the `id`
+     * const apikeyWithIdOnly = await prisma.apikey.findMany({ select: { id: true } })
+     *
+     */
+    findMany<T extends ApikeyFindManyArgs>(args?: SelectSubset<T, ApikeyFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ApikeyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
-        /**
-         * Find one Apikey that matches the filter or throw an error with `error.code='P2025'`
-         * if no matches were found.
-         * @param {ApikeyFindUniqueOrThrowArgs} args - Arguments to find a Apikey
-         * @example
-         * // Get one Apikey
-         * const apikey = await prisma.apikey.findUniqueOrThrow({
-         *   where: {
-         *     // ... provide filter here
-         *   }
-         * })
-         */
-        findUniqueOrThrow<T extends ApikeyFindUniqueOrThrowArgs>(args: SelectSubset<T, ApikeyFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ApikeyClient<$Result.GetResult<Prisma.$ApikeyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    /**
+     * Create a Apikey.
+     * @param {ApikeyCreateArgs} args - Arguments to create a Apikey.
+     * @example
+     * // Create one Apikey
+     * const Apikey = await prisma.apikey.create({
+     *   data: {
+     *     // ... data to create a Apikey
+     *   }
+     * })
+     *
+     */
+    create<T extends ApikeyCreateArgs>(args: SelectSubset<T, ApikeyCreateArgs<ExtArgs>>): Prisma__ApikeyClient<$Result.GetResult<Prisma.$ApikeyPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
-        /**
-         * Find the first Apikey that matches the filter.
-         * Note, that providing `undefined` is treated as the value not being there.
-         * Read more here: https://pris.ly/d/null-undefined
-         * @param {ApikeyFindFirstArgs} args - Arguments to find a Apikey
-         * @example
-         * // Get one Apikey
-         * const apikey = await prisma.apikey.findFirst({
-         *   where: {
-         *     // ... provide filter here
-         *   }
-         * })
-         */
-        findFirst<T extends ApikeyFindFirstArgs>(args?: SelectSubset<T, ApikeyFindFirstArgs<ExtArgs>>): Prisma__ApikeyClient<$Result.GetResult<Prisma.$ApikeyPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Create many Apikeys.
+     * @param {ApikeyCreateManyArgs} args - Arguments to create many Apikeys.
+     * @example
+     * // Create many Apikeys
+     * const apikey = await prisma.apikey.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     */
+    createMany<T extends ApikeyCreateManyArgs>(args?: SelectSubset<T, ApikeyCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
-        /**
-         * Find the first Apikey that matches the filter or
-         * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-         * Note, that providing `undefined` is treated as the value not being there.
-         * Read more here: https://pris.ly/d/null-undefined
-         * @param {ApikeyFindFirstOrThrowArgs} args - Arguments to find a Apikey
-         * @example
-         * // Get one Apikey
-         * const apikey = await prisma.apikey.findFirstOrThrow({
-         *   where: {
-         *     // ... provide filter here
-         *   }
-         * })
-         */
-        findFirstOrThrow<T extends ApikeyFindFirstOrThrowArgs>(args?: SelectSubset<T, ApikeyFindFirstOrThrowArgs<ExtArgs>>): Prisma__ApikeyClient<$Result.GetResult<Prisma.$ApikeyPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    /**
+     * Delete a Apikey.
+     * @param {ApikeyDeleteArgs} args - Arguments to delete one Apikey.
+     * @example
+     * // Delete one Apikey
+     * const Apikey = await prisma.apikey.delete({
+     *   where: {
+     *     // ... filter to delete one Apikey
+     *   }
+     * })
+     *
+     */
+    delete<T extends ApikeyDeleteArgs>(args: SelectSubset<T, ApikeyDeleteArgs<ExtArgs>>): Prisma__ApikeyClient<$Result.GetResult<Prisma.$ApikeyPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
-        /**
-         * Find zero or more Apikeys that matches the filter.
-         * Note, that providing `undefined` is treated as the value not being there.
-         * Read more here: https://pris.ly/d/null-undefined
-         * @param {ApikeyFindManyArgs} args - Arguments to filter and select certain fields only.
-         * @example
-         * // Get all Apikeys
-         * const apikeys = await prisma.apikey.findMany()
-         *
-         * // Get first 10 Apikeys
-         * const apikeys = await prisma.apikey.findMany({ take: 10 })
-         *
-         * // Only select the `id`
-         * const apikeyWithIdOnly = await prisma.apikey.findMany({ select: { id: true } })
-         *
-         */
-        findMany<T extends ApikeyFindManyArgs>(args?: SelectSubset<T, ApikeyFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ApikeyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+    /**
+     * Update one Apikey.
+     * @param {ApikeyUpdateArgs} args - Arguments to update one Apikey.
+     * @example
+     * // Update one Apikey
+     * const apikey = await prisma.apikey.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    update<T extends ApikeyUpdateArgs>(args: SelectSubset<T, ApikeyUpdateArgs<ExtArgs>>): Prisma__ApikeyClient<$Result.GetResult<Prisma.$ApikeyPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
-        /**
-         * Create a Apikey.
-         * @param {ApikeyCreateArgs} args - Arguments to create a Apikey.
-         * @example
-         * // Create one Apikey
-         * const Apikey = await prisma.apikey.create({
-         *   data: {
-         *     // ... data to create a Apikey
-         *   }
-         * })
-         *
-         */
-        create<T extends ApikeyCreateArgs>(args: SelectSubset<T, ApikeyCreateArgs<ExtArgs>>): Prisma__ApikeyClient<$Result.GetResult<Prisma.$ApikeyPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    /**
+     * Delete zero or more Apikeys.
+     * @param {ApikeyDeleteManyArgs} args - Arguments to filter Apikeys to delete.
+     * @example
+     * // Delete a few Apikeys
+     * const { count } = await prisma.apikey.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     *
+     */
+    deleteMany<T extends ApikeyDeleteManyArgs>(args?: SelectSubset<T, ApikeyDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
-        /**
-         * Create many Apikeys.
-         * @param {ApikeyCreateManyArgs} args - Arguments to create many Apikeys.
-         * @example
-         * // Create many Apikeys
-         * const apikey = await prisma.apikey.createMany({
-         *   data: [
-         *     // ... provide data here
-         *   ]
-         * })
-         *
-         */
-        createMany<T extends ApikeyCreateManyArgs>(args?: SelectSubset<T, ApikeyCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    /**
+     * Update zero or more Apikeys.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ApikeyUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Apikeys
+     * const apikey = await prisma.apikey.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    updateMany<T extends ApikeyUpdateManyArgs>(args: SelectSubset<T, ApikeyUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
-        /**
-         * Delete a Apikey.
-         * @param {ApikeyDeleteArgs} args - Arguments to delete one Apikey.
-         * @example
-         * // Delete one Apikey
-         * const Apikey = await prisma.apikey.delete({
-         *   where: {
-         *     // ... filter to delete one Apikey
-         *   }
-         * })
-         *
-         */
-        delete<T extends ApikeyDeleteArgs>(args: SelectSubset<T, ApikeyDeleteArgs<ExtArgs>>): Prisma__ApikeyClient<$Result.GetResult<Prisma.$ApikeyPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-        /**
-         * Update one Apikey.
-         * @param {ApikeyUpdateArgs} args - Arguments to update one Apikey.
-         * @example
-         * // Update one Apikey
-         * const apikey = await prisma.apikey.update({
-         *   where: {
-         *     // ... provide filter here
-         *   },
-         *   data: {
-         *     // ... provide data here
-         *   }
-         * })
-         *
-         */
-        update<T extends ApikeyUpdateArgs>(args: SelectSubset<T, ApikeyUpdateArgs<ExtArgs>>): Prisma__ApikeyClient<$Result.GetResult<Prisma.$ApikeyPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-        /**
-         * Delete zero or more Apikeys.
-         * @param {ApikeyDeleteManyArgs} args - Arguments to filter Apikeys to delete.
-         * @example
-         * // Delete a few Apikeys
-         * const { count } = await prisma.apikey.deleteMany({
-         *   where: {
-         *     // ... provide filter here
-         *   }
-         * })
-         *
-         */
-        deleteMany<T extends ApikeyDeleteManyArgs>(args?: SelectSubset<T, ApikeyDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-        /**
-         * Update zero or more Apikeys.
-         * Note, that providing `undefined` is treated as the value not being there.
-         * Read more here: https://pris.ly/d/null-undefined
-         * @param {ApikeyUpdateManyArgs} args - Arguments to update one or more rows.
-         * @example
-         * // Update many Apikeys
-         * const apikey = await prisma.apikey.updateMany({
-         *   where: {
-         *     // ... provide filter here
-         *   },
-         *   data: {
-         *     // ... provide data here
-         *   }
-         * })
-         *
-         */
-        updateMany<T extends ApikeyUpdateManyArgs>(args: SelectSubset<T, ApikeyUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-        /**
-         * Create or update one Apikey.
-         * @param {ApikeyUpsertArgs} args - Arguments to update or create a Apikey.
-         * @example
-         * // Update or create a Apikey
-         * const apikey = await prisma.apikey.upsert({
-         *   create: {
-         *     // ... data to create a Apikey
-         *   },
-         *   update: {
-         *     // ... in case it already exists, update
-         *   },
-         *   where: {
-         *     // ... the filter for the Apikey we want to update
-         *   }
-         * })
-         */
-        upsert<T extends ApikeyUpsertArgs>(args: SelectSubset<T, ApikeyUpsertArgs<ExtArgs>>): Prisma__ApikeyClient<$Result.GetResult<Prisma.$ApikeyPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    /**
+     * Create or update one Apikey.
+     * @param {ApikeyUpsertArgs} args - Arguments to update or create a Apikey.
+     * @example
+     * // Update or create a Apikey
+     * const apikey = await prisma.apikey.upsert({
+     *   create: {
+     *     // ... data to create a Apikey
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Apikey we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ApikeyUpsertArgs>(args: SelectSubset<T, ApikeyUpsertArgs<ExtArgs>>): Prisma__ApikeyClient<$Result.GetResult<Prisma.$ApikeyPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
-        /**
-         * Count the number of Apikeys.
-         * Note, that providing `undefined` is treated as the value not being there.
-         * Read more here: https://pris.ly/d/null-undefined
-         * @param {ApikeyCountArgs} args - Arguments to filter Apikeys to count.
-         * @example
-         * // Count the number of Apikeys
-         * const count = await prisma.apikey.count({
-         *   where: {
-         *     // ... the filter for the Apikeys we want to count
-         *   }
-         * })
-         **/
-        count<T extends ApikeyCountArgs>(
-            args?: Subset<T, ApikeyCountArgs>,
-        ): Prisma.PrismaPromise<
-            T extends $Utils.Record<'select', any>
-                ? T['select'] extends true
-                    ? number
-                    : GetScalarType<T['select'], ApikeyCountAggregateOutputType>
-                : number
-        >
+    /**
+     * Count the number of Apikeys.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ApikeyCountArgs} args - Arguments to filter Apikeys to count.
+     * @example
+     * // Count the number of Apikeys
+     * const count = await prisma.apikey.count({
+     *   where: {
+     *     // ... the filter for the Apikeys we want to count
+     *   }
+     * })
+     **/
+    count<T extends ApikeyCountArgs>(
+        args?: Subset<T, ApikeyCountArgs>,
+    ): Prisma.PrismaPromise<
+        T extends $Utils.Record<'select', any>
+            ? T['select'] extends true
+                ? number
+                : GetScalarType<T['select'], ApikeyCountAggregateOutputType>
+            : number
+    >
 
-        /**
-         * Allows you to perform aggregations operations on a Apikey.
-         * Note, that providing `undefined` is treated as the value not being there.
-         * Read more here: https://pris.ly/d/null-undefined
-         * @param {ApikeyAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-         * @example
-         * // Ordered by age ascending
-         * // Where email contains prisma.io
-         * // Limited to the 10 users
-         * const aggregations = await prisma.user.aggregate({
-         *   _avg: {
-         *     age: true,
-         *   },
-         *   where: {
-         *     email: {
-         *       contains: "prisma.io",
-         *     },
-         *   },
-         *   orderBy: {
-         *     age: "asc",
-         *   },
-         *   take: 10,
-         * })
-         **/
-        aggregate<T extends ApikeyAggregateArgs>(args: Subset<T, ApikeyAggregateArgs>): Prisma.PrismaPromise<GetApikeyAggregateType<T>>
+    /**
+     * Allows you to perform aggregations operations on a Apikey.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ApikeyAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+     **/
+    aggregate<T extends ApikeyAggregateArgs>(args: Subset<T, ApikeyAggregateArgs>): Prisma.PrismaPromise<GetApikeyAggregateType<T>>
 
-        /**
-         * Group by Apikey.
-         * Note, that providing `undefined` is treated as the value not being there.
-         * Read more here: https://pris.ly/d/null-undefined
-         * @param {ApikeyGroupByArgs} args - Group by arguments.
-         * @example
-         * // Group by city, order by createdAt, get count
-         * const result = await prisma.user.groupBy({
-         *   by: ['city', 'createdAt'],
-         *   orderBy: {
-         *     createdAt: true
-         *   },
-         *   _count: {
-         *     _all: true
-         *   },
-         * })
-         *
-         **/
-        groupBy<
-            T extends ApikeyGroupByArgs,
-            HasSelectOrTake extends Or<
-                Extends<'skip', Keys<T>>,
-                Extends<'take', Keys<T>>
-            >,
-            OrderByArg extends True extends HasSelectOrTake
-                ? { orderBy: ApikeyGroupByArgs['orderBy'] }
-                : { orderBy?: ApikeyGroupByArgs['orderBy'] },
-            OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-            ByFields extends MaybeTupleToUnion<T['by']>,
-            ByValid extends Has<ByFields, OrderFields>,
-            HavingFields extends GetHavingFields<T['having']>,
-            HavingValid extends Has<ByFields, HavingFields>,
-            ByEmpty extends T['by'] extends never[] ? True : False,
-            InputErrors extends ByEmpty extends True
-                ? `Error: "by" must not be empty.`
-                : HavingValid extends False
-                    ? {
-                        [P in HavingFields]: P extends ByFields
-                            ? never
-                            : P extends string
-                                ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-                                : [
-                                    Error,
-                                    'Field ',
-                                    P,
-                                    ` in "having" needs to be provided in "by"`,
-                                ]
-                    }[HavingFields]
-                    : 'take' extends Keys<T>
+    /**
+     * Group by Apikey.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ApikeyGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     *
+     **/
+    groupBy<
+        T extends ApikeyGroupByArgs,
+        HasSelectOrTake extends Or<
+            Extends<'skip', Keys<T>>,
+            Extends<'take', Keys<T>>
+        >,
+        OrderByArg extends True extends HasSelectOrTake
+            ? { orderBy: ApikeyGroupByArgs['orderBy'] }
+            : { orderBy?: ApikeyGroupByArgs['orderBy'] },
+        OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+        ByFields extends MaybeTupleToUnion<T['by']>,
+        ByValid extends Has<ByFields, OrderFields>,
+        HavingFields extends GetHavingFields<T['having']>,
+        HavingValid extends Has<ByFields, HavingFields>,
+        ByEmpty extends T['by'] extends never[] ? True : False,
+        InputErrors extends ByEmpty extends True
+            ? `Error: "by" must not be empty.`
+            : HavingValid extends False
+                ? {
+                  [P in HavingFields]: P extends ByFields
+                      ? never
+                      : P extends string
+                          ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+                          : [
+                            Error,
+                            'Field ',
+                            P,
+                            ` in "having" needs to be provided in "by"`,
+                          ]
+                }[HavingFields]
+                : 'take' extends Keys<T>
+                    ? 'orderBy' extends Keys<T>
+                        ? ByValid extends True
+                            ? {}
+                            : {
+                              [P in OrderFields]: P extends ByFields
+                                  ? never
+                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                            }[OrderFields]
+                        : 'Error: If you provide "take", you also need to provide "orderBy"'
+                    : 'skip' extends Keys<T>
                         ? 'orderBy' extends Keys<T>
                             ? ByValid extends True
                                 ? {}
                                 : {
-                                    [P in OrderFields]: P extends ByFields
-                                        ? never
-                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                  [P in OrderFields]: P extends ByFields
+                                      ? never
+                                      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                                 }[OrderFields]
-                            : 'Error: If you provide "take", you also need to provide "orderBy"'
-                        : 'skip' extends Keys<T>
-                            ? 'orderBy' extends Keys<T>
-                                ? ByValid extends True
-                                    ? {}
-                                    : {
-                                        [P in OrderFields]: P extends ByFields
-                                            ? never
-                                            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-                                    }[OrderFields]
-                                : 'Error: If you provide "skip", you also need to provide "orderBy"'
-                            : ByValid extends True
-                                ? {}
-                                : {
-                                    [P in OrderFields]: P extends ByFields
-                                        ? never
-                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-                                }[OrderFields]
-        >(args: SubsetIntersection<T, ApikeyGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetApikeyGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-
-        /**
-         * Fields of the Apikey model
-         */
-        readonly fields: ApikeyFieldRefs;
-    }
-
-    /**
-     * The delegate class that acts as a "Promise-like" for Apikey.
-     * Why is this prefixed with `Prisma__`?
-     * Because we want to prevent naming conflicts as mentioned in
-     * https://github.com/prisma/prisma-client-js/issues/707
-     */
-    export interface Prisma__ApikeyClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
-        readonly [Symbol.toStringTag]: "PrismaPromise"
-
-        user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-
-        /**
-         * Attaches callbacks for the resolution and/or rejection of the Promise.
-         * @param onfulfilled The callback to execute when the Promise is resolved.
-         * @param onrejected The callback to execute when the Promise is rejected.
-         * @returns A Promise for the completion of which ever callback is executed.
-         */
-        then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-
-        /**
-         * Attaches a callback for only the rejection of the Promise.
-         * @param onrejected The callback to execute when the Promise is rejected.
-         * @returns A Promise for the completion of the callback.
-         */
-        catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-
-        /**
-         * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-         * resolved value cannot be modified from the callback.
-         * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-         * @returns A Promise for the completion of the callback.
-         */
-        finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-    }
-
+                            : 'Error: If you provide "skip", you also need to provide "orderBy"'
+                        : ByValid extends True
+                            ? {}
+                            : {
+                              [P in OrderFields]: P extends ByFields
+                                  ? never
+                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                            }[OrderFields]
+    >(args: SubsetIntersection<T, ApikeyGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetApikeyGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
 
     /**
      * Fields of the Apikey model
      */
-    interface ApikeyFieldRefs {
-        readonly id: FieldRef<"Apikey", 'String'>
-        readonly name: FieldRef<"Apikey", 'String'>
-        readonly start: FieldRef<"Apikey", 'String'>
-        readonly prefix: FieldRef<"Apikey", 'String'>
-        readonly key: FieldRef<"Apikey", 'String'>
-        readonly userId: FieldRef<"Apikey", 'String'>
-        readonly refillInterval: FieldRef<"Apikey", 'Int'>
-        readonly refillAmount: FieldRef<"Apikey", 'Int'>
-        readonly lastRefillAt: FieldRef<"Apikey", 'DateTime'>
-        readonly enabled: FieldRef<"Apikey", 'Boolean'>
-        readonly rateLimitEnabled: FieldRef<"Apikey", 'Boolean'>
-        readonly rateLimitTimeWindow: FieldRef<"Apikey", 'Int'>
-        readonly rateLimitMax: FieldRef<"Apikey", 'Int'>
-        readonly requestCount: FieldRef<"Apikey", 'Int'>
-        readonly remaining: FieldRef<"Apikey", 'Int'>
-        readonly lastRequest: FieldRef<"Apikey", 'DateTime'>
-        readonly expiresAt: FieldRef<"Apikey", 'DateTime'>
-        readonly createdAt: FieldRef<"Apikey", 'DateTime'>
-        readonly updatedAt: FieldRef<"Apikey", 'DateTime'>
-        readonly permissions: FieldRef<"Apikey", 'String'>
-        readonly metadata: FieldRef<"Apikey", 'String'>
-    }
+    readonly fields: ApikeyFieldRefs;
+  }
 
+  /**
+   * The delegate class that acts as a "Promise-like" for Apikey.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ApikeyClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
 
-    // Custom InputTypes
-    /**
-     * Apikey findUnique
-     */
-    export type ApikeyFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Apikey
-         */
-        select?: ApikeySelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Apikey
-         */
-        omit?: ApikeyOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: ApikeyInclude<ExtArgs> | null
-        /**
-         * Filter, which Apikey to fetch.
-         */
-        where: ApikeyWhereUniqueInput
-    }
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Apikey findUniqueOrThrow
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
      */
-    export type ApikeyFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Apikey
-         */
-        select?: ApikeySelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Apikey
-         */
-        omit?: ApikeyOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: ApikeyInclude<ExtArgs> | null
-        /**
-         * Filter, which Apikey to fetch.
-         */
-        where: ApikeyWhereUniqueInput
-    }
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
 
     /**
-     * Apikey findFirst
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
      */
-    export type ApikeyFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Apikey
-         */
-        select?: ApikeySelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Apikey
-         */
-        omit?: ApikeyOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: ApikeyInclude<ExtArgs> | null
-        /**
-         * Filter, which Apikey to fetch.
-         */
-        where?: ApikeyWhereInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-         *
-         * Determine the order of Apikeys to fetch.
-         */
-        orderBy?: ApikeyOrderByWithRelationInput | ApikeyOrderByWithRelationInput[]
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-         *
-         * Sets the position for searching for Apikeys.
-         */
-        cursor?: ApikeyWhereUniqueInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Take `±n` Apikeys from the position of the cursor.
-         */
-        take?: number
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Skip the first `n` Apikeys.
-         */
-        skip?: number
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-         *
-         * Filter by unique combinations of Apikeys.
-         */
-        distinct?: ApikeyScalarFieldEnum | ApikeyScalarFieldEnum[]
-    }
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
 
     /**
-     * Apikey findFirstOrThrow
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
      */
-    export type ApikeyFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Apikey
-         */
-        select?: ApikeySelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Apikey
-         */
-        omit?: ApikeyOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: ApikeyInclude<ExtArgs> | null
-        /**
-         * Filter, which Apikey to fetch.
-         */
-        where?: ApikeyWhereInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-         *
-         * Determine the order of Apikeys to fetch.
-         */
-        orderBy?: ApikeyOrderByWithRelationInput | ApikeyOrderByWithRelationInput[]
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-         *
-         * Sets the position for searching for Apikeys.
-         */
-        cursor?: ApikeyWhereUniqueInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Take `±n` Apikeys from the position of the cursor.
-         */
-        take?: number
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Skip the first `n` Apikeys.
-         */
-        skip?: number
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-         *
-         * Filter by unique combinations of Apikeys.
-         */
-        distinct?: ApikeyScalarFieldEnum | ApikeyScalarFieldEnum[]
-    }
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
 
+
+  /**
+   * Fields of the Apikey model
+   */
+  interface ApikeyFieldRefs {
+    readonly id: FieldRef<"Apikey", 'String'>
+    readonly name: FieldRef<"Apikey", 'String'>
+    readonly start: FieldRef<"Apikey", 'String'>
+    readonly prefix: FieldRef<"Apikey", 'String'>
+    readonly key: FieldRef<"Apikey", 'String'>
+    readonly userId: FieldRef<"Apikey", 'String'>
+    readonly refillInterval: FieldRef<"Apikey", 'Int'>
+    readonly refillAmount: FieldRef<"Apikey", 'Int'>
+    readonly lastRefillAt: FieldRef<"Apikey", 'DateTime'>
+    readonly enabled: FieldRef<"Apikey", 'Boolean'>
+    readonly rateLimitEnabled: FieldRef<"Apikey", 'Boolean'>
+    readonly rateLimitTimeWindow: FieldRef<"Apikey", 'Int'>
+    readonly rateLimitMax: FieldRef<"Apikey", 'Int'>
+    readonly requestCount: FieldRef<"Apikey", 'Int'>
+    readonly remaining: FieldRef<"Apikey", 'Int'>
+    readonly lastRequest: FieldRef<"Apikey", 'DateTime'>
+    readonly expiresAt: FieldRef<"Apikey", 'DateTime'>
+    readonly createdAt: FieldRef<"Apikey", 'DateTime'>
+    readonly updatedAt: FieldRef<"Apikey", 'DateTime'>
+    readonly permissions: FieldRef<"Apikey", 'String'>
+    readonly metadata: FieldRef<"Apikey", 'String'>
+  }
+
+
+  // Custom InputTypes
+  /**
+   * Apikey findUnique
+   */
+  export type ApikeyFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Apikey findMany
+     * Select specific fields to fetch from the Apikey
      */
-    export type ApikeyFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Apikey
-         */
-        select?: ApikeySelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Apikey
-         */
-        omit?: ApikeyOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: ApikeyInclude<ExtArgs> | null
-        /**
-         * Filter, which Apikeys to fetch.
-         */
-        where?: ApikeyWhereInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-         *
-         * Determine the order of Apikeys to fetch.
-         */
-        orderBy?: ApikeyOrderByWithRelationInput | ApikeyOrderByWithRelationInput[]
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-         *
-         * Sets the position for listing Apikeys.
-         */
-        cursor?: ApikeyWhereUniqueInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Take `±n` Apikeys from the position of the cursor.
-         */
-        take?: number
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Skip the first `n` Apikeys.
-         */
-        skip?: number
-        distinct?: ApikeyScalarFieldEnum | ApikeyScalarFieldEnum[]
-    }
-
+    select?: ApikeySelect<ExtArgs> | null
     /**
-     * Apikey create
+     * Omit specific fields from the Apikey
      */
-    export type ApikeyCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Apikey
-         */
-        select?: ApikeySelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Apikey
-         */
-        omit?: ApikeyOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: ApikeyInclude<ExtArgs> | null
-        /**
-         * The data needed to create a Apikey.
-         */
-        data: XOR<ApikeyCreateInput, ApikeyUncheckedCreateInput>
-    }
-
+    omit?: ApikeyOmit<ExtArgs> | null
     /**
-     * Apikey createMany
+     * Choose, which related nodes to fetch as well
      */
-    export type ApikeyCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * The data used to create many Apikeys.
-         */
-        data: ApikeyCreateManyInput | ApikeyCreateManyInput[]
-        skipDuplicates?: boolean
-    }
-
+    include?: ApikeyInclude<ExtArgs> | null
     /**
-     * Apikey update
+     * Filter, which Apikey to fetch.
      */
-    export type ApikeyUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Apikey
-         */
-        select?: ApikeySelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Apikey
-         */
-        omit?: ApikeyOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: ApikeyInclude<ExtArgs> | null
-        /**
-         * The data needed to update a Apikey.
-         */
-        data: XOR<ApikeyUpdateInput, ApikeyUncheckedUpdateInput>
-        /**
-         * Choose, which Apikey to update.
-         */
-        where: ApikeyWhereUniqueInput
-    }
+    where: ApikeyWhereUniqueInput
+  }
 
+  /**
+   * Apikey findUniqueOrThrow
+   */
+  export type ApikeyFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Apikey updateMany
+     * Select specific fields to fetch from the Apikey
      */
-    export type ApikeyUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * The data used to update Apikeys.
-         */
-        data: XOR<ApikeyUpdateManyMutationInput, ApikeyUncheckedUpdateManyInput>
-        /**
-         * Filter which Apikeys to update
-         */
-        where?: ApikeyWhereInput
-        /**
-         * Limit how many Apikeys to update.
-         */
-        limit?: number
-    }
-
+    select?: ApikeySelect<ExtArgs> | null
     /**
-     * Apikey upsert
+     * Omit specific fields from the Apikey
      */
-    export type ApikeyUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Apikey
-         */
-        select?: ApikeySelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Apikey
-         */
-        omit?: ApikeyOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: ApikeyInclude<ExtArgs> | null
-        /**
-         * The filter to search for the Apikey to update in case it exists.
-         */
-        where: ApikeyWhereUniqueInput
-        /**
-         * In case the Apikey found by the `where` argument doesn't exist, create a new Apikey with this data.
-         */
-        create: XOR<ApikeyCreateInput, ApikeyUncheckedCreateInput>
-        /**
-         * In case the Apikey was found with the provided `where` argument, update it with this data.
-         */
-        update: XOR<ApikeyUpdateInput, ApikeyUncheckedUpdateInput>
-    }
-
+    omit?: ApikeyOmit<ExtArgs> | null
     /**
-     * Apikey delete
+     * Choose, which related nodes to fetch as well
      */
-    export type ApikeyDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Apikey
-         */
-        select?: ApikeySelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Apikey
-         */
-        omit?: ApikeyOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: ApikeyInclude<ExtArgs> | null
-        /**
-         * Filter which Apikey to delete.
-         */
-        where: ApikeyWhereUniqueInput
-    }
-
+    include?: ApikeyInclude<ExtArgs> | null
     /**
-     * Apikey deleteMany
+     * Filter, which Apikey to fetch.
      */
-    export type ApikeyDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Filter which Apikeys to delete
-         */
-        where?: ApikeyWhereInput
-        /**
-         * Limit how many Apikeys to delete.
-         */
-        limit?: number
-    }
+    where: ApikeyWhereUniqueInput
+  }
 
+  /**
+   * Apikey findFirst
+   */
+  export type ApikeyFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Apikey without action
+     * Select specific fields to fetch from the Apikey
      */
-    export type ApikeyDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Apikey
-         */
-        select?: ApikeySelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Apikey
-         */
-        omit?: ApikeyOmit<ExtArgs> | null
-        /**
-         * Choose, which related nodes to fetch as well
-         */
-        include?: ApikeyInclude<ExtArgs> | null
-    }
-
-
+    select?: ApikeySelect<ExtArgs> | null
     /**
-     * Model Jwks
+     * Omit specific fields from the Apikey
      */
+    omit?: ApikeyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApikeyInclude<ExtArgs> | null
+    /**
+     * Filter, which Apikey to fetch.
+     */
+    where?: ApikeyWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Apikeys to fetch.
+     */
+    orderBy?: ApikeyOrderByWithRelationInput | ApikeyOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for Apikeys.
+     */
+    cursor?: ApikeyWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Apikeys from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Apikeys.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of Apikeys.
+     */
+    distinct?: ApikeyScalarFieldEnum | ApikeyScalarFieldEnum[]
+  }
 
-    export type AggregateJwks = {
-        _count: JwksCountAggregateOutputType | null
-        _min: JwksMinAggregateOutputType | null
-        _max: JwksMaxAggregateOutputType | null
-    }
+  /**
+   * Apikey findFirstOrThrow
+   */
+  export type ApikeyFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Apikey
+     */
+    select?: ApikeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Apikey
+     */
+    omit?: ApikeyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApikeyInclude<ExtArgs> | null
+    /**
+     * Filter, which Apikey to fetch.
+     */
+    where?: ApikeyWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Apikeys to fetch.
+     */
+    orderBy?: ApikeyOrderByWithRelationInput | ApikeyOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for Apikeys.
+     */
+    cursor?: ApikeyWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Apikeys from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Apikeys.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of Apikeys.
+     */
+    distinct?: ApikeyScalarFieldEnum | ApikeyScalarFieldEnum[]
+  }
 
-    export type JwksMinAggregateOutputType = {
-        id: string | null
-        publicKey: string | null
-        privateKey: string | null
-        createdAt: Date | null
-    }
+  /**
+   * Apikey findMany
+   */
+  export type ApikeyFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Apikey
+     */
+    select?: ApikeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Apikey
+     */
+    omit?: ApikeyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApikeyInclude<ExtArgs> | null
+    /**
+     * Filter, which Apikeys to fetch.
+     */
+    where?: ApikeyWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Apikeys to fetch.
+     */
+    orderBy?: ApikeyOrderByWithRelationInput | ApikeyOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for listing Apikeys.
+     */
+    cursor?: ApikeyWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Apikeys from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Apikeys.
+     */
+    skip?: number
+    distinct?: ApikeyScalarFieldEnum | ApikeyScalarFieldEnum[]
+  }
 
-    export type JwksMaxAggregateOutputType = {
-        id: string | null
-        publicKey: string | null
-        privateKey: string | null
-        createdAt: Date | null
-    }
+  /**
+   * Apikey create
+   */
+  export type ApikeyCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Apikey
+     */
+    select?: ApikeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Apikey
+     */
+    omit?: ApikeyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApikeyInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Apikey.
+     */
+    data: XOR<ApikeyCreateInput, ApikeyUncheckedCreateInput>
+  }
 
-    export type JwksCountAggregateOutputType = {
-        id: number
-        publicKey: number
-        privateKey: number
-        createdAt: number
-        _all: number
-    }
+  /**
+   * Apikey createMany
+   */
+  export type ApikeyCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Apikeys.
+     */
+    data: ApikeyCreateManyInput | ApikeyCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Apikey update
+   */
+  export type ApikeyUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Apikey
+     */
+    select?: ApikeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Apikey
+     */
+    omit?: ApikeyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApikeyInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Apikey.
+     */
+    data: XOR<ApikeyUpdateInput, ApikeyUncheckedUpdateInput>
+    /**
+     * Choose, which Apikey to update.
+     */
+    where: ApikeyWhereUniqueInput
+  }
+
+  /**
+   * Apikey updateMany
+   */
+  export type ApikeyUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Apikeys.
+     */
+    data: XOR<ApikeyUpdateManyMutationInput, ApikeyUncheckedUpdateManyInput>
+    /**
+     * Filter which Apikeys to update
+     */
+    where?: ApikeyWhereInput
+    /**
+     * Limit how many Apikeys to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Apikey upsert
+   */
+  export type ApikeyUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Apikey
+     */
+    select?: ApikeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Apikey
+     */
+    omit?: ApikeyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApikeyInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Apikey to update in case it exists.
+     */
+    where: ApikeyWhereUniqueInput
+    /**
+     * In case the Apikey found by the `where` argument doesn't exist, create a new Apikey with this data.
+     */
+    create: XOR<ApikeyCreateInput, ApikeyUncheckedCreateInput>
+    /**
+     * In case the Apikey was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ApikeyUpdateInput, ApikeyUncheckedUpdateInput>
+  }
+
+  /**
+   * Apikey delete
+   */
+  export type ApikeyDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Apikey
+     */
+    select?: ApikeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Apikey
+     */
+    omit?: ApikeyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApikeyInclude<ExtArgs> | null
+    /**
+     * Filter which Apikey to delete.
+     */
+    where: ApikeyWhereUniqueInput
+  }
+
+  /**
+   * Apikey deleteMany
+   */
+  export type ApikeyDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Apikeys to delete
+     */
+    where?: ApikeyWhereInput
+    /**
+     * Limit how many Apikeys to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Apikey without action
+   */
+  export type ApikeyDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Apikey
+     */
+    select?: ApikeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Apikey
+     */
+    omit?: ApikeyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApikeyInclude<ExtArgs> | null
+  }
 
 
-    export type JwksMinAggregateInputType = {
-        id?: true
-        publicKey?: true
-        privateKey?: true
-        createdAt?: true
-    }
+  /**
+   * Model Jwks
+   */
 
-    export type JwksMaxAggregateInputType = {
-        id?: true
-        publicKey?: true
-        privateKey?: true
-        createdAt?: true
-    }
+  export type AggregateJwks = {
+    _count: JwksCountAggregateOutputType | null
+    _min: JwksMinAggregateOutputType | null
+    _max: JwksMaxAggregateOutputType | null
+  }
 
-    export type JwksCountAggregateInputType = {
-        id?: true
-        publicKey?: true
-        privateKey?: true
-        createdAt?: true
-        _all?: true
-    }
+  export type JwksMinAggregateOutputType = {
+    id: string | null
+    publicKey: string | null
+    privateKey: string | null
+    createdAt: Date | null
+  }
 
-    export type JwksAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Filter which Jwks to aggregate.
-         */
-        where?: JwksWhereInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-         *
-         * Determine the order of Jwks to fetch.
-         */
-        orderBy?: JwksOrderByWithRelationInput | JwksOrderByWithRelationInput[]
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-         *
-         * Sets the start position
-         */
-        cursor?: JwksWhereUniqueInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Take `±n` Jwks from the position of the cursor.
-         */
-        take?: number
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Skip the first `n` Jwks.
-         */
-        skip?: number
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-         *
-         * Count returned Jwks
-         **/
-        _count?: true | JwksCountAggregateInputType
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-         *
-         * Select which fields to find the minimum value
-         **/
-        _min?: JwksMinAggregateInputType
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-         *
-         * Select which fields to find the maximum value
-         **/
-        _max?: JwksMaxAggregateInputType
-    }
+  export type JwksMaxAggregateOutputType = {
+    id: string | null
+    publicKey: string | null
+    privateKey: string | null
+    createdAt: Date | null
+  }
 
-    export type GetJwksAggregateType<T extends JwksAggregateArgs> = {
+  export type JwksCountAggregateOutputType = {
+    id: number
+    publicKey: number
+    privateKey: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type JwksMinAggregateInputType = {
+    id?: true
+    publicKey?: true
+    privateKey?: true
+    createdAt?: true
+  }
+
+  export type JwksMaxAggregateInputType = {
+    id?: true
+    publicKey?: true
+    privateKey?: true
+    createdAt?: true
+  }
+
+  export type JwksCountAggregateInputType = {
+    id?: true
+    publicKey?: true
+    privateKey?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type JwksAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Jwks to aggregate.
+     */
+    where?: JwksWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Jwks to fetch.
+     */
+    orderBy?: JwksOrderByWithRelationInput | JwksOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the start position
+     */
+    cursor?: JwksWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Jwks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Jwks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Count returned Jwks
+     **/
+    _count?: true | JwksCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the minimum value
+     **/
+    _min?: JwksMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the maximum value
+     **/
+    _max?: JwksMaxAggregateInputType
+  }
+
+  export type GetJwksAggregateType<T extends JwksAggregateArgs> = {
         [P in keyof T & keyof AggregateJwks]: P extends '_count' | 'count'
-            ? T[P] extends true
-                ? number
-                : GetScalarType<T[P], AggregateJwks[P]>
+        ? T[P] extends true
+            ? number
             : GetScalarType<T[P], AggregateJwks[P]>
-    }
+        : GetScalarType<T[P], AggregateJwks[P]>
+  }
 
 
-    export type JwksGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        where?: JwksWhereInput
-        orderBy?: JwksOrderByWithAggregationInput | JwksOrderByWithAggregationInput[]
-        by: JwksScalarFieldEnum[] | JwksScalarFieldEnum
-        having?: JwksScalarWhereWithAggregatesInput
-        take?: number
-        skip?: number
-        _count?: JwksCountAggregateInputType | true
-        _min?: JwksMinAggregateInputType
-        _max?: JwksMaxAggregateInputType
-    }
+  export type JwksGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JwksWhereInput
+    orderBy?: JwksOrderByWithAggregationInput | JwksOrderByWithAggregationInput[]
+    by: JwksScalarFieldEnum[] | JwksScalarFieldEnum
+    having?: JwksScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: JwksCountAggregateInputType | true
+    _min?: JwksMinAggregateInputType
+    _max?: JwksMaxAggregateInputType
+  }
 
-    export type JwksGroupByOutputType = {
-        id: string
-        publicKey: string
-        privateKey: string
-        createdAt: Date
-        _count: JwksCountAggregateOutputType | null
-        _min: JwksMinAggregateOutputType | null
-        _max: JwksMaxAggregateOutputType | null
-    }
+  export type JwksGroupByOutputType = {
+    id: string
+    publicKey: string
+    privateKey: string
+    createdAt: Date
+    _count: JwksCountAggregateOutputType | null
+    _min: JwksMinAggregateOutputType | null
+    _max: JwksMaxAggregateOutputType | null
+  }
 
-    type GetJwksGroupByPayload<T extends JwksGroupByArgs> = Prisma.PrismaPromise<
-        Array<
-            PickEnumerable<JwksGroupByOutputType, T['by']> &
-            {
-                [P in ((keyof T) & (keyof JwksGroupByOutputType))]: P extends '_count'
-                ? T[P] extends boolean
-                    ? number
-                    : GetScalarType<T[P], JwksGroupByOutputType[P]>
-                : GetScalarType<T[P], JwksGroupByOutputType[P]>
-            }
-        >
+  type GetJwksGroupByPayload<T extends JwksGroupByArgs> = Prisma.PrismaPromise<
+      Array<
+          PickEnumerable<JwksGroupByOutputType, T['by']> &
+          {
+            [P in ((keyof T) & (keyof JwksGroupByOutputType))]: P extends '_count'
+              ? T[P] extends boolean
+                  ? number
+                  : GetScalarType<T[P], JwksGroupByOutputType[P]>
+              : GetScalarType<T[P], JwksGroupByOutputType[P]>
+          }
+      >
     >
 
 
-    export type JwksSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-        id?: boolean
-        publicKey?: boolean
-        privateKey?: boolean
-        createdAt?: boolean
+  export type JwksSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    publicKey?: boolean
+    privateKey?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["jwks"]>
+
+
+  export type JwksSelectScalar = {
+    id?: boolean
+    publicKey?: boolean
+    privateKey?: boolean
+    createdAt?: boolean
+  }
+
+  export type JwksOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "publicKey" | "privateKey" | "createdAt", ExtArgs["result"]["jwks"]>
+
+  export type $JwksPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Jwks"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      publicKey: string
+      privateKey: string
+      createdAt: Date
     }, ExtArgs["result"]["jwks"]>
+    composites: {}
+  }
 
+  type JwksGetPayload<S extends boolean | null | undefined | JwksDefaultArgs> = $Result.GetResult<Prisma.$JwksPayload, S>
 
-    export type JwksSelectScalar = {
-        id?: boolean
-        publicKey?: boolean
-        privateKey?: boolean
-        createdAt?: boolean
+  type JwksCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+      Omit<JwksFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+    select?: JwksCountAggregateInputType | true
     }
 
-    export type JwksOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "publicKey" | "privateKey" | "createdAt", ExtArgs["result"]["jwks"]>
+  export interface JwksDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Jwks'], meta: { name: 'Jwks' } }
 
-    export type $JwksPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        name: "Jwks"
-        objects: {}
-        scalars: $Extensions.GetPayloadResult<{
-            id: string
-            publicKey: string
-            privateKey: string
-            createdAt: Date
-        }, ExtArgs["result"]["jwks"]>
-        composites: {}
-    }
+    /**
+     * Find zero or one Jwks that matches the filter.
+     * @param {JwksFindUniqueArgs} args - Arguments to find a Jwks
+     * @example
+     * // Get one Jwks
+     * const jwks = await prisma.jwks.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends JwksFindUniqueArgs>(args: SelectSubset<T, JwksFindUniqueArgs<ExtArgs>>): Prisma__JwksClient<$Result.GetResult<Prisma.$JwksPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
-    type JwksGetPayload<S extends boolean | null | undefined | JwksDefaultArgs> = $Result.GetResult<Prisma.$JwksPayload, S>
+    /**
+     * Find one Jwks that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {JwksFindUniqueOrThrowArgs} args - Arguments to find a Jwks
+     * @example
+     * // Get one Jwks
+     * const jwks = await prisma.jwks.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends JwksFindUniqueOrThrowArgs>(args: SelectSubset<T, JwksFindUniqueOrThrowArgs<ExtArgs>>): Prisma__JwksClient<$Result.GetResult<Prisma.$JwksPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
-    type JwksCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-        Omit<JwksFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-        select?: JwksCountAggregateInputType | true
-    }
+    /**
+     * Find the first Jwks that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JwksFindFirstArgs} args - Arguments to find a Jwks
+     * @example
+     * // Get one Jwks
+     * const jwks = await prisma.jwks.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends JwksFindFirstArgs>(args?: SelectSubset<T, JwksFindFirstArgs<ExtArgs>>): Prisma__JwksClient<$Result.GetResult<Prisma.$JwksPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
-    export interface JwksDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-        [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Jwks'], meta: { name: 'Jwks' } }
+    /**
+     * Find the first Jwks that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JwksFindFirstOrThrowArgs} args - Arguments to find a Jwks
+     * @example
+     * // Get one Jwks
+     * const jwks = await prisma.jwks.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends JwksFindFirstOrThrowArgs>(args?: SelectSubset<T, JwksFindFirstOrThrowArgs<ExtArgs>>): Prisma__JwksClient<$Result.GetResult<Prisma.$JwksPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
-        /**
-         * Find zero or one Jwks that matches the filter.
-         * @param {JwksFindUniqueArgs} args - Arguments to find a Jwks
-         * @example
-         * // Get one Jwks
-         * const jwks = await prisma.jwks.findUnique({
-         *   where: {
-         *     // ... provide filter here
-         *   }
-         * })
-         */
-        findUnique<T extends JwksFindUniqueArgs>(args: SelectSubset<T, JwksFindUniqueArgs<ExtArgs>>): Prisma__JwksClient<$Result.GetResult<Prisma.$JwksPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Find zero or more Jwks that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JwksFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Jwks
+     * const jwks = await prisma.jwks.findMany()
+     *
+     * // Get first 10 Jwks
+     * const jwks = await prisma.jwks.findMany({ take: 10 })
+     *
+     * // Only select the `id`
+     * const jwksWithIdOnly = await prisma.jwks.findMany({ select: { id: true } })
+     *
+     */
+    findMany<T extends JwksFindManyArgs>(args?: SelectSubset<T, JwksFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JwksPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
-        /**
-         * Find one Jwks that matches the filter or throw an error with `error.code='P2025'`
-         * if no matches were found.
-         * @param {JwksFindUniqueOrThrowArgs} args - Arguments to find a Jwks
-         * @example
-         * // Get one Jwks
-         * const jwks = await prisma.jwks.findUniqueOrThrow({
-         *   where: {
-         *     // ... provide filter here
-         *   }
-         * })
-         */
-        findUniqueOrThrow<T extends JwksFindUniqueOrThrowArgs>(args: SelectSubset<T, JwksFindUniqueOrThrowArgs<ExtArgs>>): Prisma__JwksClient<$Result.GetResult<Prisma.$JwksPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    /**
+     * Create a Jwks.
+     * @param {JwksCreateArgs} args - Arguments to create a Jwks.
+     * @example
+     * // Create one Jwks
+     * const Jwks = await prisma.jwks.create({
+     *   data: {
+     *     // ... data to create a Jwks
+     *   }
+     * })
+     *
+     */
+    create<T extends JwksCreateArgs>(args: SelectSubset<T, JwksCreateArgs<ExtArgs>>): Prisma__JwksClient<$Result.GetResult<Prisma.$JwksPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
-        /**
-         * Find the first Jwks that matches the filter.
-         * Note, that providing `undefined` is treated as the value not being there.
-         * Read more here: https://pris.ly/d/null-undefined
-         * @param {JwksFindFirstArgs} args - Arguments to find a Jwks
-         * @example
-         * // Get one Jwks
-         * const jwks = await prisma.jwks.findFirst({
-         *   where: {
-         *     // ... provide filter here
-         *   }
-         * })
-         */
-        findFirst<T extends JwksFindFirstArgs>(args?: SelectSubset<T, JwksFindFirstArgs<ExtArgs>>): Prisma__JwksClient<$Result.GetResult<Prisma.$JwksPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Create many Jwks.
+     * @param {JwksCreateManyArgs} args - Arguments to create many Jwks.
+     * @example
+     * // Create many Jwks
+     * const jwks = await prisma.jwks.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     */
+    createMany<T extends JwksCreateManyArgs>(args?: SelectSubset<T, JwksCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
-        /**
-         * Find the first Jwks that matches the filter or
-         * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-         * Note, that providing `undefined` is treated as the value not being there.
-         * Read more here: https://pris.ly/d/null-undefined
-         * @param {JwksFindFirstOrThrowArgs} args - Arguments to find a Jwks
-         * @example
-         * // Get one Jwks
-         * const jwks = await prisma.jwks.findFirstOrThrow({
-         *   where: {
-         *     // ... provide filter here
-         *   }
-         * })
-         */
-        findFirstOrThrow<T extends JwksFindFirstOrThrowArgs>(args?: SelectSubset<T, JwksFindFirstOrThrowArgs<ExtArgs>>): Prisma__JwksClient<$Result.GetResult<Prisma.$JwksPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    /**
+     * Delete a Jwks.
+     * @param {JwksDeleteArgs} args - Arguments to delete one Jwks.
+     * @example
+     * // Delete one Jwks
+     * const Jwks = await prisma.jwks.delete({
+     *   where: {
+     *     // ... filter to delete one Jwks
+     *   }
+     * })
+     *
+     */
+    delete<T extends JwksDeleteArgs>(args: SelectSubset<T, JwksDeleteArgs<ExtArgs>>): Prisma__JwksClient<$Result.GetResult<Prisma.$JwksPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
-        /**
-         * Find zero or more Jwks that matches the filter.
-         * Note, that providing `undefined` is treated as the value not being there.
-         * Read more here: https://pris.ly/d/null-undefined
-         * @param {JwksFindManyArgs} args - Arguments to filter and select certain fields only.
-         * @example
-         * // Get all Jwks
-         * const jwks = await prisma.jwks.findMany()
-         *
-         * // Get first 10 Jwks
-         * const jwks = await prisma.jwks.findMany({ take: 10 })
-         *
-         * // Only select the `id`
-         * const jwksWithIdOnly = await prisma.jwks.findMany({ select: { id: true } })
-         *
-         */
-        findMany<T extends JwksFindManyArgs>(args?: SelectSubset<T, JwksFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JwksPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+    /**
+     * Update one Jwks.
+     * @param {JwksUpdateArgs} args - Arguments to update one Jwks.
+     * @example
+     * // Update one Jwks
+     * const jwks = await prisma.jwks.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    update<T extends JwksUpdateArgs>(args: SelectSubset<T, JwksUpdateArgs<ExtArgs>>): Prisma__JwksClient<$Result.GetResult<Prisma.$JwksPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
-        /**
-         * Create a Jwks.
-         * @param {JwksCreateArgs} args - Arguments to create a Jwks.
-         * @example
-         * // Create one Jwks
-         * const Jwks = await prisma.jwks.create({
-         *   data: {
-         *     // ... data to create a Jwks
-         *   }
-         * })
-         *
-         */
-        create<T extends JwksCreateArgs>(args: SelectSubset<T, JwksCreateArgs<ExtArgs>>): Prisma__JwksClient<$Result.GetResult<Prisma.$JwksPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    /**
+     * Delete zero or more Jwks.
+     * @param {JwksDeleteManyArgs} args - Arguments to filter Jwks to delete.
+     * @example
+     * // Delete a few Jwks
+     * const { count } = await prisma.jwks.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     *
+     */
+    deleteMany<T extends JwksDeleteManyArgs>(args?: SelectSubset<T, JwksDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
-        /**
-         * Create many Jwks.
-         * @param {JwksCreateManyArgs} args - Arguments to create many Jwks.
-         * @example
-         * // Create many Jwks
-         * const jwks = await prisma.jwks.createMany({
-         *   data: [
-         *     // ... provide data here
-         *   ]
-         * })
-         *
-         */
-        createMany<T extends JwksCreateManyArgs>(args?: SelectSubset<T, JwksCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    /**
+     * Update zero or more Jwks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JwksUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Jwks
+     * const jwks = await prisma.jwks.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    updateMany<T extends JwksUpdateManyArgs>(args: SelectSubset<T, JwksUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
-        /**
-         * Delete a Jwks.
-         * @param {JwksDeleteArgs} args - Arguments to delete one Jwks.
-         * @example
-         * // Delete one Jwks
-         * const Jwks = await prisma.jwks.delete({
-         *   where: {
-         *     // ... filter to delete one Jwks
-         *   }
-         * })
-         *
-         */
-        delete<T extends JwksDeleteArgs>(args: SelectSubset<T, JwksDeleteArgs<ExtArgs>>): Prisma__JwksClient<$Result.GetResult<Prisma.$JwksPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-        /**
-         * Update one Jwks.
-         * @param {JwksUpdateArgs} args - Arguments to update one Jwks.
-         * @example
-         * // Update one Jwks
-         * const jwks = await prisma.jwks.update({
-         *   where: {
-         *     // ... provide filter here
-         *   },
-         *   data: {
-         *     // ... provide data here
-         *   }
-         * })
-         *
-         */
-        update<T extends JwksUpdateArgs>(args: SelectSubset<T, JwksUpdateArgs<ExtArgs>>): Prisma__JwksClient<$Result.GetResult<Prisma.$JwksPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-        /**
-         * Delete zero or more Jwks.
-         * @param {JwksDeleteManyArgs} args - Arguments to filter Jwks to delete.
-         * @example
-         * // Delete a few Jwks
-         * const { count } = await prisma.jwks.deleteMany({
-         *   where: {
-         *     // ... provide filter here
-         *   }
-         * })
-         *
-         */
-        deleteMany<T extends JwksDeleteManyArgs>(args?: SelectSubset<T, JwksDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-        /**
-         * Update zero or more Jwks.
-         * Note, that providing `undefined` is treated as the value not being there.
-         * Read more here: https://pris.ly/d/null-undefined
-         * @param {JwksUpdateManyArgs} args - Arguments to update one or more rows.
-         * @example
-         * // Update many Jwks
-         * const jwks = await prisma.jwks.updateMany({
-         *   where: {
-         *     // ... provide filter here
-         *   },
-         *   data: {
-         *     // ... provide data here
-         *   }
-         * })
-         *
-         */
-        updateMany<T extends JwksUpdateManyArgs>(args: SelectSubset<T, JwksUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-        /**
-         * Create or update one Jwks.
-         * @param {JwksUpsertArgs} args - Arguments to update or create a Jwks.
-         * @example
-         * // Update or create a Jwks
-         * const jwks = await prisma.jwks.upsert({
-         *   create: {
-         *     // ... data to create a Jwks
-         *   },
-         *   update: {
-         *     // ... in case it already exists, update
-         *   },
-         *   where: {
-         *     // ... the filter for the Jwks we want to update
-         *   }
-         * })
-         */
-        upsert<T extends JwksUpsertArgs>(args: SelectSubset<T, JwksUpsertArgs<ExtArgs>>): Prisma__JwksClient<$Result.GetResult<Prisma.$JwksPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    /**
+     * Create or update one Jwks.
+     * @param {JwksUpsertArgs} args - Arguments to update or create a Jwks.
+     * @example
+     * // Update or create a Jwks
+     * const jwks = await prisma.jwks.upsert({
+     *   create: {
+     *     // ... data to create a Jwks
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Jwks we want to update
+     *   }
+     * })
+     */
+    upsert<T extends JwksUpsertArgs>(args: SelectSubset<T, JwksUpsertArgs<ExtArgs>>): Prisma__JwksClient<$Result.GetResult<Prisma.$JwksPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
-        /**
-         * Count the number of Jwks.
-         * Note, that providing `undefined` is treated as the value not being there.
-         * Read more here: https://pris.ly/d/null-undefined
-         * @param {JwksCountArgs} args - Arguments to filter Jwks to count.
-         * @example
-         * // Count the number of Jwks
-         * const count = await prisma.jwks.count({
-         *   where: {
-         *     // ... the filter for the Jwks we want to count
-         *   }
-         * })
-         **/
-        count<T extends JwksCountArgs>(
-            args?: Subset<T, JwksCountArgs>,
-        ): Prisma.PrismaPromise<
-            T extends $Utils.Record<'select', any>
-                ? T['select'] extends true
-                    ? number
-                    : GetScalarType<T['select'], JwksCountAggregateOutputType>
-                : number
-        >
+    /**
+     * Count the number of Jwks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JwksCountArgs} args - Arguments to filter Jwks to count.
+     * @example
+     * // Count the number of Jwks
+     * const count = await prisma.jwks.count({
+     *   where: {
+     *     // ... the filter for the Jwks we want to count
+     *   }
+     * })
+     **/
+    count<T extends JwksCountArgs>(
+        args?: Subset<T, JwksCountArgs>,
+    ): Prisma.PrismaPromise<
+        T extends $Utils.Record<'select', any>
+            ? T['select'] extends true
+                ? number
+                : GetScalarType<T['select'], JwksCountAggregateOutputType>
+            : number
+    >
 
-        /**
-         * Allows you to perform aggregations operations on a Jwks.
-         * Note, that providing `undefined` is treated as the value not being there.
-         * Read more here: https://pris.ly/d/null-undefined
-         * @param {JwksAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-         * @example
-         * // Ordered by age ascending
-         * // Where email contains prisma.io
-         * // Limited to the 10 users
-         * const aggregations = await prisma.user.aggregate({
-         *   _avg: {
-         *     age: true,
-         *   },
-         *   where: {
-         *     email: {
-         *       contains: "prisma.io",
-         *     },
-         *   },
-         *   orderBy: {
-         *     age: "asc",
-         *   },
-         *   take: 10,
-         * })
-         **/
-        aggregate<T extends JwksAggregateArgs>(args: Subset<T, JwksAggregateArgs>): Prisma.PrismaPromise<GetJwksAggregateType<T>>
+    /**
+     * Allows you to perform aggregations operations on a Jwks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JwksAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+     **/
+    aggregate<T extends JwksAggregateArgs>(args: Subset<T, JwksAggregateArgs>): Prisma.PrismaPromise<GetJwksAggregateType<T>>
 
-        /**
-         * Group by Jwks.
-         * Note, that providing `undefined` is treated as the value not being there.
-         * Read more here: https://pris.ly/d/null-undefined
-         * @param {JwksGroupByArgs} args - Group by arguments.
-         * @example
-         * // Group by city, order by createdAt, get count
-         * const result = await prisma.user.groupBy({
-         *   by: ['city', 'createdAt'],
-         *   orderBy: {
-         *     createdAt: true
-         *   },
-         *   _count: {
-         *     _all: true
-         *   },
-         * })
-         *
-         **/
-        groupBy<
-            T extends JwksGroupByArgs,
-            HasSelectOrTake extends Or<
-                Extends<'skip', Keys<T>>,
-                Extends<'take', Keys<T>>
-            >,
-            OrderByArg extends True extends HasSelectOrTake
-                ? { orderBy: JwksGroupByArgs['orderBy'] }
-                : { orderBy?: JwksGroupByArgs['orderBy'] },
-            OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-            ByFields extends MaybeTupleToUnion<T['by']>,
-            ByValid extends Has<ByFields, OrderFields>,
-            HavingFields extends GetHavingFields<T['having']>,
-            HavingValid extends Has<ByFields, HavingFields>,
-            ByEmpty extends T['by'] extends never[] ? True : False,
-            InputErrors extends ByEmpty extends True
-                ? `Error: "by" must not be empty.`
-                : HavingValid extends False
-                    ? {
-                        [P in HavingFields]: P extends ByFields
-                            ? never
-                            : P extends string
-                                ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-                                : [
-                                    Error,
-                                    'Field ',
-                                    P,
-                                    ` in "having" needs to be provided in "by"`,
-                                ]
-                    }[HavingFields]
-                    : 'take' extends Keys<T>
+    /**
+     * Group by Jwks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JwksGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     *
+     **/
+    groupBy<
+        T extends JwksGroupByArgs,
+        HasSelectOrTake extends Or<
+            Extends<'skip', Keys<T>>,
+            Extends<'take', Keys<T>>
+        >,
+        OrderByArg extends True extends HasSelectOrTake
+            ? { orderBy: JwksGroupByArgs['orderBy'] }
+            : { orderBy?: JwksGroupByArgs['orderBy'] },
+        OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+        ByFields extends MaybeTupleToUnion<T['by']>,
+        ByValid extends Has<ByFields, OrderFields>,
+        HavingFields extends GetHavingFields<T['having']>,
+        HavingValid extends Has<ByFields, HavingFields>,
+        ByEmpty extends T['by'] extends never[] ? True : False,
+        InputErrors extends ByEmpty extends True
+            ? `Error: "by" must not be empty.`
+            : HavingValid extends False
+                ? {
+                  [P in HavingFields]: P extends ByFields
+                      ? never
+                      : P extends string
+                          ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+                          : [
+                            Error,
+                            'Field ',
+                            P,
+                            ` in "having" needs to be provided in "by"`,
+                          ]
+                }[HavingFields]
+                : 'take' extends Keys<T>
+                    ? 'orderBy' extends Keys<T>
+                        ? ByValid extends True
+                            ? {}
+                            : {
+                              [P in OrderFields]: P extends ByFields
+                                  ? never
+                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                            }[OrderFields]
+                        : 'Error: If you provide "take", you also need to provide "orderBy"'
+                    : 'skip' extends Keys<T>
                         ? 'orderBy' extends Keys<T>
                             ? ByValid extends True
                                 ? {}
                                 : {
-                                    [P in OrderFields]: P extends ByFields
-                                        ? never
-                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                  [P in OrderFields]: P extends ByFields
+                                      ? never
+                                      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
                                 }[OrderFields]
-                            : 'Error: If you provide "take", you also need to provide "orderBy"'
-                        : 'skip' extends Keys<T>
-                            ? 'orderBy' extends Keys<T>
-                                ? ByValid extends True
-                                    ? {}
-                                    : {
-                                        [P in OrderFields]: P extends ByFields
-                                            ? never
-                                            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-                                    }[OrderFields]
-                                : 'Error: If you provide "skip", you also need to provide "orderBy"'
-                            : ByValid extends True
-                                ? {}
-                                : {
-                                    [P in OrderFields]: P extends ByFields
-                                        ? never
-                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-                                }[OrderFields]
-        >(args: SubsetIntersection<T, JwksGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetJwksGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-
-        /**
-         * Fields of the Jwks model
-         */
-        readonly fields: JwksFieldRefs;
-    }
-
-    /**
-     * The delegate class that acts as a "Promise-like" for Jwks.
-     * Why is this prefixed with `Prisma__`?
-     * Because we want to prevent naming conflicts as mentioned in
-     * https://github.com/prisma/prisma-client-js/issues/707
-     */
-    export interface Prisma__JwksClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
-        readonly [Symbol.toStringTag]: "PrismaPromise"
-
-        /**
-         * Attaches callbacks for the resolution and/or rejection of the Promise.
-         * @param onfulfilled The callback to execute when the Promise is resolved.
-         * @param onrejected The callback to execute when the Promise is rejected.
-         * @returns A Promise for the completion of which ever callback is executed.
-         */
-        then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-
-        /**
-         * Attaches a callback for only the rejection of the Promise.
-         * @param onrejected The callback to execute when the Promise is rejected.
-         * @returns A Promise for the completion of the callback.
-         */
-        catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-
-        /**
-         * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-         * resolved value cannot be modified from the callback.
-         * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-         * @returns A Promise for the completion of the callback.
-         */
-        finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-    }
-
+                            : 'Error: If you provide "skip", you also need to provide "orderBy"'
+                        : ByValid extends True
+                            ? {}
+                            : {
+                              [P in OrderFields]: P extends ByFields
+                                  ? never
+                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                            }[OrderFields]
+    >(args: SubsetIntersection<T, JwksGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetJwksGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
 
     /**
      * Fields of the Jwks model
      */
-    interface JwksFieldRefs {
-        readonly id: FieldRef<"Jwks", 'String'>
-        readonly publicKey: FieldRef<"Jwks", 'String'>
-        readonly privateKey: FieldRef<"Jwks", 'String'>
-        readonly createdAt: FieldRef<"Jwks", 'DateTime'>
-    }
+    readonly fields: JwksFieldRefs;
+  }
 
-
-    // Custom InputTypes
-    /**
-     * Jwks findUnique
-     */
-    export type JwksFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Jwks
-         */
-        select?: JwksSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Jwks
-         */
-        omit?: JwksOmit<ExtArgs> | null
-        /**
-         * Filter, which Jwks to fetch.
-         */
-        where: JwksWhereUniqueInput
-    }
+  /**
+   * The delegate class that acts as a "Promise-like" for Jwks.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__JwksClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
 
     /**
-     * Jwks findUniqueOrThrow
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
      */
-    export type JwksFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Jwks
-         */
-        select?: JwksSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Jwks
-         */
-        omit?: JwksOmit<ExtArgs> | null
-        /**
-         * Filter, which Jwks to fetch.
-         */
-        where: JwksWhereUniqueInput
-    }
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
 
     /**
-     * Jwks findFirst
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
      */
-    export type JwksFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Jwks
-         */
-        select?: JwksSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Jwks
-         */
-        omit?: JwksOmit<ExtArgs> | null
-        /**
-         * Filter, which Jwks to fetch.
-         */
-        where?: JwksWhereInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-         *
-         * Determine the order of Jwks to fetch.
-         */
-        orderBy?: JwksOrderByWithRelationInput | JwksOrderByWithRelationInput[]
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-         *
-         * Sets the position for searching for Jwks.
-         */
-        cursor?: JwksWhereUniqueInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Take `±n` Jwks from the position of the cursor.
-         */
-        take?: number
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Skip the first `n` Jwks.
-         */
-        skip?: number
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-         *
-         * Filter by unique combinations of Jwks.
-         */
-        distinct?: JwksScalarFieldEnum | JwksScalarFieldEnum[]
-    }
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
 
     /**
-     * Jwks findFirstOrThrow
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
      */
-    export type JwksFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Jwks
-         */
-        select?: JwksSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Jwks
-         */
-        omit?: JwksOmit<ExtArgs> | null
-        /**
-         * Filter, which Jwks to fetch.
-         */
-        where?: JwksWhereInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-         *
-         * Determine the order of Jwks to fetch.
-         */
-        orderBy?: JwksOrderByWithRelationInput | JwksOrderByWithRelationInput[]
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-         *
-         * Sets the position for searching for Jwks.
-         */
-        cursor?: JwksWhereUniqueInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Take `±n` Jwks from the position of the cursor.
-         */
-        take?: number
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Skip the first `n` Jwks.
-         */
-        skip?: number
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-         *
-         * Filter by unique combinations of Jwks.
-         */
-        distinct?: JwksScalarFieldEnum | JwksScalarFieldEnum[]
-    }
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
 
-    /**
-     * Jwks findMany
-     */
-    export type JwksFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Jwks
-         */
-        select?: JwksSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Jwks
-         */
-        omit?: JwksOmit<ExtArgs> | null
-        /**
-         * Filter, which Jwks to fetch.
-         */
-        where?: JwksWhereInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-         *
-         * Determine the order of Jwks to fetch.
-         */
-        orderBy?: JwksOrderByWithRelationInput | JwksOrderByWithRelationInput[]
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-         *
-         * Sets the position for listing Jwks.
-         */
-        cursor?: JwksWhereUniqueInput
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Take `±n` Jwks from the position of the cursor.
-         */
-        take?: number
-        /**
-         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-         *
-         * Skip the first `n` Jwks.
-         */
-        skip?: number
-        distinct?: JwksScalarFieldEnum | JwksScalarFieldEnum[]
-    }
 
-    /**
-     * Jwks create
-     */
-    export type JwksCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Jwks
-         */
-        select?: JwksSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Jwks
-         */
-        omit?: JwksOmit<ExtArgs> | null
-        /**
-         * The data needed to create a Jwks.
-         */
-        data: XOR<JwksCreateInput, JwksUncheckedCreateInput>
-    }
+  /**
+   * Fields of the Jwks model
+   */
+  interface JwksFieldRefs {
+    readonly id: FieldRef<"Jwks", 'String'>
+    readonly publicKey: FieldRef<"Jwks", 'String'>
+    readonly privateKey: FieldRef<"Jwks", 'String'>
+    readonly createdAt: FieldRef<"Jwks", 'DateTime'>
+  }
 
-    /**
-     * Jwks createMany
-     */
-    export type JwksCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * The data used to create many Jwks.
-         */
-        data: JwksCreateManyInput | JwksCreateManyInput[]
-        skipDuplicates?: boolean
-    }
 
+  // Custom InputTypes
+  /**
+   * Jwks findUnique
+   */
+  export type JwksFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Jwks update
+     * Select specific fields to fetch from the Jwks
      */
-    export type JwksUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Jwks
-         */
-        select?: JwksSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Jwks
-         */
-        omit?: JwksOmit<ExtArgs> | null
-        /**
-         * The data needed to update a Jwks.
-         */
-        data: XOR<JwksUpdateInput, JwksUncheckedUpdateInput>
-        /**
-         * Choose, which Jwks to update.
-         */
-        where: JwksWhereUniqueInput
-    }
+    select?: JwksSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Jwks
+     */
+    omit?: JwksOmit<ExtArgs> | null
+    /**
+     * Filter, which Jwks to fetch.
+     */
+    where: JwksWhereUniqueInput
+  }
 
+  /**
+   * Jwks findUniqueOrThrow
+   */
+  export type JwksFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Jwks updateMany
+     * Select specific fields to fetch from the Jwks
      */
-    export type JwksUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * The data used to update Jwks.
-         */
-        data: XOR<JwksUpdateManyMutationInput, JwksUncheckedUpdateManyInput>
-        /**
-         * Filter which Jwks to update
-         */
-        where?: JwksWhereInput
-        /**
-         * Limit how many Jwks to update.
-         */
-        limit?: number
-    }
+    select?: JwksSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Jwks
+     */
+    omit?: JwksOmit<ExtArgs> | null
+    /**
+     * Filter, which Jwks to fetch.
+     */
+    where: JwksWhereUniqueInput
+  }
 
+  /**
+   * Jwks findFirst
+   */
+  export type JwksFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Jwks upsert
+     * Select specific fields to fetch from the Jwks
      */
-    export type JwksUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Jwks
-         */
-        select?: JwksSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Jwks
-         */
-        omit?: JwksOmit<ExtArgs> | null
-        /**
-         * The filter to search for the Jwks to update in case it exists.
-         */
-        where: JwksWhereUniqueInput
-        /**
-         * In case the Jwks found by the `where` argument doesn't exist, create a new Jwks with this data.
-         */
-        create: XOR<JwksCreateInput, JwksUncheckedCreateInput>
-        /**
-         * In case the Jwks was found with the provided `where` argument, update it with this data.
-         */
-        update: XOR<JwksUpdateInput, JwksUncheckedUpdateInput>
-    }
+    select?: JwksSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Jwks
+     */
+    omit?: JwksOmit<ExtArgs> | null
+    /**
+     * Filter, which Jwks to fetch.
+     */
+    where?: JwksWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Jwks to fetch.
+     */
+    orderBy?: JwksOrderByWithRelationInput | JwksOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for Jwks.
+     */
+    cursor?: JwksWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Jwks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Jwks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of Jwks.
+     */
+    distinct?: JwksScalarFieldEnum | JwksScalarFieldEnum[]
+  }
 
+  /**
+   * Jwks findFirstOrThrow
+   */
+  export type JwksFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Jwks delete
+     * Select specific fields to fetch from the Jwks
      */
-    export type JwksDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Jwks
-         */
-        select?: JwksSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Jwks
-         */
-        omit?: JwksOmit<ExtArgs> | null
-        /**
-         * Filter which Jwks to delete.
-         */
-        where: JwksWhereUniqueInput
-    }
+    select?: JwksSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Jwks
+     */
+    omit?: JwksOmit<ExtArgs> | null
+    /**
+     * Filter, which Jwks to fetch.
+     */
+    where?: JwksWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Jwks to fetch.
+     */
+    orderBy?: JwksOrderByWithRelationInput | JwksOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for Jwks.
+     */
+    cursor?: JwksWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Jwks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Jwks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of Jwks.
+     */
+    distinct?: JwksScalarFieldEnum | JwksScalarFieldEnum[]
+  }
 
+  /**
+   * Jwks findMany
+   */
+  export type JwksFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Jwks deleteMany
+     * Select specific fields to fetch from the Jwks
      */
-    export type JwksDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Filter which Jwks to delete
-         */
-        where?: JwksWhereInput
-        /**
-         * Limit how many Jwks to delete.
-         */
-        limit?: number
-    }
+    select?: JwksSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Jwks
+     */
+    omit?: JwksOmit<ExtArgs> | null
+    /**
+     * Filter, which Jwks to fetch.
+     */
+    where?: JwksWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Jwks to fetch.
+     */
+    orderBy?: JwksOrderByWithRelationInput | JwksOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for listing Jwks.
+     */
+    cursor?: JwksWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Jwks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Jwks.
+     */
+    skip?: number
+    distinct?: JwksScalarFieldEnum | JwksScalarFieldEnum[]
+  }
 
+  /**
+   * Jwks create
+   */
+  export type JwksCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Jwks without action
+     * Select specific fields to fetch from the Jwks
      */
-    export type JwksDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        /**
-         * Select specific fields to fetch from the Jwks
-         */
-        select?: JwksSelect<ExtArgs> | null
-        /**
-         * Omit specific fields from the Jwks
-         */
-        omit?: JwksOmit<ExtArgs> | null
-    }
+    select?: JwksSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Jwks
+     */
+    omit?: JwksOmit<ExtArgs> | null
+    /**
+     * The data needed to create a Jwks.
+     */
+    data: XOR<JwksCreateInput, JwksUncheckedCreateInput>
+  }
+
+  /**
+   * Jwks createMany
+   */
+  export type JwksCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Jwks.
+     */
+    data: JwksCreateManyInput | JwksCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Jwks update
+   */
+  export type JwksUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Jwks
+     */
+    select?: JwksSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Jwks
+     */
+    omit?: JwksOmit<ExtArgs> | null
+    /**
+     * The data needed to update a Jwks.
+     */
+    data: XOR<JwksUpdateInput, JwksUncheckedUpdateInput>
+    /**
+     * Choose, which Jwks to update.
+     */
+    where: JwksWhereUniqueInput
+  }
+
+  /**
+   * Jwks updateMany
+   */
+  export type JwksUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Jwks.
+     */
+    data: XOR<JwksUpdateManyMutationInput, JwksUncheckedUpdateManyInput>
+    /**
+     * Filter which Jwks to update
+     */
+    where?: JwksWhereInput
+    /**
+     * Limit how many Jwks to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Jwks upsert
+   */
+  export type JwksUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Jwks
+     */
+    select?: JwksSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Jwks
+     */
+    omit?: JwksOmit<ExtArgs> | null
+    /**
+     * The filter to search for the Jwks to update in case it exists.
+     */
+    where: JwksWhereUniqueInput
+    /**
+     * In case the Jwks found by the `where` argument doesn't exist, create a new Jwks with this data.
+     */
+    create: XOR<JwksCreateInput, JwksUncheckedCreateInput>
+    /**
+     * In case the Jwks was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<JwksUpdateInput, JwksUncheckedUpdateInput>
+  }
+
+  /**
+   * Jwks delete
+   */
+  export type JwksDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Jwks
+     */
+    select?: JwksSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Jwks
+     */
+    omit?: JwksOmit<ExtArgs> | null
+    /**
+     * Filter which Jwks to delete.
+     */
+    where: JwksWhereUniqueInput
+  }
+
+  /**
+   * Jwks deleteMany
+   */
+  export type JwksDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Jwks to delete
+     */
+    where?: JwksWhereInput
+    /**
+     * Limit how many Jwks to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Jwks without action
+   */
+  export type JwksDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Jwks
+     */
+    select?: JwksSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Jwks
+     */
+    omit?: JwksOmit<ExtArgs> | null
+  }
 
 
   /**
@@ -18298,9 +18310,9 @@ export namespace Prisma {
     banned: 'banned',
     banReason: 'banReason',
     banExpires: 'banExpires',
-      twoFactorEnabled: 'twoFactorEnabled',
-      username: 'username',
-      displayUsername: 'displayUsername'
+    twoFactorEnabled: 'twoFactorEnabled',
+    username: 'username',
+    displayUsername: 'displayUsername'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -18399,12 +18411,12 @@ export namespace Prisma {
   export type TwoFactorScalarFieldEnum = (typeof TwoFactorScalarFieldEnum)[keyof typeof TwoFactorScalarFieldEnum]
 
 
-    export const ChannelScalarFieldEnum: {
-        id: 'id',
-        name: 'name'
-    };
+  export const ChannelScalarFieldEnum: {
+    id: 'id',
+    name: 'name'
+  };
 
-    export type ChannelScalarFieldEnum = (typeof ChannelScalarFieldEnum)[keyof typeof ChannelScalarFieldEnum]
+  export type ChannelScalarFieldEnum = (typeof ChannelScalarFieldEnum)[keyof typeof ChannelScalarFieldEnum]
 
 
   export const MessageScalarFieldEnum: {
@@ -18453,54 +18465,54 @@ export namespace Prisma {
   export type EventRegistrationScalarFieldEnum = (typeof EventRegistrationScalarFieldEnum)[keyof typeof EventRegistrationScalarFieldEnum]
 
 
-    export const TicketScalarFieldEnum: {
-        id: 'id',
-        discordUserID: 'discordUserID',
-        channelId: 'channelId',
-        channelName: 'channelName',
-        createdAt: 'createdAt',
-        updatedAt: 'updatedAt',
-        assignedUserId: 'assignedUserId'
-    };
+  export const TicketScalarFieldEnum: {
+    id: 'id',
+    discordUserID: 'discordUserID',
+    channelId: 'channelId',
+    channelName: 'channelName',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    assignedUserId: 'assignedUserId'
+  };
 
-    export type TicketScalarFieldEnum = (typeof TicketScalarFieldEnum)[keyof typeof TicketScalarFieldEnum]
-
-
-    export const ApikeyScalarFieldEnum: {
-        id: 'id',
-        name: 'name',
-        start: 'start',
-        prefix: 'prefix',
-        key: 'key',
-        userId: 'userId',
-        refillInterval: 'refillInterval',
-        refillAmount: 'refillAmount',
-        lastRefillAt: 'lastRefillAt',
-        enabled: 'enabled',
-        rateLimitEnabled: 'rateLimitEnabled',
-        rateLimitTimeWindow: 'rateLimitTimeWindow',
-        rateLimitMax: 'rateLimitMax',
-        requestCount: 'requestCount',
-        remaining: 'remaining',
-        lastRequest: 'lastRequest',
-        expiresAt: 'expiresAt',
-        createdAt: 'createdAt',
-        updatedAt: 'updatedAt',
-        permissions: 'permissions',
-        metadata: 'metadata'
-    };
-
-    export type ApikeyScalarFieldEnum = (typeof ApikeyScalarFieldEnum)[keyof typeof ApikeyScalarFieldEnum]
+  export type TicketScalarFieldEnum = (typeof TicketScalarFieldEnum)[keyof typeof TicketScalarFieldEnum]
 
 
-    export const JwksScalarFieldEnum: {
-        id: 'id',
-        publicKey: 'publicKey',
-        privateKey: 'privateKey',
-        createdAt: 'createdAt'
-    };
+  export const ApikeyScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    start: 'start',
+    prefix: 'prefix',
+    key: 'key',
+    userId: 'userId',
+    refillInterval: 'refillInterval',
+    refillAmount: 'refillAmount',
+    lastRefillAt: 'lastRefillAt',
+    enabled: 'enabled',
+    rateLimitEnabled: 'rateLimitEnabled',
+    rateLimitTimeWindow: 'rateLimitTimeWindow',
+    rateLimitMax: 'rateLimitMax',
+    requestCount: 'requestCount',
+    remaining: 'remaining',
+    lastRequest: 'lastRequest',
+    expiresAt: 'expiresAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    permissions: 'permissions',
+    metadata: 'metadata'
+  };
 
-    export type JwksScalarFieldEnum = (typeof JwksScalarFieldEnum)[keyof typeof JwksScalarFieldEnum]
+  export type ApikeyScalarFieldEnum = (typeof ApikeyScalarFieldEnum)[keyof typeof ApikeyScalarFieldEnum]
+
+
+  export const JwksScalarFieldEnum: {
+    id: 'id',
+    publicKey: 'publicKey',
+    privateKey: 'privateKey',
+    createdAt: 'createdAt'
+  };
+
+  export type JwksScalarFieldEnum = (typeof JwksScalarFieldEnum)[keyof typeof JwksScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -18519,176 +18531,176 @@ export namespace Prisma {
   export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
-    export const UserOrderByRelevanceFieldEnum: {
-        id: 'id',
-        name: 'name',
-        email: 'email',
-        image: 'image',
-        role: 'role',
-        banReason: 'banReason',
-        username: 'username',
-        displayUsername: 'displayUsername'
-    };
+  export const UserOrderByRelevanceFieldEnum: {
+    id: 'id',
+    name: 'name',
+    email: 'email',
+    image: 'image',
+    role: 'role',
+    banReason: 'banReason',
+    username: 'username',
+    displayUsername: 'displayUsername'
+  };
 
-    export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnum)[keyof typeof UserOrderByRelevanceFieldEnum]
-
-
-    export const SessionOrderByRelevanceFieldEnum: {
-        id: 'id',
-        token: 'token',
-        ipAddress: 'ipAddress',
-        userAgent: 'userAgent',
-        userId: 'userId',
-        impersonatedBy: 'impersonatedBy',
-        activeOrganizationId: 'activeOrganizationId'
-    };
-
-    export type SessionOrderByRelevanceFieldEnum = (typeof SessionOrderByRelevanceFieldEnum)[keyof typeof SessionOrderByRelevanceFieldEnum]
+  export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnum)[keyof typeof UserOrderByRelevanceFieldEnum]
 
 
-    export const AccountOrderByRelevanceFieldEnum: {
-        id: 'id',
-        accountId: 'accountId',
-        providerId: 'providerId',
-        userId: 'userId',
-        accessToken: 'accessToken',
-        refreshToken: 'refreshToken',
-        idToken: 'idToken',
-        scope: 'scope',
-        password: 'password'
-    };
+  export const SessionOrderByRelevanceFieldEnum: {
+    id: 'id',
+    token: 'token',
+    ipAddress: 'ipAddress',
+    userAgent: 'userAgent',
+    userId: 'userId',
+    impersonatedBy: 'impersonatedBy',
+    activeOrganizationId: 'activeOrganizationId'
+  };
 
-    export type AccountOrderByRelevanceFieldEnum = (typeof AccountOrderByRelevanceFieldEnum)[keyof typeof AccountOrderByRelevanceFieldEnum]
+  export type SessionOrderByRelevanceFieldEnum = (typeof SessionOrderByRelevanceFieldEnum)[keyof typeof SessionOrderByRelevanceFieldEnum]
 
 
-    export const VerificationOrderByRelevanceFieldEnum: {
-        id: 'id',
-        identifier: 'identifier',
-        value: 'value'
-    };
+  export const AccountOrderByRelevanceFieldEnum: {
+    id: 'id',
+    accountId: 'accountId',
+    providerId: 'providerId',
+    userId: 'userId',
+    accessToken: 'accessToken',
+    refreshToken: 'refreshToken',
+    idToken: 'idToken',
+    scope: 'scope',
+    password: 'password'
+  };
 
-    export type VerificationOrderByRelevanceFieldEnum = (typeof VerificationOrderByRelevanceFieldEnum)[keyof typeof VerificationOrderByRelevanceFieldEnum]
-
-
-    export const OrganizationOrderByRelevanceFieldEnum: {
-        id: 'id',
-        name: 'name',
-        slug: 'slug',
-        logo: 'logo',
-        metadata: 'metadata'
-    };
-
-    export type OrganizationOrderByRelevanceFieldEnum = (typeof OrganizationOrderByRelevanceFieldEnum)[keyof typeof OrganizationOrderByRelevanceFieldEnum]
+  export type AccountOrderByRelevanceFieldEnum = (typeof AccountOrderByRelevanceFieldEnum)[keyof typeof AccountOrderByRelevanceFieldEnum]
 
 
-    export const MemberOrderByRelevanceFieldEnum: {
-        id: 'id',
-        organizationId: 'organizationId',
-        userId: 'userId',
-        role: 'role'
-    };
+  export const VerificationOrderByRelevanceFieldEnum: {
+    id: 'id',
+    identifier: 'identifier',
+    value: 'value'
+  };
 
-    export type MemberOrderByRelevanceFieldEnum = (typeof MemberOrderByRelevanceFieldEnum)[keyof typeof MemberOrderByRelevanceFieldEnum]
-
-
-    export const InvitationOrderByRelevanceFieldEnum: {
-        id: 'id',
-        organizationId: 'organizationId',
-        email: 'email',
-        role: 'role',
-        status: 'status',
-        inviterId: 'inviterId'
-    };
-
-    export type InvitationOrderByRelevanceFieldEnum = (typeof InvitationOrderByRelevanceFieldEnum)[keyof typeof InvitationOrderByRelevanceFieldEnum]
+  export type VerificationOrderByRelevanceFieldEnum = (typeof VerificationOrderByRelevanceFieldEnum)[keyof typeof VerificationOrderByRelevanceFieldEnum]
 
 
-    export const TwoFactorOrderByRelevanceFieldEnum: {
-        id: 'id',
-        secret: 'secret',
-        backupCodes: 'backupCodes',
-        userId: 'userId'
-    };
+  export const OrganizationOrderByRelevanceFieldEnum: {
+    id: 'id',
+    name: 'name',
+    slug: 'slug',
+    logo: 'logo',
+    metadata: 'metadata'
+  };
 
-    export type TwoFactorOrderByRelevanceFieldEnum = (typeof TwoFactorOrderByRelevanceFieldEnum)[keyof typeof TwoFactorOrderByRelevanceFieldEnum]
-
-
-    export const ChannelOrderByRelevanceFieldEnum: {
-        id: 'id',
-        name: 'name'
-    };
-
-    export type ChannelOrderByRelevanceFieldEnum = (typeof ChannelOrderByRelevanceFieldEnum)[keyof typeof ChannelOrderByRelevanceFieldEnum]
+  export type OrganizationOrderByRelevanceFieldEnum = (typeof OrganizationOrderByRelevanceFieldEnum)[keyof typeof OrganizationOrderByRelevanceFieldEnum]
 
 
-    export const MessageOrderByRelevanceFieldEnum: {
-        userId: 'userId',
-        channelId: 'channelId'
-    };
+  export const MemberOrderByRelevanceFieldEnum: {
+    id: 'id',
+    organizationId: 'organizationId',
+    userId: 'userId',
+    role: 'role'
+  };
 
-    export type MessageOrderByRelevanceFieldEnum = (typeof MessageOrderByRelevanceFieldEnum)[keyof typeof MessageOrderByRelevanceFieldEnum]
-
-
-    export const EventOrderByRelevanceFieldEnum: {
-        id: 'id',
-        title: 'title',
-        description: 'description',
-        userId: 'userId'
-    };
-
-    export type EventOrderByRelevanceFieldEnum = (typeof EventOrderByRelevanceFieldEnum)[keyof typeof EventOrderByRelevanceFieldEnum]
+  export type MemberOrderByRelevanceFieldEnum = (typeof MemberOrderByRelevanceFieldEnum)[keyof typeof MemberOrderByRelevanceFieldEnum]
 
 
-    export const RoleSlotOrderByRelevanceFieldEnum: {
-        id: 'id',
-        role: 'role',
-        eventId: 'eventId'
-    };
+  export const InvitationOrderByRelevanceFieldEnum: {
+    id: 'id',
+    organizationId: 'organizationId',
+    email: 'email',
+    role: 'role',
+    status: 'status',
+    inviterId: 'inviterId'
+  };
 
-    export type RoleSlotOrderByRelevanceFieldEnum = (typeof RoleSlotOrderByRelevanceFieldEnum)[keyof typeof RoleSlotOrderByRelevanceFieldEnum]
-
-
-    export const EventRegistrationOrderByRelevanceFieldEnum: {
-        id: 'id',
-        userId: 'userId',
-        roleSlotId: 'roleSlotId',
-        eventId: 'eventId'
-    };
-
-    export type EventRegistrationOrderByRelevanceFieldEnum = (typeof EventRegistrationOrderByRelevanceFieldEnum)[keyof typeof EventRegistrationOrderByRelevanceFieldEnum]
+  export type InvitationOrderByRelevanceFieldEnum = (typeof InvitationOrderByRelevanceFieldEnum)[keyof typeof InvitationOrderByRelevanceFieldEnum]
 
 
-    export const TicketOrderByRelevanceFieldEnum: {
-        discordUserID: 'discordUserID',
-        channelId: 'channelId',
-        channelName: 'channelName',
-        assignedUserId: 'assignedUserId'
-    };
+  export const TwoFactorOrderByRelevanceFieldEnum: {
+    id: 'id',
+    secret: 'secret',
+    backupCodes: 'backupCodes',
+    userId: 'userId'
+  };
 
-    export type TicketOrderByRelevanceFieldEnum = (typeof TicketOrderByRelevanceFieldEnum)[keyof typeof TicketOrderByRelevanceFieldEnum]
-
-
-    export const ApikeyOrderByRelevanceFieldEnum: {
-        id: 'id',
-        name: 'name',
-        start: 'start',
-        prefix: 'prefix',
-        key: 'key',
-        userId: 'userId',
-        permissions: 'permissions',
-        metadata: 'metadata'
-    };
-
-    export type ApikeyOrderByRelevanceFieldEnum = (typeof ApikeyOrderByRelevanceFieldEnum)[keyof typeof ApikeyOrderByRelevanceFieldEnum]
+  export type TwoFactorOrderByRelevanceFieldEnum = (typeof TwoFactorOrderByRelevanceFieldEnum)[keyof typeof TwoFactorOrderByRelevanceFieldEnum]
 
 
-    export const JwksOrderByRelevanceFieldEnum: {
-        id: 'id',
-        publicKey: 'publicKey',
-        privateKey: 'privateKey'
-    };
+  export const ChannelOrderByRelevanceFieldEnum: {
+    id: 'id',
+    name: 'name'
+  };
 
-    export type JwksOrderByRelevanceFieldEnum = (typeof JwksOrderByRelevanceFieldEnum)[keyof typeof JwksOrderByRelevanceFieldEnum]
+  export type ChannelOrderByRelevanceFieldEnum = (typeof ChannelOrderByRelevanceFieldEnum)[keyof typeof ChannelOrderByRelevanceFieldEnum]
+
+
+  export const MessageOrderByRelevanceFieldEnum: {
+    userId: 'userId',
+    channelId: 'channelId'
+  };
+
+  export type MessageOrderByRelevanceFieldEnum = (typeof MessageOrderByRelevanceFieldEnum)[keyof typeof MessageOrderByRelevanceFieldEnum]
+
+
+  export const EventOrderByRelevanceFieldEnum: {
+    id: 'id',
+    title: 'title',
+    description: 'description',
+    userId: 'userId'
+  };
+
+  export type EventOrderByRelevanceFieldEnum = (typeof EventOrderByRelevanceFieldEnum)[keyof typeof EventOrderByRelevanceFieldEnum]
+
+
+  export const RoleSlotOrderByRelevanceFieldEnum: {
+    id: 'id',
+    role: 'role',
+    eventId: 'eventId'
+  };
+
+  export type RoleSlotOrderByRelevanceFieldEnum = (typeof RoleSlotOrderByRelevanceFieldEnum)[keyof typeof RoleSlotOrderByRelevanceFieldEnum]
+
+
+  export const EventRegistrationOrderByRelevanceFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    roleSlotId: 'roleSlotId',
+    eventId: 'eventId'
+  };
+
+  export type EventRegistrationOrderByRelevanceFieldEnum = (typeof EventRegistrationOrderByRelevanceFieldEnum)[keyof typeof EventRegistrationOrderByRelevanceFieldEnum]
+
+
+  export const TicketOrderByRelevanceFieldEnum: {
+    discordUserID: 'discordUserID',
+    channelId: 'channelId',
+    channelName: 'channelName',
+    assignedUserId: 'assignedUserId'
+  };
+
+  export type TicketOrderByRelevanceFieldEnum = (typeof TicketOrderByRelevanceFieldEnum)[keyof typeof TicketOrderByRelevanceFieldEnum]
+
+
+  export const ApikeyOrderByRelevanceFieldEnum: {
+    id: 'id',
+    name: 'name',
+    start: 'start',
+    prefix: 'prefix',
+    key: 'key',
+    userId: 'userId',
+    permissions: 'permissions',
+    metadata: 'metadata'
+  };
+
+  export type ApikeyOrderByRelevanceFieldEnum = (typeof ApikeyOrderByRelevanceFieldEnum)[keyof typeof ApikeyOrderByRelevanceFieldEnum]
+
+
+  export const JwksOrderByRelevanceFieldEnum: {
+    id: 'id',
+    publicKey: 'publicKey',
+    privateKey: 'privateKey'
+  };
+
+  export type JwksOrderByRelevanceFieldEnum = (typeof JwksOrderByRelevanceFieldEnum)[keyof typeof JwksOrderByRelevanceFieldEnum]
 
 
   /**
@@ -18702,36 +18714,36 @@ export namespace Prisma {
   export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String'>
 
 
-    /**
+  /**
    * Reference to a field of type 'Boolean'
    */
   export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
 
 
-    /**
+  /**
    * Reference to a field of type 'DateTime'
    */
   export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
 
 
-    /**
+  /**
    * Reference to a field of type 'Int'
    */
   export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
 
 
-    /**
+  /**
    * Reference to a field of type 'Bytes'
    */
   export type BytesFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Bytes'>
 
 
-    /**
+  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
 
-    /**
+  /**
    * Deep Input Types
    */
 
@@ -18752,8 +18764,8 @@ export namespace Prisma {
     banReason?: StringNullableFilter<"User"> | string | null
     banExpires?: DateTimeNullableFilter<"User"> | Date | string | null
     twoFactorEnabled?: BoolNullableFilter<"User"> | boolean | null
-        username?: StringNullableFilter<"User"> | string | null
-        displayUsername?: StringNullableFilter<"User"> | string | null
+    username?: StringNullableFilter<"User"> | string | null
+    displayUsername?: StringNullableFilter<"User"> | string | null
     accounts?: AccountListRelationFilter
     sessions?: SessionListRelationFilter
     messages?: MessageListRelationFilter
@@ -18762,8 +18774,8 @@ export namespace Prisma {
     twofactors?: TwoFactorListRelationFilter
     Event?: EventListRelationFilter
     EventRegistration?: EventRegistrationListRelationFilter
-        Ticket?: TicketListRelationFilter
-        apikeys?: ApikeyListRelationFilter
+    Ticket?: TicketListRelationFilter
+    apikeys?: ApikeyListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -18779,8 +18791,8 @@ export namespace Prisma {
     banReason?: SortOrderInput | SortOrder
     banExpires?: SortOrderInput | SortOrder
     twoFactorEnabled?: SortOrderInput | SortOrder
-      username?: SortOrderInput | SortOrder
-      displayUsername?: SortOrderInput | SortOrder
+    username?: SortOrderInput | SortOrder
+    displayUsername?: SortOrderInput | SortOrder
     accounts?: AccountOrderByRelationAggregateInput
     sessions?: SessionOrderByRelationAggregateInput
     messages?: MessageOrderByRelationAggregateInput
@@ -18789,15 +18801,15 @@ export namespace Prisma {
     twofactors?: TwoFactorOrderByRelationAggregateInput
     Event?: EventOrderByRelationAggregateInput
     EventRegistration?: EventRegistrationOrderByRelationAggregateInput
-      Ticket?: TicketOrderByRelationAggregateInput
-      apikeys?: ApikeyOrderByRelationAggregateInput
-      _relevance?: UserOrderByRelevanceInput
+    Ticket?: TicketOrderByRelationAggregateInput
+    apikeys?: ApikeyOrderByRelationAggregateInput
+    _relevance?: UserOrderByRelevanceInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
     id?: string
     email?: string
-      username?: string
+    username?: string
     AND?: UserWhereInput | UserWhereInput[]
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
@@ -18811,7 +18823,7 @@ export namespace Prisma {
     banReason?: StringNullableFilter<"User"> | string | null
     banExpires?: DateTimeNullableFilter<"User"> | Date | string | null
     twoFactorEnabled?: BoolNullableFilter<"User"> | boolean | null
-      displayUsername?: StringNullableFilter<"User"> | string | null
+    displayUsername?: StringNullableFilter<"User"> | string | null
     accounts?: AccountListRelationFilter
     sessions?: SessionListRelationFilter
     messages?: MessageListRelationFilter
@@ -18820,8 +18832,8 @@ export namespace Prisma {
     twofactors?: TwoFactorListRelationFilter
     Event?: EventListRelationFilter
     EventRegistration?: EventRegistrationListRelationFilter
-      Ticket?: TicketListRelationFilter
-      apikeys?: ApikeyListRelationFilter
+    Ticket?: TicketListRelationFilter
+    apikeys?: ApikeyListRelationFilter
   }, "id" | "email" | "username">
 
   export type UserOrderByWithAggregationInput = {
@@ -18837,8 +18849,8 @@ export namespace Prisma {
     banReason?: SortOrderInput | SortOrder
     banExpires?: SortOrderInput | SortOrder
     twoFactorEnabled?: SortOrderInput | SortOrder
-      username?: SortOrderInput | SortOrder
-      displayUsername?: SortOrderInput | SortOrder
+    username?: SortOrderInput | SortOrder
+    displayUsername?: SortOrderInput | SortOrder
     _count?: UserCountOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
@@ -18860,8 +18872,8 @@ export namespace Prisma {
     banReason?: StringNullableWithAggregatesFilter<"User"> | string | null
     banExpires?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     twoFactorEnabled?: BoolNullableWithAggregatesFilter<"User"> | boolean | null
-      username?: StringNullableWithAggregatesFilter<"User"> | string | null
-      displayUsername?: StringNullableWithAggregatesFilter<"User"> | string | null
+    username?: StringNullableWithAggregatesFilter<"User"> | string | null
+    displayUsername?: StringNullableWithAggregatesFilter<"User"> | string | null
   }
 
   export type SessionWhereInput = {
@@ -18878,7 +18890,7 @@ export namespace Prisma {
     userId?: StringFilter<"Session"> | string
     impersonatedBy?: StringNullableFilter<"Session"> | string | null
     activeOrganizationId?: StringNullableFilter<"Session"> | string | null
-      user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
 
   export type SessionOrderByWithRelationInput = {
@@ -18893,7 +18905,7 @@ export namespace Prisma {
     impersonatedBy?: SortOrderInput | SortOrder
     activeOrganizationId?: SortOrderInput | SortOrder
     user?: UserOrderByWithRelationInput
-      _relevance?: SessionOrderByRelevanceInput
+    _relevance?: SessionOrderByRelevanceInput
   }
 
   export type SessionWhereUniqueInput = Prisma.AtLeast<{
@@ -18910,7 +18922,7 @@ export namespace Prisma {
     userId?: StringFilter<"Session"> | string
     impersonatedBy?: StringNullableFilter<"Session"> | string | null
     activeOrganizationId?: StringNullableFilter<"Session"> | string | null
-      user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "id" | "token">
 
   export type SessionOrderByWithAggregationInput = {
@@ -18962,7 +18974,7 @@ export namespace Prisma {
     password?: StringNullableFilter<"Account"> | string | null
     createdAt?: DateTimeFilter<"Account"> | Date | string
     updatedAt?: DateTimeFilter<"Account"> | Date | string
-      user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
 
   export type AccountOrderByWithRelationInput = {
@@ -18980,7 +18992,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
-      _relevance?: AccountOrderByRelevanceInput
+    _relevance?: AccountOrderByRelevanceInput
   }
 
   export type AccountWhereUniqueInput = Prisma.AtLeast<{
@@ -19000,7 +19012,7 @@ export namespace Prisma {
     password?: StringNullableFilter<"Account"> | string | null
     createdAt?: DateTimeFilter<"Account"> | Date | string
     updatedAt?: DateTimeFilter<"Account"> | Date | string
-      user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "id">
 
   export type AccountOrderByWithAggregationInput = {
@@ -19060,7 +19072,7 @@ export namespace Prisma {
     expiresAt?: SortOrder
     createdAt?: SortOrderInput | SortOrder
     updatedAt?: SortOrderInput | SortOrder
-      _relevance?: VerificationOrderByRelevanceInput
+    _relevance?: VerificationOrderByRelevanceInput
   }
 
   export type VerificationWhereUniqueInput = Prisma.AtLeast<{
@@ -19122,7 +19134,7 @@ export namespace Prisma {
     metadata?: SortOrderInput | SortOrder
     members?: MemberOrderByRelationAggregateInput
     invitations?: InvitationOrderByRelationAggregateInput
-      _relevance?: OrganizationOrderByRelevanceInput
+    _relevance?: OrganizationOrderByRelevanceInput
   }
 
   export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
@@ -19172,8 +19184,8 @@ export namespace Prisma {
     userId?: StringFilter<"Member"> | string
     role?: StringFilter<"Member"> | string
     createdAt?: DateTimeFilter<"Member"> | Date | string
-      organization?: XOR<OrganizationScalarRelationFilter, OrganizationWhereInput>
-      user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    organization?: XOR<OrganizationScalarRelationFilter, OrganizationWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
 
   export type MemberOrderByWithRelationInput = {
@@ -19184,7 +19196,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     organization?: OrganizationOrderByWithRelationInput
     user?: UserOrderByWithRelationInput
-      _relevance?: MemberOrderByRelevanceInput
+    _relevance?: MemberOrderByRelevanceInput
   }
 
   export type MemberWhereUniqueInput = Prisma.AtLeast<{
@@ -19196,8 +19208,8 @@ export namespace Prisma {
     userId?: StringFilter<"Member"> | string
     role?: StringFilter<"Member"> | string
     createdAt?: DateTimeFilter<"Member"> | Date | string
-      organization?: XOR<OrganizationScalarRelationFilter, OrganizationWhereInput>
-      user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    organization?: XOR<OrganizationScalarRelationFilter, OrganizationWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "id">
 
   export type MemberOrderByWithAggregationInput = {
@@ -19233,8 +19245,8 @@ export namespace Prisma {
     status?: StringFilter<"Invitation"> | string
     expiresAt?: DateTimeFilter<"Invitation"> | Date | string
     inviterId?: StringFilter<"Invitation"> | string
-      organization?: XOR<OrganizationScalarRelationFilter, OrganizationWhereInput>
-      user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    organization?: XOR<OrganizationScalarRelationFilter, OrganizationWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
 
   export type InvitationOrderByWithRelationInput = {
@@ -19247,7 +19259,7 @@ export namespace Prisma {
     inviterId?: SortOrder
     organization?: OrganizationOrderByWithRelationInput
     user?: UserOrderByWithRelationInput
-      _relevance?: InvitationOrderByRelevanceInput
+    _relevance?: InvitationOrderByRelevanceInput
   }
 
   export type InvitationWhereUniqueInput = Prisma.AtLeast<{
@@ -19261,8 +19273,8 @@ export namespace Prisma {
     status?: StringFilter<"Invitation"> | string
     expiresAt?: DateTimeFilter<"Invitation"> | Date | string
     inviterId?: StringFilter<"Invitation"> | string
-      organization?: XOR<OrganizationScalarRelationFilter, OrganizationWhereInput>
-      user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    organization?: XOR<OrganizationScalarRelationFilter, OrganizationWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "id">
 
   export type InvitationOrderByWithAggregationInput = {
@@ -19299,7 +19311,7 @@ export namespace Prisma {
     secret?: StringFilter<"TwoFactor"> | string
     backupCodes?: StringFilter<"TwoFactor"> | string
     userId?: StringFilter<"TwoFactor"> | string
-      user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
 
   export type TwoFactorOrderByWithRelationInput = {
@@ -19308,7 +19320,7 @@ export namespace Prisma {
     backupCodes?: SortOrder
     userId?: SortOrder
     user?: UserOrderByWithRelationInput
-      _relevance?: TwoFactorOrderByRelevanceInput
+    _relevance?: TwoFactorOrderByRelevanceInput
   }
 
   export type TwoFactorWhereUniqueInput = Prisma.AtLeast<{
@@ -19319,7 +19331,7 @@ export namespace Prisma {
     secret?: StringFilter<"TwoFactor"> | string
     backupCodes?: StringFilter<"TwoFactor"> | string
     userId?: StringFilter<"TwoFactor"> | string
-      user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "id">
 
   export type TwoFactorOrderByWithAggregationInput = {
@@ -19342,50 +19354,50 @@ export namespace Prisma {
     userId?: StringWithAggregatesFilter<"TwoFactor"> | string
   }
 
-    export type ChannelWhereInput = {
-        AND?: ChannelWhereInput | ChannelWhereInput[]
-        OR?: ChannelWhereInput[]
-        NOT?: ChannelWhereInput | ChannelWhereInput[]
-        id?: StringFilter<"Channel"> | string
-        name?: StringFilter<"Channel"> | string
-        Message?: MessageListRelationFilter
-        Ticket?: TicketListRelationFilter
-    }
+  export type ChannelWhereInput = {
+    AND?: ChannelWhereInput | ChannelWhereInput[]
+    OR?: ChannelWhereInput[]
+    NOT?: ChannelWhereInput | ChannelWhereInput[]
+    id?: StringFilter<"Channel"> | string
+    name?: StringFilter<"Channel"> | string
+    Message?: MessageListRelationFilter
+    Ticket?: TicketListRelationFilter
+  }
 
-    export type ChannelOrderByWithRelationInput = {
-        id?: SortOrder
-        name?: SortOrder
-        Message?: MessageOrderByRelationAggregateInput
-        Ticket?: TicketOrderByRelationAggregateInput
-        _relevance?: ChannelOrderByRelevanceInput
-    }
+  export type ChannelOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    Message?: MessageOrderByRelationAggregateInput
+    Ticket?: TicketOrderByRelationAggregateInput
+    _relevance?: ChannelOrderByRelevanceInput
+  }
 
-    export type ChannelWhereUniqueInput = Prisma.AtLeast<{
-        id?: string
-        id_name?: ChannelIdNameCompoundUniqueInput
-        AND?: ChannelWhereInput | ChannelWhereInput[]
-        OR?: ChannelWhereInput[]
-        NOT?: ChannelWhereInput | ChannelWhereInput[]
-        name?: StringFilter<"Channel"> | string
-        Message?: MessageListRelationFilter
-        Ticket?: TicketListRelationFilter
-    }, "id" | "id_name">
+  export type ChannelWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    id_name?: ChannelIdNameCompoundUniqueInput
+    AND?: ChannelWhereInput | ChannelWhereInput[]
+    OR?: ChannelWhereInput[]
+    NOT?: ChannelWhereInput | ChannelWhereInput[]
+    name?: StringFilter<"Channel"> | string
+    Message?: MessageListRelationFilter
+    Ticket?: TicketListRelationFilter
+  }, "id" | "id_name">
 
-    export type ChannelOrderByWithAggregationInput = {
-        id?: SortOrder
-        name?: SortOrder
-        _count?: ChannelCountOrderByAggregateInput
-        _max?: ChannelMaxOrderByAggregateInput
-        _min?: ChannelMinOrderByAggregateInput
-    }
+  export type ChannelOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    _count?: ChannelCountOrderByAggregateInput
+    _max?: ChannelMaxOrderByAggregateInput
+    _min?: ChannelMinOrderByAggregateInput
+  }
 
-    export type ChannelScalarWhereWithAggregatesInput = {
-        AND?: ChannelScalarWhereWithAggregatesInput | ChannelScalarWhereWithAggregatesInput[]
-        OR?: ChannelScalarWhereWithAggregatesInput[]
-        NOT?: ChannelScalarWhereWithAggregatesInput | ChannelScalarWhereWithAggregatesInput[]
-        id?: StringWithAggregatesFilter<"Channel"> | string
-        name?: StringWithAggregatesFilter<"Channel"> | string
-    }
+  export type ChannelScalarWhereWithAggregatesInput = {
+    AND?: ChannelScalarWhereWithAggregatesInput | ChannelScalarWhereWithAggregatesInput[]
+    OR?: ChannelScalarWhereWithAggregatesInput[]
+    NOT?: ChannelScalarWhereWithAggregatesInput | ChannelScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Channel"> | string
+    name?: StringWithAggregatesFilter<"Channel"> | string
+  }
 
   export type MessageWhereInput = {
     AND?: MessageWhereInput | MessageWhereInput[]
@@ -19396,8 +19408,8 @@ export namespace Prisma {
     userId?: StringFilter<"Message"> | string
     channelId?: StringFilter<"Message"> | string
     content?: BytesFilter<"Message"> | Uint8Array
-      user?: XOR<UserScalarRelationFilter, UserWhereInput>
-      channel?: XOR<ChannelScalarRelationFilter, ChannelWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    channel?: XOR<ChannelScalarRelationFilter, ChannelWhereInput>
   }
 
   export type MessageOrderByWithRelationInput = {
@@ -19407,8 +19419,8 @@ export namespace Prisma {
     channelId?: SortOrder
     content?: SortOrder
     user?: UserOrderByWithRelationInput
-      channel?: ChannelOrderByWithRelationInput
-      _relevance?: MessageOrderByRelevanceInput
+    channel?: ChannelOrderByWithRelationInput
+    _relevance?: MessageOrderByRelevanceInput
   }
 
   export type MessageWhereUniqueInput = Prisma.AtLeast<{
@@ -19420,8 +19432,8 @@ export namespace Prisma {
     userId?: StringFilter<"Message"> | string
     channelId?: StringFilter<"Message"> | string
     content?: BytesFilter<"Message"> | Uint8Array
-      user?: XOR<UserScalarRelationFilter, UserWhereInput>
-      channel?: XOR<ChannelScalarRelationFilter, ChannelWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    channel?: XOR<ChannelScalarRelationFilter, ChannelWhereInput>
   }, "id">
 
   export type MessageOrderByWithAggregationInput = {
@@ -19460,7 +19472,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Event"> | Date | string
     updatedAt?: DateTimeFilter<"Event"> | Date | string
     userId?: StringFilter<"Event"> | string
-      user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
     roleSlots?: RoleSlotListRelationFilter
     registrations?: EventRegistrationListRelationFilter
   }
@@ -19477,7 +19489,7 @@ export namespace Prisma {
     user?: UserOrderByWithRelationInput
     roleSlots?: RoleSlotOrderByRelationAggregateInput
     registrations?: EventRegistrationOrderByRelationAggregateInput
-      _relevance?: EventOrderByRelevanceInput
+    _relevance?: EventOrderByRelevanceInput
   }
 
   export type EventWhereUniqueInput = Prisma.AtLeast<{
@@ -19492,7 +19504,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Event"> | Date | string
     updatedAt?: DateTimeFilter<"Event"> | Date | string
     userId?: StringFilter<"Event"> | string
-      user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
     roleSlots?: RoleSlotListRelationFilter
     registrations?: EventRegistrationListRelationFilter
   }, "id">
@@ -19533,7 +19545,7 @@ export namespace Prisma {
     role?: StringFilter<"RoleSlot"> | string
     goalCount?: IntFilter<"RoleSlot"> | number
     eventId?: StringFilter<"RoleSlot"> | string
-      event?: XOR<EventScalarRelationFilter, EventWhereInput>
+    event?: XOR<EventScalarRelationFilter, EventWhereInput>
     registrations?: EventRegistrationListRelationFilter
   }
 
@@ -19544,7 +19556,7 @@ export namespace Prisma {
     eventId?: SortOrder
     event?: EventOrderByWithRelationInput
     registrations?: EventRegistrationOrderByRelationAggregateInput
-      _relevance?: RoleSlotOrderByRelevanceInput
+    _relevance?: RoleSlotOrderByRelevanceInput
   }
 
   export type RoleSlotWhereUniqueInput = Prisma.AtLeast<{
@@ -19555,7 +19567,7 @@ export namespace Prisma {
     role?: StringFilter<"RoleSlot"> | string
     goalCount?: IntFilter<"RoleSlot"> | number
     eventId?: StringFilter<"RoleSlot"> | string
-      event?: XOR<EventScalarRelationFilter, EventWhereInput>
+    event?: XOR<EventScalarRelationFilter, EventWhereInput>
     registrations?: EventRegistrationListRelationFilter
   }, "id">
 
@@ -19590,9 +19602,9 @@ export namespace Prisma {
     roleSlotId?: StringFilter<"EventRegistration"> | string
     registeredAt?: DateTimeFilter<"EventRegistration"> | Date | string
     eventId?: StringNullableFilter<"EventRegistration"> | string | null
-      user?: XOR<UserScalarRelationFilter, UserWhereInput>
-      roleSlot?: XOR<RoleSlotScalarRelationFilter, RoleSlotWhereInput>
-      Event?: XOR<EventNullableScalarRelationFilter, EventWhereInput> | null
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    roleSlot?: XOR<RoleSlotScalarRelationFilter, RoleSlotWhereInput>
+    Event?: XOR<EventNullableScalarRelationFilter, EventWhereInput> | null
   }
 
   export type EventRegistrationOrderByWithRelationInput = {
@@ -19604,7 +19616,7 @@ export namespace Prisma {
     user?: UserOrderByWithRelationInput
     roleSlot?: RoleSlotOrderByWithRelationInput
     Event?: EventOrderByWithRelationInput
-      _relevance?: EventRegistrationOrderByRelevanceInput
+    _relevance?: EventRegistrationOrderByRelevanceInput
   }
 
   export type EventRegistrationWhereUniqueInput = Prisma.AtLeast<{
@@ -19617,9 +19629,9 @@ export namespace Prisma {
     roleSlotId?: StringFilter<"EventRegistration"> | string
     registeredAt?: DateTimeFilter<"EventRegistration"> | Date | string
     eventId?: StringNullableFilter<"EventRegistration"> | string | null
-      user?: XOR<UserScalarRelationFilter, UserWhereInput>
-      roleSlot?: XOR<RoleSlotScalarRelationFilter, RoleSlotWhereInput>
-      Event?: XOR<EventNullableScalarRelationFilter, EventWhereInput> | null
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    roleSlot?: XOR<RoleSlotScalarRelationFilter, RoleSlotWhereInput>
+    Event?: XOR<EventNullableScalarRelationFilter, EventWhereInput> | null
   }, "id" | "userId_roleSlotId">
 
   export type EventRegistrationOrderByWithAggregationInput = {
@@ -19644,262 +19656,262 @@ export namespace Prisma {
     eventId?: StringNullableWithAggregatesFilter<"EventRegistration"> | string | null
   }
 
-    export type TicketWhereInput = {
-        AND?: TicketWhereInput | TicketWhereInput[]
-        OR?: TicketWhereInput[]
-        NOT?: TicketWhereInput | TicketWhereInput[]
-        id?: IntFilter<"Ticket"> | number
-        discordUserID?: StringFilter<"Ticket"> | string
-        channelId?: StringNullableFilter<"Ticket"> | string | null
-        channelName?: StringNullableFilter<"Ticket"> | string | null
-        createdAt?: DateTimeFilter<"Ticket"> | Date | string
-        updatedAt?: DateTimeFilter<"Ticket"> | Date | string
-        assignedUserId?: StringNullableFilter<"Ticket"> | string | null
-        channel?: XOR<ChannelNullableScalarRelationFilter, ChannelWhereInput> | null
-        user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
-    }
+  export type TicketWhereInput = {
+    AND?: TicketWhereInput | TicketWhereInput[]
+    OR?: TicketWhereInput[]
+    NOT?: TicketWhereInput | TicketWhereInput[]
+    id?: IntFilter<"Ticket"> | number
+    discordUserID?: StringFilter<"Ticket"> | string
+    channelId?: StringNullableFilter<"Ticket"> | string | null
+    channelName?: StringNullableFilter<"Ticket"> | string | null
+    createdAt?: DateTimeFilter<"Ticket"> | Date | string
+    updatedAt?: DateTimeFilter<"Ticket"> | Date | string
+    assignedUserId?: StringNullableFilter<"Ticket"> | string | null
+    channel?: XOR<ChannelNullableScalarRelationFilter, ChannelWhereInput> | null
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+  }
 
-    export type TicketOrderByWithRelationInput = {
-        id?: SortOrder
-        discordUserID?: SortOrder
-        channelId?: SortOrderInput | SortOrder
-        channelName?: SortOrderInput | SortOrder
-        createdAt?: SortOrder
-        updatedAt?: SortOrder
-        assignedUserId?: SortOrderInput | SortOrder
-        channel?: ChannelOrderByWithRelationInput
-        user?: UserOrderByWithRelationInput
-        _relevance?: TicketOrderByRelevanceInput
-    }
+  export type TicketOrderByWithRelationInput = {
+    id?: SortOrder
+    discordUserID?: SortOrder
+    channelId?: SortOrderInput | SortOrder
+    channelName?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    assignedUserId?: SortOrderInput | SortOrder
+    channel?: ChannelOrderByWithRelationInput
+    user?: UserOrderByWithRelationInput
+    _relevance?: TicketOrderByRelevanceInput
+  }
 
-    export type TicketWhereUniqueInput = Prisma.AtLeast<{
-        id?: number
-        AND?: TicketWhereInput | TicketWhereInput[]
-        OR?: TicketWhereInput[]
-        NOT?: TicketWhereInput | TicketWhereInput[]
-        discordUserID?: StringFilter<"Ticket"> | string
-        channelId?: StringNullableFilter<"Ticket"> | string | null
-        channelName?: StringNullableFilter<"Ticket"> | string | null
-        createdAt?: DateTimeFilter<"Ticket"> | Date | string
-        updatedAt?: DateTimeFilter<"Ticket"> | Date | string
-        assignedUserId?: StringNullableFilter<"Ticket"> | string | null
-        channel?: XOR<ChannelNullableScalarRelationFilter, ChannelWhereInput> | null
-        user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
-    }, "id">
+  export type TicketWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: TicketWhereInput | TicketWhereInput[]
+    OR?: TicketWhereInput[]
+    NOT?: TicketWhereInput | TicketWhereInput[]
+    discordUserID?: StringFilter<"Ticket"> | string
+    channelId?: StringNullableFilter<"Ticket"> | string | null
+    channelName?: StringNullableFilter<"Ticket"> | string | null
+    createdAt?: DateTimeFilter<"Ticket"> | Date | string
+    updatedAt?: DateTimeFilter<"Ticket"> | Date | string
+    assignedUserId?: StringNullableFilter<"Ticket"> | string | null
+    channel?: XOR<ChannelNullableScalarRelationFilter, ChannelWhereInput> | null
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+  }, "id">
 
-    export type TicketOrderByWithAggregationInput = {
-        id?: SortOrder
-        discordUserID?: SortOrder
-        channelId?: SortOrderInput | SortOrder
-        channelName?: SortOrderInput | SortOrder
-        createdAt?: SortOrder
-        updatedAt?: SortOrder
-        assignedUserId?: SortOrderInput | SortOrder
-        _count?: TicketCountOrderByAggregateInput
-        _avg?: TicketAvgOrderByAggregateInput
-        _max?: TicketMaxOrderByAggregateInput
-        _min?: TicketMinOrderByAggregateInput
-        _sum?: TicketSumOrderByAggregateInput
-    }
+  export type TicketOrderByWithAggregationInput = {
+    id?: SortOrder
+    discordUserID?: SortOrder
+    channelId?: SortOrderInput | SortOrder
+    channelName?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    assignedUserId?: SortOrderInput | SortOrder
+    _count?: TicketCountOrderByAggregateInput
+    _avg?: TicketAvgOrderByAggregateInput
+    _max?: TicketMaxOrderByAggregateInput
+    _min?: TicketMinOrderByAggregateInput
+    _sum?: TicketSumOrderByAggregateInput
+  }
 
-    export type TicketScalarWhereWithAggregatesInput = {
-        AND?: TicketScalarWhereWithAggregatesInput | TicketScalarWhereWithAggregatesInput[]
-        OR?: TicketScalarWhereWithAggregatesInput[]
-        NOT?: TicketScalarWhereWithAggregatesInput | TicketScalarWhereWithAggregatesInput[]
-        id?: IntWithAggregatesFilter<"Ticket"> | number
-        discordUserID?: StringWithAggregatesFilter<"Ticket"> | string
-        channelId?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
-        channelName?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
-        createdAt?: DateTimeWithAggregatesFilter<"Ticket"> | Date | string
-        updatedAt?: DateTimeWithAggregatesFilter<"Ticket"> | Date | string
-        assignedUserId?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
-    }
+  export type TicketScalarWhereWithAggregatesInput = {
+    AND?: TicketScalarWhereWithAggregatesInput | TicketScalarWhereWithAggregatesInput[]
+    OR?: TicketScalarWhereWithAggregatesInput[]
+    NOT?: TicketScalarWhereWithAggregatesInput | TicketScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"Ticket"> | number
+    discordUserID?: StringWithAggregatesFilter<"Ticket"> | string
+    channelId?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
+    channelName?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"Ticket"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Ticket"> | Date | string
+    assignedUserId?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
+  }
 
-    export type ApikeyWhereInput = {
-        AND?: ApikeyWhereInput | ApikeyWhereInput[]
-        OR?: ApikeyWhereInput[]
-        NOT?: ApikeyWhereInput | ApikeyWhereInput[]
-        id?: StringFilter<"Apikey"> | string
-        name?: StringNullableFilter<"Apikey"> | string | null
-        start?: StringNullableFilter<"Apikey"> | string | null
-        prefix?: StringNullableFilter<"Apikey"> | string | null
-        key?: StringFilter<"Apikey"> | string
-        userId?: StringFilter<"Apikey"> | string
-        refillInterval?: IntNullableFilter<"Apikey"> | number | null
-        refillAmount?: IntNullableFilter<"Apikey"> | number | null
-        lastRefillAt?: DateTimeNullableFilter<"Apikey"> | Date | string | null
-        enabled?: BoolNullableFilter<"Apikey"> | boolean | null
-        rateLimitEnabled?: BoolNullableFilter<"Apikey"> | boolean | null
-        rateLimitTimeWindow?: IntNullableFilter<"Apikey"> | number | null
-        rateLimitMax?: IntNullableFilter<"Apikey"> | number | null
-        requestCount?: IntNullableFilter<"Apikey"> | number | null
-        remaining?: IntNullableFilter<"Apikey"> | number | null
-        lastRequest?: DateTimeNullableFilter<"Apikey"> | Date | string | null
-        expiresAt?: DateTimeNullableFilter<"Apikey"> | Date | string | null
-        createdAt?: DateTimeFilter<"Apikey"> | Date | string
-        updatedAt?: DateTimeFilter<"Apikey"> | Date | string
-        permissions?: StringNullableFilter<"Apikey"> | string | null
-        metadata?: StringNullableFilter<"Apikey"> | string | null
-        user?: XOR<UserScalarRelationFilter, UserWhereInput>
-    }
+  export type ApikeyWhereInput = {
+    AND?: ApikeyWhereInput | ApikeyWhereInput[]
+    OR?: ApikeyWhereInput[]
+    NOT?: ApikeyWhereInput | ApikeyWhereInput[]
+    id?: StringFilter<"Apikey"> | string
+    name?: StringNullableFilter<"Apikey"> | string | null
+    start?: StringNullableFilter<"Apikey"> | string | null
+    prefix?: StringNullableFilter<"Apikey"> | string | null
+    key?: StringFilter<"Apikey"> | string
+    userId?: StringFilter<"Apikey"> | string
+    refillInterval?: IntNullableFilter<"Apikey"> | number | null
+    refillAmount?: IntNullableFilter<"Apikey"> | number | null
+    lastRefillAt?: DateTimeNullableFilter<"Apikey"> | Date | string | null
+    enabled?: BoolNullableFilter<"Apikey"> | boolean | null
+    rateLimitEnabled?: BoolNullableFilter<"Apikey"> | boolean | null
+    rateLimitTimeWindow?: IntNullableFilter<"Apikey"> | number | null
+    rateLimitMax?: IntNullableFilter<"Apikey"> | number | null
+    requestCount?: IntNullableFilter<"Apikey"> | number | null
+    remaining?: IntNullableFilter<"Apikey"> | number | null
+    lastRequest?: DateTimeNullableFilter<"Apikey"> | Date | string | null
+    expiresAt?: DateTimeNullableFilter<"Apikey"> | Date | string | null
+    createdAt?: DateTimeFilter<"Apikey"> | Date | string
+    updatedAt?: DateTimeFilter<"Apikey"> | Date | string
+    permissions?: StringNullableFilter<"Apikey"> | string | null
+    metadata?: StringNullableFilter<"Apikey"> | string | null
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
 
-    export type ApikeyOrderByWithRelationInput = {
-        id?: SortOrder
-        name?: SortOrderInput | SortOrder
-        start?: SortOrderInput | SortOrder
-        prefix?: SortOrderInput | SortOrder
-        key?: SortOrder
-        userId?: SortOrder
-        refillInterval?: SortOrderInput | SortOrder
-        refillAmount?: SortOrderInput | SortOrder
-        lastRefillAt?: SortOrderInput | SortOrder
-        enabled?: SortOrderInput | SortOrder
-        rateLimitEnabled?: SortOrderInput | SortOrder
-        rateLimitTimeWindow?: SortOrderInput | SortOrder
-        rateLimitMax?: SortOrderInput | SortOrder
-        requestCount?: SortOrderInput | SortOrder
-        remaining?: SortOrderInput | SortOrder
-        lastRequest?: SortOrderInput | SortOrder
-        expiresAt?: SortOrderInput | SortOrder
-        createdAt?: SortOrder
-        updatedAt?: SortOrder
-        permissions?: SortOrderInput | SortOrder
-        metadata?: SortOrderInput | SortOrder
-        user?: UserOrderByWithRelationInput
-        _relevance?: ApikeyOrderByRelevanceInput
-    }
+  export type ApikeyOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrderInput | SortOrder
+    start?: SortOrderInput | SortOrder
+    prefix?: SortOrderInput | SortOrder
+    key?: SortOrder
+    userId?: SortOrder
+    refillInterval?: SortOrderInput | SortOrder
+    refillAmount?: SortOrderInput | SortOrder
+    lastRefillAt?: SortOrderInput | SortOrder
+    enabled?: SortOrderInput | SortOrder
+    rateLimitEnabled?: SortOrderInput | SortOrder
+    rateLimitTimeWindow?: SortOrderInput | SortOrder
+    rateLimitMax?: SortOrderInput | SortOrder
+    requestCount?: SortOrderInput | SortOrder
+    remaining?: SortOrderInput | SortOrder
+    lastRequest?: SortOrderInput | SortOrder
+    expiresAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    permissions?: SortOrderInput | SortOrder
+    metadata?: SortOrderInput | SortOrder
+    user?: UserOrderByWithRelationInput
+    _relevance?: ApikeyOrderByRelevanceInput
+  }
 
-    export type ApikeyWhereUniqueInput = Prisma.AtLeast<{
-        id?: string
-        AND?: ApikeyWhereInput | ApikeyWhereInput[]
-        OR?: ApikeyWhereInput[]
-        NOT?: ApikeyWhereInput | ApikeyWhereInput[]
-        name?: StringNullableFilter<"Apikey"> | string | null
-        start?: StringNullableFilter<"Apikey"> | string | null
-        prefix?: StringNullableFilter<"Apikey"> | string | null
-        key?: StringFilter<"Apikey"> | string
-        userId?: StringFilter<"Apikey"> | string
-        refillInterval?: IntNullableFilter<"Apikey"> | number | null
-        refillAmount?: IntNullableFilter<"Apikey"> | number | null
-        lastRefillAt?: DateTimeNullableFilter<"Apikey"> | Date | string | null
-        enabled?: BoolNullableFilter<"Apikey"> | boolean | null
-        rateLimitEnabled?: BoolNullableFilter<"Apikey"> | boolean | null
-        rateLimitTimeWindow?: IntNullableFilter<"Apikey"> | number | null
-        rateLimitMax?: IntNullableFilter<"Apikey"> | number | null
-        requestCount?: IntNullableFilter<"Apikey"> | number | null
-        remaining?: IntNullableFilter<"Apikey"> | number | null
-        lastRequest?: DateTimeNullableFilter<"Apikey"> | Date | string | null
-        expiresAt?: DateTimeNullableFilter<"Apikey"> | Date | string | null
-        createdAt?: DateTimeFilter<"Apikey"> | Date | string
-        updatedAt?: DateTimeFilter<"Apikey"> | Date | string
-        permissions?: StringNullableFilter<"Apikey"> | string | null
-        metadata?: StringNullableFilter<"Apikey"> | string | null
-        user?: XOR<UserScalarRelationFilter, UserWhereInput>
-    }, "id">
+  export type ApikeyWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: ApikeyWhereInput | ApikeyWhereInput[]
+    OR?: ApikeyWhereInput[]
+    NOT?: ApikeyWhereInput | ApikeyWhereInput[]
+    name?: StringNullableFilter<"Apikey"> | string | null
+    start?: StringNullableFilter<"Apikey"> | string | null
+    prefix?: StringNullableFilter<"Apikey"> | string | null
+    key?: StringFilter<"Apikey"> | string
+    userId?: StringFilter<"Apikey"> | string
+    refillInterval?: IntNullableFilter<"Apikey"> | number | null
+    refillAmount?: IntNullableFilter<"Apikey"> | number | null
+    lastRefillAt?: DateTimeNullableFilter<"Apikey"> | Date | string | null
+    enabled?: BoolNullableFilter<"Apikey"> | boolean | null
+    rateLimitEnabled?: BoolNullableFilter<"Apikey"> | boolean | null
+    rateLimitTimeWindow?: IntNullableFilter<"Apikey"> | number | null
+    rateLimitMax?: IntNullableFilter<"Apikey"> | number | null
+    requestCount?: IntNullableFilter<"Apikey"> | number | null
+    remaining?: IntNullableFilter<"Apikey"> | number | null
+    lastRequest?: DateTimeNullableFilter<"Apikey"> | Date | string | null
+    expiresAt?: DateTimeNullableFilter<"Apikey"> | Date | string | null
+    createdAt?: DateTimeFilter<"Apikey"> | Date | string
+    updatedAt?: DateTimeFilter<"Apikey"> | Date | string
+    permissions?: StringNullableFilter<"Apikey"> | string | null
+    metadata?: StringNullableFilter<"Apikey"> | string | null
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
 
-    export type ApikeyOrderByWithAggregationInput = {
-        id?: SortOrder
-        name?: SortOrderInput | SortOrder
-        start?: SortOrderInput | SortOrder
-        prefix?: SortOrderInput | SortOrder
-        key?: SortOrder
-        userId?: SortOrder
-        refillInterval?: SortOrderInput | SortOrder
-        refillAmount?: SortOrderInput | SortOrder
-        lastRefillAt?: SortOrderInput | SortOrder
-        enabled?: SortOrderInput | SortOrder
-        rateLimitEnabled?: SortOrderInput | SortOrder
-        rateLimitTimeWindow?: SortOrderInput | SortOrder
-        rateLimitMax?: SortOrderInput | SortOrder
-        requestCount?: SortOrderInput | SortOrder
-        remaining?: SortOrderInput | SortOrder
-        lastRequest?: SortOrderInput | SortOrder
-        expiresAt?: SortOrderInput | SortOrder
-        createdAt?: SortOrder
-        updatedAt?: SortOrder
-        permissions?: SortOrderInput | SortOrder
-        metadata?: SortOrderInput | SortOrder
-        _count?: ApikeyCountOrderByAggregateInput
-        _avg?: ApikeyAvgOrderByAggregateInput
-        _max?: ApikeyMaxOrderByAggregateInput
-        _min?: ApikeyMinOrderByAggregateInput
-        _sum?: ApikeySumOrderByAggregateInput
-    }
+  export type ApikeyOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrderInput | SortOrder
+    start?: SortOrderInput | SortOrder
+    prefix?: SortOrderInput | SortOrder
+    key?: SortOrder
+    userId?: SortOrder
+    refillInterval?: SortOrderInput | SortOrder
+    refillAmount?: SortOrderInput | SortOrder
+    lastRefillAt?: SortOrderInput | SortOrder
+    enabled?: SortOrderInput | SortOrder
+    rateLimitEnabled?: SortOrderInput | SortOrder
+    rateLimitTimeWindow?: SortOrderInput | SortOrder
+    rateLimitMax?: SortOrderInput | SortOrder
+    requestCount?: SortOrderInput | SortOrder
+    remaining?: SortOrderInput | SortOrder
+    lastRequest?: SortOrderInput | SortOrder
+    expiresAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    permissions?: SortOrderInput | SortOrder
+    metadata?: SortOrderInput | SortOrder
+    _count?: ApikeyCountOrderByAggregateInput
+    _avg?: ApikeyAvgOrderByAggregateInput
+    _max?: ApikeyMaxOrderByAggregateInput
+    _min?: ApikeyMinOrderByAggregateInput
+    _sum?: ApikeySumOrderByAggregateInput
+  }
 
-    export type ApikeyScalarWhereWithAggregatesInput = {
-        AND?: ApikeyScalarWhereWithAggregatesInput | ApikeyScalarWhereWithAggregatesInput[]
-        OR?: ApikeyScalarWhereWithAggregatesInput[]
-        NOT?: ApikeyScalarWhereWithAggregatesInput | ApikeyScalarWhereWithAggregatesInput[]
-        id?: StringWithAggregatesFilter<"Apikey"> | string
-        name?: StringNullableWithAggregatesFilter<"Apikey"> | string | null
-        start?: StringNullableWithAggregatesFilter<"Apikey"> | string | null
-        prefix?: StringNullableWithAggregatesFilter<"Apikey"> | string | null
-        key?: StringWithAggregatesFilter<"Apikey"> | string
-        userId?: StringWithAggregatesFilter<"Apikey"> | string
-        refillInterval?: IntNullableWithAggregatesFilter<"Apikey"> | number | null
-        refillAmount?: IntNullableWithAggregatesFilter<"Apikey"> | number | null
-        lastRefillAt?: DateTimeNullableWithAggregatesFilter<"Apikey"> | Date | string | null
-        enabled?: BoolNullableWithAggregatesFilter<"Apikey"> | boolean | null
-        rateLimitEnabled?: BoolNullableWithAggregatesFilter<"Apikey"> | boolean | null
-        rateLimitTimeWindow?: IntNullableWithAggregatesFilter<"Apikey"> | number | null
-        rateLimitMax?: IntNullableWithAggregatesFilter<"Apikey"> | number | null
-        requestCount?: IntNullableWithAggregatesFilter<"Apikey"> | number | null
-        remaining?: IntNullableWithAggregatesFilter<"Apikey"> | number | null
-        lastRequest?: DateTimeNullableWithAggregatesFilter<"Apikey"> | Date | string | null
-        expiresAt?: DateTimeNullableWithAggregatesFilter<"Apikey"> | Date | string | null
-        createdAt?: DateTimeWithAggregatesFilter<"Apikey"> | Date | string
-        updatedAt?: DateTimeWithAggregatesFilter<"Apikey"> | Date | string
-        permissions?: StringNullableWithAggregatesFilter<"Apikey"> | string | null
-        metadata?: StringNullableWithAggregatesFilter<"Apikey"> | string | null
-    }
+  export type ApikeyScalarWhereWithAggregatesInput = {
+    AND?: ApikeyScalarWhereWithAggregatesInput | ApikeyScalarWhereWithAggregatesInput[]
+    OR?: ApikeyScalarWhereWithAggregatesInput[]
+    NOT?: ApikeyScalarWhereWithAggregatesInput | ApikeyScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Apikey"> | string
+    name?: StringNullableWithAggregatesFilter<"Apikey"> | string | null
+    start?: StringNullableWithAggregatesFilter<"Apikey"> | string | null
+    prefix?: StringNullableWithAggregatesFilter<"Apikey"> | string | null
+    key?: StringWithAggregatesFilter<"Apikey"> | string
+    userId?: StringWithAggregatesFilter<"Apikey"> | string
+    refillInterval?: IntNullableWithAggregatesFilter<"Apikey"> | number | null
+    refillAmount?: IntNullableWithAggregatesFilter<"Apikey"> | number | null
+    lastRefillAt?: DateTimeNullableWithAggregatesFilter<"Apikey"> | Date | string | null
+    enabled?: BoolNullableWithAggregatesFilter<"Apikey"> | boolean | null
+    rateLimitEnabled?: BoolNullableWithAggregatesFilter<"Apikey"> | boolean | null
+    rateLimitTimeWindow?: IntNullableWithAggregatesFilter<"Apikey"> | number | null
+    rateLimitMax?: IntNullableWithAggregatesFilter<"Apikey"> | number | null
+    requestCount?: IntNullableWithAggregatesFilter<"Apikey"> | number | null
+    remaining?: IntNullableWithAggregatesFilter<"Apikey"> | number | null
+    lastRequest?: DateTimeNullableWithAggregatesFilter<"Apikey"> | Date | string | null
+    expiresAt?: DateTimeNullableWithAggregatesFilter<"Apikey"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"Apikey"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Apikey"> | Date | string
+    permissions?: StringNullableWithAggregatesFilter<"Apikey"> | string | null
+    metadata?: StringNullableWithAggregatesFilter<"Apikey"> | string | null
+  }
 
-    export type JwksWhereInput = {
-        AND?: JwksWhereInput | JwksWhereInput[]
-        OR?: JwksWhereInput[]
-        NOT?: JwksWhereInput | JwksWhereInput[]
-        id?: StringFilter<"Jwks"> | string
-        publicKey?: StringFilter<"Jwks"> | string
-        privateKey?: StringFilter<"Jwks"> | string
-        createdAt?: DateTimeFilter<"Jwks"> | Date | string
-    }
+  export type JwksWhereInput = {
+    AND?: JwksWhereInput | JwksWhereInput[]
+    OR?: JwksWhereInput[]
+    NOT?: JwksWhereInput | JwksWhereInput[]
+    id?: StringFilter<"Jwks"> | string
+    publicKey?: StringFilter<"Jwks"> | string
+    privateKey?: StringFilter<"Jwks"> | string
+    createdAt?: DateTimeFilter<"Jwks"> | Date | string
+  }
 
-    export type JwksOrderByWithRelationInput = {
-        id?: SortOrder
-        publicKey?: SortOrder
-        privateKey?: SortOrder
-        createdAt?: SortOrder
-        _relevance?: JwksOrderByRelevanceInput
-    }
+  export type JwksOrderByWithRelationInput = {
+    id?: SortOrder
+    publicKey?: SortOrder
+    privateKey?: SortOrder
+    createdAt?: SortOrder
+    _relevance?: JwksOrderByRelevanceInput
+  }
 
-    export type JwksWhereUniqueInput = Prisma.AtLeast<{
-        id?: string
-        AND?: JwksWhereInput | JwksWhereInput[]
-        OR?: JwksWhereInput[]
-        NOT?: JwksWhereInput | JwksWhereInput[]
-        publicKey?: StringFilter<"Jwks"> | string
-        privateKey?: StringFilter<"Jwks"> | string
-        createdAt?: DateTimeFilter<"Jwks"> | Date | string
-    }, "id">
+  export type JwksWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: JwksWhereInput | JwksWhereInput[]
+    OR?: JwksWhereInput[]
+    NOT?: JwksWhereInput | JwksWhereInput[]
+    publicKey?: StringFilter<"Jwks"> | string
+    privateKey?: StringFilter<"Jwks"> | string
+    createdAt?: DateTimeFilter<"Jwks"> | Date | string
+  }, "id">
 
-    export type JwksOrderByWithAggregationInput = {
-        id?: SortOrder
-        publicKey?: SortOrder
-        privateKey?: SortOrder
-        createdAt?: SortOrder
-        _count?: JwksCountOrderByAggregateInput
-        _max?: JwksMaxOrderByAggregateInput
-        _min?: JwksMinOrderByAggregateInput
-    }
+  export type JwksOrderByWithAggregationInput = {
+    id?: SortOrder
+    publicKey?: SortOrder
+    privateKey?: SortOrder
+    createdAt?: SortOrder
+    _count?: JwksCountOrderByAggregateInput
+    _max?: JwksMaxOrderByAggregateInput
+    _min?: JwksMinOrderByAggregateInput
+  }
 
-    export type JwksScalarWhereWithAggregatesInput = {
-        AND?: JwksScalarWhereWithAggregatesInput | JwksScalarWhereWithAggregatesInput[]
-        OR?: JwksScalarWhereWithAggregatesInput[]
-        NOT?: JwksScalarWhereWithAggregatesInput | JwksScalarWhereWithAggregatesInput[]
-        id?: StringWithAggregatesFilter<"Jwks"> | string
-        publicKey?: StringWithAggregatesFilter<"Jwks"> | string
-        privateKey?: StringWithAggregatesFilter<"Jwks"> | string
-        createdAt?: DateTimeWithAggregatesFilter<"Jwks"> | Date | string
-    }
+  export type JwksScalarWhereWithAggregatesInput = {
+    AND?: JwksScalarWhereWithAggregatesInput | JwksScalarWhereWithAggregatesInput[]
+    OR?: JwksScalarWhereWithAggregatesInput[]
+    NOT?: JwksScalarWhereWithAggregatesInput | JwksScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Jwks"> | string
+    publicKey?: StringWithAggregatesFilter<"Jwks"> | string
+    privateKey?: StringWithAggregatesFilter<"Jwks"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"Jwks"> | Date | string
+  }
 
   export type UserCreateInput = {
     id: string
@@ -19914,8 +19926,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
-      username?: string | null
-      displayUsername?: string | null
+    username?: string | null
+    displayUsername?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
@@ -19924,8 +19936,8 @@ export namespace Prisma {
     twofactors?: TwoFactorCreateNestedManyWithoutUserInput
     Event?: EventCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
-      Ticket?: TicketCreateNestedManyWithoutUserInput
-      apikeys?: ApikeyCreateNestedManyWithoutUserInput
+    Ticket?: TicketCreateNestedManyWithoutUserInput
+    apikeys?: ApikeyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -19941,8 +19953,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
-      username?: string | null
-      displayUsername?: string | null
+    username?: string | null
+    displayUsername?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
@@ -19951,8 +19963,8 @@ export namespace Prisma {
     twofactors?: TwoFactorUncheckedCreateNestedManyWithoutUserInput
     Event?: EventUncheckedCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
-      Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
-      apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
+    Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
+    apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -19968,8 +19980,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-      username?: NullableStringFieldUpdateOperationsInput | string | null
-      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
@@ -19978,8 +19990,8 @@ export namespace Prisma {
     twofactors?: TwoFactorUpdateManyWithoutUserNestedInput
     Event?: EventUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
-      Ticket?: TicketUpdateManyWithoutUserNestedInput
-      apikeys?: ApikeyUpdateManyWithoutUserNestedInput
+    Ticket?: TicketUpdateManyWithoutUserNestedInput
+    apikeys?: ApikeyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -19995,8 +20007,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-      username?: NullableStringFieldUpdateOperationsInput | string | null
-      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
@@ -20005,8 +20017,8 @@ export namespace Prisma {
     twofactors?: TwoFactorUncheckedUpdateManyWithoutUserNestedInput
     Event?: EventUncheckedUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
-      Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
-      apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
+    Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
+    apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -20022,8 +20034,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
-      username?: string | null
-      displayUsername?: string | null
+    username?: string | null
+    displayUsername?: string | null
   }
 
   export type UserUpdateManyMutationInput = {
@@ -20039,8 +20051,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-      username?: NullableStringFieldUpdateOperationsInput | string | null
-      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type UserUncheckedUpdateManyInput = {
@@ -20056,8 +20068,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-      username?: NullableStringFieldUpdateOperationsInput | string | null
-      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type SessionCreateInput = {
@@ -20565,54 +20577,54 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
   }
 
-    export type ChannelCreateInput = {
-        id?: string
-        name: string
-        Message?: MessageCreateNestedManyWithoutChannelInput
-        Ticket?: TicketCreateNestedManyWithoutChannelInput
-    }
+  export type ChannelCreateInput = {
+    id?: string
+    name: string
+    Message?: MessageCreateNestedManyWithoutChannelInput
+    Ticket?: TicketCreateNestedManyWithoutChannelInput
+  }
 
-    export type ChannelUncheckedCreateInput = {
-        id?: string
-        name: string
-        Message?: MessageUncheckedCreateNestedManyWithoutChannelInput
-        Ticket?: TicketUncheckedCreateNestedManyWithoutChannelInput
-    }
+  export type ChannelUncheckedCreateInput = {
+    id?: string
+    name: string
+    Message?: MessageUncheckedCreateNestedManyWithoutChannelInput
+    Ticket?: TicketUncheckedCreateNestedManyWithoutChannelInput
+  }
 
-    export type ChannelUpdateInput = {
-        id?: StringFieldUpdateOperationsInput | string
-        name?: StringFieldUpdateOperationsInput | string
-        Message?: MessageUpdateManyWithoutChannelNestedInput
-        Ticket?: TicketUpdateManyWithoutChannelNestedInput
-    }
+  export type ChannelUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    Message?: MessageUpdateManyWithoutChannelNestedInput
+    Ticket?: TicketUpdateManyWithoutChannelNestedInput
+  }
 
-    export type ChannelUncheckedUpdateInput = {
-        id?: StringFieldUpdateOperationsInput | string
-        name?: StringFieldUpdateOperationsInput | string
-        Message?: MessageUncheckedUpdateManyWithoutChannelNestedInput
-        Ticket?: TicketUncheckedUpdateManyWithoutChannelNestedInput
-    }
+  export type ChannelUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    Message?: MessageUncheckedUpdateManyWithoutChannelNestedInput
+    Ticket?: TicketUncheckedUpdateManyWithoutChannelNestedInput
+  }
 
-    export type ChannelCreateManyInput = {
-        id?: string
-        name: string
-    }
+  export type ChannelCreateManyInput = {
+    id?: string
+    name: string
+  }
 
-    export type ChannelUpdateManyMutationInput = {
-        id?: StringFieldUpdateOperationsInput | string
-        name?: StringFieldUpdateOperationsInput | string
-    }
+  export type ChannelUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+  }
 
-    export type ChannelUncheckedUpdateManyInput = {
-        id?: StringFieldUpdateOperationsInput | string
-        name?: StringFieldUpdateOperationsInput | string
-    }
+  export type ChannelUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+  }
 
   export type MessageCreateInput = {
     createdAt: Date | string
     content: Uint8Array
     user: UserCreateNestedOneWithoutMessagesInput
-      channel: ChannelCreateNestedOneWithoutMessageInput
+    channel: ChannelCreateNestedOneWithoutMessageInput
   }
 
   export type MessageUncheckedCreateInput = {
@@ -20627,7 +20639,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     content?: BytesFieldUpdateOperationsInput | Uint8Array
     user?: UserUpdateOneRequiredWithoutMessagesNestedInput
-      channel?: ChannelUpdateOneRequiredWithoutMessageNestedInput
+    channel?: ChannelUpdateOneRequiredWithoutMessageNestedInput
   }
 
   export type MessageUncheckedUpdateInput = {
@@ -20848,283 +20860,283 @@ export namespace Prisma {
     eventId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
-    export type TicketCreateInput = {
-        discordUserID: string
-        createdAt: Date | string
-        updatedAt: Date | string
-        channel?: ChannelCreateNestedOneWithoutTicketInput
-        user?: UserCreateNestedOneWithoutTicketInput
-    }
+  export type TicketCreateInput = {
+    discordUserID: string
+    createdAt: Date | string
+    updatedAt: Date | string
+    channel?: ChannelCreateNestedOneWithoutTicketInput
+    user?: UserCreateNestedOneWithoutTicketInput
+  }
 
-    export type TicketUncheckedCreateInput = {
-        id?: number
-        discordUserID: string
-        channelId?: string | null
-        channelName?: string | null
-        createdAt: Date | string
-        updatedAt: Date | string
-        assignedUserId?: string | null
-    }
+  export type TicketUncheckedCreateInput = {
+    id?: number
+    discordUserID: string
+    channelId?: string | null
+    channelName?: string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+    assignedUserId?: string | null
+  }
 
-    export type TicketUpdateInput = {
-        discordUserID?: StringFieldUpdateOperationsInput | string
-        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        channel?: ChannelUpdateOneWithoutTicketNestedInput
-        user?: UserUpdateOneWithoutTicketNestedInput
-    }
+  export type TicketUpdateInput = {
+    discordUserID?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    channel?: ChannelUpdateOneWithoutTicketNestedInput
+    user?: UserUpdateOneWithoutTicketNestedInput
+  }
 
-    export type TicketUncheckedUpdateInput = {
-        id?: IntFieldUpdateOperationsInput | number
-        discordUserID?: StringFieldUpdateOperationsInput | string
-        channelId?: NullableStringFieldUpdateOperationsInput | string | null
-        channelName?: NullableStringFieldUpdateOperationsInput | string | null
-        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
-    }
+  export type TicketUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    discordUserID?: StringFieldUpdateOperationsInput | string
+    channelId?: NullableStringFieldUpdateOperationsInput | string | null
+    channelName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
 
-    export type TicketCreateManyInput = {
-        id?: number
-        discordUserID: string
-        channelId?: string | null
-        channelName?: string | null
-        createdAt: Date | string
-        updatedAt: Date | string
-        assignedUserId?: string | null
-    }
+  export type TicketCreateManyInput = {
+    id?: number
+    discordUserID: string
+    channelId?: string | null
+    channelName?: string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+    assignedUserId?: string | null
+  }
 
-    export type TicketUpdateManyMutationInput = {
-        discordUserID?: StringFieldUpdateOperationsInput | string
-        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    }
+  export type TicketUpdateManyMutationInput = {
+    discordUserID?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
 
-    export type TicketUncheckedUpdateManyInput = {
-        id?: IntFieldUpdateOperationsInput | number
-        discordUserID?: StringFieldUpdateOperationsInput | string
-        channelId?: NullableStringFieldUpdateOperationsInput | string | null
-        channelName?: NullableStringFieldUpdateOperationsInput | string | null
-        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
-    }
+  export type TicketUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    discordUserID?: StringFieldUpdateOperationsInput | string
+    channelId?: NullableStringFieldUpdateOperationsInput | string | null
+    channelName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
 
-    export type ApikeyCreateInput = {
-        id: string
-        name?: string | null
-        start?: string | null
-        prefix?: string | null
-        key: string
-        refillInterval?: number | null
-        refillAmount?: number | null
-        lastRefillAt?: Date | string | null
-        enabled?: boolean | null
-        rateLimitEnabled?: boolean | null
-        rateLimitTimeWindow?: number | null
-        rateLimitMax?: number | null
-        requestCount?: number | null
-        remaining?: number | null
-        lastRequest?: Date | string | null
-        expiresAt?: Date | string | null
-        createdAt: Date | string
-        updatedAt: Date | string
-        permissions?: string | null
-        metadata?: string | null
-        user: UserCreateNestedOneWithoutApikeysInput
-    }
+  export type ApikeyCreateInput = {
+    id: string
+    name?: string | null
+    start?: string | null
+    prefix?: string | null
+    key: string
+    refillInterval?: number | null
+    refillAmount?: number | null
+    lastRefillAt?: Date | string | null
+    enabled?: boolean | null
+    rateLimitEnabled?: boolean | null
+    rateLimitTimeWindow?: number | null
+    rateLimitMax?: number | null
+    requestCount?: number | null
+    remaining?: number | null
+    lastRequest?: Date | string | null
+    expiresAt?: Date | string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+    permissions?: string | null
+    metadata?: string | null
+    user: UserCreateNestedOneWithoutApikeysInput
+  }
 
-    export type ApikeyUncheckedCreateInput = {
-        id: string
-        name?: string | null
-        start?: string | null
-        prefix?: string | null
-        key: string
-        userId: string
-        refillInterval?: number | null
-        refillAmount?: number | null
-        lastRefillAt?: Date | string | null
-        enabled?: boolean | null
-        rateLimitEnabled?: boolean | null
-        rateLimitTimeWindow?: number | null
-        rateLimitMax?: number | null
-        requestCount?: number | null
-        remaining?: number | null
-        lastRequest?: Date | string | null
-        expiresAt?: Date | string | null
-        createdAt: Date | string
-        updatedAt: Date | string
-        permissions?: string | null
-        metadata?: string | null
-    }
+  export type ApikeyUncheckedCreateInput = {
+    id: string
+    name?: string | null
+    start?: string | null
+    prefix?: string | null
+    key: string
+    userId: string
+    refillInterval?: number | null
+    refillAmount?: number | null
+    lastRefillAt?: Date | string | null
+    enabled?: boolean | null
+    rateLimitEnabled?: boolean | null
+    rateLimitTimeWindow?: number | null
+    rateLimitMax?: number | null
+    requestCount?: number | null
+    remaining?: number | null
+    lastRequest?: Date | string | null
+    expiresAt?: Date | string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+    permissions?: string | null
+    metadata?: string | null
+  }
 
-    export type ApikeyUpdateInput = {
-        id?: StringFieldUpdateOperationsInput | string
-        name?: NullableStringFieldUpdateOperationsInput | string | null
-        start?: NullableStringFieldUpdateOperationsInput | string | null
-        prefix?: NullableStringFieldUpdateOperationsInput | string | null
-        key?: StringFieldUpdateOperationsInput | string
-        refillInterval?: NullableIntFieldUpdateOperationsInput | number | null
-        refillAmount?: NullableIntFieldUpdateOperationsInput | number | null
-        lastRefillAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-        enabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-        rateLimitEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-        rateLimitTimeWindow?: NullableIntFieldUpdateOperationsInput | number | null
-        rateLimitMax?: NullableIntFieldUpdateOperationsInput | number | null
-        requestCount?: NullableIntFieldUpdateOperationsInput | number | null
-        remaining?: NullableIntFieldUpdateOperationsInput | number | null
-        lastRequest?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-        expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        permissions?: NullableStringFieldUpdateOperationsInput | string | null
-        metadata?: NullableStringFieldUpdateOperationsInput | string | null
-        user?: UserUpdateOneRequiredWithoutApikeysNestedInput
-    }
+  export type ApikeyUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    start?: NullableStringFieldUpdateOperationsInput | string | null
+    prefix?: NullableStringFieldUpdateOperationsInput | string | null
+    key?: StringFieldUpdateOperationsInput | string
+    refillInterval?: NullableIntFieldUpdateOperationsInput | number | null
+    refillAmount?: NullableIntFieldUpdateOperationsInput | number | null
+    lastRefillAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    enabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    rateLimitEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    rateLimitTimeWindow?: NullableIntFieldUpdateOperationsInput | number | null
+    rateLimitMax?: NullableIntFieldUpdateOperationsInput | number | null
+    requestCount?: NullableIntFieldUpdateOperationsInput | number | null
+    remaining?: NullableIntFieldUpdateOperationsInput | number | null
+    lastRequest?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    permissions?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneRequiredWithoutApikeysNestedInput
+  }
 
-    export type ApikeyUncheckedUpdateInput = {
-        id?: StringFieldUpdateOperationsInput | string
-        name?: NullableStringFieldUpdateOperationsInput | string | null
-        start?: NullableStringFieldUpdateOperationsInput | string | null
-        prefix?: NullableStringFieldUpdateOperationsInput | string | null
-        key?: StringFieldUpdateOperationsInput | string
-        userId?: StringFieldUpdateOperationsInput | string
-        refillInterval?: NullableIntFieldUpdateOperationsInput | number | null
-        refillAmount?: NullableIntFieldUpdateOperationsInput | number | null
-        lastRefillAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-        enabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-        rateLimitEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-        rateLimitTimeWindow?: NullableIntFieldUpdateOperationsInput | number | null
-        rateLimitMax?: NullableIntFieldUpdateOperationsInput | number | null
-        requestCount?: NullableIntFieldUpdateOperationsInput | number | null
-        remaining?: NullableIntFieldUpdateOperationsInput | number | null
-        lastRequest?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-        expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        permissions?: NullableStringFieldUpdateOperationsInput | string | null
-        metadata?: NullableStringFieldUpdateOperationsInput | string | null
-    }
+  export type ApikeyUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    start?: NullableStringFieldUpdateOperationsInput | string | null
+    prefix?: NullableStringFieldUpdateOperationsInput | string | null
+    key?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    refillInterval?: NullableIntFieldUpdateOperationsInput | number | null
+    refillAmount?: NullableIntFieldUpdateOperationsInput | number | null
+    lastRefillAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    enabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    rateLimitEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    rateLimitTimeWindow?: NullableIntFieldUpdateOperationsInput | number | null
+    rateLimitMax?: NullableIntFieldUpdateOperationsInput | number | null
+    requestCount?: NullableIntFieldUpdateOperationsInput | number | null
+    remaining?: NullableIntFieldUpdateOperationsInput | number | null
+    lastRequest?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    permissions?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableStringFieldUpdateOperationsInput | string | null
+  }
 
-    export type ApikeyCreateManyInput = {
-        id: string
-        name?: string | null
-        start?: string | null
-        prefix?: string | null
-        key: string
-        userId: string
-        refillInterval?: number | null
-        refillAmount?: number | null
-        lastRefillAt?: Date | string | null
-        enabled?: boolean | null
-        rateLimitEnabled?: boolean | null
-        rateLimitTimeWindow?: number | null
-        rateLimitMax?: number | null
-        requestCount?: number | null
-        remaining?: number | null
-        lastRequest?: Date | string | null
-        expiresAt?: Date | string | null
-        createdAt: Date | string
-        updatedAt: Date | string
-        permissions?: string | null
-        metadata?: string | null
-    }
+  export type ApikeyCreateManyInput = {
+    id: string
+    name?: string | null
+    start?: string | null
+    prefix?: string | null
+    key: string
+    userId: string
+    refillInterval?: number | null
+    refillAmount?: number | null
+    lastRefillAt?: Date | string | null
+    enabled?: boolean | null
+    rateLimitEnabled?: boolean | null
+    rateLimitTimeWindow?: number | null
+    rateLimitMax?: number | null
+    requestCount?: number | null
+    remaining?: number | null
+    lastRequest?: Date | string | null
+    expiresAt?: Date | string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+    permissions?: string | null
+    metadata?: string | null
+  }
 
-    export type ApikeyUpdateManyMutationInput = {
-        id?: StringFieldUpdateOperationsInput | string
-        name?: NullableStringFieldUpdateOperationsInput | string | null
-        start?: NullableStringFieldUpdateOperationsInput | string | null
-        prefix?: NullableStringFieldUpdateOperationsInput | string | null
-        key?: StringFieldUpdateOperationsInput | string
-        refillInterval?: NullableIntFieldUpdateOperationsInput | number | null
-        refillAmount?: NullableIntFieldUpdateOperationsInput | number | null
-        lastRefillAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-        enabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-        rateLimitEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-        rateLimitTimeWindow?: NullableIntFieldUpdateOperationsInput | number | null
-        rateLimitMax?: NullableIntFieldUpdateOperationsInput | number | null
-        requestCount?: NullableIntFieldUpdateOperationsInput | number | null
-        remaining?: NullableIntFieldUpdateOperationsInput | number | null
-        lastRequest?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-        expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        permissions?: NullableStringFieldUpdateOperationsInput | string | null
-        metadata?: NullableStringFieldUpdateOperationsInput | string | null
-    }
+  export type ApikeyUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    start?: NullableStringFieldUpdateOperationsInput | string | null
+    prefix?: NullableStringFieldUpdateOperationsInput | string | null
+    key?: StringFieldUpdateOperationsInput | string
+    refillInterval?: NullableIntFieldUpdateOperationsInput | number | null
+    refillAmount?: NullableIntFieldUpdateOperationsInput | number | null
+    lastRefillAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    enabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    rateLimitEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    rateLimitTimeWindow?: NullableIntFieldUpdateOperationsInput | number | null
+    rateLimitMax?: NullableIntFieldUpdateOperationsInput | number | null
+    requestCount?: NullableIntFieldUpdateOperationsInput | number | null
+    remaining?: NullableIntFieldUpdateOperationsInput | number | null
+    lastRequest?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    permissions?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableStringFieldUpdateOperationsInput | string | null
+  }
 
-    export type ApikeyUncheckedUpdateManyInput = {
-        id?: StringFieldUpdateOperationsInput | string
-        name?: NullableStringFieldUpdateOperationsInput | string | null
-        start?: NullableStringFieldUpdateOperationsInput | string | null
-        prefix?: NullableStringFieldUpdateOperationsInput | string | null
-        key?: StringFieldUpdateOperationsInput | string
-        userId?: StringFieldUpdateOperationsInput | string
-        refillInterval?: NullableIntFieldUpdateOperationsInput | number | null
-        refillAmount?: NullableIntFieldUpdateOperationsInput | number | null
-        lastRefillAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-        enabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-        rateLimitEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-        rateLimitTimeWindow?: NullableIntFieldUpdateOperationsInput | number | null
-        rateLimitMax?: NullableIntFieldUpdateOperationsInput | number | null
-        requestCount?: NullableIntFieldUpdateOperationsInput | number | null
-        remaining?: NullableIntFieldUpdateOperationsInput | number | null
-        lastRequest?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-        expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        permissions?: NullableStringFieldUpdateOperationsInput | string | null
-        metadata?: NullableStringFieldUpdateOperationsInput | string | null
-    }
+  export type ApikeyUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    start?: NullableStringFieldUpdateOperationsInput | string | null
+    prefix?: NullableStringFieldUpdateOperationsInput | string | null
+    key?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    refillInterval?: NullableIntFieldUpdateOperationsInput | number | null
+    refillAmount?: NullableIntFieldUpdateOperationsInput | number | null
+    lastRefillAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    enabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    rateLimitEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    rateLimitTimeWindow?: NullableIntFieldUpdateOperationsInput | number | null
+    rateLimitMax?: NullableIntFieldUpdateOperationsInput | number | null
+    requestCount?: NullableIntFieldUpdateOperationsInput | number | null
+    remaining?: NullableIntFieldUpdateOperationsInput | number | null
+    lastRequest?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    permissions?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableStringFieldUpdateOperationsInput | string | null
+  }
 
-    export type JwksCreateInput = {
-        id: string
-        publicKey: string
-        privateKey: string
-        createdAt: Date | string
-    }
+  export type JwksCreateInput = {
+    id: string
+    publicKey: string
+    privateKey: string
+    createdAt: Date | string
+  }
 
-    export type JwksUncheckedCreateInput = {
-        id: string
-        publicKey: string
-        privateKey: string
-        createdAt: Date | string
-    }
+  export type JwksUncheckedCreateInput = {
+    id: string
+    publicKey: string
+    privateKey: string
+    createdAt: Date | string
+  }
 
-    export type JwksUpdateInput = {
-        id?: StringFieldUpdateOperationsInput | string
-        publicKey?: StringFieldUpdateOperationsInput | string
-        privateKey?: StringFieldUpdateOperationsInput | string
-        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    }
+  export type JwksUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    publicKey?: StringFieldUpdateOperationsInput | string
+    privateKey?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
 
-    export type JwksUncheckedUpdateInput = {
-        id?: StringFieldUpdateOperationsInput | string
-        publicKey?: StringFieldUpdateOperationsInput | string
-        privateKey?: StringFieldUpdateOperationsInput | string
-        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    }
+  export type JwksUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    publicKey?: StringFieldUpdateOperationsInput | string
+    privateKey?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
 
-    export type JwksCreateManyInput = {
-        id: string
-        publicKey: string
-        privateKey: string
-        createdAt: Date | string
-    }
+  export type JwksCreateManyInput = {
+    id: string
+    publicKey: string
+    privateKey: string
+    createdAt: Date | string
+  }
 
-    export type JwksUpdateManyMutationInput = {
-        id?: StringFieldUpdateOperationsInput | string
-        publicKey?: StringFieldUpdateOperationsInput | string
-        privateKey?: StringFieldUpdateOperationsInput | string
-        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    }
+  export type JwksUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    publicKey?: StringFieldUpdateOperationsInput | string
+    privateKey?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
 
-    export type JwksUncheckedUpdateManyInput = {
-        id?: StringFieldUpdateOperationsInput | string
-        publicKey?: StringFieldUpdateOperationsInput | string
-        privateKey?: StringFieldUpdateOperationsInput | string
-        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    }
+  export type JwksUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    publicKey?: StringFieldUpdateOperationsInput | string
+    privateKey?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
 
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
@@ -21137,7 +21149,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
-      search?: string
+    search?: string
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
@@ -21157,7 +21169,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
-      search?: string
+    search?: string
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
@@ -21236,17 +21248,17 @@ export namespace Prisma {
     none?: EventRegistrationWhereInput
   }
 
-    export type TicketListRelationFilter = {
-        every?: TicketWhereInput
-        some?: TicketWhereInput
-        none?: TicketWhereInput
-    }
+  export type TicketListRelationFilter = {
+    every?: TicketWhereInput
+    some?: TicketWhereInput
+    none?: TicketWhereInput
+  }
 
-    export type ApikeyListRelationFilter = {
-        every?: ApikeyWhereInput
-        some?: ApikeyWhereInput
-        none?: ApikeyWhereInput
-    }
+  export type ApikeyListRelationFilter = {
+    every?: ApikeyWhereInput
+    some?: ApikeyWhereInput
+    none?: ApikeyWhereInput
+  }
 
   export type SortOrderInput = {
     sort: SortOrder
@@ -21285,19 +21297,19 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
-    export type TicketOrderByRelationAggregateInput = {
-        _count?: SortOrder
-    }
+  export type TicketOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
 
-    export type ApikeyOrderByRelationAggregateInput = {
-        _count?: SortOrder
-    }
+  export type ApikeyOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
 
-    export type UserOrderByRelevanceInput = {
-        fields: UserOrderByRelevanceFieldEnum | UserOrderByRelevanceFieldEnum[]
-        sort: SortOrder
-        search: string
-    }
+  export type UserOrderByRelevanceInput = {
+    fields: UserOrderByRelevanceFieldEnum | UserOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
 
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
@@ -21312,8 +21324,8 @@ export namespace Prisma {
     banReason?: SortOrder
     banExpires?: SortOrder
     twoFactorEnabled?: SortOrder
-      username?: SortOrder
-      displayUsername?: SortOrder
+    username?: SortOrder
+    displayUsername?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -21329,8 +21341,8 @@ export namespace Prisma {
     banReason?: SortOrder
     banExpires?: SortOrder
     twoFactorEnabled?: SortOrder
-      username?: SortOrder
-      displayUsername?: SortOrder
+    username?: SortOrder
+    displayUsername?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -21346,8 +21358,8 @@ export namespace Prisma {
     banReason?: SortOrder
     banExpires?: SortOrder
     twoFactorEnabled?: SortOrder
-      username?: SortOrder
-      displayUsername?: SortOrder
+    username?: SortOrder
+    displayUsername?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -21361,7 +21373,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
-      search?: string
+    search?: string
     not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedStringFilter<$PrismaModel>
@@ -21387,7 +21399,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
-      search?: string
+    search?: string
     not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
@@ -21430,16 +21442,16 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
-    export type UserScalarRelationFilter = {
+  export type UserScalarRelationFilter = {
     is?: UserWhereInput
     isNot?: UserWhereInput
   }
 
-    export type SessionOrderByRelevanceInput = {
-        fields: SessionOrderByRelevanceFieldEnum | SessionOrderByRelevanceFieldEnum[]
-        sort: SortOrder
-        search: string
-    }
+  export type SessionOrderByRelevanceInput = {
+    fields: SessionOrderByRelevanceFieldEnum | SessionOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
 
   export type SessionCountOrderByAggregateInput = {
     id?: SortOrder
@@ -21480,11 +21492,11 @@ export namespace Prisma {
     activeOrganizationId?: SortOrder
   }
 
-    export type AccountOrderByRelevanceInput = {
-        fields: AccountOrderByRelevanceFieldEnum | AccountOrderByRelevanceFieldEnum[]
-        sort: SortOrder
-        search: string
-    }
+  export type AccountOrderByRelevanceInput = {
+    fields: AccountOrderByRelevanceFieldEnum | AccountOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
 
   export type AccountCountOrderByAggregateInput = {
     id?: SortOrder
@@ -21534,11 +21546,11 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
-    export type VerificationOrderByRelevanceInput = {
-        fields: VerificationOrderByRelevanceFieldEnum | VerificationOrderByRelevanceFieldEnum[]
-        sort: SortOrder
-        search: string
-    }
+  export type VerificationOrderByRelevanceInput = {
+    fields: VerificationOrderByRelevanceFieldEnum | VerificationOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
 
   export type VerificationCountOrderByAggregateInput = {
     id?: SortOrder
@@ -21567,11 +21579,11 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
-    export type OrganizationOrderByRelevanceInput = {
-        fields: OrganizationOrderByRelevanceFieldEnum | OrganizationOrderByRelevanceFieldEnum[]
-        sort: SortOrder
-        search: string
-    }
+  export type OrganizationOrderByRelevanceInput = {
+    fields: OrganizationOrderByRelevanceFieldEnum | OrganizationOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
 
   export type OrganizationCountOrderByAggregateInput = {
     id?: SortOrder
@@ -21600,16 +21612,16 @@ export namespace Prisma {
     metadata?: SortOrder
   }
 
-    export type OrganizationScalarRelationFilter = {
+  export type OrganizationScalarRelationFilter = {
     is?: OrganizationWhereInput
     isNot?: OrganizationWhereInput
   }
 
-    export type MemberOrderByRelevanceInput = {
-        fields: MemberOrderByRelevanceFieldEnum | MemberOrderByRelevanceFieldEnum[]
-        sort: SortOrder
-        search: string
-    }
+  export type MemberOrderByRelevanceInput = {
+    fields: MemberOrderByRelevanceFieldEnum | MemberOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
 
   export type MemberCountOrderByAggregateInput = {
     id?: SortOrder
@@ -21635,11 +21647,11 @@ export namespace Prisma {
     createdAt?: SortOrder
   }
 
-    export type InvitationOrderByRelevanceInput = {
-        fields: InvitationOrderByRelevanceFieldEnum | InvitationOrderByRelevanceFieldEnum[]
-        sort: SortOrder
-        search: string
-    }
+  export type InvitationOrderByRelevanceInput = {
+    fields: InvitationOrderByRelevanceFieldEnum | InvitationOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
 
   export type InvitationCountOrderByAggregateInput = {
     id?: SortOrder
@@ -21671,11 +21683,11 @@ export namespace Prisma {
     inviterId?: SortOrder
   }
 
-    export type TwoFactorOrderByRelevanceInput = {
-        fields: TwoFactorOrderByRelevanceFieldEnum | TwoFactorOrderByRelevanceFieldEnum[]
-        sort: SortOrder
-        search: string
-    }
+  export type TwoFactorOrderByRelevanceInput = {
+    fields: TwoFactorOrderByRelevanceFieldEnum | TwoFactorOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
 
   export type TwoFactorCountOrderByAggregateInput = {
     id?: SortOrder
@@ -21698,31 +21710,31 @@ export namespace Prisma {
     userId?: SortOrder
   }
 
-    export type ChannelOrderByRelevanceInput = {
-        fields: ChannelOrderByRelevanceFieldEnum | ChannelOrderByRelevanceFieldEnum[]
-        sort: SortOrder
-        search: string
-    }
+  export type ChannelOrderByRelevanceInput = {
+    fields: ChannelOrderByRelevanceFieldEnum | ChannelOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
 
-    export type ChannelIdNameCompoundUniqueInput = {
-        id: string
-        name: string
-    }
+  export type ChannelIdNameCompoundUniqueInput = {
+    id: string
+    name: string
+  }
 
-    export type ChannelCountOrderByAggregateInput = {
-        id?: SortOrder
-        name?: SortOrder
-    }
+  export type ChannelCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+  }
 
-    export type ChannelMaxOrderByAggregateInput = {
-        id?: SortOrder
-        name?: SortOrder
-    }
+  export type ChannelMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+  }
 
-    export type ChannelMinOrderByAggregateInput = {
-        id?: SortOrder
-        name?: SortOrder
-    }
+  export type ChannelMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+  }
 
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
@@ -21742,16 +21754,16 @@ export namespace Prisma {
     not?: NestedBytesFilter<$PrismaModel> | Uint8Array
   }
 
-    export type ChannelScalarRelationFilter = {
-        is?: ChannelWhereInput
-        isNot?: ChannelWhereInput
-    }
+  export type ChannelScalarRelationFilter = {
+    is?: ChannelWhereInput
+    isNot?: ChannelWhereInput
+  }
 
-    export type MessageOrderByRelevanceInput = {
-        fields: MessageOrderByRelevanceFieldEnum | MessageOrderByRelevanceFieldEnum[]
-        sort: SortOrder
-        search: string
-    }
+  export type MessageOrderByRelevanceInput = {
+    fields: MessageOrderByRelevanceFieldEnum | MessageOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
 
   export type MessageCountOrderByAggregateInput = {
     id?: SortOrder
@@ -21821,11 +21833,11 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
-    export type EventOrderByRelevanceInput = {
-        fields: EventOrderByRelevanceFieldEnum | EventOrderByRelevanceFieldEnum[]
-        sort: SortOrder
-        search: string
-    }
+  export type EventOrderByRelevanceInput = {
+    fields: EventOrderByRelevanceFieldEnum | EventOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
 
   export type EventCountOrderByAggregateInput = {
     id?: SortOrder
@@ -21860,16 +21872,16 @@ export namespace Prisma {
     userId?: SortOrder
   }
 
-    export type EventScalarRelationFilter = {
+  export type EventScalarRelationFilter = {
     is?: EventWhereInput
     isNot?: EventWhereInput
   }
 
-    export type RoleSlotOrderByRelevanceInput = {
-        fields: RoleSlotOrderByRelevanceFieldEnum | RoleSlotOrderByRelevanceFieldEnum[]
-        sort: SortOrder
-        search: string
-    }
+  export type RoleSlotOrderByRelevanceInput = {
+    fields: RoleSlotOrderByRelevanceFieldEnum | RoleSlotOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
 
   export type RoleSlotCountOrderByAggregateInput = {
     id?: SortOrder
@@ -21900,21 +21912,21 @@ export namespace Prisma {
     goalCount?: SortOrder
   }
 
-    export type RoleSlotScalarRelationFilter = {
+  export type RoleSlotScalarRelationFilter = {
     is?: RoleSlotWhereInput
     isNot?: RoleSlotWhereInput
   }
 
-    export type EventNullableScalarRelationFilter = {
+  export type EventNullableScalarRelationFilter = {
     is?: EventWhereInput | null
     isNot?: EventWhereInput | null
   }
 
-    export type EventRegistrationOrderByRelevanceInput = {
-        fields: EventRegistrationOrderByRelevanceFieldEnum | EventRegistrationOrderByRelevanceFieldEnum[]
-        sort: SortOrder
-        search: string
-    }
+  export type EventRegistrationOrderByRelevanceInput = {
+    fields: EventRegistrationOrderByRelevanceFieldEnum | EventRegistrationOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
 
   export type EventRegistrationUserIdRoleSlotIdCompoundUniqueInput = {
     userId: string
@@ -21945,209 +21957,209 @@ export namespace Prisma {
     eventId?: SortOrder
   }
 
-    export type ChannelNullableScalarRelationFilter = {
-        is?: ChannelWhereInput | null
-        isNot?: ChannelWhereInput | null
-    }
+  export type ChannelNullableScalarRelationFilter = {
+    is?: ChannelWhereInput | null
+    isNot?: ChannelWhereInput | null
+  }
 
-    export type UserNullableScalarRelationFilter = {
-        is?: UserWhereInput | null
-        isNot?: UserWhereInput | null
-    }
+  export type UserNullableScalarRelationFilter = {
+    is?: UserWhereInput | null
+    isNot?: UserWhereInput | null
+  }
 
-    export type TicketOrderByRelevanceInput = {
-        fields: TicketOrderByRelevanceFieldEnum | TicketOrderByRelevanceFieldEnum[]
-        sort: SortOrder
-        search: string
-    }
+  export type TicketOrderByRelevanceInput = {
+    fields: TicketOrderByRelevanceFieldEnum | TicketOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
 
-    export type TicketCountOrderByAggregateInput = {
-        id?: SortOrder
-        discordUserID?: SortOrder
-        channelId?: SortOrder
-        channelName?: SortOrder
-        createdAt?: SortOrder
-        updatedAt?: SortOrder
-        assignedUserId?: SortOrder
-    }
+  export type TicketCountOrderByAggregateInput = {
+    id?: SortOrder
+    discordUserID?: SortOrder
+    channelId?: SortOrder
+    channelName?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    assignedUserId?: SortOrder
+  }
 
-    export type TicketAvgOrderByAggregateInput = {
-        id?: SortOrder
-    }
+  export type TicketAvgOrderByAggregateInput = {
+    id?: SortOrder
+  }
 
-    export type TicketMaxOrderByAggregateInput = {
-        id?: SortOrder
-        discordUserID?: SortOrder
-        channelId?: SortOrder
-        channelName?: SortOrder
-        createdAt?: SortOrder
-        updatedAt?: SortOrder
-        assignedUserId?: SortOrder
-    }
+  export type TicketMaxOrderByAggregateInput = {
+    id?: SortOrder
+    discordUserID?: SortOrder
+    channelId?: SortOrder
+    channelName?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    assignedUserId?: SortOrder
+  }
 
-    export type TicketMinOrderByAggregateInput = {
-        id?: SortOrder
-        discordUserID?: SortOrder
-        channelId?: SortOrder
-        channelName?: SortOrder
-        createdAt?: SortOrder
-        updatedAt?: SortOrder
-        assignedUserId?: SortOrder
-    }
+  export type TicketMinOrderByAggregateInput = {
+    id?: SortOrder
+    discordUserID?: SortOrder
+    channelId?: SortOrder
+    channelName?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    assignedUserId?: SortOrder
+  }
 
-    export type TicketSumOrderByAggregateInput = {
-        id?: SortOrder
-    }
+  export type TicketSumOrderByAggregateInput = {
+    id?: SortOrder
+  }
 
-    export type IntNullableFilter<$PrismaModel = never> = {
-        equals?: number | IntFieldRefInput<$PrismaModel> | null
-        in?: number[] | null
-        notIn?: number[] | null
-        lt?: number | IntFieldRefInput<$PrismaModel>
-        lte?: number | IntFieldRefInput<$PrismaModel>
-        gt?: number | IntFieldRefInput<$PrismaModel>
-        gte?: number | IntFieldRefInput<$PrismaModel>
-        not?: NestedIntNullableFilter<$PrismaModel> | number | null
-    }
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
 
-    export type ApikeyOrderByRelevanceInput = {
-        fields: ApikeyOrderByRelevanceFieldEnum | ApikeyOrderByRelevanceFieldEnum[]
-        sort: SortOrder
-        search: string
-    }
+  export type ApikeyOrderByRelevanceInput = {
+    fields: ApikeyOrderByRelevanceFieldEnum | ApikeyOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
 
-    export type ApikeyCountOrderByAggregateInput = {
-        id?: SortOrder
-        name?: SortOrder
-        start?: SortOrder
-        prefix?: SortOrder
-        key?: SortOrder
-        userId?: SortOrder
-        refillInterval?: SortOrder
-        refillAmount?: SortOrder
-        lastRefillAt?: SortOrder
-        enabled?: SortOrder
-        rateLimitEnabled?: SortOrder
-        rateLimitTimeWindow?: SortOrder
-        rateLimitMax?: SortOrder
-        requestCount?: SortOrder
-        remaining?: SortOrder
-        lastRequest?: SortOrder
-        expiresAt?: SortOrder
-        createdAt?: SortOrder
-        updatedAt?: SortOrder
-        permissions?: SortOrder
-        metadata?: SortOrder
-    }
+  export type ApikeyCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    start?: SortOrder
+    prefix?: SortOrder
+    key?: SortOrder
+    userId?: SortOrder
+    refillInterval?: SortOrder
+    refillAmount?: SortOrder
+    lastRefillAt?: SortOrder
+    enabled?: SortOrder
+    rateLimitEnabled?: SortOrder
+    rateLimitTimeWindow?: SortOrder
+    rateLimitMax?: SortOrder
+    requestCount?: SortOrder
+    remaining?: SortOrder
+    lastRequest?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    permissions?: SortOrder
+    metadata?: SortOrder
+  }
 
-    export type ApikeyAvgOrderByAggregateInput = {
-        refillInterval?: SortOrder
-        refillAmount?: SortOrder
-        rateLimitTimeWindow?: SortOrder
-        rateLimitMax?: SortOrder
-        requestCount?: SortOrder
-        remaining?: SortOrder
-    }
+  export type ApikeyAvgOrderByAggregateInput = {
+    refillInterval?: SortOrder
+    refillAmount?: SortOrder
+    rateLimitTimeWindow?: SortOrder
+    rateLimitMax?: SortOrder
+    requestCount?: SortOrder
+    remaining?: SortOrder
+  }
 
-    export type ApikeyMaxOrderByAggregateInput = {
-        id?: SortOrder
-        name?: SortOrder
-        start?: SortOrder
-        prefix?: SortOrder
-        key?: SortOrder
-        userId?: SortOrder
-        refillInterval?: SortOrder
-        refillAmount?: SortOrder
-        lastRefillAt?: SortOrder
-        enabled?: SortOrder
-        rateLimitEnabled?: SortOrder
-        rateLimitTimeWindow?: SortOrder
-        rateLimitMax?: SortOrder
-        requestCount?: SortOrder
-        remaining?: SortOrder
-        lastRequest?: SortOrder
-        expiresAt?: SortOrder
-        createdAt?: SortOrder
-        updatedAt?: SortOrder
-        permissions?: SortOrder
-        metadata?: SortOrder
-    }
+  export type ApikeyMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    start?: SortOrder
+    prefix?: SortOrder
+    key?: SortOrder
+    userId?: SortOrder
+    refillInterval?: SortOrder
+    refillAmount?: SortOrder
+    lastRefillAt?: SortOrder
+    enabled?: SortOrder
+    rateLimitEnabled?: SortOrder
+    rateLimitTimeWindow?: SortOrder
+    rateLimitMax?: SortOrder
+    requestCount?: SortOrder
+    remaining?: SortOrder
+    lastRequest?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    permissions?: SortOrder
+    metadata?: SortOrder
+  }
 
-    export type ApikeyMinOrderByAggregateInput = {
-        id?: SortOrder
-        name?: SortOrder
-        start?: SortOrder
-        prefix?: SortOrder
-        key?: SortOrder
-        userId?: SortOrder
-        refillInterval?: SortOrder
-        refillAmount?: SortOrder
-        lastRefillAt?: SortOrder
-        enabled?: SortOrder
-        rateLimitEnabled?: SortOrder
-        rateLimitTimeWindow?: SortOrder
-        rateLimitMax?: SortOrder
-        requestCount?: SortOrder
-        remaining?: SortOrder
-        lastRequest?: SortOrder
-        expiresAt?: SortOrder
-        createdAt?: SortOrder
-        updatedAt?: SortOrder
-        permissions?: SortOrder
-        metadata?: SortOrder
-    }
+  export type ApikeyMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    start?: SortOrder
+    prefix?: SortOrder
+    key?: SortOrder
+    userId?: SortOrder
+    refillInterval?: SortOrder
+    refillAmount?: SortOrder
+    lastRefillAt?: SortOrder
+    enabled?: SortOrder
+    rateLimitEnabled?: SortOrder
+    rateLimitTimeWindow?: SortOrder
+    rateLimitMax?: SortOrder
+    requestCount?: SortOrder
+    remaining?: SortOrder
+    lastRequest?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    permissions?: SortOrder
+    metadata?: SortOrder
+  }
 
-    export type ApikeySumOrderByAggregateInput = {
-        refillInterval?: SortOrder
-        refillAmount?: SortOrder
-        rateLimitTimeWindow?: SortOrder
-        rateLimitMax?: SortOrder
-        requestCount?: SortOrder
-        remaining?: SortOrder
-    }
+  export type ApikeySumOrderByAggregateInput = {
+    refillInterval?: SortOrder
+    refillAmount?: SortOrder
+    rateLimitTimeWindow?: SortOrder
+    rateLimitMax?: SortOrder
+    requestCount?: SortOrder
+    remaining?: SortOrder
+  }
 
-    export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
-        equals?: number | IntFieldRefInput<$PrismaModel> | null
-        in?: number[] | null
-        notIn?: number[] | null
-        lt?: number | IntFieldRefInput<$PrismaModel>
-        lte?: number | IntFieldRefInput<$PrismaModel>
-        gt?: number | IntFieldRefInput<$PrismaModel>
-        gte?: number | IntFieldRefInput<$PrismaModel>
-        not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
-        _count?: NestedIntNullableFilter<$PrismaModel>
-        _avg?: NestedFloatNullableFilter<$PrismaModel>
-        _sum?: NestedIntNullableFilter<$PrismaModel>
-        _min?: NestedIntNullableFilter<$PrismaModel>
-        _max?: NestedIntNullableFilter<$PrismaModel>
-    }
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
 
-    export type JwksOrderByRelevanceInput = {
-        fields: JwksOrderByRelevanceFieldEnum | JwksOrderByRelevanceFieldEnum[]
-        sort: SortOrder
-        search: string
-    }
+  export type JwksOrderByRelevanceInput = {
+    fields: JwksOrderByRelevanceFieldEnum | JwksOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
 
-    export type JwksCountOrderByAggregateInput = {
-        id?: SortOrder
-        publicKey?: SortOrder
-        privateKey?: SortOrder
-        createdAt?: SortOrder
-    }
+  export type JwksCountOrderByAggregateInput = {
+    id?: SortOrder
+    publicKey?: SortOrder
+    privateKey?: SortOrder
+    createdAt?: SortOrder
+  }
 
-    export type JwksMaxOrderByAggregateInput = {
-        id?: SortOrder
-        publicKey?: SortOrder
-        privateKey?: SortOrder
-        createdAt?: SortOrder
-    }
+  export type JwksMaxOrderByAggregateInput = {
+    id?: SortOrder
+    publicKey?: SortOrder
+    privateKey?: SortOrder
+    createdAt?: SortOrder
+  }
 
-    export type JwksMinOrderByAggregateInput = {
-        id?: SortOrder
-        publicKey?: SortOrder
-        privateKey?: SortOrder
-        createdAt?: SortOrder
-    }
+  export type JwksMinOrderByAggregateInput = {
+    id?: SortOrder
+    publicKey?: SortOrder
+    privateKey?: SortOrder
+    createdAt?: SortOrder
+  }
 
   export type AccountCreateNestedManyWithoutUserInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
@@ -22205,19 +22217,19 @@ export namespace Prisma {
     connect?: EventRegistrationWhereUniqueInput | EventRegistrationWhereUniqueInput[]
   }
 
-    export type TicketCreateNestedManyWithoutUserInput = {
-        create?: XOR<TicketCreateWithoutUserInput, TicketUncheckedCreateWithoutUserInput> | TicketCreateWithoutUserInput[] | TicketUncheckedCreateWithoutUserInput[]
-        connectOrCreate?: TicketCreateOrConnectWithoutUserInput | TicketCreateOrConnectWithoutUserInput[]
-        createMany?: TicketCreateManyUserInputEnvelope
-        connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
-    }
+  export type TicketCreateNestedManyWithoutUserInput = {
+    create?: XOR<TicketCreateWithoutUserInput, TicketUncheckedCreateWithoutUserInput> | TicketCreateWithoutUserInput[] | TicketUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: TicketCreateOrConnectWithoutUserInput | TicketCreateOrConnectWithoutUserInput[]
+    createMany?: TicketCreateManyUserInputEnvelope
+    connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+  }
 
-    export type ApikeyCreateNestedManyWithoutUserInput = {
-        create?: XOR<ApikeyCreateWithoutUserInput, ApikeyUncheckedCreateWithoutUserInput> | ApikeyCreateWithoutUserInput[] | ApikeyUncheckedCreateWithoutUserInput[]
-        connectOrCreate?: ApikeyCreateOrConnectWithoutUserInput | ApikeyCreateOrConnectWithoutUserInput[]
-        createMany?: ApikeyCreateManyUserInputEnvelope
-        connect?: ApikeyWhereUniqueInput | ApikeyWhereUniqueInput[]
-    }
+  export type ApikeyCreateNestedManyWithoutUserInput = {
+    create?: XOR<ApikeyCreateWithoutUserInput, ApikeyUncheckedCreateWithoutUserInput> | ApikeyCreateWithoutUserInput[] | ApikeyUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ApikeyCreateOrConnectWithoutUserInput | ApikeyCreateOrConnectWithoutUserInput[]
+    createMany?: ApikeyCreateManyUserInputEnvelope
+    connect?: ApikeyWhereUniqueInput | ApikeyWhereUniqueInput[]
+  }
 
   export type AccountUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
@@ -22275,19 +22287,19 @@ export namespace Prisma {
     connect?: EventRegistrationWhereUniqueInput | EventRegistrationWhereUniqueInput[]
   }
 
-    export type TicketUncheckedCreateNestedManyWithoutUserInput = {
-        create?: XOR<TicketCreateWithoutUserInput, TicketUncheckedCreateWithoutUserInput> | TicketCreateWithoutUserInput[] | TicketUncheckedCreateWithoutUserInput[]
-        connectOrCreate?: TicketCreateOrConnectWithoutUserInput | TicketCreateOrConnectWithoutUserInput[]
-        createMany?: TicketCreateManyUserInputEnvelope
-        connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
-    }
+  export type TicketUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<TicketCreateWithoutUserInput, TicketUncheckedCreateWithoutUserInput> | TicketCreateWithoutUserInput[] | TicketUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: TicketCreateOrConnectWithoutUserInput | TicketCreateOrConnectWithoutUserInput[]
+    createMany?: TicketCreateManyUserInputEnvelope
+    connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+  }
 
-    export type ApikeyUncheckedCreateNestedManyWithoutUserInput = {
-        create?: XOR<ApikeyCreateWithoutUserInput, ApikeyUncheckedCreateWithoutUserInput> | ApikeyCreateWithoutUserInput[] | ApikeyUncheckedCreateWithoutUserInput[]
-        connectOrCreate?: ApikeyCreateOrConnectWithoutUserInput | ApikeyCreateOrConnectWithoutUserInput[]
-        createMany?: ApikeyCreateManyUserInputEnvelope
-        connect?: ApikeyWhereUniqueInput | ApikeyWhereUniqueInput[]
-    }
+  export type ApikeyUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<ApikeyCreateWithoutUserInput, ApikeyUncheckedCreateWithoutUserInput> | ApikeyCreateWithoutUserInput[] | ApikeyUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ApikeyCreateOrConnectWithoutUserInput | ApikeyCreateOrConnectWithoutUserInput[]
+    createMany?: ApikeyCreateManyUserInputEnvelope
+    connect?: ApikeyWhereUniqueInput | ApikeyWhereUniqueInput[]
+  }
 
   export type StringFieldUpdateOperationsInput = {
     set?: string
@@ -22425,33 +22437,33 @@ export namespace Prisma {
     deleteMany?: EventRegistrationScalarWhereInput | EventRegistrationScalarWhereInput[]
   }
 
-    export type TicketUpdateManyWithoutUserNestedInput = {
-        create?: XOR<TicketCreateWithoutUserInput, TicketUncheckedCreateWithoutUserInput> | TicketCreateWithoutUserInput[] | TicketUncheckedCreateWithoutUserInput[]
-        connectOrCreate?: TicketCreateOrConnectWithoutUserInput | TicketCreateOrConnectWithoutUserInput[]
-        upsert?: TicketUpsertWithWhereUniqueWithoutUserInput | TicketUpsertWithWhereUniqueWithoutUserInput[]
-        createMany?: TicketCreateManyUserInputEnvelope
-        set?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
-        disconnect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
-        delete?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
-        connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
-        update?: TicketUpdateWithWhereUniqueWithoutUserInput | TicketUpdateWithWhereUniqueWithoutUserInput[]
-        updateMany?: TicketUpdateManyWithWhereWithoutUserInput | TicketUpdateManyWithWhereWithoutUserInput[]
-        deleteMany?: TicketScalarWhereInput | TicketScalarWhereInput[]
-    }
+  export type TicketUpdateManyWithoutUserNestedInput = {
+    create?: XOR<TicketCreateWithoutUserInput, TicketUncheckedCreateWithoutUserInput> | TicketCreateWithoutUserInput[] | TicketUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: TicketCreateOrConnectWithoutUserInput | TicketCreateOrConnectWithoutUserInput[]
+    upsert?: TicketUpsertWithWhereUniqueWithoutUserInput | TicketUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: TicketCreateManyUserInputEnvelope
+    set?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    disconnect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    delete?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    update?: TicketUpdateWithWhereUniqueWithoutUserInput | TicketUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: TicketUpdateManyWithWhereWithoutUserInput | TicketUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: TicketScalarWhereInput | TicketScalarWhereInput[]
+  }
 
-    export type ApikeyUpdateManyWithoutUserNestedInput = {
-        create?: XOR<ApikeyCreateWithoutUserInput, ApikeyUncheckedCreateWithoutUserInput> | ApikeyCreateWithoutUserInput[] | ApikeyUncheckedCreateWithoutUserInput[]
-        connectOrCreate?: ApikeyCreateOrConnectWithoutUserInput | ApikeyCreateOrConnectWithoutUserInput[]
-        upsert?: ApikeyUpsertWithWhereUniqueWithoutUserInput | ApikeyUpsertWithWhereUniqueWithoutUserInput[]
-        createMany?: ApikeyCreateManyUserInputEnvelope
-        set?: ApikeyWhereUniqueInput | ApikeyWhereUniqueInput[]
-        disconnect?: ApikeyWhereUniqueInput | ApikeyWhereUniqueInput[]
-        delete?: ApikeyWhereUniqueInput | ApikeyWhereUniqueInput[]
-        connect?: ApikeyWhereUniqueInput | ApikeyWhereUniqueInput[]
-        update?: ApikeyUpdateWithWhereUniqueWithoutUserInput | ApikeyUpdateWithWhereUniqueWithoutUserInput[]
-        updateMany?: ApikeyUpdateManyWithWhereWithoutUserInput | ApikeyUpdateManyWithWhereWithoutUserInput[]
-        deleteMany?: ApikeyScalarWhereInput | ApikeyScalarWhereInput[]
-    }
+  export type ApikeyUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ApikeyCreateWithoutUserInput, ApikeyUncheckedCreateWithoutUserInput> | ApikeyCreateWithoutUserInput[] | ApikeyUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ApikeyCreateOrConnectWithoutUserInput | ApikeyCreateOrConnectWithoutUserInput[]
+    upsert?: ApikeyUpsertWithWhereUniqueWithoutUserInput | ApikeyUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ApikeyCreateManyUserInputEnvelope
+    set?: ApikeyWhereUniqueInput | ApikeyWhereUniqueInput[]
+    disconnect?: ApikeyWhereUniqueInput | ApikeyWhereUniqueInput[]
+    delete?: ApikeyWhereUniqueInput | ApikeyWhereUniqueInput[]
+    connect?: ApikeyWhereUniqueInput | ApikeyWhereUniqueInput[]
+    update?: ApikeyUpdateWithWhereUniqueWithoutUserInput | ApikeyUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ApikeyUpdateManyWithWhereWithoutUserInput | ApikeyUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ApikeyScalarWhereInput | ApikeyScalarWhereInput[]
+  }
 
   export type AccountUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
@@ -22565,33 +22577,33 @@ export namespace Prisma {
     deleteMany?: EventRegistrationScalarWhereInput | EventRegistrationScalarWhereInput[]
   }
 
-    export type TicketUncheckedUpdateManyWithoutUserNestedInput = {
-        create?: XOR<TicketCreateWithoutUserInput, TicketUncheckedCreateWithoutUserInput> | TicketCreateWithoutUserInput[] | TicketUncheckedCreateWithoutUserInput[]
-        connectOrCreate?: TicketCreateOrConnectWithoutUserInput | TicketCreateOrConnectWithoutUserInput[]
-        upsert?: TicketUpsertWithWhereUniqueWithoutUserInput | TicketUpsertWithWhereUniqueWithoutUserInput[]
-        createMany?: TicketCreateManyUserInputEnvelope
-        set?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
-        disconnect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
-        delete?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
-        connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
-        update?: TicketUpdateWithWhereUniqueWithoutUserInput | TicketUpdateWithWhereUniqueWithoutUserInput[]
-        updateMany?: TicketUpdateManyWithWhereWithoutUserInput | TicketUpdateManyWithWhereWithoutUserInput[]
-        deleteMany?: TicketScalarWhereInput | TicketScalarWhereInput[]
-    }
+  export type TicketUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<TicketCreateWithoutUserInput, TicketUncheckedCreateWithoutUserInput> | TicketCreateWithoutUserInput[] | TicketUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: TicketCreateOrConnectWithoutUserInput | TicketCreateOrConnectWithoutUserInput[]
+    upsert?: TicketUpsertWithWhereUniqueWithoutUserInput | TicketUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: TicketCreateManyUserInputEnvelope
+    set?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    disconnect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    delete?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    update?: TicketUpdateWithWhereUniqueWithoutUserInput | TicketUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: TicketUpdateManyWithWhereWithoutUserInput | TicketUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: TicketScalarWhereInput | TicketScalarWhereInput[]
+  }
 
-    export type ApikeyUncheckedUpdateManyWithoutUserNestedInput = {
-        create?: XOR<ApikeyCreateWithoutUserInput, ApikeyUncheckedCreateWithoutUserInput> | ApikeyCreateWithoutUserInput[] | ApikeyUncheckedCreateWithoutUserInput[]
-        connectOrCreate?: ApikeyCreateOrConnectWithoutUserInput | ApikeyCreateOrConnectWithoutUserInput[]
-        upsert?: ApikeyUpsertWithWhereUniqueWithoutUserInput | ApikeyUpsertWithWhereUniqueWithoutUserInput[]
-        createMany?: ApikeyCreateManyUserInputEnvelope
-        set?: ApikeyWhereUniqueInput | ApikeyWhereUniqueInput[]
-        disconnect?: ApikeyWhereUniqueInput | ApikeyWhereUniqueInput[]
-        delete?: ApikeyWhereUniqueInput | ApikeyWhereUniqueInput[]
-        connect?: ApikeyWhereUniqueInput | ApikeyWhereUniqueInput[]
-        update?: ApikeyUpdateWithWhereUniqueWithoutUserInput | ApikeyUpdateWithWhereUniqueWithoutUserInput[]
-        updateMany?: ApikeyUpdateManyWithWhereWithoutUserInput | ApikeyUpdateManyWithWhereWithoutUserInput[]
-        deleteMany?: ApikeyScalarWhereInput | ApikeyScalarWhereInput[]
-    }
+  export type ApikeyUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ApikeyCreateWithoutUserInput, ApikeyUncheckedCreateWithoutUserInput> | ApikeyCreateWithoutUserInput[] | ApikeyUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ApikeyCreateOrConnectWithoutUserInput | ApikeyCreateOrConnectWithoutUserInput[]
+    upsert?: ApikeyUpsertWithWhereUniqueWithoutUserInput | ApikeyUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ApikeyCreateManyUserInputEnvelope
+    set?: ApikeyWhereUniqueInput | ApikeyWhereUniqueInput[]
+    disconnect?: ApikeyWhereUniqueInput | ApikeyWhereUniqueInput[]
+    delete?: ApikeyWhereUniqueInput | ApikeyWhereUniqueInput[]
+    connect?: ApikeyWhereUniqueInput | ApikeyWhereUniqueInput[]
+    update?: ApikeyUpdateWithWhereUniqueWithoutUserInput | ApikeyUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ApikeyUpdateManyWithWhereWithoutUserInput | ApikeyUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ApikeyScalarWhereInput | ApikeyScalarWhereInput[]
+  }
 
   export type UserCreateNestedOneWithoutSessionsInput = {
     create?: XOR<UserCreateWithoutSessionsInput, UserUncheckedCreateWithoutSessionsInput>
@@ -22775,89 +22787,89 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutTwofactorsInput, UserUpdateWithoutTwofactorsInput>, UserUncheckedUpdateWithoutTwofactorsInput>
   }
 
-    export type MessageCreateNestedManyWithoutChannelInput = {
-        create?: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput> | MessageCreateWithoutChannelInput[] | MessageUncheckedCreateWithoutChannelInput[]
-        connectOrCreate?: MessageCreateOrConnectWithoutChannelInput | MessageCreateOrConnectWithoutChannelInput[]
-        createMany?: MessageCreateManyChannelInputEnvelope
-        connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
-    }
+  export type MessageCreateNestedManyWithoutChannelInput = {
+    create?: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput> | MessageCreateWithoutChannelInput[] | MessageUncheckedCreateWithoutChannelInput[]
+    connectOrCreate?: MessageCreateOrConnectWithoutChannelInput | MessageCreateOrConnectWithoutChannelInput[]
+    createMany?: MessageCreateManyChannelInputEnvelope
+    connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+  }
 
-    export type TicketCreateNestedManyWithoutChannelInput = {
-        create?: XOR<TicketCreateWithoutChannelInput, TicketUncheckedCreateWithoutChannelInput> | TicketCreateWithoutChannelInput[] | TicketUncheckedCreateWithoutChannelInput[]
-        connectOrCreate?: TicketCreateOrConnectWithoutChannelInput | TicketCreateOrConnectWithoutChannelInput[]
-        createMany?: TicketCreateManyChannelInputEnvelope
-        connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
-    }
+  export type TicketCreateNestedManyWithoutChannelInput = {
+    create?: XOR<TicketCreateWithoutChannelInput, TicketUncheckedCreateWithoutChannelInput> | TicketCreateWithoutChannelInput[] | TicketUncheckedCreateWithoutChannelInput[]
+    connectOrCreate?: TicketCreateOrConnectWithoutChannelInput | TicketCreateOrConnectWithoutChannelInput[]
+    createMany?: TicketCreateManyChannelInputEnvelope
+    connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+  }
 
-    export type MessageUncheckedCreateNestedManyWithoutChannelInput = {
-        create?: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput> | MessageCreateWithoutChannelInput[] | MessageUncheckedCreateWithoutChannelInput[]
-        connectOrCreate?: MessageCreateOrConnectWithoutChannelInput | MessageCreateOrConnectWithoutChannelInput[]
-        createMany?: MessageCreateManyChannelInputEnvelope
-        connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
-    }
+  export type MessageUncheckedCreateNestedManyWithoutChannelInput = {
+    create?: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput> | MessageCreateWithoutChannelInput[] | MessageUncheckedCreateWithoutChannelInput[]
+    connectOrCreate?: MessageCreateOrConnectWithoutChannelInput | MessageCreateOrConnectWithoutChannelInput[]
+    createMany?: MessageCreateManyChannelInputEnvelope
+    connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+  }
 
-    export type TicketUncheckedCreateNestedManyWithoutChannelInput = {
-        create?: XOR<TicketCreateWithoutChannelInput, TicketUncheckedCreateWithoutChannelInput> | TicketCreateWithoutChannelInput[] | TicketUncheckedCreateWithoutChannelInput[]
-        connectOrCreate?: TicketCreateOrConnectWithoutChannelInput | TicketCreateOrConnectWithoutChannelInput[]
-        createMany?: TicketCreateManyChannelInputEnvelope
-        connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
-    }
+  export type TicketUncheckedCreateNestedManyWithoutChannelInput = {
+    create?: XOR<TicketCreateWithoutChannelInput, TicketUncheckedCreateWithoutChannelInput> | TicketCreateWithoutChannelInput[] | TicketUncheckedCreateWithoutChannelInput[]
+    connectOrCreate?: TicketCreateOrConnectWithoutChannelInput | TicketCreateOrConnectWithoutChannelInput[]
+    createMany?: TicketCreateManyChannelInputEnvelope
+    connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+  }
 
-    export type MessageUpdateManyWithoutChannelNestedInput = {
-        create?: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput> | MessageCreateWithoutChannelInput[] | MessageUncheckedCreateWithoutChannelInput[]
-        connectOrCreate?: MessageCreateOrConnectWithoutChannelInput | MessageCreateOrConnectWithoutChannelInput[]
-        upsert?: MessageUpsertWithWhereUniqueWithoutChannelInput | MessageUpsertWithWhereUniqueWithoutChannelInput[]
-        createMany?: MessageCreateManyChannelInputEnvelope
-        set?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
-        disconnect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
-        delete?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
-        connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
-        update?: MessageUpdateWithWhereUniqueWithoutChannelInput | MessageUpdateWithWhereUniqueWithoutChannelInput[]
-        updateMany?: MessageUpdateManyWithWhereWithoutChannelInput | MessageUpdateManyWithWhereWithoutChannelInput[]
-        deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
-    }
+  export type MessageUpdateManyWithoutChannelNestedInput = {
+    create?: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput> | MessageCreateWithoutChannelInput[] | MessageUncheckedCreateWithoutChannelInput[]
+    connectOrCreate?: MessageCreateOrConnectWithoutChannelInput | MessageCreateOrConnectWithoutChannelInput[]
+    upsert?: MessageUpsertWithWhereUniqueWithoutChannelInput | MessageUpsertWithWhereUniqueWithoutChannelInput[]
+    createMany?: MessageCreateManyChannelInputEnvelope
+    set?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    disconnect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    delete?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    update?: MessageUpdateWithWhereUniqueWithoutChannelInput | MessageUpdateWithWhereUniqueWithoutChannelInput[]
+    updateMany?: MessageUpdateManyWithWhereWithoutChannelInput | MessageUpdateManyWithWhereWithoutChannelInput[]
+    deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
+  }
 
-    export type TicketUpdateManyWithoutChannelNestedInput = {
-        create?: XOR<TicketCreateWithoutChannelInput, TicketUncheckedCreateWithoutChannelInput> | TicketCreateWithoutChannelInput[] | TicketUncheckedCreateWithoutChannelInput[]
-        connectOrCreate?: TicketCreateOrConnectWithoutChannelInput | TicketCreateOrConnectWithoutChannelInput[]
-        upsert?: TicketUpsertWithWhereUniqueWithoutChannelInput | TicketUpsertWithWhereUniqueWithoutChannelInput[]
-        createMany?: TicketCreateManyChannelInputEnvelope
-        set?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
-        disconnect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
-        delete?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
-        connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
-        update?: TicketUpdateWithWhereUniqueWithoutChannelInput | TicketUpdateWithWhereUniqueWithoutChannelInput[]
-        updateMany?: TicketUpdateManyWithWhereWithoutChannelInput | TicketUpdateManyWithWhereWithoutChannelInput[]
-        deleteMany?: TicketScalarWhereInput | TicketScalarWhereInput[]
-    }
+  export type TicketUpdateManyWithoutChannelNestedInput = {
+    create?: XOR<TicketCreateWithoutChannelInput, TicketUncheckedCreateWithoutChannelInput> | TicketCreateWithoutChannelInput[] | TicketUncheckedCreateWithoutChannelInput[]
+    connectOrCreate?: TicketCreateOrConnectWithoutChannelInput | TicketCreateOrConnectWithoutChannelInput[]
+    upsert?: TicketUpsertWithWhereUniqueWithoutChannelInput | TicketUpsertWithWhereUniqueWithoutChannelInput[]
+    createMany?: TicketCreateManyChannelInputEnvelope
+    set?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    disconnect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    delete?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    update?: TicketUpdateWithWhereUniqueWithoutChannelInput | TicketUpdateWithWhereUniqueWithoutChannelInput[]
+    updateMany?: TicketUpdateManyWithWhereWithoutChannelInput | TicketUpdateManyWithWhereWithoutChannelInput[]
+    deleteMany?: TicketScalarWhereInput | TicketScalarWhereInput[]
+  }
 
-    export type MessageUncheckedUpdateManyWithoutChannelNestedInput = {
-        create?: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput> | MessageCreateWithoutChannelInput[] | MessageUncheckedCreateWithoutChannelInput[]
-        connectOrCreate?: MessageCreateOrConnectWithoutChannelInput | MessageCreateOrConnectWithoutChannelInput[]
-        upsert?: MessageUpsertWithWhereUniqueWithoutChannelInput | MessageUpsertWithWhereUniqueWithoutChannelInput[]
-        createMany?: MessageCreateManyChannelInputEnvelope
-        set?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
-        disconnect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
-        delete?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
-        connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
-        update?: MessageUpdateWithWhereUniqueWithoutChannelInput | MessageUpdateWithWhereUniqueWithoutChannelInput[]
-        updateMany?: MessageUpdateManyWithWhereWithoutChannelInput | MessageUpdateManyWithWhereWithoutChannelInput[]
-        deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
-    }
+  export type MessageUncheckedUpdateManyWithoutChannelNestedInput = {
+    create?: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput> | MessageCreateWithoutChannelInput[] | MessageUncheckedCreateWithoutChannelInput[]
+    connectOrCreate?: MessageCreateOrConnectWithoutChannelInput | MessageCreateOrConnectWithoutChannelInput[]
+    upsert?: MessageUpsertWithWhereUniqueWithoutChannelInput | MessageUpsertWithWhereUniqueWithoutChannelInput[]
+    createMany?: MessageCreateManyChannelInputEnvelope
+    set?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    disconnect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    delete?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    update?: MessageUpdateWithWhereUniqueWithoutChannelInput | MessageUpdateWithWhereUniqueWithoutChannelInput[]
+    updateMany?: MessageUpdateManyWithWhereWithoutChannelInput | MessageUpdateManyWithWhereWithoutChannelInput[]
+    deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
+  }
 
-    export type TicketUncheckedUpdateManyWithoutChannelNestedInput = {
-        create?: XOR<TicketCreateWithoutChannelInput, TicketUncheckedCreateWithoutChannelInput> | TicketCreateWithoutChannelInput[] | TicketUncheckedCreateWithoutChannelInput[]
-        connectOrCreate?: TicketCreateOrConnectWithoutChannelInput | TicketCreateOrConnectWithoutChannelInput[]
-        upsert?: TicketUpsertWithWhereUniqueWithoutChannelInput | TicketUpsertWithWhereUniqueWithoutChannelInput[]
-        createMany?: TicketCreateManyChannelInputEnvelope
-        set?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
-        disconnect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
-        delete?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
-        connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
-        update?: TicketUpdateWithWhereUniqueWithoutChannelInput | TicketUpdateWithWhereUniqueWithoutChannelInput[]
-        updateMany?: TicketUpdateManyWithWhereWithoutChannelInput | TicketUpdateManyWithWhereWithoutChannelInput[]
-        deleteMany?: TicketScalarWhereInput | TicketScalarWhereInput[]
-    }
+  export type TicketUncheckedUpdateManyWithoutChannelNestedInput = {
+    create?: XOR<TicketCreateWithoutChannelInput, TicketUncheckedCreateWithoutChannelInput> | TicketCreateWithoutChannelInput[] | TicketUncheckedCreateWithoutChannelInput[]
+    connectOrCreate?: TicketCreateOrConnectWithoutChannelInput | TicketCreateOrConnectWithoutChannelInput[]
+    upsert?: TicketUpsertWithWhereUniqueWithoutChannelInput | TicketUpsertWithWhereUniqueWithoutChannelInput[]
+    createMany?: TicketCreateManyChannelInputEnvelope
+    set?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    disconnect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    delete?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    update?: TicketUpdateWithWhereUniqueWithoutChannelInput | TicketUpdateWithWhereUniqueWithoutChannelInput[]
+    updateMany?: TicketUpdateManyWithWhereWithoutChannelInput | TicketUpdateManyWithWhereWithoutChannelInput[]
+    deleteMany?: TicketScalarWhereInput | TicketScalarWhereInput[]
+  }
 
   export type UserCreateNestedOneWithoutMessagesInput = {
     create?: XOR<UserCreateWithoutMessagesInput, UserUncheckedCreateWithoutMessagesInput>
@@ -22865,11 +22877,11 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
-    export type ChannelCreateNestedOneWithoutMessageInput = {
-        create?: XOR<ChannelCreateWithoutMessageInput, ChannelUncheckedCreateWithoutMessageInput>
-        connectOrCreate?: ChannelCreateOrConnectWithoutMessageInput
-        connect?: ChannelWhereUniqueInput
-    }
+  export type ChannelCreateNestedOneWithoutMessageInput = {
+    create?: XOR<ChannelCreateWithoutMessageInput, ChannelUncheckedCreateWithoutMessageInput>
+    connectOrCreate?: ChannelCreateOrConnectWithoutMessageInput
+    connect?: ChannelWhereUniqueInput
+  }
 
   export type BytesFieldUpdateOperationsInput = {
     set?: Uint8Array
@@ -22883,13 +22895,13 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutMessagesInput, UserUpdateWithoutMessagesInput>, UserUncheckedUpdateWithoutMessagesInput>
   }
 
-    export type ChannelUpdateOneRequiredWithoutMessageNestedInput = {
-        create?: XOR<ChannelCreateWithoutMessageInput, ChannelUncheckedCreateWithoutMessageInput>
-        connectOrCreate?: ChannelCreateOrConnectWithoutMessageInput
-        upsert?: ChannelUpsertWithoutMessageInput
-        connect?: ChannelWhereUniqueInput
-        update?: XOR<XOR<ChannelUpdateToOneWithWhereWithoutMessageInput, ChannelUpdateWithoutMessageInput>, ChannelUncheckedUpdateWithoutMessageInput>
-    }
+  export type ChannelUpdateOneRequiredWithoutMessageNestedInput = {
+    create?: XOR<ChannelCreateWithoutMessageInput, ChannelUncheckedCreateWithoutMessageInput>
+    connectOrCreate?: ChannelCreateOrConnectWithoutMessageInput
+    upsert?: ChannelUpsertWithoutMessageInput
+    connect?: ChannelWhereUniqueInput
+    update?: XOR<XOR<ChannelUpdateToOneWithWhereWithoutMessageInput, ChannelUpdateWithoutMessageInput>, ChannelUncheckedUpdateWithoutMessageInput>
+  }
 
   export type IntFieldUpdateOperationsInput = {
     set?: number
@@ -23097,59 +23109,59 @@ export namespace Prisma {
     update?: XOR<XOR<EventUpdateToOneWithWhereWithoutRegistrationsInput, EventUpdateWithoutRegistrationsInput>, EventUncheckedUpdateWithoutRegistrationsInput>
   }
 
-    export type ChannelCreateNestedOneWithoutTicketInput = {
-        create?: XOR<ChannelCreateWithoutTicketInput, ChannelUncheckedCreateWithoutTicketInput>
-        connectOrCreate?: ChannelCreateOrConnectWithoutTicketInput
-        connect?: ChannelWhereUniqueInput
-    }
+  export type ChannelCreateNestedOneWithoutTicketInput = {
+    create?: XOR<ChannelCreateWithoutTicketInput, ChannelUncheckedCreateWithoutTicketInput>
+    connectOrCreate?: ChannelCreateOrConnectWithoutTicketInput
+    connect?: ChannelWhereUniqueInput
+  }
 
-    export type UserCreateNestedOneWithoutTicketInput = {
-        create?: XOR<UserCreateWithoutTicketInput, UserUncheckedCreateWithoutTicketInput>
-        connectOrCreate?: UserCreateOrConnectWithoutTicketInput
-        connect?: UserWhereUniqueInput
-    }
+  export type UserCreateNestedOneWithoutTicketInput = {
+    create?: XOR<UserCreateWithoutTicketInput, UserUncheckedCreateWithoutTicketInput>
+    connectOrCreate?: UserCreateOrConnectWithoutTicketInput
+    connect?: UserWhereUniqueInput
+  }
 
-    export type ChannelUpdateOneWithoutTicketNestedInput = {
-        create?: XOR<ChannelCreateWithoutTicketInput, ChannelUncheckedCreateWithoutTicketInput>
-        connectOrCreate?: ChannelCreateOrConnectWithoutTicketInput
-        upsert?: ChannelUpsertWithoutTicketInput
-        disconnect?: ChannelWhereInput | boolean
-        delete?: ChannelWhereInput | boolean
-        connect?: ChannelWhereUniqueInput
-        update?: XOR<XOR<ChannelUpdateToOneWithWhereWithoutTicketInput, ChannelUpdateWithoutTicketInput>, ChannelUncheckedUpdateWithoutTicketInput>
-    }
+  export type ChannelUpdateOneWithoutTicketNestedInput = {
+    create?: XOR<ChannelCreateWithoutTicketInput, ChannelUncheckedCreateWithoutTicketInput>
+    connectOrCreate?: ChannelCreateOrConnectWithoutTicketInput
+    upsert?: ChannelUpsertWithoutTicketInput
+    disconnect?: ChannelWhereInput | boolean
+    delete?: ChannelWhereInput | boolean
+    connect?: ChannelWhereUniqueInput
+    update?: XOR<XOR<ChannelUpdateToOneWithWhereWithoutTicketInput, ChannelUpdateWithoutTicketInput>, ChannelUncheckedUpdateWithoutTicketInput>
+  }
 
-    export type UserUpdateOneWithoutTicketNestedInput = {
-        create?: XOR<UserCreateWithoutTicketInput, UserUncheckedCreateWithoutTicketInput>
-        connectOrCreate?: UserCreateOrConnectWithoutTicketInput
-        upsert?: UserUpsertWithoutTicketInput
-        disconnect?: UserWhereInput | boolean
-        delete?: UserWhereInput | boolean
-        connect?: UserWhereUniqueInput
-        update?: XOR<XOR<UserUpdateToOneWithWhereWithoutTicketInput, UserUpdateWithoutTicketInput>, UserUncheckedUpdateWithoutTicketInput>
-    }
+  export type UserUpdateOneWithoutTicketNestedInput = {
+    create?: XOR<UserCreateWithoutTicketInput, UserUncheckedCreateWithoutTicketInput>
+    connectOrCreate?: UserCreateOrConnectWithoutTicketInput
+    upsert?: UserUpsertWithoutTicketInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutTicketInput, UserUpdateWithoutTicketInput>, UserUncheckedUpdateWithoutTicketInput>
+  }
 
-    export type UserCreateNestedOneWithoutApikeysInput = {
-        create?: XOR<UserCreateWithoutApikeysInput, UserUncheckedCreateWithoutApikeysInput>
-        connectOrCreate?: UserCreateOrConnectWithoutApikeysInput
-        connect?: UserWhereUniqueInput
-    }
+  export type UserCreateNestedOneWithoutApikeysInput = {
+    create?: XOR<UserCreateWithoutApikeysInput, UserUncheckedCreateWithoutApikeysInput>
+    connectOrCreate?: UserCreateOrConnectWithoutApikeysInput
+    connect?: UserWhereUniqueInput
+  }
 
-    export type NullableIntFieldUpdateOperationsInput = {
-        set?: number | null
-        increment?: number
-        decrement?: number
-        multiply?: number
-        divide?: number
-    }
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
 
-    export type UserUpdateOneRequiredWithoutApikeysNestedInput = {
-        create?: XOR<UserCreateWithoutApikeysInput, UserUncheckedCreateWithoutApikeysInput>
-        connectOrCreate?: UserCreateOrConnectWithoutApikeysInput
-        upsert?: UserUpsertWithoutApikeysInput
-        connect?: UserWhereUniqueInput
-        update?: XOR<XOR<UserUpdateToOneWithWhereWithoutApikeysInput, UserUpdateWithoutApikeysInput>, UserUncheckedUpdateWithoutApikeysInput>
-    }
+  export type UserUpdateOneRequiredWithoutApikeysNestedInput = {
+    create?: XOR<UserCreateWithoutApikeysInput, UserUncheckedCreateWithoutApikeysInput>
+    connectOrCreate?: UserCreateOrConnectWithoutApikeysInput
+    upsert?: UserUpsertWithoutApikeysInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutApikeysInput, UserUpdateWithoutApikeysInput>, UserUncheckedUpdateWithoutApikeysInput>
+  }
 
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
@@ -23162,7 +23174,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
-      search?: string
+    search?: string
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
@@ -23182,7 +23194,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
-      search?: string
+    search?: string
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
@@ -23224,7 +23236,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
-      search?: string
+    search?: string
     not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedStringFilter<$PrismaModel>
@@ -23261,7 +23273,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
-      search?: string
+    search?: string
     not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
@@ -23359,32 +23371,32 @@ export namespace Prisma {
     _max?: NestedBytesFilter<$PrismaModel>
   }
 
-    export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
-        equals?: number | IntFieldRefInput<$PrismaModel> | null
-        in?: number[] | null
-        notIn?: number[] | null
-        lt?: number | IntFieldRefInput<$PrismaModel>
-        lte?: number | IntFieldRefInput<$PrismaModel>
-        gt?: number | IntFieldRefInput<$PrismaModel>
-        gte?: number | IntFieldRefInput<$PrismaModel>
-        not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
-        _count?: NestedIntNullableFilter<$PrismaModel>
-        _avg?: NestedFloatNullableFilter<$PrismaModel>
-        _sum?: NestedIntNullableFilter<$PrismaModel>
-        _min?: NestedIntNullableFilter<$PrismaModel>
-        _max?: NestedIntNullableFilter<$PrismaModel>
-    }
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
 
-    export type NestedFloatNullableFilter<$PrismaModel = never> = {
-        equals?: number | FloatFieldRefInput<$PrismaModel> | null
-        in?: number[] | null
-        notIn?: number[] | null
-        lt?: number | FloatFieldRefInput<$PrismaModel>
-        lte?: number | FloatFieldRefInput<$PrismaModel>
-        gt?: number | FloatFieldRefInput<$PrismaModel>
-        gte?: number | FloatFieldRefInput<$PrismaModel>
-        not?: NestedFloatNullableFilter<$PrismaModel> | number | null
-    }
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
 
   export type AccountCreateWithoutUserInput = {
     id: string
@@ -23463,7 +23475,7 @@ export namespace Prisma {
   export type MessageCreateWithoutUserInput = {
     createdAt: Date | string
     content: Uint8Array
-      channel: ChannelCreateNestedOneWithoutMessageInput
+    channel: ChannelCreateNestedOneWithoutMessageInput
   }
 
   export type MessageUncheckedCreateWithoutUserInput = {
@@ -23615,87 +23627,87 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-    export type TicketCreateWithoutUserInput = {
-        discordUserID: string
-        createdAt: Date | string
-        updatedAt: Date | string
-        channel?: ChannelCreateNestedOneWithoutTicketInput
-    }
+  export type TicketCreateWithoutUserInput = {
+    discordUserID: string
+    createdAt: Date | string
+    updatedAt: Date | string
+    channel?: ChannelCreateNestedOneWithoutTicketInput
+  }
 
-    export type TicketUncheckedCreateWithoutUserInput = {
-        id?: number
-        discordUserID: string
-        channelId?: string | null
-        channelName?: string | null
-        createdAt: Date | string
-        updatedAt: Date | string
-    }
+  export type TicketUncheckedCreateWithoutUserInput = {
+    id?: number
+    discordUserID: string
+    channelId?: string | null
+    channelName?: string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+  }
 
-    export type TicketCreateOrConnectWithoutUserInput = {
-        where: TicketWhereUniqueInput
-        create: XOR<TicketCreateWithoutUserInput, TicketUncheckedCreateWithoutUserInput>
-    }
+  export type TicketCreateOrConnectWithoutUserInput = {
+    where: TicketWhereUniqueInput
+    create: XOR<TicketCreateWithoutUserInput, TicketUncheckedCreateWithoutUserInput>
+  }
 
-    export type TicketCreateManyUserInputEnvelope = {
-        data: TicketCreateManyUserInput | TicketCreateManyUserInput[]
-        skipDuplicates?: boolean
-    }
+  export type TicketCreateManyUserInputEnvelope = {
+    data: TicketCreateManyUserInput | TicketCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
 
-    export type ApikeyCreateWithoutUserInput = {
-        id: string
-        name?: string | null
-        start?: string | null
-        prefix?: string | null
-        key: string
-        refillInterval?: number | null
-        refillAmount?: number | null
-        lastRefillAt?: Date | string | null
-        enabled?: boolean | null
-        rateLimitEnabled?: boolean | null
-        rateLimitTimeWindow?: number | null
-        rateLimitMax?: number | null
-        requestCount?: number | null
-        remaining?: number | null
-        lastRequest?: Date | string | null
-        expiresAt?: Date | string | null
-        createdAt: Date | string
-        updatedAt: Date | string
-        permissions?: string | null
-        metadata?: string | null
-    }
+  export type ApikeyCreateWithoutUserInput = {
+    id: string
+    name?: string | null
+    start?: string | null
+    prefix?: string | null
+    key: string
+    refillInterval?: number | null
+    refillAmount?: number | null
+    lastRefillAt?: Date | string | null
+    enabled?: boolean | null
+    rateLimitEnabled?: boolean | null
+    rateLimitTimeWindow?: number | null
+    rateLimitMax?: number | null
+    requestCount?: number | null
+    remaining?: number | null
+    lastRequest?: Date | string | null
+    expiresAt?: Date | string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+    permissions?: string | null
+    metadata?: string | null
+  }
 
-    export type ApikeyUncheckedCreateWithoutUserInput = {
-        id: string
-        name?: string | null
-        start?: string | null
-        prefix?: string | null
-        key: string
-        refillInterval?: number | null
-        refillAmount?: number | null
-        lastRefillAt?: Date | string | null
-        enabled?: boolean | null
-        rateLimitEnabled?: boolean | null
-        rateLimitTimeWindow?: number | null
-        rateLimitMax?: number | null
-        requestCount?: number | null
-        remaining?: number | null
-        lastRequest?: Date | string | null
-        expiresAt?: Date | string | null
-        createdAt: Date | string
-        updatedAt: Date | string
-        permissions?: string | null
-        metadata?: string | null
-    }
+  export type ApikeyUncheckedCreateWithoutUserInput = {
+    id: string
+    name?: string | null
+    start?: string | null
+    prefix?: string | null
+    key: string
+    refillInterval?: number | null
+    refillAmount?: number | null
+    lastRefillAt?: Date | string | null
+    enabled?: boolean | null
+    rateLimitEnabled?: boolean | null
+    rateLimitTimeWindow?: number | null
+    rateLimitMax?: number | null
+    requestCount?: number | null
+    remaining?: number | null
+    lastRequest?: Date | string | null
+    expiresAt?: Date | string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+    permissions?: string | null
+    metadata?: string | null
+  }
 
-    export type ApikeyCreateOrConnectWithoutUserInput = {
-        where: ApikeyWhereUniqueInput
-        create: XOR<ApikeyCreateWithoutUserInput, ApikeyUncheckedCreateWithoutUserInput>
-    }
+  export type ApikeyCreateOrConnectWithoutUserInput = {
+    where: ApikeyWhereUniqueInput
+    create: XOR<ApikeyCreateWithoutUserInput, ApikeyUncheckedCreateWithoutUserInput>
+  }
 
-    export type ApikeyCreateManyUserInputEnvelope = {
-        data: ApikeyCreateManyUserInput | ApikeyCreateManyUserInput[]
-        skipDuplicates?: boolean
-    }
+  export type ApikeyCreateManyUserInputEnvelope = {
+    data: ApikeyCreateManyUserInput | ApikeyCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
 
   export type AccountUpsertWithWhereUniqueWithoutUserInput = {
     where: AccountWhereUniqueInput
@@ -23930,77 +23942,77 @@ export namespace Prisma {
     eventId?: StringNullableFilter<"EventRegistration"> | string | null
   }
 
-    export type TicketUpsertWithWhereUniqueWithoutUserInput = {
-        where: TicketWhereUniqueInput
-        update: XOR<TicketUpdateWithoutUserInput, TicketUncheckedUpdateWithoutUserInput>
-        create: XOR<TicketCreateWithoutUserInput, TicketUncheckedCreateWithoutUserInput>
-    }
+  export type TicketUpsertWithWhereUniqueWithoutUserInput = {
+    where: TicketWhereUniqueInput
+    update: XOR<TicketUpdateWithoutUserInput, TicketUncheckedUpdateWithoutUserInput>
+    create: XOR<TicketCreateWithoutUserInput, TicketUncheckedCreateWithoutUserInput>
+  }
 
-    export type TicketUpdateWithWhereUniqueWithoutUserInput = {
-        where: TicketWhereUniqueInput
-        data: XOR<TicketUpdateWithoutUserInput, TicketUncheckedUpdateWithoutUserInput>
-    }
+  export type TicketUpdateWithWhereUniqueWithoutUserInput = {
+    where: TicketWhereUniqueInput
+    data: XOR<TicketUpdateWithoutUserInput, TicketUncheckedUpdateWithoutUserInput>
+  }
 
-    export type TicketUpdateManyWithWhereWithoutUserInput = {
-        where: TicketScalarWhereInput
-        data: XOR<TicketUpdateManyMutationInput, TicketUncheckedUpdateManyWithoutUserInput>
-    }
+  export type TicketUpdateManyWithWhereWithoutUserInput = {
+    where: TicketScalarWhereInput
+    data: XOR<TicketUpdateManyMutationInput, TicketUncheckedUpdateManyWithoutUserInput>
+  }
 
-    export type TicketScalarWhereInput = {
-        AND?: TicketScalarWhereInput | TicketScalarWhereInput[]
-        OR?: TicketScalarWhereInput[]
-        NOT?: TicketScalarWhereInput | TicketScalarWhereInput[]
-        id?: IntFilter<"Ticket"> | number
-        discordUserID?: StringFilter<"Ticket"> | string
-        channelId?: StringNullableFilter<"Ticket"> | string | null
-        channelName?: StringNullableFilter<"Ticket"> | string | null
-        createdAt?: DateTimeFilter<"Ticket"> | Date | string
-        updatedAt?: DateTimeFilter<"Ticket"> | Date | string
-        assignedUserId?: StringNullableFilter<"Ticket"> | string | null
-    }
+  export type TicketScalarWhereInput = {
+    AND?: TicketScalarWhereInput | TicketScalarWhereInput[]
+    OR?: TicketScalarWhereInput[]
+    NOT?: TicketScalarWhereInput | TicketScalarWhereInput[]
+    id?: IntFilter<"Ticket"> | number
+    discordUserID?: StringFilter<"Ticket"> | string
+    channelId?: StringNullableFilter<"Ticket"> | string | null
+    channelName?: StringNullableFilter<"Ticket"> | string | null
+    createdAt?: DateTimeFilter<"Ticket"> | Date | string
+    updatedAt?: DateTimeFilter<"Ticket"> | Date | string
+    assignedUserId?: StringNullableFilter<"Ticket"> | string | null
+  }
 
-    export type ApikeyUpsertWithWhereUniqueWithoutUserInput = {
-        where: ApikeyWhereUniqueInput
-        update: XOR<ApikeyUpdateWithoutUserInput, ApikeyUncheckedUpdateWithoutUserInput>
-        create: XOR<ApikeyCreateWithoutUserInput, ApikeyUncheckedCreateWithoutUserInput>
-    }
+  export type ApikeyUpsertWithWhereUniqueWithoutUserInput = {
+    where: ApikeyWhereUniqueInput
+    update: XOR<ApikeyUpdateWithoutUserInput, ApikeyUncheckedUpdateWithoutUserInput>
+    create: XOR<ApikeyCreateWithoutUserInput, ApikeyUncheckedCreateWithoutUserInput>
+  }
 
-    export type ApikeyUpdateWithWhereUniqueWithoutUserInput = {
-        where: ApikeyWhereUniqueInput
-        data: XOR<ApikeyUpdateWithoutUserInput, ApikeyUncheckedUpdateWithoutUserInput>
-    }
+  export type ApikeyUpdateWithWhereUniqueWithoutUserInput = {
+    where: ApikeyWhereUniqueInput
+    data: XOR<ApikeyUpdateWithoutUserInput, ApikeyUncheckedUpdateWithoutUserInput>
+  }
 
-    export type ApikeyUpdateManyWithWhereWithoutUserInput = {
-        where: ApikeyScalarWhereInput
-        data: XOR<ApikeyUpdateManyMutationInput, ApikeyUncheckedUpdateManyWithoutUserInput>
-    }
+  export type ApikeyUpdateManyWithWhereWithoutUserInput = {
+    where: ApikeyScalarWhereInput
+    data: XOR<ApikeyUpdateManyMutationInput, ApikeyUncheckedUpdateManyWithoutUserInput>
+  }
 
-    export type ApikeyScalarWhereInput = {
-        AND?: ApikeyScalarWhereInput | ApikeyScalarWhereInput[]
-        OR?: ApikeyScalarWhereInput[]
-        NOT?: ApikeyScalarWhereInput | ApikeyScalarWhereInput[]
-        id?: StringFilter<"Apikey"> | string
-        name?: StringNullableFilter<"Apikey"> | string | null
-        start?: StringNullableFilter<"Apikey"> | string | null
-        prefix?: StringNullableFilter<"Apikey"> | string | null
-        key?: StringFilter<"Apikey"> | string
-        userId?: StringFilter<"Apikey"> | string
-        refillInterval?: IntNullableFilter<"Apikey"> | number | null
-        refillAmount?: IntNullableFilter<"Apikey"> | number | null
-        lastRefillAt?: DateTimeNullableFilter<"Apikey"> | Date | string | null
-        enabled?: BoolNullableFilter<"Apikey"> | boolean | null
-        rateLimitEnabled?: BoolNullableFilter<"Apikey"> | boolean | null
-        rateLimitTimeWindow?: IntNullableFilter<"Apikey"> | number | null
-        rateLimitMax?: IntNullableFilter<"Apikey"> | number | null
-        requestCount?: IntNullableFilter<"Apikey"> | number | null
-        remaining?: IntNullableFilter<"Apikey"> | number | null
-        lastRequest?: DateTimeNullableFilter<"Apikey"> | Date | string | null
-        expiresAt?: DateTimeNullableFilter<"Apikey"> | Date | string | null
-        createdAt?: DateTimeFilter<"Apikey"> | Date | string
-        updatedAt?: DateTimeFilter<"Apikey"> | Date | string
-        permissions?: StringNullableFilter<"Apikey"> | string | null
-        metadata?: StringNullableFilter<"Apikey"> | string | null
-    }
+  export type ApikeyScalarWhereInput = {
+    AND?: ApikeyScalarWhereInput | ApikeyScalarWhereInput[]
+    OR?: ApikeyScalarWhereInput[]
+    NOT?: ApikeyScalarWhereInput | ApikeyScalarWhereInput[]
+    id?: StringFilter<"Apikey"> | string
+    name?: StringNullableFilter<"Apikey"> | string | null
+    start?: StringNullableFilter<"Apikey"> | string | null
+    prefix?: StringNullableFilter<"Apikey"> | string | null
+    key?: StringFilter<"Apikey"> | string
+    userId?: StringFilter<"Apikey"> | string
+    refillInterval?: IntNullableFilter<"Apikey"> | number | null
+    refillAmount?: IntNullableFilter<"Apikey"> | number | null
+    lastRefillAt?: DateTimeNullableFilter<"Apikey"> | Date | string | null
+    enabled?: BoolNullableFilter<"Apikey"> | boolean | null
+    rateLimitEnabled?: BoolNullableFilter<"Apikey"> | boolean | null
+    rateLimitTimeWindow?: IntNullableFilter<"Apikey"> | number | null
+    rateLimitMax?: IntNullableFilter<"Apikey"> | number | null
+    requestCount?: IntNullableFilter<"Apikey"> | number | null
+    remaining?: IntNullableFilter<"Apikey"> | number | null
+    lastRequest?: DateTimeNullableFilter<"Apikey"> | Date | string | null
+    expiresAt?: DateTimeNullableFilter<"Apikey"> | Date | string | null
+    createdAt?: DateTimeFilter<"Apikey"> | Date | string
+    updatedAt?: DateTimeFilter<"Apikey"> | Date | string
+    permissions?: StringNullableFilter<"Apikey"> | string | null
+    metadata?: StringNullableFilter<"Apikey"> | string | null
+  }
 
   export type UserCreateWithoutSessionsInput = {
     id: string
@@ -24015,8 +24027,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
-      username?: string | null
-      displayUsername?: string | null
+    username?: string | null
+    displayUsername?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
     members?: MemberCreateNestedManyWithoutUserInput
@@ -24024,8 +24036,8 @@ export namespace Prisma {
     twofactors?: TwoFactorCreateNestedManyWithoutUserInput
     Event?: EventCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
-      Ticket?: TicketCreateNestedManyWithoutUserInput
-      apikeys?: ApikeyCreateNestedManyWithoutUserInput
+    Ticket?: TicketCreateNestedManyWithoutUserInput
+    apikeys?: ApikeyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -24041,8 +24053,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
-      username?: string | null
-      displayUsername?: string | null
+    username?: string | null
+    displayUsername?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     members?: MemberUncheckedCreateNestedManyWithoutUserInput
@@ -24050,8 +24062,8 @@ export namespace Prisma {
     twofactors?: TwoFactorUncheckedCreateNestedManyWithoutUserInput
     Event?: EventUncheckedCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
-      Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
-      apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
+    Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
+    apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -24083,8 +24095,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-      username?: NullableStringFieldUpdateOperationsInput | string | null
-      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
     members?: MemberUpdateManyWithoutUserNestedInput
@@ -24092,8 +24104,8 @@ export namespace Prisma {
     twofactors?: TwoFactorUpdateManyWithoutUserNestedInput
     Event?: EventUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
-      Ticket?: TicketUpdateManyWithoutUserNestedInput
-      apikeys?: ApikeyUpdateManyWithoutUserNestedInput
+    Ticket?: TicketUpdateManyWithoutUserNestedInput
+    apikeys?: ApikeyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -24109,8 +24121,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-      username?: NullableStringFieldUpdateOperationsInput | string | null
-      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     members?: MemberUncheckedUpdateManyWithoutUserNestedInput
@@ -24118,8 +24130,8 @@ export namespace Prisma {
     twofactors?: TwoFactorUncheckedUpdateManyWithoutUserNestedInput
     Event?: EventUncheckedUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
-      Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
-      apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
+    Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
+    apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutAccountsInput = {
@@ -24135,8 +24147,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
-      username?: string | null
-      displayUsername?: string | null
+    username?: string | null
+    displayUsername?: string | null
     sessions?: SessionCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
     members?: MemberCreateNestedManyWithoutUserInput
@@ -24144,8 +24156,8 @@ export namespace Prisma {
     twofactors?: TwoFactorCreateNestedManyWithoutUserInput
     Event?: EventCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
-      Ticket?: TicketCreateNestedManyWithoutUserInput
-      apikeys?: ApikeyCreateNestedManyWithoutUserInput
+    Ticket?: TicketCreateNestedManyWithoutUserInput
+    apikeys?: ApikeyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAccountsInput = {
@@ -24161,8 +24173,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
-      username?: string | null
-      displayUsername?: string | null
+    username?: string | null
+    displayUsername?: string | null
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     members?: MemberUncheckedCreateNestedManyWithoutUserInput
@@ -24170,8 +24182,8 @@ export namespace Prisma {
     twofactors?: TwoFactorUncheckedCreateNestedManyWithoutUserInput
     Event?: EventUncheckedCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
-      Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
-      apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
+    Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
+    apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAccountsInput = {
@@ -24203,8 +24215,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-      username?: NullableStringFieldUpdateOperationsInput | string | null
-      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     sessions?: SessionUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
     members?: MemberUpdateManyWithoutUserNestedInput
@@ -24212,8 +24224,8 @@ export namespace Prisma {
     twofactors?: TwoFactorUpdateManyWithoutUserNestedInput
     Event?: EventUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
-      Ticket?: TicketUpdateManyWithoutUserNestedInput
-      apikeys?: ApikeyUpdateManyWithoutUserNestedInput
+    Ticket?: TicketUpdateManyWithoutUserNestedInput
+    apikeys?: ApikeyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -24229,8 +24241,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-      username?: NullableStringFieldUpdateOperationsInput | string | null
-      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     members?: MemberUncheckedUpdateManyWithoutUserNestedInput
@@ -24238,8 +24250,8 @@ export namespace Prisma {
     twofactors?: TwoFactorUncheckedUpdateManyWithoutUserNestedInput
     Event?: EventUncheckedUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
-      Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
-      apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
+    Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
+    apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type MemberCreateWithoutOrganizationInput = {
@@ -24364,8 +24376,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
-      username?: string | null
-      displayUsername?: string | null
+    username?: string | null
+    displayUsername?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
@@ -24373,8 +24385,8 @@ export namespace Prisma {
     twofactors?: TwoFactorCreateNestedManyWithoutUserInput
     Event?: EventCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
-      Ticket?: TicketCreateNestedManyWithoutUserInput
-      apikeys?: ApikeyCreateNestedManyWithoutUserInput
+    Ticket?: TicketCreateNestedManyWithoutUserInput
+    apikeys?: ApikeyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutMembersInput = {
@@ -24390,8 +24402,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
-      username?: string | null
-      displayUsername?: string | null
+    username?: string | null
+    displayUsername?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
@@ -24399,8 +24411,8 @@ export namespace Prisma {
     twofactors?: TwoFactorUncheckedCreateNestedManyWithoutUserInput
     Event?: EventUncheckedCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
-      Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
-      apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
+    Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
+    apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutMembersInput = {
@@ -24463,8 +24475,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-      username?: NullableStringFieldUpdateOperationsInput | string | null
-      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
@@ -24472,8 +24484,8 @@ export namespace Prisma {
     twofactors?: TwoFactorUpdateManyWithoutUserNestedInput
     Event?: EventUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
-      Ticket?: TicketUpdateManyWithoutUserNestedInput
-      apikeys?: ApikeyUpdateManyWithoutUserNestedInput
+    Ticket?: TicketUpdateManyWithoutUserNestedInput
+    apikeys?: ApikeyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMembersInput = {
@@ -24489,8 +24501,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-      username?: NullableStringFieldUpdateOperationsInput | string | null
-      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
@@ -24498,8 +24510,8 @@ export namespace Prisma {
     twofactors?: TwoFactorUncheckedUpdateManyWithoutUserNestedInput
     Event?: EventUncheckedUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
-      Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
-      apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
+    Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
+    apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type OrganizationCreateWithoutInvitationsInput = {
@@ -24540,8 +24552,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
-      username?: string | null
-      displayUsername?: string | null
+    username?: string | null
+    displayUsername?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
@@ -24549,8 +24561,8 @@ export namespace Prisma {
     twofactors?: TwoFactorCreateNestedManyWithoutUserInput
     Event?: EventCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
-      Ticket?: TicketCreateNestedManyWithoutUserInput
-      apikeys?: ApikeyCreateNestedManyWithoutUserInput
+    Ticket?: TicketCreateNestedManyWithoutUserInput
+    apikeys?: ApikeyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutInvitationsInput = {
@@ -24566,8 +24578,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
-      username?: string | null
-      displayUsername?: string | null
+    username?: string | null
+    displayUsername?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
@@ -24575,8 +24587,8 @@ export namespace Prisma {
     twofactors?: TwoFactorUncheckedCreateNestedManyWithoutUserInput
     Event?: EventUncheckedCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
-      Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
-      apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
+    Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
+    apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutInvitationsInput = {
@@ -24639,8 +24651,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-      username?: NullableStringFieldUpdateOperationsInput | string | null
-      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
@@ -24648,8 +24660,8 @@ export namespace Prisma {
     twofactors?: TwoFactorUpdateManyWithoutUserNestedInput
     Event?: EventUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
-      Ticket?: TicketUpdateManyWithoutUserNestedInput
-      apikeys?: ApikeyUpdateManyWithoutUserNestedInput
+    Ticket?: TicketUpdateManyWithoutUserNestedInput
+    apikeys?: ApikeyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutInvitationsInput = {
@@ -24665,8 +24677,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-      username?: NullableStringFieldUpdateOperationsInput | string | null
-      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
@@ -24674,8 +24686,8 @@ export namespace Prisma {
     twofactors?: TwoFactorUncheckedUpdateManyWithoutUserNestedInput
     Event?: EventUncheckedUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
-      Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
-      apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
+    Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
+    apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutTwofactorsInput = {
@@ -24691,8 +24703,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
-      username?: string | null
-      displayUsername?: string | null
+    username?: string | null
+    displayUsername?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
@@ -24700,8 +24712,8 @@ export namespace Prisma {
     invitations?: InvitationCreateNestedManyWithoutUserInput
     Event?: EventCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
-      Ticket?: TicketCreateNestedManyWithoutUserInput
-      apikeys?: ApikeyCreateNestedManyWithoutUserInput
+    Ticket?: TicketCreateNestedManyWithoutUserInput
+    apikeys?: ApikeyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutTwofactorsInput = {
@@ -24717,8 +24729,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
-      username?: string | null
-      displayUsername?: string | null
+    username?: string | null
+    displayUsername?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
@@ -24726,8 +24738,8 @@ export namespace Prisma {
     invitations?: InvitationUncheckedCreateNestedManyWithoutUserInput
     Event?: EventUncheckedCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
-      Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
-      apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
+    Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
+    apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutTwofactorsInput = {
@@ -24759,8 +24771,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-      username?: NullableStringFieldUpdateOperationsInput | string | null
-      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
@@ -24768,8 +24780,8 @@ export namespace Prisma {
     invitations?: InvitationUpdateManyWithoutUserNestedInput
     Event?: EventUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
-      Ticket?: TicketUpdateManyWithoutUserNestedInput
-      apikeys?: ApikeyUpdateManyWithoutUserNestedInput
+    Ticket?: TicketUpdateManyWithoutUserNestedInput
+    apikeys?: ApikeyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutTwofactorsInput = {
@@ -24785,8 +24797,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-      username?: NullableStringFieldUpdateOperationsInput | string | null
-      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
@@ -24794,88 +24806,88 @@ export namespace Prisma {
     invitations?: InvitationUncheckedUpdateManyWithoutUserNestedInput
     Event?: EventUncheckedUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
-      Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
-      apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
+    Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
+    apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
   }
 
-    export type MessageCreateWithoutChannelInput = {
-        createdAt: Date | string
-        content: Uint8Array
-        user: UserCreateNestedOneWithoutMessagesInput
-    }
+  export type MessageCreateWithoutChannelInput = {
+    createdAt: Date | string
+    content: Uint8Array
+    user: UserCreateNestedOneWithoutMessagesInput
+  }
 
-    export type MessageUncheckedCreateWithoutChannelInput = {
-        id?: number
-        createdAt: Date | string
-        userId: string
-        content: Uint8Array
-    }
+  export type MessageUncheckedCreateWithoutChannelInput = {
+    id?: number
+    createdAt: Date | string
+    userId: string
+    content: Uint8Array
+  }
 
-    export type MessageCreateOrConnectWithoutChannelInput = {
-        where: MessageWhereUniqueInput
-        create: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput>
-    }
+  export type MessageCreateOrConnectWithoutChannelInput = {
+    where: MessageWhereUniqueInput
+    create: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput>
+  }
 
-    export type MessageCreateManyChannelInputEnvelope = {
-        data: MessageCreateManyChannelInput | MessageCreateManyChannelInput[]
-        skipDuplicates?: boolean
-    }
+  export type MessageCreateManyChannelInputEnvelope = {
+    data: MessageCreateManyChannelInput | MessageCreateManyChannelInput[]
+    skipDuplicates?: boolean
+  }
 
-    export type TicketCreateWithoutChannelInput = {
-        discordUserID: string
-        createdAt: Date | string
-        updatedAt: Date | string
-        user?: UserCreateNestedOneWithoutTicketInput
-    }
+  export type TicketCreateWithoutChannelInput = {
+    discordUserID: string
+    createdAt: Date | string
+    updatedAt: Date | string
+    user?: UserCreateNestedOneWithoutTicketInput
+  }
 
-    export type TicketUncheckedCreateWithoutChannelInput = {
-        id?: number
-        discordUserID: string
-        createdAt: Date | string
-        updatedAt: Date | string
-        assignedUserId?: string | null
-    }
+  export type TicketUncheckedCreateWithoutChannelInput = {
+    id?: number
+    discordUserID: string
+    createdAt: Date | string
+    updatedAt: Date | string
+    assignedUserId?: string | null
+  }
 
-    export type TicketCreateOrConnectWithoutChannelInput = {
-        where: TicketWhereUniqueInput
-        create: XOR<TicketCreateWithoutChannelInput, TicketUncheckedCreateWithoutChannelInput>
-    }
+  export type TicketCreateOrConnectWithoutChannelInput = {
+    where: TicketWhereUniqueInput
+    create: XOR<TicketCreateWithoutChannelInput, TicketUncheckedCreateWithoutChannelInput>
+  }
 
-    export type TicketCreateManyChannelInputEnvelope = {
-        data: TicketCreateManyChannelInput | TicketCreateManyChannelInput[]
-        skipDuplicates?: boolean
-    }
+  export type TicketCreateManyChannelInputEnvelope = {
+    data: TicketCreateManyChannelInput | TicketCreateManyChannelInput[]
+    skipDuplicates?: boolean
+  }
 
-    export type MessageUpsertWithWhereUniqueWithoutChannelInput = {
-        where: MessageWhereUniqueInput
-        update: XOR<MessageUpdateWithoutChannelInput, MessageUncheckedUpdateWithoutChannelInput>
-        create: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput>
-    }
+  export type MessageUpsertWithWhereUniqueWithoutChannelInput = {
+    where: MessageWhereUniqueInput
+    update: XOR<MessageUpdateWithoutChannelInput, MessageUncheckedUpdateWithoutChannelInput>
+    create: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput>
+  }
 
-    export type MessageUpdateWithWhereUniqueWithoutChannelInput = {
-        where: MessageWhereUniqueInput
-        data: XOR<MessageUpdateWithoutChannelInput, MessageUncheckedUpdateWithoutChannelInput>
-    }
+  export type MessageUpdateWithWhereUniqueWithoutChannelInput = {
+    where: MessageWhereUniqueInput
+    data: XOR<MessageUpdateWithoutChannelInput, MessageUncheckedUpdateWithoutChannelInput>
+  }
 
-    export type MessageUpdateManyWithWhereWithoutChannelInput = {
-        where: MessageScalarWhereInput
-        data: XOR<MessageUpdateManyMutationInput, MessageUncheckedUpdateManyWithoutChannelInput>
-    }
+  export type MessageUpdateManyWithWhereWithoutChannelInput = {
+    where: MessageScalarWhereInput
+    data: XOR<MessageUpdateManyMutationInput, MessageUncheckedUpdateManyWithoutChannelInput>
+  }
 
-    export type TicketUpsertWithWhereUniqueWithoutChannelInput = {
-        where: TicketWhereUniqueInput
-        update: XOR<TicketUpdateWithoutChannelInput, TicketUncheckedUpdateWithoutChannelInput>
-        create: XOR<TicketCreateWithoutChannelInput, TicketUncheckedCreateWithoutChannelInput>
-    }
+  export type TicketUpsertWithWhereUniqueWithoutChannelInput = {
+    where: TicketWhereUniqueInput
+    update: XOR<TicketUpdateWithoutChannelInput, TicketUncheckedUpdateWithoutChannelInput>
+    create: XOR<TicketCreateWithoutChannelInput, TicketUncheckedCreateWithoutChannelInput>
+  }
 
-    export type TicketUpdateWithWhereUniqueWithoutChannelInput = {
-        where: TicketWhereUniqueInput
-        data: XOR<TicketUpdateWithoutChannelInput, TicketUncheckedUpdateWithoutChannelInput>
-    }
+  export type TicketUpdateWithWhereUniqueWithoutChannelInput = {
+    where: TicketWhereUniqueInput
+    data: XOR<TicketUpdateWithoutChannelInput, TicketUncheckedUpdateWithoutChannelInput>
+  }
 
-    export type TicketUpdateManyWithWhereWithoutChannelInput = {
-        where: TicketScalarWhereInput
-        data: XOR<TicketUpdateManyMutationInput, TicketUncheckedUpdateManyWithoutChannelInput>
+  export type TicketUpdateManyWithWhereWithoutChannelInput = {
+    where: TicketScalarWhereInput
+    data: XOR<TicketUpdateManyMutationInput, TicketUncheckedUpdateManyWithoutChannelInput>
   }
 
   export type UserCreateWithoutMessagesInput = {
@@ -24891,8 +24903,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
-      username?: string | null
-      displayUsername?: string | null
+    username?: string | null
+    displayUsername?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     members?: MemberCreateNestedManyWithoutUserInput
@@ -24900,8 +24912,8 @@ export namespace Prisma {
     twofactors?: TwoFactorCreateNestedManyWithoutUserInput
     Event?: EventCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
-      Ticket?: TicketCreateNestedManyWithoutUserInput
-      apikeys?: ApikeyCreateNestedManyWithoutUserInput
+    Ticket?: TicketCreateNestedManyWithoutUserInput
+    apikeys?: ApikeyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutMessagesInput = {
@@ -24917,8 +24929,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
-      username?: string | null
-      displayUsername?: string | null
+    username?: string | null
+    displayUsername?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     members?: MemberUncheckedCreateNestedManyWithoutUserInput
@@ -24926,8 +24938,8 @@ export namespace Prisma {
     twofactors?: TwoFactorUncheckedCreateNestedManyWithoutUserInput
     Event?: EventUncheckedCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
-      Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
-      apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
+    Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
+    apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutMessagesInput = {
@@ -24935,22 +24947,22 @@ export namespace Prisma {
     create: XOR<UserCreateWithoutMessagesInput, UserUncheckedCreateWithoutMessagesInput>
   }
 
-    export type ChannelCreateWithoutMessageInput = {
-        id?: string
-        name: string
-        Ticket?: TicketCreateNestedManyWithoutChannelInput
-    }
+  export type ChannelCreateWithoutMessageInput = {
+    id?: string
+    name: string
+    Ticket?: TicketCreateNestedManyWithoutChannelInput
+  }
 
-    export type ChannelUncheckedCreateWithoutMessageInput = {
-        id?: string
-        name: string
-        Ticket?: TicketUncheckedCreateNestedManyWithoutChannelInput
-    }
+  export type ChannelUncheckedCreateWithoutMessageInput = {
+    id?: string
+    name: string
+    Ticket?: TicketUncheckedCreateNestedManyWithoutChannelInput
+  }
 
-    export type ChannelCreateOrConnectWithoutMessageInput = {
-        where: ChannelWhereUniqueInput
-        create: XOR<ChannelCreateWithoutMessageInput, ChannelUncheckedCreateWithoutMessageInput>
-    }
+  export type ChannelCreateOrConnectWithoutMessageInput = {
+    where: ChannelWhereUniqueInput
+    create: XOR<ChannelCreateWithoutMessageInput, ChannelUncheckedCreateWithoutMessageInput>
+  }
 
   export type UserUpsertWithoutMessagesInput = {
     update: XOR<UserUpdateWithoutMessagesInput, UserUncheckedUpdateWithoutMessagesInput>
@@ -24976,8 +24988,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-      username?: NullableStringFieldUpdateOperationsInput | string | null
-      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     members?: MemberUpdateManyWithoutUserNestedInput
@@ -24985,8 +24997,8 @@ export namespace Prisma {
     twofactors?: TwoFactorUpdateManyWithoutUserNestedInput
     Event?: EventUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
-      Ticket?: TicketUpdateManyWithoutUserNestedInput
-      apikeys?: ApikeyUpdateManyWithoutUserNestedInput
+    Ticket?: TicketUpdateManyWithoutUserNestedInput
+    apikeys?: ApikeyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMessagesInput = {
@@ -25002,8 +25014,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-      username?: NullableStringFieldUpdateOperationsInput | string | null
-      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     members?: MemberUncheckedUpdateManyWithoutUserNestedInput
@@ -25011,31 +25023,31 @@ export namespace Prisma {
     twofactors?: TwoFactorUncheckedUpdateManyWithoutUserNestedInput
     Event?: EventUncheckedUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
-      Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
-      apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
+    Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
+    apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
   }
 
-    export type ChannelUpsertWithoutMessageInput = {
-        update: XOR<ChannelUpdateWithoutMessageInput, ChannelUncheckedUpdateWithoutMessageInput>
-        create: XOR<ChannelCreateWithoutMessageInput, ChannelUncheckedCreateWithoutMessageInput>
-        where?: ChannelWhereInput
-    }
+  export type ChannelUpsertWithoutMessageInput = {
+    update: XOR<ChannelUpdateWithoutMessageInput, ChannelUncheckedUpdateWithoutMessageInput>
+    create: XOR<ChannelCreateWithoutMessageInput, ChannelUncheckedCreateWithoutMessageInput>
+    where?: ChannelWhereInput
+  }
 
-    export type ChannelUpdateToOneWithWhereWithoutMessageInput = {
-        where?: ChannelWhereInput
-        data: XOR<ChannelUpdateWithoutMessageInput, ChannelUncheckedUpdateWithoutMessageInput>
-    }
+  export type ChannelUpdateToOneWithWhereWithoutMessageInput = {
+    where?: ChannelWhereInput
+    data: XOR<ChannelUpdateWithoutMessageInput, ChannelUncheckedUpdateWithoutMessageInput>
+  }
 
-    export type ChannelUpdateWithoutMessageInput = {
-        id?: StringFieldUpdateOperationsInput | string
-        name?: StringFieldUpdateOperationsInput | string
-        Ticket?: TicketUpdateManyWithoutChannelNestedInput
-    }
+  export type ChannelUpdateWithoutMessageInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    Ticket?: TicketUpdateManyWithoutChannelNestedInput
+  }
 
-    export type ChannelUncheckedUpdateWithoutMessageInput = {
-        id?: StringFieldUpdateOperationsInput | string
-        name?: StringFieldUpdateOperationsInput | string
-        Ticket?: TicketUncheckedUpdateManyWithoutChannelNestedInput
+  export type ChannelUncheckedUpdateWithoutMessageInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    Ticket?: TicketUncheckedUpdateManyWithoutChannelNestedInput
   }
 
   export type UserCreateWithoutEventInput = {
@@ -25051,8 +25063,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
-      username?: string | null
-      displayUsername?: string | null
+    username?: string | null
+    displayUsername?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
@@ -25060,8 +25072,8 @@ export namespace Prisma {
     invitations?: InvitationCreateNestedManyWithoutUserInput
     twofactors?: TwoFactorCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
-      Ticket?: TicketCreateNestedManyWithoutUserInput
-      apikeys?: ApikeyCreateNestedManyWithoutUserInput
+    Ticket?: TicketCreateNestedManyWithoutUserInput
+    apikeys?: ApikeyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutEventInput = {
@@ -25077,8 +25089,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
-      username?: string | null
-      displayUsername?: string | null
+    username?: string | null
+    displayUsername?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
@@ -25086,8 +25098,8 @@ export namespace Prisma {
     invitations?: InvitationUncheckedCreateNestedManyWithoutUserInput
     twofactors?: TwoFactorUncheckedCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
-      Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
-      apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
+    Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
+    apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutEventInput = {
@@ -25167,8 +25179,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-      username?: NullableStringFieldUpdateOperationsInput | string | null
-      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
@@ -25176,8 +25188,8 @@ export namespace Prisma {
     invitations?: InvitationUpdateManyWithoutUserNestedInput
     twofactors?: TwoFactorUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
-      Ticket?: TicketUpdateManyWithoutUserNestedInput
-      apikeys?: ApikeyUpdateManyWithoutUserNestedInput
+    Ticket?: TicketUpdateManyWithoutUserNestedInput
+    apikeys?: ApikeyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEventInput = {
@@ -25193,8 +25205,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-      username?: NullableStringFieldUpdateOperationsInput | string | null
-      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
@@ -25202,8 +25214,8 @@ export namespace Prisma {
     invitations?: InvitationUncheckedUpdateManyWithoutUserNestedInput
     twofactors?: TwoFactorUncheckedUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
-      Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
-      apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
+    Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
+    apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type RoleSlotUpsertWithWhereUniqueWithoutEventInput = {
@@ -25365,8 +25377,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
-      username?: string | null
-      displayUsername?: string | null
+    username?: string | null
+    displayUsername?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
@@ -25374,8 +25386,8 @@ export namespace Prisma {
     invitations?: InvitationCreateNestedManyWithoutUserInput
     twofactors?: TwoFactorCreateNestedManyWithoutUserInput
     Event?: EventCreateNestedManyWithoutUserInput
-      Ticket?: TicketCreateNestedManyWithoutUserInput
-      apikeys?: ApikeyCreateNestedManyWithoutUserInput
+    Ticket?: TicketCreateNestedManyWithoutUserInput
+    apikeys?: ApikeyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutEventRegistrationInput = {
@@ -25391,8 +25403,8 @@ export namespace Prisma {
     banReason?: string | null
     banExpires?: Date | string | null
     twoFactorEnabled?: boolean | null
-      username?: string | null
-      displayUsername?: string | null
+    username?: string | null
+    displayUsername?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
@@ -25400,8 +25412,8 @@ export namespace Prisma {
     invitations?: InvitationUncheckedCreateNestedManyWithoutUserInput
     twofactors?: TwoFactorUncheckedCreateNestedManyWithoutUserInput
     Event?: EventUncheckedCreateNestedManyWithoutUserInput
-      Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
-      apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
+    Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
+    apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutEventRegistrationInput = {
@@ -25481,8 +25493,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-      username?: NullableStringFieldUpdateOperationsInput | string | null
-      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
@@ -25490,8 +25502,8 @@ export namespace Prisma {
     invitations?: InvitationUpdateManyWithoutUserNestedInput
     twofactors?: TwoFactorUpdateManyWithoutUserNestedInput
     Event?: EventUpdateManyWithoutUserNestedInput
-      Ticket?: TicketUpdateManyWithoutUserNestedInput
-      apikeys?: ApikeyUpdateManyWithoutUserNestedInput
+    Ticket?: TicketUpdateManyWithoutUserNestedInput
+    apikeys?: ApikeyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEventRegistrationInput = {
@@ -25507,8 +25519,8 @@ export namespace Prisma {
     banReason?: NullableStringFieldUpdateOperationsInput | string | null
     banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-      username?: NullableStringFieldUpdateOperationsInput | string | null
-      displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
@@ -25516,8 +25528,8 @@ export namespace Prisma {
     invitations?: InvitationUncheckedUpdateManyWithoutUserNestedInput
     twofactors?: TwoFactorUncheckedUpdateManyWithoutUserNestedInput
     Event?: EventUncheckedUpdateManyWithoutUserNestedInput
-      Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
-      apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
+    Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
+    apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type RoleSlotUpsertWithoutRegistrationsInput = {
@@ -25580,285 +25592,285 @@ export namespace Prisma {
     roleSlots?: RoleSlotUncheckedUpdateManyWithoutEventNestedInput
   }
 
-    export type ChannelCreateWithoutTicketInput = {
-        id?: string
-        name: string
-        Message?: MessageCreateNestedManyWithoutChannelInput
-    }
+  export type ChannelCreateWithoutTicketInput = {
+    id?: string
+    name: string
+    Message?: MessageCreateNestedManyWithoutChannelInput
+  }
 
-    export type ChannelUncheckedCreateWithoutTicketInput = {
-        id?: string
-        name: string
-        Message?: MessageUncheckedCreateNestedManyWithoutChannelInput
-    }
+  export type ChannelUncheckedCreateWithoutTicketInput = {
+    id?: string
+    name: string
+    Message?: MessageUncheckedCreateNestedManyWithoutChannelInput
+  }
 
-    export type ChannelCreateOrConnectWithoutTicketInput = {
-        where: ChannelWhereUniqueInput
-        create: XOR<ChannelCreateWithoutTicketInput, ChannelUncheckedCreateWithoutTicketInput>
-    }
+  export type ChannelCreateOrConnectWithoutTicketInput = {
+    where: ChannelWhereUniqueInput
+    create: XOR<ChannelCreateWithoutTicketInput, ChannelUncheckedCreateWithoutTicketInput>
+  }
 
-    export type UserCreateWithoutTicketInput = {
-        id: string
-        name: string
-        email: string
-        emailVerified: boolean
-        image?: string | null
-        createdAt: Date | string
-        updatedAt: Date | string
-        role?: string | null
-        banned?: boolean | null
-        banReason?: string | null
-        banExpires?: Date | string | null
-        twoFactorEnabled?: boolean | null
-        username?: string | null
-        displayUsername?: string | null
-        accounts?: AccountCreateNestedManyWithoutUserInput
-        sessions?: SessionCreateNestedManyWithoutUserInput
-        messages?: MessageCreateNestedManyWithoutUserInput
-        members?: MemberCreateNestedManyWithoutUserInput
-        invitations?: InvitationCreateNestedManyWithoutUserInput
-        twofactors?: TwoFactorCreateNestedManyWithoutUserInput
-        Event?: EventCreateNestedManyWithoutUserInput
-        EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
-        apikeys?: ApikeyCreateNestedManyWithoutUserInput
-    }
+  export type UserCreateWithoutTicketInput = {
+    id: string
+    name: string
+    email: string
+    emailVerified: boolean
+    image?: string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+    role?: string | null
+    banned?: boolean | null
+    banReason?: string | null
+    banExpires?: Date | string | null
+    twoFactorEnabled?: boolean | null
+    username?: string | null
+    displayUsername?: string | null
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    messages?: MessageCreateNestedManyWithoutUserInput
+    members?: MemberCreateNestedManyWithoutUserInput
+    invitations?: InvitationCreateNestedManyWithoutUserInput
+    twofactors?: TwoFactorCreateNestedManyWithoutUserInput
+    Event?: EventCreateNestedManyWithoutUserInput
+    EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
+    apikeys?: ApikeyCreateNestedManyWithoutUserInput
+  }
 
-    export type UserUncheckedCreateWithoutTicketInput = {
-        id: string
-        name: string
-        email: string
-        emailVerified: boolean
-        image?: string | null
-        createdAt: Date | string
-        updatedAt: Date | string
-        role?: string | null
-        banned?: boolean | null
-        banReason?: string | null
-        banExpires?: Date | string | null
-        twoFactorEnabled?: boolean | null
-        username?: string | null
-        displayUsername?: string | null
-        accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
-        sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-        messages?: MessageUncheckedCreateNestedManyWithoutUserInput
-        members?: MemberUncheckedCreateNestedManyWithoutUserInput
-        invitations?: InvitationUncheckedCreateNestedManyWithoutUserInput
-        twofactors?: TwoFactorUncheckedCreateNestedManyWithoutUserInput
-        Event?: EventUncheckedCreateNestedManyWithoutUserInput
-        EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
-        apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
-    }
+  export type UserUncheckedCreateWithoutTicketInput = {
+    id: string
+    name: string
+    email: string
+    emailVerified: boolean
+    image?: string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+    role?: string | null
+    banned?: boolean | null
+    banReason?: string | null
+    banExpires?: Date | string | null
+    twoFactorEnabled?: boolean | null
+    username?: string | null
+    displayUsername?: string | null
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    members?: MemberUncheckedCreateNestedManyWithoutUserInput
+    invitations?: InvitationUncheckedCreateNestedManyWithoutUserInput
+    twofactors?: TwoFactorUncheckedCreateNestedManyWithoutUserInput
+    Event?: EventUncheckedCreateNestedManyWithoutUserInput
+    EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
+    apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
+  }
 
-    export type UserCreateOrConnectWithoutTicketInput = {
-        where: UserWhereUniqueInput
-        create: XOR<UserCreateWithoutTicketInput, UserUncheckedCreateWithoutTicketInput>
-    }
+  export type UserCreateOrConnectWithoutTicketInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutTicketInput, UserUncheckedCreateWithoutTicketInput>
+  }
 
-    export type ChannelUpsertWithoutTicketInput = {
-        update: XOR<ChannelUpdateWithoutTicketInput, ChannelUncheckedUpdateWithoutTicketInput>
-        create: XOR<ChannelCreateWithoutTicketInput, ChannelUncheckedCreateWithoutTicketInput>
-        where?: ChannelWhereInput
-    }
+  export type ChannelUpsertWithoutTicketInput = {
+    update: XOR<ChannelUpdateWithoutTicketInput, ChannelUncheckedUpdateWithoutTicketInput>
+    create: XOR<ChannelCreateWithoutTicketInput, ChannelUncheckedCreateWithoutTicketInput>
+    where?: ChannelWhereInput
+  }
 
-    export type ChannelUpdateToOneWithWhereWithoutTicketInput = {
-        where?: ChannelWhereInput
-        data: XOR<ChannelUpdateWithoutTicketInput, ChannelUncheckedUpdateWithoutTicketInput>
-    }
+  export type ChannelUpdateToOneWithWhereWithoutTicketInput = {
+    where?: ChannelWhereInput
+    data: XOR<ChannelUpdateWithoutTicketInput, ChannelUncheckedUpdateWithoutTicketInput>
+  }
 
-    export type ChannelUpdateWithoutTicketInput = {
-        id?: StringFieldUpdateOperationsInput | string
-        name?: StringFieldUpdateOperationsInput | string
-        Message?: MessageUpdateManyWithoutChannelNestedInput
-    }
+  export type ChannelUpdateWithoutTicketInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    Message?: MessageUpdateManyWithoutChannelNestedInput
+  }
 
-    export type ChannelUncheckedUpdateWithoutTicketInput = {
-        id?: StringFieldUpdateOperationsInput | string
-        name?: StringFieldUpdateOperationsInput | string
-        Message?: MessageUncheckedUpdateManyWithoutChannelNestedInput
-    }
+  export type ChannelUncheckedUpdateWithoutTicketInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    Message?: MessageUncheckedUpdateManyWithoutChannelNestedInput
+  }
 
-    export type UserUpsertWithoutTicketInput = {
-        update: XOR<UserUpdateWithoutTicketInput, UserUncheckedUpdateWithoutTicketInput>
-        create: XOR<UserCreateWithoutTicketInput, UserUncheckedCreateWithoutTicketInput>
-        where?: UserWhereInput
-    }
+  export type UserUpsertWithoutTicketInput = {
+    update: XOR<UserUpdateWithoutTicketInput, UserUncheckedUpdateWithoutTicketInput>
+    create: XOR<UserCreateWithoutTicketInput, UserUncheckedCreateWithoutTicketInput>
+    where?: UserWhereInput
+  }
 
-    export type UserUpdateToOneWithWhereWithoutTicketInput = {
-        where?: UserWhereInput
-        data: XOR<UserUpdateWithoutTicketInput, UserUncheckedUpdateWithoutTicketInput>
-    }
+  export type UserUpdateToOneWithWhereWithoutTicketInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutTicketInput, UserUncheckedUpdateWithoutTicketInput>
+  }
 
-    export type UserUpdateWithoutTicketInput = {
-        id?: StringFieldUpdateOperationsInput | string
-        name?: StringFieldUpdateOperationsInput | string
-        email?: StringFieldUpdateOperationsInput | string
-        emailVerified?: BoolFieldUpdateOperationsInput | boolean
-        image?: NullableStringFieldUpdateOperationsInput | string | null
-        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        role?: NullableStringFieldUpdateOperationsInput | string | null
-        banned?: NullableBoolFieldUpdateOperationsInput | boolean | null
-        banReason?: NullableStringFieldUpdateOperationsInput | string | null
-        banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-        twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-        username?: NullableStringFieldUpdateOperationsInput | string | null
-        displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
-        accounts?: AccountUpdateManyWithoutUserNestedInput
-        sessions?: SessionUpdateManyWithoutUserNestedInput
-        messages?: MessageUpdateManyWithoutUserNestedInput
-        members?: MemberUpdateManyWithoutUserNestedInput
-        invitations?: InvitationUpdateManyWithoutUserNestedInput
-        twofactors?: TwoFactorUpdateManyWithoutUserNestedInput
-        Event?: EventUpdateManyWithoutUserNestedInput
-        EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
-        apikeys?: ApikeyUpdateManyWithoutUserNestedInput
-    }
+  export type UserUpdateWithoutTicketInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: NullableStringFieldUpdateOperationsInput | string | null
+    banned?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    banReason?: NullableStringFieldUpdateOperationsInput | string | null
+    banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
+    members?: MemberUpdateManyWithoutUserNestedInput
+    invitations?: InvitationUpdateManyWithoutUserNestedInput
+    twofactors?: TwoFactorUpdateManyWithoutUserNestedInput
+    Event?: EventUpdateManyWithoutUserNestedInput
+    EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
+    apikeys?: ApikeyUpdateManyWithoutUserNestedInput
+  }
 
-    export type UserUncheckedUpdateWithoutTicketInput = {
-        id?: StringFieldUpdateOperationsInput | string
-        name?: StringFieldUpdateOperationsInput | string
-        email?: StringFieldUpdateOperationsInput | string
-        emailVerified?: BoolFieldUpdateOperationsInput | boolean
-        image?: NullableStringFieldUpdateOperationsInput | string | null
-        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        role?: NullableStringFieldUpdateOperationsInput | string | null
-        banned?: NullableBoolFieldUpdateOperationsInput | boolean | null
-        banReason?: NullableStringFieldUpdateOperationsInput | string | null
-        banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-        twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-        username?: NullableStringFieldUpdateOperationsInput | string | null
-        displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
-        accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
-        sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-        messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
-        members?: MemberUncheckedUpdateManyWithoutUserNestedInput
-        invitations?: InvitationUncheckedUpdateManyWithoutUserNestedInput
-        twofactors?: TwoFactorUncheckedUpdateManyWithoutUserNestedInput
-        Event?: EventUncheckedUpdateManyWithoutUserNestedInput
-        EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
-        apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
-    }
+  export type UserUncheckedUpdateWithoutTicketInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: NullableStringFieldUpdateOperationsInput | string | null
+    banned?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    banReason?: NullableStringFieldUpdateOperationsInput | string | null
+    banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    members?: MemberUncheckedUpdateManyWithoutUserNestedInput
+    invitations?: InvitationUncheckedUpdateManyWithoutUserNestedInput
+    twofactors?: TwoFactorUncheckedUpdateManyWithoutUserNestedInput
+    Event?: EventUncheckedUpdateManyWithoutUserNestedInput
+    EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
+    apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
+  }
 
-    export type UserCreateWithoutApikeysInput = {
-        id: string
-        name: string
-        email: string
-        emailVerified: boolean
-        image?: string | null
-        createdAt: Date | string
-        updatedAt: Date | string
-        role?: string | null
-        banned?: boolean | null
-        banReason?: string | null
-        banExpires?: Date | string | null
-        twoFactorEnabled?: boolean | null
-        username?: string | null
-        displayUsername?: string | null
-        accounts?: AccountCreateNestedManyWithoutUserInput
-        sessions?: SessionCreateNestedManyWithoutUserInput
-        messages?: MessageCreateNestedManyWithoutUserInput
-        members?: MemberCreateNestedManyWithoutUserInput
-        invitations?: InvitationCreateNestedManyWithoutUserInput
-        twofactors?: TwoFactorCreateNestedManyWithoutUserInput
-        Event?: EventCreateNestedManyWithoutUserInput
-        EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
-        Ticket?: TicketCreateNestedManyWithoutUserInput
-    }
+  export type UserCreateWithoutApikeysInput = {
+    id: string
+    name: string
+    email: string
+    emailVerified: boolean
+    image?: string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+    role?: string | null
+    banned?: boolean | null
+    banReason?: string | null
+    banExpires?: Date | string | null
+    twoFactorEnabled?: boolean | null
+    username?: string | null
+    displayUsername?: string | null
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    messages?: MessageCreateNestedManyWithoutUserInput
+    members?: MemberCreateNestedManyWithoutUserInput
+    invitations?: InvitationCreateNestedManyWithoutUserInput
+    twofactors?: TwoFactorCreateNestedManyWithoutUserInput
+    Event?: EventCreateNestedManyWithoutUserInput
+    EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
+    Ticket?: TicketCreateNestedManyWithoutUserInput
+  }
 
-    export type UserUncheckedCreateWithoutApikeysInput = {
-        id: string
-        name: string
-        email: string
-        emailVerified: boolean
-        image?: string | null
-        createdAt: Date | string
-        updatedAt: Date | string
-        role?: string | null
-        banned?: boolean | null
-        banReason?: string | null
-        banExpires?: Date | string | null
-        twoFactorEnabled?: boolean | null
-        username?: string | null
-        displayUsername?: string | null
-        accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
-        sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-        messages?: MessageUncheckedCreateNestedManyWithoutUserInput
-        members?: MemberUncheckedCreateNestedManyWithoutUserInput
-        invitations?: InvitationUncheckedCreateNestedManyWithoutUserInput
-        twofactors?: TwoFactorUncheckedCreateNestedManyWithoutUserInput
-        Event?: EventUncheckedCreateNestedManyWithoutUserInput
-        EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
-        Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
-    }
+  export type UserUncheckedCreateWithoutApikeysInput = {
+    id: string
+    name: string
+    email: string
+    emailVerified: boolean
+    image?: string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+    role?: string | null
+    banned?: boolean | null
+    banReason?: string | null
+    banExpires?: Date | string | null
+    twoFactorEnabled?: boolean | null
+    username?: string | null
+    displayUsername?: string | null
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    members?: MemberUncheckedCreateNestedManyWithoutUserInput
+    invitations?: InvitationUncheckedCreateNestedManyWithoutUserInput
+    twofactors?: TwoFactorUncheckedCreateNestedManyWithoutUserInput
+    Event?: EventUncheckedCreateNestedManyWithoutUserInput
+    EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
+    Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
+  }
 
-    export type UserCreateOrConnectWithoutApikeysInput = {
-        where: UserWhereUniqueInput
-        create: XOR<UserCreateWithoutApikeysInput, UserUncheckedCreateWithoutApikeysInput>
-    }
+  export type UserCreateOrConnectWithoutApikeysInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutApikeysInput, UserUncheckedCreateWithoutApikeysInput>
+  }
 
-    export type UserUpsertWithoutApikeysInput = {
-        update: XOR<UserUpdateWithoutApikeysInput, UserUncheckedUpdateWithoutApikeysInput>
-        create: XOR<UserCreateWithoutApikeysInput, UserUncheckedCreateWithoutApikeysInput>
-        where?: UserWhereInput
-    }
+  export type UserUpsertWithoutApikeysInput = {
+    update: XOR<UserUpdateWithoutApikeysInput, UserUncheckedUpdateWithoutApikeysInput>
+    create: XOR<UserCreateWithoutApikeysInput, UserUncheckedCreateWithoutApikeysInput>
+    where?: UserWhereInput
+  }
 
-    export type UserUpdateToOneWithWhereWithoutApikeysInput = {
-        where?: UserWhereInput
-        data: XOR<UserUpdateWithoutApikeysInput, UserUncheckedUpdateWithoutApikeysInput>
-    }
+  export type UserUpdateToOneWithWhereWithoutApikeysInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutApikeysInput, UserUncheckedUpdateWithoutApikeysInput>
+  }
 
-    export type UserUpdateWithoutApikeysInput = {
-        id?: StringFieldUpdateOperationsInput | string
-        name?: StringFieldUpdateOperationsInput | string
-        email?: StringFieldUpdateOperationsInput | string
-        emailVerified?: BoolFieldUpdateOperationsInput | boolean
-        image?: NullableStringFieldUpdateOperationsInput | string | null
-        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        role?: NullableStringFieldUpdateOperationsInput | string | null
-        banned?: NullableBoolFieldUpdateOperationsInput | boolean | null
-        banReason?: NullableStringFieldUpdateOperationsInput | string | null
-        banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-        twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-        username?: NullableStringFieldUpdateOperationsInput | string | null
-        displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
-        accounts?: AccountUpdateManyWithoutUserNestedInput
-        sessions?: SessionUpdateManyWithoutUserNestedInput
-        messages?: MessageUpdateManyWithoutUserNestedInput
-        members?: MemberUpdateManyWithoutUserNestedInput
-        invitations?: InvitationUpdateManyWithoutUserNestedInput
-        twofactors?: TwoFactorUpdateManyWithoutUserNestedInput
-        Event?: EventUpdateManyWithoutUserNestedInput
-        EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
-        Ticket?: TicketUpdateManyWithoutUserNestedInput
-    }
+  export type UserUpdateWithoutApikeysInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: NullableStringFieldUpdateOperationsInput | string | null
+    banned?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    banReason?: NullableStringFieldUpdateOperationsInput | string | null
+    banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
+    members?: MemberUpdateManyWithoutUserNestedInput
+    invitations?: InvitationUpdateManyWithoutUserNestedInput
+    twofactors?: TwoFactorUpdateManyWithoutUserNestedInput
+    Event?: EventUpdateManyWithoutUserNestedInput
+    EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
+    Ticket?: TicketUpdateManyWithoutUserNestedInput
+  }
 
-    export type UserUncheckedUpdateWithoutApikeysInput = {
-        id?: StringFieldUpdateOperationsInput | string
-        name?: StringFieldUpdateOperationsInput | string
-        email?: StringFieldUpdateOperationsInput | string
-        emailVerified?: BoolFieldUpdateOperationsInput | boolean
-        image?: NullableStringFieldUpdateOperationsInput | string | null
-        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        role?: NullableStringFieldUpdateOperationsInput | string | null
-        banned?: NullableBoolFieldUpdateOperationsInput | boolean | null
-        banReason?: NullableStringFieldUpdateOperationsInput | string | null
-        banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-        twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-        username?: NullableStringFieldUpdateOperationsInput | string | null
-        displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
-        accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
-        sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-        messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
-        members?: MemberUncheckedUpdateManyWithoutUserNestedInput
-        invitations?: InvitationUncheckedUpdateManyWithoutUserNestedInput
-        twofactors?: TwoFactorUncheckedUpdateManyWithoutUserNestedInput
-        Event?: EventUncheckedUpdateManyWithoutUserNestedInput
-        EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
-        Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
-    }
+  export type UserUncheckedUpdateWithoutApikeysInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: NullableStringFieldUpdateOperationsInput | string | null
+    banned?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    banReason?: NullableStringFieldUpdateOperationsInput | string | null
+    banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    members?: MemberUncheckedUpdateManyWithoutUserNestedInput
+    invitations?: InvitationUncheckedUpdateManyWithoutUserNestedInput
+    twofactors?: TwoFactorUncheckedUpdateManyWithoutUserNestedInput
+    Event?: EventUncheckedUpdateManyWithoutUserNestedInput
+    EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
+    Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
+  }
 
   export type AccountCreateManyUserInput = {
     id: string
@@ -25933,37 +25945,37 @@ export namespace Prisma {
     eventId?: string | null
   }
 
-    export type TicketCreateManyUserInput = {
-        id?: number
-        discordUserID: string
-        channelId?: string | null
-        channelName?: string | null
-        createdAt: Date | string
-        updatedAt: Date | string
-    }
+  export type TicketCreateManyUserInput = {
+    id?: number
+    discordUserID: string
+    channelId?: string | null
+    channelName?: string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+  }
 
-    export type ApikeyCreateManyUserInput = {
-        id: string
-        name?: string | null
-        start?: string | null
-        prefix?: string | null
-        key: string
-        refillInterval?: number | null
-        refillAmount?: number | null
-        lastRefillAt?: Date | string | null
-        enabled?: boolean | null
-        rateLimitEnabled?: boolean | null
-        rateLimitTimeWindow?: number | null
-        rateLimitMax?: number | null
-        requestCount?: number | null
-        remaining?: number | null
-        lastRequest?: Date | string | null
-        expiresAt?: Date | string | null
-        createdAt: Date | string
-        updatedAt: Date | string
-        permissions?: string | null
-        metadata?: string | null
-    }
+  export type ApikeyCreateManyUserInput = {
+    id: string
+    name?: string | null
+    start?: string | null
+    prefix?: string | null
+    key: string
+    refillInterval?: number | null
+    refillAmount?: number | null
+    lastRefillAt?: Date | string | null
+    enabled?: boolean | null
+    rateLimitEnabled?: boolean | null
+    rateLimitTimeWindow?: number | null
+    rateLimitMax?: number | null
+    requestCount?: number | null
+    remaining?: number | null
+    lastRequest?: Date | string | null
+    expiresAt?: Date | string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+    permissions?: string | null
+    metadata?: string | null
+  }
 
   export type AccountUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
@@ -26049,7 +26061,7 @@ export namespace Prisma {
   export type MessageUpdateWithoutUserInput = {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     content?: BytesFieldUpdateOperationsInput | Uint8Array
-      channel?: ChannelUpdateOneRequiredWithoutMessageNestedInput
+    channel?: ChannelUpdateOneRequiredWithoutMessageNestedInput
   }
 
   export type MessageUncheckedUpdateWithoutUserInput = {
@@ -26187,99 +26199,99 @@ export namespace Prisma {
     eventId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
-    export type TicketUpdateWithoutUserInput = {
-        discordUserID?: StringFieldUpdateOperationsInput | string
-        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        channel?: ChannelUpdateOneWithoutTicketNestedInput
-    }
+  export type TicketUpdateWithoutUserInput = {
+    discordUserID?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    channel?: ChannelUpdateOneWithoutTicketNestedInput
+  }
 
-    export type TicketUncheckedUpdateWithoutUserInput = {
-        id?: IntFieldUpdateOperationsInput | number
-        discordUserID?: StringFieldUpdateOperationsInput | string
-        channelId?: NullableStringFieldUpdateOperationsInput | string | null
-        channelName?: NullableStringFieldUpdateOperationsInput | string | null
-        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    }
+  export type TicketUncheckedUpdateWithoutUserInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    discordUserID?: StringFieldUpdateOperationsInput | string
+    channelId?: NullableStringFieldUpdateOperationsInput | string | null
+    channelName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
 
-    export type TicketUncheckedUpdateManyWithoutUserInput = {
-        id?: IntFieldUpdateOperationsInput | number
-        discordUserID?: StringFieldUpdateOperationsInput | string
-        channelId?: NullableStringFieldUpdateOperationsInput | string | null
-        channelName?: NullableStringFieldUpdateOperationsInput | string | null
-        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    }
+  export type TicketUncheckedUpdateManyWithoutUserInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    discordUserID?: StringFieldUpdateOperationsInput | string
+    channelId?: NullableStringFieldUpdateOperationsInput | string | null
+    channelName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
 
-    export type ApikeyUpdateWithoutUserInput = {
-        id?: StringFieldUpdateOperationsInput | string
-        name?: NullableStringFieldUpdateOperationsInput | string | null
-        start?: NullableStringFieldUpdateOperationsInput | string | null
-        prefix?: NullableStringFieldUpdateOperationsInput | string | null
-        key?: StringFieldUpdateOperationsInput | string
-        refillInterval?: NullableIntFieldUpdateOperationsInput | number | null
-        refillAmount?: NullableIntFieldUpdateOperationsInput | number | null
-        lastRefillAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-        enabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-        rateLimitEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-        rateLimitTimeWindow?: NullableIntFieldUpdateOperationsInput | number | null
-        rateLimitMax?: NullableIntFieldUpdateOperationsInput | number | null
-        requestCount?: NullableIntFieldUpdateOperationsInput | number | null
-        remaining?: NullableIntFieldUpdateOperationsInput | number | null
-        lastRequest?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-        expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        permissions?: NullableStringFieldUpdateOperationsInput | string | null
-        metadata?: NullableStringFieldUpdateOperationsInput | string | null
-    }
+  export type ApikeyUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    start?: NullableStringFieldUpdateOperationsInput | string | null
+    prefix?: NullableStringFieldUpdateOperationsInput | string | null
+    key?: StringFieldUpdateOperationsInput | string
+    refillInterval?: NullableIntFieldUpdateOperationsInput | number | null
+    refillAmount?: NullableIntFieldUpdateOperationsInput | number | null
+    lastRefillAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    enabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    rateLimitEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    rateLimitTimeWindow?: NullableIntFieldUpdateOperationsInput | number | null
+    rateLimitMax?: NullableIntFieldUpdateOperationsInput | number | null
+    requestCount?: NullableIntFieldUpdateOperationsInput | number | null
+    remaining?: NullableIntFieldUpdateOperationsInput | number | null
+    lastRequest?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    permissions?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableStringFieldUpdateOperationsInput | string | null
+  }
 
-    export type ApikeyUncheckedUpdateWithoutUserInput = {
-        id?: StringFieldUpdateOperationsInput | string
-        name?: NullableStringFieldUpdateOperationsInput | string | null
-        start?: NullableStringFieldUpdateOperationsInput | string | null
-        prefix?: NullableStringFieldUpdateOperationsInput | string | null
-        key?: StringFieldUpdateOperationsInput | string
-        refillInterval?: NullableIntFieldUpdateOperationsInput | number | null
-        refillAmount?: NullableIntFieldUpdateOperationsInput | number | null
-        lastRefillAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-        enabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-        rateLimitEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-        rateLimitTimeWindow?: NullableIntFieldUpdateOperationsInput | number | null
-        rateLimitMax?: NullableIntFieldUpdateOperationsInput | number | null
-        requestCount?: NullableIntFieldUpdateOperationsInput | number | null
-        remaining?: NullableIntFieldUpdateOperationsInput | number | null
-        lastRequest?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-        expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        permissions?: NullableStringFieldUpdateOperationsInput | string | null
-        metadata?: NullableStringFieldUpdateOperationsInput | string | null
-    }
+  export type ApikeyUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    start?: NullableStringFieldUpdateOperationsInput | string | null
+    prefix?: NullableStringFieldUpdateOperationsInput | string | null
+    key?: StringFieldUpdateOperationsInput | string
+    refillInterval?: NullableIntFieldUpdateOperationsInput | number | null
+    refillAmount?: NullableIntFieldUpdateOperationsInput | number | null
+    lastRefillAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    enabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    rateLimitEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    rateLimitTimeWindow?: NullableIntFieldUpdateOperationsInput | number | null
+    rateLimitMax?: NullableIntFieldUpdateOperationsInput | number | null
+    requestCount?: NullableIntFieldUpdateOperationsInput | number | null
+    remaining?: NullableIntFieldUpdateOperationsInput | number | null
+    lastRequest?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    permissions?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableStringFieldUpdateOperationsInput | string | null
+  }
 
-    export type ApikeyUncheckedUpdateManyWithoutUserInput = {
-        id?: StringFieldUpdateOperationsInput | string
-        name?: NullableStringFieldUpdateOperationsInput | string | null
-        start?: NullableStringFieldUpdateOperationsInput | string | null
-        prefix?: NullableStringFieldUpdateOperationsInput | string | null
-        key?: StringFieldUpdateOperationsInput | string
-        refillInterval?: NullableIntFieldUpdateOperationsInput | number | null
-        refillAmount?: NullableIntFieldUpdateOperationsInput | number | null
-        lastRefillAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-        enabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-        rateLimitEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
-        rateLimitTimeWindow?: NullableIntFieldUpdateOperationsInput | number | null
-        rateLimitMax?: NullableIntFieldUpdateOperationsInput | number | null
-        requestCount?: NullableIntFieldUpdateOperationsInput | number | null
-        remaining?: NullableIntFieldUpdateOperationsInput | number | null
-        lastRequest?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-        expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        permissions?: NullableStringFieldUpdateOperationsInput | string | null
-        metadata?: NullableStringFieldUpdateOperationsInput | string | null
-    }
+  export type ApikeyUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    start?: NullableStringFieldUpdateOperationsInput | string | null
+    prefix?: NullableStringFieldUpdateOperationsInput | string | null
+    key?: StringFieldUpdateOperationsInput | string
+    refillInterval?: NullableIntFieldUpdateOperationsInput | number | null
+    refillAmount?: NullableIntFieldUpdateOperationsInput | number | null
+    lastRefillAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    enabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    rateLimitEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    rateLimitTimeWindow?: NullableIntFieldUpdateOperationsInput | number | null
+    rateLimitMax?: NullableIntFieldUpdateOperationsInput | number | null
+    requestCount?: NullableIntFieldUpdateOperationsInput | number | null
+    remaining?: NullableIntFieldUpdateOperationsInput | number | null
+    lastRequest?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    permissions?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableStringFieldUpdateOperationsInput | string | null
+  }
 
   export type MemberCreateManyOrganizationInput = {
     id: string
@@ -26345,63 +26357,63 @@ export namespace Prisma {
     inviterId?: StringFieldUpdateOperationsInput | string
   }
 
-    export type MessageCreateManyChannelInput = {
-        id?: number
-        createdAt: Date | string
-        userId: string
-        content: Uint8Array
-    }
+  export type MessageCreateManyChannelInput = {
+    id?: number
+    createdAt: Date | string
+    userId: string
+    content: Uint8Array
+  }
 
-    export type TicketCreateManyChannelInput = {
-        id?: number
-        discordUserID: string
-        createdAt: Date | string
-        updatedAt: Date | string
-        assignedUserId?: string | null
-    }
+  export type TicketCreateManyChannelInput = {
+    id?: number
+    discordUserID: string
+    createdAt: Date | string
+    updatedAt: Date | string
+    assignedUserId?: string | null
+  }
 
-    export type MessageUpdateWithoutChannelInput = {
-        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        content?: BytesFieldUpdateOperationsInput | Uint8Array
-        user?: UserUpdateOneRequiredWithoutMessagesNestedInput
-    }
+  export type MessageUpdateWithoutChannelInput = {
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    content?: BytesFieldUpdateOperationsInput | Uint8Array
+    user?: UserUpdateOneRequiredWithoutMessagesNestedInput
+  }
 
-    export type MessageUncheckedUpdateWithoutChannelInput = {
-        id?: IntFieldUpdateOperationsInput | number
-        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        userId?: StringFieldUpdateOperationsInput | string
-        content?: BytesFieldUpdateOperationsInput | Uint8Array
-    }
+  export type MessageUncheckedUpdateWithoutChannelInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    content?: BytesFieldUpdateOperationsInput | Uint8Array
+  }
 
-    export type MessageUncheckedUpdateManyWithoutChannelInput = {
-        id?: IntFieldUpdateOperationsInput | number
-        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        userId?: StringFieldUpdateOperationsInput | string
-        content?: BytesFieldUpdateOperationsInput | Uint8Array
-    }
+  export type MessageUncheckedUpdateManyWithoutChannelInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    content?: BytesFieldUpdateOperationsInput | Uint8Array
+  }
 
-    export type TicketUpdateWithoutChannelInput = {
-        discordUserID?: StringFieldUpdateOperationsInput | string
-        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        user?: UserUpdateOneWithoutTicketNestedInput
-    }
+  export type TicketUpdateWithoutChannelInput = {
+    discordUserID?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneWithoutTicketNestedInput
+  }
 
-    export type TicketUncheckedUpdateWithoutChannelInput = {
-        id?: IntFieldUpdateOperationsInput | number
-        discordUserID?: StringFieldUpdateOperationsInput | string
-        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
-    }
+  export type TicketUncheckedUpdateWithoutChannelInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    discordUserID?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
 
-    export type TicketUncheckedUpdateManyWithoutChannelInput = {
-        id?: IntFieldUpdateOperationsInput | number
-        discordUserID?: StringFieldUpdateOperationsInput | string
-        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
-    }
+  export type TicketUncheckedUpdateManyWithoutChannelInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    discordUserID?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
 
   export type RoleSlotCreateManyEventInput = {
     id?: string
