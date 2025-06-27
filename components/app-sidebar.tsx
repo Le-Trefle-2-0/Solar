@@ -36,16 +36,18 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
     ]);
 
     useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/tickets`).then(async tickets => {
-            let ticketList = await tickets.json()
-            for (let ticket of ticketList) {
-                setData([...data, {
+        fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/tickets`)
+            .then((res) => res.json())
+            .then((ticketList) => {
+                const items = ticketList.map((ticket: { channelName: string; channelId: string }) => ({
                     name: ticket.channelName,
                     url: '/app/ticket/' + ticket.channelId,
                     icon: MessageSquareLock
-                }]);
-            }
-        })
+                }));
+                console.log([...data, ...items])
+                setData(data => [...data, ...items]);
+            })
+            .catch(err => console.error('Failed to load tickets:', err));
     }, []);
 
     return (
