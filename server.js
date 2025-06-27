@@ -87,6 +87,7 @@ app.prepare().then(() => {
             if (socket.handshake.auth.token) {
                 validToken = await validateAPIKey(socket.handshake.auth.token);
             }
+            // console.log(validJWT, validToken);
             if (!validJWT && !validToken) {
                 throw new Error("Invalid API key");
             }
