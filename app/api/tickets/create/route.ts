@@ -8,7 +8,7 @@ const bodySchema = z.object({
     token: z.string(),
 })
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest) {
     const body = await req.json();
     try {
         const verifiedBody = bodySchema.parse(body);
