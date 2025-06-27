@@ -8,3 +8,11 @@ export async function channelInfo(channelID: string) {
 
     return channel;
 }
+
+export async function createChannel(name: string) {
+    const channel = await prisma.channel.create({
+        data: {name}
+    });
+
+    return channel;
+}
