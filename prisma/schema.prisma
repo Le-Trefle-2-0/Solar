@@ -203,12 +203,11 @@ model EventRegistration {
 model Ticket {
   id             Int      @id @default(autoincrement())
   discordUserID  String
-  channelId      String
-  channelName    String
-  channel        Channel  @relation(fields: [channelId, channelName], references: [id, name], onDelete: Cascade)
+  channelId   String?
+  channelName String?
+  channel     Channel? @relation(fields: [channelId, channelName], references: [id, name], onDelete: Cascade)
   createdAt      DateTime
   updatedAt      DateTime
-  type           String
   user           User?    @relation(fields: [assignedUserId], references: [id])
   assignedUserId String?
 }

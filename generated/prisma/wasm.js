@@ -255,7 +255,6 @@ exports.Prisma.TicketScalarFieldEnum = {
     channelName: 'channelName',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
-    type: 'type',
     assignedUserId: 'assignedUserId'
 };
 
@@ -404,7 +403,6 @@ exports.Prisma.TicketOrderByRelevanceFieldEnum = {
     discordUserID: 'discordUserID',
     channelId: 'channelId',
     channelName: 'channelName',
-    type: 'type',
     assignedUserId: 'assignedUserId'
 };
 

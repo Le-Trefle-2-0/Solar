@@ -15239,7 +15239,6 @@ export namespace Prisma {
         channelName: string | null
         createdAt: Date | null
         updatedAt: Date | null
-        type: string | null
         assignedUserId: string | null
     }
 
@@ -15250,7 +15249,6 @@ export namespace Prisma {
         channelName: string | null
         createdAt: Date | null
         updatedAt: Date | null
-        type: string | null
         assignedUserId: string | null
     }
 
@@ -15261,7 +15259,6 @@ export namespace Prisma {
         channelName: number
         createdAt: number
         updatedAt: number
-        type: number
         assignedUserId: number
         _all: number
     }
@@ -15282,7 +15279,6 @@ export namespace Prisma {
         channelName?: true
         createdAt?: true
         updatedAt?: true
-        type?: true
         assignedUserId?: true
     }
 
@@ -15293,7 +15289,6 @@ export namespace Prisma {
         channelName?: true
         createdAt?: true
         updatedAt?: true
-        type?: true
         assignedUserId?: true
     }
 
@@ -15304,7 +15299,6 @@ export namespace Prisma {
         channelName?: true
         createdAt?: true
         updatedAt?: true
-        type?: true
         assignedUserId?: true
         _all?: true
     }
@@ -15396,11 +15390,10 @@ export namespace Prisma {
     export type TicketGroupByOutputType = {
         id: number
         discordUserID: string
-        channelId: string
-        channelName: string
+        channelId: string | null
+        channelName: string | null
         createdAt: Date
         updatedAt: Date
-        type: string
         assignedUserId: string | null
         _count: TicketCountAggregateOutputType | null
         _avg: TicketAvgAggregateOutputType | null
@@ -15430,9 +15423,8 @@ export namespace Prisma {
         channelName?: boolean
         createdAt?: boolean
         updatedAt?: boolean
-        type?: boolean
         assignedUserId?: boolean
-        channel?: boolean | ChannelDefaultArgs<ExtArgs>
+        channel?: boolean | Ticket$channelArgs<ExtArgs>
         user?: boolean | Ticket$userArgs<ExtArgs>
     }, ExtArgs["result"]["ticket"]>
 
@@ -15444,30 +15436,28 @@ export namespace Prisma {
         channelName?: boolean
         createdAt?: boolean
         updatedAt?: boolean
-        type?: boolean
         assignedUserId?: boolean
     }
 
-    export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "discordUserID" | "channelId" | "channelName" | "createdAt" | "updatedAt" | "type" | "assignedUserId", ExtArgs["result"]["ticket"]>
+    export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "discordUserID" | "channelId" | "channelName" | "createdAt" | "updatedAt" | "assignedUserId", ExtArgs["result"]["ticket"]>
     export type TicketInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-        channel?: boolean | ChannelDefaultArgs<ExtArgs>
+        channel?: boolean | Ticket$channelArgs<ExtArgs>
         user?: boolean | Ticket$userArgs<ExtArgs>
     }
 
     export type $TicketPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
         name: "Ticket"
         objects: {
-            channel: Prisma.$ChannelPayload<ExtArgs>
+            channel: Prisma.$ChannelPayload<ExtArgs> | null
             user: Prisma.$UserPayload<ExtArgs> | null
         }
         scalars: $Extensions.GetPayloadResult<{
             id: number
             discordUserID: string
-            channelId: string
-            channelName: string
+            channelId: string | null
+            channelName: string | null
             createdAt: Date
             updatedAt: Date
-            type: string
             assignedUserId: string | null
         }, ExtArgs["result"]["ticket"]>
         composites: {}
@@ -15812,7 +15802,7 @@ export namespace Prisma {
     export interface Prisma__TicketClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
         readonly [Symbol.toStringTag]: "PrismaPromise"
 
-        channel<T extends ChannelDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ChannelDefaultArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+        channel<T extends Ticket$channelArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$channelArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
         user<T extends Ticket$userArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$userArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
@@ -15851,7 +15841,6 @@ export namespace Prisma {
         readonly channelName: FieldRef<"Ticket", 'String'>
         readonly createdAt: FieldRef<"Ticket", 'DateTime'>
         readonly updatedAt: FieldRef<"Ticket", 'DateTime'>
-        readonly type: FieldRef<"Ticket", 'String'>
         readonly assignedUserId: FieldRef<"Ticket", 'String'>
     }
 
@@ -16193,6 +16182,25 @@ export namespace Prisma {
          * Limit how many Tickets to delete.
          */
         limit?: number
+    }
+
+    /**
+     * Ticket.channel
+     */
+    export type Ticket$channelArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the Channel
+         */
+        select?: ChannelSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the Channel
+         */
+        omit?: ChannelOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: ChannelInclude<ExtArgs> | null
+        where?: ChannelWhereInput
     }
 
     /**
@@ -18452,7 +18460,6 @@ export namespace Prisma {
         channelName: 'channelName',
         createdAt: 'createdAt',
         updatedAt: 'updatedAt',
-        type: 'type',
         assignedUserId: 'assignedUserId'
     };
 
@@ -18655,7 +18662,6 @@ export namespace Prisma {
         discordUserID: 'discordUserID',
         channelId: 'channelId',
         channelName: 'channelName',
-        type: 'type',
         assignedUserId: 'assignedUserId'
     };
 
@@ -19644,24 +19650,22 @@ export namespace Prisma {
         NOT?: TicketWhereInput | TicketWhereInput[]
         id?: IntFilter<"Ticket"> | number
         discordUserID?: StringFilter<"Ticket"> | string
-        channelId?: StringFilter<"Ticket"> | string
-        channelName?: StringFilter<"Ticket"> | string
+        channelId?: StringNullableFilter<"Ticket"> | string | null
+        channelName?: StringNullableFilter<"Ticket"> | string | null
         createdAt?: DateTimeFilter<"Ticket"> | Date | string
         updatedAt?: DateTimeFilter<"Ticket"> | Date | string
-        type?: StringFilter<"Ticket"> | string
         assignedUserId?: StringNullableFilter<"Ticket"> | string | null
-        channel?: XOR<ChannelScalarRelationFilter, ChannelWhereInput>
+        channel?: XOR<ChannelNullableScalarRelationFilter, ChannelWhereInput> | null
         user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     }
 
     export type TicketOrderByWithRelationInput = {
         id?: SortOrder
         discordUserID?: SortOrder
-        channelId?: SortOrder
-        channelName?: SortOrder
+        channelId?: SortOrderInput | SortOrder
+        channelName?: SortOrderInput | SortOrder
         createdAt?: SortOrder
         updatedAt?: SortOrder
-        type?: SortOrder
         assignedUserId?: SortOrderInput | SortOrder
         channel?: ChannelOrderByWithRelationInput
         user?: UserOrderByWithRelationInput
@@ -19674,24 +19678,22 @@ export namespace Prisma {
         OR?: TicketWhereInput[]
         NOT?: TicketWhereInput | TicketWhereInput[]
         discordUserID?: StringFilter<"Ticket"> | string
-        channelId?: StringFilter<"Ticket"> | string
-        channelName?: StringFilter<"Ticket"> | string
+        channelId?: StringNullableFilter<"Ticket"> | string | null
+        channelName?: StringNullableFilter<"Ticket"> | string | null
         createdAt?: DateTimeFilter<"Ticket"> | Date | string
         updatedAt?: DateTimeFilter<"Ticket"> | Date | string
-        type?: StringFilter<"Ticket"> | string
         assignedUserId?: StringNullableFilter<"Ticket"> | string | null
-        channel?: XOR<ChannelScalarRelationFilter, ChannelWhereInput>
+        channel?: XOR<ChannelNullableScalarRelationFilter, ChannelWhereInput> | null
         user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     }, "id">
 
     export type TicketOrderByWithAggregationInput = {
         id?: SortOrder
         discordUserID?: SortOrder
-        channelId?: SortOrder
-        channelName?: SortOrder
+        channelId?: SortOrderInput | SortOrder
+        channelName?: SortOrderInput | SortOrder
         createdAt?: SortOrder
         updatedAt?: SortOrder
-        type?: SortOrder
         assignedUserId?: SortOrderInput | SortOrder
         _count?: TicketCountOrderByAggregateInput
         _avg?: TicketAvgOrderByAggregateInput
@@ -19706,11 +19708,10 @@ export namespace Prisma {
         NOT?: TicketScalarWhereWithAggregatesInput | TicketScalarWhereWithAggregatesInput[]
         id?: IntWithAggregatesFilter<"Ticket"> | number
         discordUserID?: StringWithAggregatesFilter<"Ticket"> | string
-        channelId?: StringWithAggregatesFilter<"Ticket"> | string
-        channelName?: StringWithAggregatesFilter<"Ticket"> | string
+        channelId?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
+        channelName?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
         createdAt?: DateTimeWithAggregatesFilter<"Ticket"> | Date | string
         updatedAt?: DateTimeWithAggregatesFilter<"Ticket"> | Date | string
-        type?: StringWithAggregatesFilter<"Ticket"> | string
         assignedUserId?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
     }
 
@@ -20851,19 +20852,17 @@ export namespace Prisma {
         discordUserID: string
         createdAt: Date | string
         updatedAt: Date | string
-        type: string
-        channel: ChannelCreateNestedOneWithoutTicketInput
+        channel?: ChannelCreateNestedOneWithoutTicketInput
         user?: UserCreateNestedOneWithoutTicketInput
     }
 
     export type TicketUncheckedCreateInput = {
         id?: number
         discordUserID: string
-        channelId: string
-        channelName: string
+        channelId?: string | null
+        channelName?: string | null
         createdAt: Date | string
         updatedAt: Date | string
-        type: string
         assignedUserId?: string | null
     }
 
@@ -20871,30 +20870,27 @@ export namespace Prisma {
         discordUserID?: StringFieldUpdateOperationsInput | string
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
         updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        type?: StringFieldUpdateOperationsInput | string
-        channel?: ChannelUpdateOneRequiredWithoutTicketNestedInput
+        channel?: ChannelUpdateOneWithoutTicketNestedInput
         user?: UserUpdateOneWithoutTicketNestedInput
     }
 
     export type TicketUncheckedUpdateInput = {
         id?: IntFieldUpdateOperationsInput | number
         discordUserID?: StringFieldUpdateOperationsInput | string
-        channelId?: StringFieldUpdateOperationsInput | string
-        channelName?: StringFieldUpdateOperationsInput | string
+        channelId?: NullableStringFieldUpdateOperationsInput | string | null
+        channelName?: NullableStringFieldUpdateOperationsInput | string | null
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
         updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        type?: StringFieldUpdateOperationsInput | string
         assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
     }
 
     export type TicketCreateManyInput = {
         id?: number
         discordUserID: string
-        channelId: string
-        channelName: string
+        channelId?: string | null
+        channelName?: string | null
         createdAt: Date | string
         updatedAt: Date | string
-        type: string
         assignedUserId?: string | null
     }
 
@@ -20902,17 +20898,15 @@ export namespace Prisma {
         discordUserID?: StringFieldUpdateOperationsInput | string
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
         updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        type?: StringFieldUpdateOperationsInput | string
     }
 
     export type TicketUncheckedUpdateManyInput = {
         id?: IntFieldUpdateOperationsInput | number
         discordUserID?: StringFieldUpdateOperationsInput | string
-        channelId?: StringFieldUpdateOperationsInput | string
-        channelName?: StringFieldUpdateOperationsInput | string
+        channelId?: NullableStringFieldUpdateOperationsInput | string | null
+        channelName?: NullableStringFieldUpdateOperationsInput | string | null
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
         updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        type?: StringFieldUpdateOperationsInput | string
         assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
     }
 
@@ -21951,6 +21945,11 @@ export namespace Prisma {
     eventId?: SortOrder
   }
 
+    export type ChannelNullableScalarRelationFilter = {
+        is?: ChannelWhereInput | null
+        isNot?: ChannelWhereInput | null
+    }
+
     export type UserNullableScalarRelationFilter = {
         is?: UserWhereInput | null
         isNot?: UserWhereInput | null
@@ -21969,7 +21968,6 @@ export namespace Prisma {
         channelName?: SortOrder
         createdAt?: SortOrder
         updatedAt?: SortOrder
-        type?: SortOrder
         assignedUserId?: SortOrder
     }
 
@@ -21984,7 +21982,6 @@ export namespace Prisma {
         channelName?: SortOrder
         createdAt?: SortOrder
         updatedAt?: SortOrder
-        type?: SortOrder
         assignedUserId?: SortOrder
     }
 
@@ -21995,7 +21992,6 @@ export namespace Prisma {
         channelName?: SortOrder
         createdAt?: SortOrder
         updatedAt?: SortOrder
-        type?: SortOrder
         assignedUserId?: SortOrder
     }
 
@@ -23113,10 +23109,12 @@ export namespace Prisma {
         connect?: UserWhereUniqueInput
     }
 
-    export type ChannelUpdateOneRequiredWithoutTicketNestedInput = {
+    export type ChannelUpdateOneWithoutTicketNestedInput = {
         create?: XOR<ChannelCreateWithoutTicketInput, ChannelUncheckedCreateWithoutTicketInput>
         connectOrCreate?: ChannelCreateOrConnectWithoutTicketInput
         upsert?: ChannelUpsertWithoutTicketInput
+        disconnect?: ChannelWhereInput | boolean
+        delete?: ChannelWhereInput | boolean
         connect?: ChannelWhereUniqueInput
         update?: XOR<XOR<ChannelUpdateToOneWithWhereWithoutTicketInput, ChannelUpdateWithoutTicketInput>, ChannelUncheckedUpdateWithoutTicketInput>
     }
@@ -23621,18 +23619,16 @@ export namespace Prisma {
         discordUserID: string
         createdAt: Date | string
         updatedAt: Date | string
-        type: string
-        channel: ChannelCreateNestedOneWithoutTicketInput
+        channel?: ChannelCreateNestedOneWithoutTicketInput
     }
 
     export type TicketUncheckedCreateWithoutUserInput = {
         id?: number
         discordUserID: string
-        channelId: string
-        channelName: string
+        channelId?: string | null
+        channelName?: string | null
         createdAt: Date | string
         updatedAt: Date | string
-        type: string
     }
 
     export type TicketCreateOrConnectWithoutUserInput = {
@@ -23956,11 +23952,10 @@ export namespace Prisma {
         NOT?: TicketScalarWhereInput | TicketScalarWhereInput[]
         id?: IntFilter<"Ticket"> | number
         discordUserID?: StringFilter<"Ticket"> | string
-        channelId?: StringFilter<"Ticket"> | string
-        channelName?: StringFilter<"Ticket"> | string
+        channelId?: StringNullableFilter<"Ticket"> | string | null
+        channelName?: StringNullableFilter<"Ticket"> | string | null
         createdAt?: DateTimeFilter<"Ticket"> | Date | string
         updatedAt?: DateTimeFilter<"Ticket"> | Date | string
-        type?: StringFilter<"Ticket"> | string
         assignedUserId?: StringNullableFilter<"Ticket"> | string | null
     }
 
@@ -24830,7 +24825,6 @@ export namespace Prisma {
         discordUserID: string
         createdAt: Date | string
         updatedAt: Date | string
-        type: string
         user?: UserCreateNestedOneWithoutTicketInput
     }
 
@@ -24839,7 +24833,6 @@ export namespace Prisma {
         discordUserID: string
         createdAt: Date | string
         updatedAt: Date | string
-        type: string
         assignedUserId?: string | null
     }
 
@@ -25943,11 +25936,10 @@ export namespace Prisma {
     export type TicketCreateManyUserInput = {
         id?: number
         discordUserID: string
-        channelId: string
-        channelName: string
+        channelId?: string | null
+        channelName?: string | null
         createdAt: Date | string
         updatedAt: Date | string
-        type: string
     }
 
     export type ApikeyCreateManyUserInput = {
@@ -26199,28 +26191,25 @@ export namespace Prisma {
         discordUserID?: StringFieldUpdateOperationsInput | string
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
         updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        type?: StringFieldUpdateOperationsInput | string
-        channel?: ChannelUpdateOneRequiredWithoutTicketNestedInput
+        channel?: ChannelUpdateOneWithoutTicketNestedInput
     }
 
     export type TicketUncheckedUpdateWithoutUserInput = {
         id?: IntFieldUpdateOperationsInput | number
         discordUserID?: StringFieldUpdateOperationsInput | string
-        channelId?: StringFieldUpdateOperationsInput | string
-        channelName?: StringFieldUpdateOperationsInput | string
+        channelId?: NullableStringFieldUpdateOperationsInput | string | null
+        channelName?: NullableStringFieldUpdateOperationsInput | string | null
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
         updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        type?: StringFieldUpdateOperationsInput | string
     }
 
     export type TicketUncheckedUpdateManyWithoutUserInput = {
         id?: IntFieldUpdateOperationsInput | number
         discordUserID?: StringFieldUpdateOperationsInput | string
-        channelId?: StringFieldUpdateOperationsInput | string
-        channelName?: StringFieldUpdateOperationsInput | string
+        channelId?: NullableStringFieldUpdateOperationsInput | string | null
+        channelName?: NullableStringFieldUpdateOperationsInput | string | null
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
         updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        type?: StringFieldUpdateOperationsInput | string
     }
 
     export type ApikeyUpdateWithoutUserInput = {
@@ -26368,7 +26357,6 @@ export namespace Prisma {
         discordUserID: string
         createdAt: Date | string
         updatedAt: Date | string
-        type: string
         assignedUserId?: string | null
     }
 
@@ -26396,7 +26384,6 @@ export namespace Prisma {
         discordUserID?: StringFieldUpdateOperationsInput | string
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
         updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        type?: StringFieldUpdateOperationsInput | string
         user?: UserUpdateOneWithoutTicketNestedInput
     }
 
@@ -26405,7 +26392,6 @@ export namespace Prisma {
         discordUserID?: StringFieldUpdateOperationsInput | string
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
         updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        type?: StringFieldUpdateOperationsInput | string
         assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
     }
 
@@ -26414,7 +26400,6 @@ export namespace Prisma {
         discordUserID?: StringFieldUpdateOperationsInput | string
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
         updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-        type?: StringFieldUpdateOperationsInput | string
         assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
     }
 
