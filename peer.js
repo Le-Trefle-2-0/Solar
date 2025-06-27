@@ -18,7 +18,7 @@ const sslOptions = {
 
 const PORT = process.env.PEER_PORT || 9000;
 
-const server = https.createServer(sslOptions, app); // ⬅️ Use HTTPS
+const server = https.createServer(sslOptions, app);
 
 const peerServer = ExpressPeerServer(server, {
     debug: true,
@@ -27,6 +27,15 @@ const peerServer = ExpressPeerServer(server, {
 });
 
 app.use("/", peerServer);
+
+// 🔽 Event listeners for peer connections
+peerServer.on("connection", (client) => {
+    console.log(`✅ Peer connected: ${client.getId()}`);
+});
+
+peerServer.on("disconnect", (client) => {
+    console.log(`❌ Peer disconnected: ${client.getId()}`);
+});
 
 server.listen(PORT, () => {
     console.log(`🔒 PeerJS server running securely on https://localhost:${PORT}/peerjs`);
