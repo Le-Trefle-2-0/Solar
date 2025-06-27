@@ -8,7 +8,14 @@ export async function GET(req: NextRequest) {
         headers: await headers()
     });
     if (!session) {
-        return new Response('unauthorized', {
+        const reqHeaders = await headers()
+        const {valid, error, key} = await auth.api.verifyApiKey({
+            body: {
+                key: reqHeaders.get("token") as string
+            }
+        });
+
+        if (!valid) return new Response('unauthorized', {
             status: 401,
         });
     }
