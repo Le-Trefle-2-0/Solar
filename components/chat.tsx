@@ -129,7 +129,7 @@ export function Chat(props: { channelID: string }) {
             .then(res => res.json())
             .then(data => {
                 setChat(data)
-                // scrollToBottom()
+                messagesListRef.current?.scrollIntoView()
             });
         fetch(`/api/channel/${channelID}`)
             .then(res => res.json())
@@ -161,7 +161,7 @@ export function Chat(props: { channelID: string }) {
                     }, 5000)
                 });
 
-                socketRef.current?.emit('listen', {id: '1'})
+                socketRef.current?.emit('listen', {id: channelID})
             }
         })
         rootDivRef.current?.focus();
