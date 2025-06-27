@@ -1,7 +1,7 @@
 import fs from 'fs';
 import 'dotenv/config'
 import {createServer as createHttpServer} from 'http';
-import {createServer as createHttpsServer} from 'https';
+import {Agent, createServer as createHttpsServer} from 'https';
 import next from 'next';
 import {Server} from 'socket.io';
 import {createRemoteJWKSet, jwtVerify} from 'jose';
@@ -14,17 +14,33 @@ const httpPort = process.env.HTTP_PORT || 80;
 const app = next({dev, hostname, port});
 const handler = app.getRequestHandler();
 
+if (process.env.NODE_ENV !== 'production') {
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+    const originalFetch = global.fetch || (await import('node-fetch')).default;
+    const agent = new Agent({rejectUnauthorized: false});
+
+    global.fetch = (url, options = {}) => {
+        return originalFetch(url, {
+            ...options,
+            agent,
+        });
+    };
+}
+
 async function validateJWT(token) {
     try {
         const JWKS = createRemoteJWKSet(
             new URL(`${process.env.NEXT_PUBLIC_APP_URL}/api/auth/jwks`)
         );
+
         const {payload} = await jwtVerify(token, JWKS, {
             issuer: process.env.NEXT_PUBLIC_APP_URL,
             audience: process.env.NEXT_PUBLIC_APP_URL,
         });
+
         return payload;
     } catch (error) {
+        console.error('JWT validation failed:', error);
         return false;
     }
 }
@@ -34,6 +50,7 @@ async function validateAPIKey(token) {
         const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/check-key`, {
             body: JSON.stringify({key: token}),
             method: 'POST',
+            headers: {'Content-Type': 'application/json'},
         });
         const valid = await res.json();
         return valid;
@@ -63,11 +80,13 @@ app.prepare().then(() => {
     io.use(async (socket, next) => {
         try {
             let validJWT = false;
-            if (socket.handshake.auth.jwt)
+            if (socket.handshake.auth.jwt) {
                 validJWT = await validateJWT(socket.handshake.auth.jwt);
+            }
             let validToken = false;
-            if (socket.handshake.auth.token)
+            if (socket.handshake.auth.token) {
                 validToken = await validateAPIKey(socket.handshake.auth.token);
+            }
             if (!validJWT && !validToken) {
                 throw new Error("Invalid API key");
             }
