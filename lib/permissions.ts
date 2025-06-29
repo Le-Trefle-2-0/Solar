@@ -33,5 +33,8 @@ export const bot = ac.newRole({
 });
 
 export const admin = ac.newRole({
-    ...adminAc.statements
+    ...adminAc.statements,
+    tickets: ['open', 'close', 'read_all', 'attribute', 'launch_voice', 'send_message_all', 'send_message', 'transmission'],
+    management: ['create_account', 'delete_account', 'ticket_history', 'view_transmission', 'view_stats', 'reset_password'],
+    permanence: ['open', 'close', 'register', 'unregister', 'unregister_other_all', 'unregister_other_user', 'register_other_all', 'register_other_user'],
 });
