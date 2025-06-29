@@ -112,6 +112,10 @@ app.prepare().then(() => {
         socket.on('typing', (data) => {
             socket.to(data.id).emit("typingIndicator", data);
         });
+
+        socket.on('update', () => {
+            socket.to('update').emit('updateRequest')
+        })
     });
 
     httpsServer

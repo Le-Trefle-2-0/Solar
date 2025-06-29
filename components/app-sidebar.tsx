@@ -1,6 +1,6 @@
 "use client"
 import * as React from "react"
-import {useEffect, useState} from "react"
+import {useEffect, useRef, useState} from "react"
 import {CalendarDays, House, MessageSquareLock, MessagesSquare} from "lucide-react"
 import {NavProjects} from "@/components/nav-projects"
 import {
@@ -15,8 +15,26 @@ import {
 import Image from "next/image";
 import logo from "@/public/logo.svg";
 import {UserButton} from "@daveyplate/better-auth-ui";
+import {io, Socket} from "socket.io-client";
 
 export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
+    const baseData = [
+        {
+            name: "Accueil",
+            url: "/app",
+            icon: House,
+        },
+        {
+            name: "Chat Permanence",
+            url: "/app/chat",
+            icon: MessagesSquare,
+        },
+        {
+            name: "Planning",
+            url: "/app/planning",
+            icon: CalendarDays,
+        },
+    ]
     const [data, setData] = useState([
         {
             name: "Accueil",
@@ -34,8 +52,9 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
             icon: CalendarDays,
         },
     ]);
+    const socketRef = useRef<Socket | null>(null);
 
-    useEffect(() => {
+    const updateTickets = () => {
         fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/tickets`)
             .then((res) => res.json())
             .then((ticketList) => {
@@ -44,10 +63,36 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
                     url: '/app/ticket/' + ticket.channelId,
                     icon: MessageSquareLock
                 }));
-                console.log([...data, ...items])
-                setData(data => [...data, ...items]);
+                console.log([...baseData, ...items])
+                setData(data => [...baseData, ...items]);
             })
             .catch(err => console.error('Failed to load tickets:', err));
+    }
+
+    useEffect(() => {
+        updateTickets()
+    }, []);
+
+    useEffect(() => {
+        fetch("/api/auth/token").then(async res => {
+            const body = await res.json();
+            if (body.token) {
+                socketRef.current = io(process.env.NEXT_PUBLIC_APP_URL, {
+                    auth: {
+                        jwt: body.token
+                    },
+                    transports: ['websocket'],
+                    withCredentials: true,
+                    rejectUnauthorized: (process.env.NODE_ENV == 'production')
+                });
+
+                socketRef.current?.emit('listen', {id: 'update'})
+
+                socketRef.current?.on('updateRequest', () => {
+                    updateTickets();
+                })
+            }
+        })
     }, []);
 
     return (
