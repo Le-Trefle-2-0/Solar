@@ -425,7 +425,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/home/azureuser/Solar/generated/prisma",
+      "value": "/Users/paul/WebstormProjects/Solar/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -434,12 +434,12 @@ const config = {
     "binaryTargets": [
       {
         "fromEnvVar": null,
-        "value": "debian-openssl-3.0.x",
+        "value": "darwin-arm64",
         "native": true
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/home/azureuser/Solar/prisma/schema.prisma",
+    "sourceFilePath": "/Users/paul/WebstormProjects/Solar/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -453,7 +453,6 @@ const config = {
     "db"
   ],
   "activeProvider": "mysql",
-  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
