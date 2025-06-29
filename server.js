@@ -98,6 +98,9 @@ app.prepare().then(() => {
     });
 
     io.on("connection", async (socket) => {
+        socket.on("ping", (callback) => {
+            callback();
+        })
         socket.on("listen", (data) => {
             socket.join(data.id);
         });
