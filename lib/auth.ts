@@ -3,7 +3,7 @@ import {dashboardPlugin} from "better-auth-dashboard";
 import {prismaAdapter} from "better-auth/adapters/prisma";
 import {PrismaClient} from "@/generated/prisma";
 import {resend} from "@/lib/resend";
-import {ac, admin, myCustomRole, user} from "./permissions"
+import {ac, admin, bot, manager, training, volunteer} from "./permissions"
 import {
     admin as adminPlugin,
     apiKey,
@@ -45,8 +45,11 @@ export const auth = betterAuth({
         }),
         adminPlugin({
             ac, roles: {
-                admin, user, myCustomRole
-            }
+                training, volunteer, manager, bot, admin
+            },
+            adminRoles: ['admin'],
+            defaultRole: 'admin'
+            // defaultRole: process.env.NODE_ENV === "production" ? "training" : "admin",
         }),
         organization(),
         twoFactor(),
