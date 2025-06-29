@@ -2,11 +2,18 @@ import prisma from "@/lib/prisma";
 import {createChannel} from "@/lib/channelsManager";
 
 export async function createTicket(id: string) {
+    const status = await prisma.ticketStatus.findUnique({
+        where: {
+            name: 'waiting'
+        }
+    });
     const ticket = await prisma.ticket.create({
         data: {
             discordUserID: id,
             createdAt: new Date(),
             updatedAt: new Date(),
+            statusName: status?.name as string,
+            statusLabel: status?.label as string,
         }
     });
 
@@ -18,7 +25,7 @@ export async function createTicket(id: string) {
     channelName = "Ecoute-" + channelName;
 
     const channel = await createChannel(channelName);
-    const ticketUpdate = await prisma.ticket.update({
+    return prisma.ticket.update({
         where: {
             id: ticket.id
         },
@@ -29,6 +36,4 @@ export async function createTicket(id: string) {
             channelId: channel.id
         }
     });
-
-    return ticketUpdate;
 }
