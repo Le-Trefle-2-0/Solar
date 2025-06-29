@@ -10,22 +10,6 @@ async function main() {
                 name: "Permanence"
             }
     });
-
-    let listenChannel = await prisma.channel.create({
-        data: {
-            name: "Ecoute-00001"
-        }
-    });
-
-    await prisma.ticket.create({
-        data: {
-            discordUserID: "369564132770578432",
-            channelId: listenChannel.id,
-            channelName: listenChannel.name,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        }
-    })
 }
 
 main()
