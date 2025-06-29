@@ -4,6 +4,7 @@ import {getMessages, saveMessage} from "@/lib/messageManager";
 import {NextRequest, NextResponse} from "next/server";
 import {z} from "zod";
 import {Msg} from "@/lib/interface";
+import prisma from "@/lib/prisma";
 
 export async function GET(
     request: Request,
@@ -26,20 +27,36 @@ export async function GET(
         });
     }
 
-    const perm = await auth.api.userHasPermission({
-        body: {
-            userId: session?.user.id,
-            permissions: {
-                event: ['view']
-            }
+    const {channel} = await params;
+
+    const dbChannel = await prisma.channel.findUnique({
+        where: {
+            id: channel
         }
     });
 
-    if (!perm.success) {
-        return new Response('Unauthorized', {status: 401,});
-    }
+    if (!dbChannel) return new Response('Not found', {status: 404});
 
-    const {channel} = await params;
+    const ticket = await prisma.ticket.findMany({
+        where: {
+            channelId: dbChannel.id
+        }
+    });
+
+    if (channel !== '1' && ticket[0].assignedUserId !== session?.user.id) {
+        const perm = await auth.api.userHasPermission({
+            body: {
+                userId: session?.user.id,
+                permissions: {
+                    tickets: ['read_all']
+                }
+            }
+        });
+
+        if (!perm.success) {
+            return new Response('Unauthorized', {status: 401,});
+        }
+    }
 
     const messages = await getMessages(channel);
     return Response.json(messages);
