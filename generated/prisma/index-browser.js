@@ -289,6 +289,28 @@ exports.Prisma.JwksScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.RouteProtectionScalarFieldEnum = {
+    id: 'id',
+    route: 'route',
+    isRoleProtected: 'isRoleProtected',
+    roleProtection: 'roleProtection',
+    isAuthenticatedProtected: 'isAuthenticatedProtected'
+};
+
+exports.Prisma.PasskeyScalarFieldEnum = {
+    id: 'id',
+    name: 'name',
+    publicKey: 'publicKey',
+    userId: 'userId',
+    credentialID: 'credentialID',
+    counter: 'counter',
+    deviceType: 'deviceType',
+    backedUp: 'backedUp',
+    transports: 'transports',
+    createdAt: 'createdAt',
+    aaguid: 'aaguid'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -423,6 +445,23 @@ exports.Prisma.JwksOrderByRelevanceFieldEnum = {
   privateKey: 'privateKey'
 };
 
+exports.Prisma.RouteProtectionOrderByRelevanceFieldEnum = {
+    id: 'id',
+    route: 'route',
+    roleProtection: 'roleProtection'
+};
+
+exports.Prisma.PasskeyOrderByRelevanceFieldEnum = {
+    id: 'id',
+    name: 'name',
+    publicKey: 'publicKey',
+    userId: 'userId',
+    credentialID: 'credentialID',
+    deviceType: 'deviceType',
+    transports: 'transports',
+    aaguid: 'aaguid'
+};
+
 
 exports.Prisma.ModelName = {
   User: 'User',
@@ -440,7 +479,9 @@ exports.Prisma.ModelName = {
   EventRegistration: 'EventRegistration',
   Ticket: 'Ticket',
   Apikey: 'Apikey',
-  Jwks: 'Jwks'
+    Jwks: 'Jwks',
+    RouteProtection: 'RouteProtection',
+    Passkey: 'Passkey'
 };
 
 /**

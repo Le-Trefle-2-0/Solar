@@ -92,6 +92,16 @@ export type Apikey = $Result.DefaultSelection<Prisma.$ApikeyPayload>
  * 
  */
 export type Jwks = $Result.DefaultSelection<Prisma.$JwksPayload>
+/**
+ * Model RouteProtection
+ *
+ */
+export type RouteProtection = $Result.DefaultSelection<Prisma.$RouteProtectionPayload>
+/**
+ * Model Passkey
+ *
+ */
+export type Passkey = $Result.DefaultSelection<Prisma.$PasskeyPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -377,6 +387,26 @@ export class PrismaClient<
    * ```
    */
   get jwks(): Prisma.JwksDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.routeProtection`: Exposes CRUD operations for the **RouteProtection** model.
+   * Example usage:
+   * ```ts
+   * // Fetch zero or more RouteProtections
+   * const routeProtections = await prisma.routeProtection.findMany()
+   * ```
+   */
+  get routeProtection(): Prisma.RouteProtectionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.passkey`: Exposes CRUD operations for the **Passkey** model.
+   * Example usage:
+   * ```ts
+   * // Fetch zero or more Passkeys
+   * const passkeys = await prisma.passkey.findMany()
+   * ```
+   */
+  get passkey(): Prisma.PasskeyDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -821,7 +851,9 @@ export namespace Prisma {
     EventRegistration: 'EventRegistration',
     Ticket: 'Ticket',
     Apikey: 'Apikey',
-    Jwks: 'Jwks'
+    Jwks: 'Jwks',
+    RouteProtection: 'RouteProtection',
+    Passkey: 'Passkey'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -840,7 +872,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "session" | "account" | "verification" | "organization" | "member" | "invitation" | "twoFactor" | "channel" | "message" | "event" | "roleSlot" | "eventRegistration" | "ticket" | "apikey" | "jwks"
+      modelProps: "user" | "session" | "account" | "verification" | "organization" | "member" | "invitation" | "twoFactor" | "channel" | "message" | "event" | "roleSlot" | "eventRegistration" | "ticket" | "apikey" | "jwks" | "routeProtection" | "passkey"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1900,6 +1932,138 @@ export namespace Prisma {
           }
         }
       }
+      RouteProtection: {
+        payload: Prisma.$RouteProtectionPayload<ExtArgs>
+        fields: Prisma.RouteProtectionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.RouteProtectionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RouteProtectionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.RouteProtectionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RouteProtectionPayload>
+          }
+          findFirst: {
+            args: Prisma.RouteProtectionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RouteProtectionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.RouteProtectionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RouteProtectionPayload>
+          }
+          findMany: {
+            args: Prisma.RouteProtectionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RouteProtectionPayload>[]
+          }
+          create: {
+            args: Prisma.RouteProtectionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RouteProtectionPayload>
+          }
+          createMany: {
+            args: Prisma.RouteProtectionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.RouteProtectionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RouteProtectionPayload>
+          }
+          update: {
+            args: Prisma.RouteProtectionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RouteProtectionPayload>
+          }
+          deleteMany: {
+            args: Prisma.RouteProtectionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.RouteProtectionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.RouteProtectionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RouteProtectionPayload>
+          }
+          aggregate: {
+            args: Prisma.RouteProtectionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateRouteProtection>
+          }
+          groupBy: {
+            args: Prisma.RouteProtectionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<RouteProtectionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.RouteProtectionCountArgs<ExtArgs>
+            result: $Utils.Optional<RouteProtectionCountAggregateOutputType> | number
+          }
+        }
+      }
+      Passkey: {
+        payload: Prisma.$PasskeyPayload<ExtArgs>
+        fields: Prisma.PasskeyFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PasskeyFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PasskeyPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PasskeyFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PasskeyPayload>
+          }
+          findFirst: {
+            args: Prisma.PasskeyFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PasskeyPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PasskeyFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PasskeyPayload>
+          }
+          findMany: {
+            args: Prisma.PasskeyFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PasskeyPayload>[]
+          }
+          create: {
+            args: Prisma.PasskeyCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PasskeyPayload>
+          }
+          createMany: {
+            args: Prisma.PasskeyCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.PasskeyDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PasskeyPayload>
+          }
+          update: {
+            args: Prisma.PasskeyUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PasskeyPayload>
+          }
+          deleteMany: {
+            args: Prisma.PasskeyDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PasskeyUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.PasskeyUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PasskeyPayload>
+          }
+          aggregate: {
+            args: Prisma.PasskeyAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePasskey>
+          }
+          groupBy: {
+            args: Prisma.PasskeyGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PasskeyGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PasskeyCountArgs<ExtArgs>
+            result: $Utils.Optional<PasskeyCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2000,6 +2164,8 @@ export namespace Prisma {
     ticket?: TicketOmit
     apikey?: ApikeyOmit
     jwks?: JwksOmit
+    routeProtection?: RouteProtectionOmit
+    passkey?: PasskeyOmit
   }
 
   /* Types for Logging */
@@ -2104,6 +2270,7 @@ export namespace Prisma {
     EventRegistration: number
     Ticket: number
     apikeys: number
+    passkeys: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2117,6 +2284,7 @@ export namespace Prisma {
     EventRegistration?: boolean | UserCountOutputTypeCountEventRegistrationArgs
     Ticket?: boolean | UserCountOutputTypeCountTicketArgs
     apikeys?: boolean | UserCountOutputTypeCountApikeysArgs
+    passkeys?: boolean | UserCountOutputTypeCountPasskeysArgs
   }
 
   // Custom InputTypes
@@ -2198,6 +2366,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountApikeysArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ApikeyWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountPasskeysArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PasskeyWhereInput
   }
 
 
@@ -2602,6 +2777,7 @@ export namespace Prisma {
     EventRegistration?: boolean | User$EventRegistrationArgs<ExtArgs>
     Ticket?: boolean | User$TicketArgs<ExtArgs>
     apikeys?: boolean | User$apikeysArgs<ExtArgs>
+    passkeys?: boolean | User$passkeysArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -2636,6 +2812,7 @@ export namespace Prisma {
     EventRegistration?: boolean | User$EventRegistrationArgs<ExtArgs>
     Ticket?: boolean | User$TicketArgs<ExtArgs>
     apikeys?: boolean | User$apikeysArgs<ExtArgs>
+    passkeys?: boolean | User$passkeysArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -2652,6 +2829,7 @@ export namespace Prisma {
       EventRegistration: Prisma.$EventRegistrationPayload<ExtArgs>[]
       Ticket: Prisma.$TicketPayload<ExtArgs>[]
       apikeys: Prisma.$ApikeyPayload<ExtArgs>[]
+      passkeys: Prisma.$PasskeyPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -3018,6 +3196,8 @@ export namespace Prisma {
     EventRegistration<T extends User$EventRegistrationArgs<ExtArgs> = {}>(args?: Subset<T, User$EventRegistrationArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventRegistrationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     Ticket<T extends User$TicketArgs<ExtArgs> = {}>(args?: Subset<T, User$TicketArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     apikeys<T extends User$apikeysArgs<ExtArgs> = {}>(args?: Subset<T, User$apikeysArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ApikeyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+
+    passkeys<T extends User$passkeysArgs<ExtArgs> = {}>(args?: Subset<T, User$passkeysArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PasskeyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3641,6 +3821,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ApikeyScalarFieldEnum | ApikeyScalarFieldEnum[]
+  }
+
+  /**
+   * User.passkeys
+   */
+  export type User$passkeysArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Passkey
+     */
+    select?: PasskeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Passkey
+     */
+    omit?: PasskeyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PasskeyInclude<ExtArgs> | null
+    where?: PasskeyWhereInput
+    orderBy?: PasskeyOrderByWithRelationInput | PasskeyOrderByWithRelationInput[]
+    cursor?: PasskeyWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PasskeyScalarFieldEnum | PasskeyScalarFieldEnum[]
   }
 
   /**
@@ -18253,6 +18457,1918 @@ export namespace Prisma {
 
 
   /**
+   * Model RouteProtection
+   */
+
+  export type AggregateRouteProtection = {
+    _count: RouteProtectionCountAggregateOutputType | null
+    _min: RouteProtectionMinAggregateOutputType | null
+    _max: RouteProtectionMaxAggregateOutputType | null
+  }
+
+  export type RouteProtectionMinAggregateOutputType = {
+    id: string | null
+    route: string | null
+    isRoleProtected: boolean | null
+    roleProtection: string | null
+    isAuthenticatedProtected: boolean | null
+  }
+
+  export type RouteProtectionMaxAggregateOutputType = {
+    id: string | null
+    route: string | null
+    isRoleProtected: boolean | null
+    roleProtection: string | null
+    isAuthenticatedProtected: boolean | null
+  }
+
+  export type RouteProtectionCountAggregateOutputType = {
+    id: number
+    route: number
+    isRoleProtected: number
+    roleProtection: number
+    isAuthenticatedProtected: number
+    _all: number
+  }
+
+
+  export type RouteProtectionMinAggregateInputType = {
+    id?: true
+    route?: true
+    isRoleProtected?: true
+    roleProtection?: true
+    isAuthenticatedProtected?: true
+  }
+
+  export type RouteProtectionMaxAggregateInputType = {
+    id?: true
+    route?: true
+    isRoleProtected?: true
+    roleProtection?: true
+    isAuthenticatedProtected?: true
+  }
+
+  export type RouteProtectionCountAggregateInputType = {
+    id?: true
+    route?: true
+    isRoleProtected?: true
+    roleProtection?: true
+    isAuthenticatedProtected?: true
+    _all?: true
+  }
+
+  export type RouteProtectionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which RouteProtection to aggregate.
+     */
+    where?: RouteProtectionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of RouteProtections to fetch.
+     */
+    orderBy?: RouteProtectionOrderByWithRelationInput | RouteProtectionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the start position
+     */
+    cursor?: RouteProtectionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` RouteProtections from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` RouteProtections.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Count returned RouteProtections
+     **/
+    _count?: true | RouteProtectionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the minimum value
+     **/
+    _min?: RouteProtectionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the maximum value
+     **/
+    _max?: RouteProtectionMaxAggregateInputType
+  }
+
+  export type GetRouteProtectionAggregateType<T extends RouteProtectionAggregateArgs> = {
+    [P in keyof T & keyof AggregateRouteProtection]: P extends '_count' | 'count'
+        ? T[P] extends true
+            ? number
+            : GetScalarType<T[P], AggregateRouteProtection[P]>
+        : GetScalarType<T[P], AggregateRouteProtection[P]>
+  }
+
+
+  export type RouteProtectionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RouteProtectionWhereInput
+    orderBy?: RouteProtectionOrderByWithAggregationInput | RouteProtectionOrderByWithAggregationInput[]
+    by: RouteProtectionScalarFieldEnum[] | RouteProtectionScalarFieldEnum
+    having?: RouteProtectionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: RouteProtectionCountAggregateInputType | true
+    _min?: RouteProtectionMinAggregateInputType
+    _max?: RouteProtectionMaxAggregateInputType
+  }
+
+  export type RouteProtectionGroupByOutputType = {
+    id: string
+    route: string
+    isRoleProtected: boolean
+    roleProtection: string
+    isAuthenticatedProtected: boolean
+    _count: RouteProtectionCountAggregateOutputType | null
+    _min: RouteProtectionMinAggregateOutputType | null
+    _max: RouteProtectionMaxAggregateOutputType | null
+  }
+
+  type GetRouteProtectionGroupByPayload<T extends RouteProtectionGroupByArgs> = Prisma.PrismaPromise<
+      Array<
+          PickEnumerable<RouteProtectionGroupByOutputType, T['by']> &
+          {
+            [P in ((keyof T) & (keyof RouteProtectionGroupByOutputType))]: P extends '_count'
+              ? T[P] extends boolean
+                  ? number
+                  : GetScalarType<T[P], RouteProtectionGroupByOutputType[P]>
+              : GetScalarType<T[P], RouteProtectionGroupByOutputType[P]>
+          }
+      >
+  >
+
+
+  export type RouteProtectionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    route?: boolean
+    isRoleProtected?: boolean
+    roleProtection?: boolean
+    isAuthenticatedProtected?: boolean
+  }, ExtArgs["result"]["routeProtection"]>
+
+
+  export type RouteProtectionSelectScalar = {
+    id?: boolean
+    route?: boolean
+    isRoleProtected?: boolean
+    roleProtection?: boolean
+    isAuthenticatedProtected?: boolean
+  }
+
+  export type RouteProtectionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "route" | "isRoleProtected" | "roleProtection" | "isAuthenticatedProtected", ExtArgs["result"]["routeProtection"]>
+
+  export type $RouteProtectionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "RouteProtection"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      route: string
+      isRoleProtected: boolean
+      roleProtection: string
+      isAuthenticatedProtected: boolean
+    }, ExtArgs["result"]["routeProtection"]>
+    composites: {}
+  }
+
+  type RouteProtectionGetPayload<S extends boolean | null | undefined | RouteProtectionDefaultArgs> = $Result.GetResult<Prisma.$RouteProtectionPayload, S>
+
+  type RouteProtectionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+      Omit<RouteProtectionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+    select?: RouteProtectionCountAggregateInputType | true
+  }
+
+  export interface RouteProtectionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['RouteProtection'], meta: { name: 'RouteProtection' } }
+
+    /**
+     * Find zero or one RouteProtection that matches the filter.
+     * @param {RouteProtectionFindUniqueArgs} args - Arguments to find a RouteProtection
+     * @example
+     * // Get one RouteProtection
+     * const routeProtection = await prisma.routeProtection.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends RouteProtectionFindUniqueArgs>(args: SelectSubset<T, RouteProtectionFindUniqueArgs<ExtArgs>>): Prisma__RouteProtectionClient<$Result.GetResult<Prisma.$RouteProtectionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one RouteProtection that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {RouteProtectionFindUniqueOrThrowArgs} args - Arguments to find a RouteProtection
+     * @example
+     * // Get one RouteProtection
+     * const routeProtection = await prisma.routeProtection.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends RouteProtectionFindUniqueOrThrowArgs>(args: SelectSubset<T, RouteProtectionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__RouteProtectionClient<$Result.GetResult<Prisma.$RouteProtectionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first RouteProtection that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RouteProtectionFindFirstArgs} args - Arguments to find a RouteProtection
+     * @example
+     * // Get one RouteProtection
+     * const routeProtection = await prisma.routeProtection.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends RouteProtectionFindFirstArgs>(args?: SelectSubset<T, RouteProtectionFindFirstArgs<ExtArgs>>): Prisma__RouteProtectionClient<$Result.GetResult<Prisma.$RouteProtectionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first RouteProtection that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RouteProtectionFindFirstOrThrowArgs} args - Arguments to find a RouteProtection
+     * @example
+     * // Get one RouteProtection
+     * const routeProtection = await prisma.routeProtection.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends RouteProtectionFindFirstOrThrowArgs>(args?: SelectSubset<T, RouteProtectionFindFirstOrThrowArgs<ExtArgs>>): Prisma__RouteProtectionClient<$Result.GetResult<Prisma.$RouteProtectionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more RouteProtections that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RouteProtectionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all RouteProtections
+     * const routeProtections = await prisma.routeProtection.findMany()
+     *
+     * // Get first 10 RouteProtections
+     * const routeProtections = await prisma.routeProtection.findMany({ take: 10 })
+     *
+     * // Only select the `id`
+     * const routeProtectionWithIdOnly = await prisma.routeProtection.findMany({ select: { id: true } })
+     *
+     */
+    findMany<T extends RouteProtectionFindManyArgs>(args?: SelectSubset<T, RouteProtectionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RouteProtectionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a RouteProtection.
+     * @param {RouteProtectionCreateArgs} args - Arguments to create a RouteProtection.
+     * @example
+     * // Create one RouteProtection
+     * const RouteProtection = await prisma.routeProtection.create({
+     *   data: {
+     *     // ... data to create a RouteProtection
+     *   }
+     * })
+     *
+     */
+    create<T extends RouteProtectionCreateArgs>(args: SelectSubset<T, RouteProtectionCreateArgs<ExtArgs>>): Prisma__RouteProtectionClient<$Result.GetResult<Prisma.$RouteProtectionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many RouteProtections.
+     * @param {RouteProtectionCreateManyArgs} args - Arguments to create many RouteProtections.
+     * @example
+     * // Create many RouteProtections
+     * const routeProtection = await prisma.routeProtection.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     */
+    createMany<T extends RouteProtectionCreateManyArgs>(args?: SelectSubset<T, RouteProtectionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a RouteProtection.
+     * @param {RouteProtectionDeleteArgs} args - Arguments to delete one RouteProtection.
+     * @example
+     * // Delete one RouteProtection
+     * const RouteProtection = await prisma.routeProtection.delete({
+     *   where: {
+     *     // ... filter to delete one RouteProtection
+     *   }
+     * })
+     *
+     */
+    delete<T extends RouteProtectionDeleteArgs>(args: SelectSubset<T, RouteProtectionDeleteArgs<ExtArgs>>): Prisma__RouteProtectionClient<$Result.GetResult<Prisma.$RouteProtectionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one RouteProtection.
+     * @param {RouteProtectionUpdateArgs} args - Arguments to update one RouteProtection.
+     * @example
+     * // Update one RouteProtection
+     * const routeProtection = await prisma.routeProtection.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    update<T extends RouteProtectionUpdateArgs>(args: SelectSubset<T, RouteProtectionUpdateArgs<ExtArgs>>): Prisma__RouteProtectionClient<$Result.GetResult<Prisma.$RouteProtectionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more RouteProtections.
+     * @param {RouteProtectionDeleteManyArgs} args - Arguments to filter RouteProtections to delete.
+     * @example
+     * // Delete a few RouteProtections
+     * const { count } = await prisma.routeProtection.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     *
+     */
+    deleteMany<T extends RouteProtectionDeleteManyArgs>(args?: SelectSubset<T, RouteProtectionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more RouteProtections.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RouteProtectionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many RouteProtections
+     * const routeProtection = await prisma.routeProtection.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    updateMany<T extends RouteProtectionUpdateManyArgs>(args: SelectSubset<T, RouteProtectionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one RouteProtection.
+     * @param {RouteProtectionUpsertArgs} args - Arguments to update or create a RouteProtection.
+     * @example
+     * // Update or create a RouteProtection
+     * const routeProtection = await prisma.routeProtection.upsert({
+     *   create: {
+     *     // ... data to create a RouteProtection
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the RouteProtection we want to update
+     *   }
+     * })
+     */
+    upsert<T extends RouteProtectionUpsertArgs>(args: SelectSubset<T, RouteProtectionUpsertArgs<ExtArgs>>): Prisma__RouteProtectionClient<$Result.GetResult<Prisma.$RouteProtectionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of RouteProtections.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RouteProtectionCountArgs} args - Arguments to filter RouteProtections to count.
+     * @example
+     * // Count the number of RouteProtections
+     * const count = await prisma.routeProtection.count({
+     *   where: {
+     *     // ... the filter for the RouteProtections we want to count
+     *   }
+     * })
+     **/
+    count<T extends RouteProtectionCountArgs>(
+        args?: Subset<T, RouteProtectionCountArgs>,
+    ): Prisma.PrismaPromise<
+        T extends $Utils.Record<'select', any>
+            ? T['select'] extends true
+                ? number
+                : GetScalarType<T['select'], RouteProtectionCountAggregateOutputType>
+            : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a RouteProtection.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RouteProtectionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+     **/
+    aggregate<T extends RouteProtectionAggregateArgs>(args: Subset<T, RouteProtectionAggregateArgs>): Prisma.PrismaPromise<GetRouteProtectionAggregateType<T>>
+
+    /**
+     * Group by RouteProtection.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RouteProtectionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     *
+     **/
+    groupBy<
+        T extends RouteProtectionGroupByArgs,
+        HasSelectOrTake extends Or<
+            Extends<'skip', Keys<T>>,
+            Extends<'take', Keys<T>>
+        >,
+        OrderByArg extends True extends HasSelectOrTake
+            ? { orderBy: RouteProtectionGroupByArgs['orderBy'] }
+            : { orderBy?: RouteProtectionGroupByArgs['orderBy'] },
+        OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+        ByFields extends MaybeTupleToUnion<T['by']>,
+        ByValid extends Has<ByFields, OrderFields>,
+        HavingFields extends GetHavingFields<T['having']>,
+        HavingValid extends Has<ByFields, HavingFields>,
+        ByEmpty extends T['by'] extends never[] ? True : False,
+        InputErrors extends ByEmpty extends True
+            ? `Error: "by" must not be empty.`
+            : HavingValid extends False
+                ? {
+                  [P in HavingFields]: P extends ByFields
+                      ? never
+                      : P extends string
+                          ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+                          : [
+                            Error,
+                            'Field ',
+                            P,
+                            ` in "having" needs to be provided in "by"`,
+                          ]
+                }[HavingFields]
+                : 'take' extends Keys<T>
+                    ? 'orderBy' extends Keys<T>
+                        ? ByValid extends True
+                            ? {}
+                            : {
+                              [P in OrderFields]: P extends ByFields
+                                  ? never
+                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                            }[OrderFields]
+                        : 'Error: If you provide "take", you also need to provide "orderBy"'
+                    : 'skip' extends Keys<T>
+                        ? 'orderBy' extends Keys<T>
+                            ? ByValid extends True
+                                ? {}
+                                : {
+                                  [P in OrderFields]: P extends ByFields
+                                      ? never
+                                      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                }[OrderFields]
+                            : 'Error: If you provide "skip", you also need to provide "orderBy"'
+                        : ByValid extends True
+                            ? {}
+                            : {
+                              [P in OrderFields]: P extends ByFields
+                                  ? never
+                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                            }[OrderFields]
+    >(args: SubsetIntersection<T, RouteProtectionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetRouteProtectionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+
+    /**
+     * Fields of the RouteProtection model
+     */
+    readonly fields: RouteProtectionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for RouteProtection.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__RouteProtectionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+  /**
+   * Fields of the RouteProtection model
+   */
+  interface RouteProtectionFieldRefs {
+    readonly id: FieldRef<"RouteProtection", 'String'>
+    readonly route: FieldRef<"RouteProtection", 'String'>
+    readonly isRoleProtected: FieldRef<"RouteProtection", 'Boolean'>
+    readonly roleProtection: FieldRef<"RouteProtection", 'String'>
+    readonly isAuthenticatedProtected: FieldRef<"RouteProtection", 'Boolean'>
+  }
+
+
+  // Custom InputTypes
+  /**
+   * RouteProtection findUnique
+   */
+  export type RouteProtectionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RouteProtection
+     */
+    select?: RouteProtectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RouteProtection
+     */
+    omit?: RouteProtectionOmit<ExtArgs> | null
+    /**
+     * Filter, which RouteProtection to fetch.
+     */
+    where: RouteProtectionWhereUniqueInput
+  }
+
+  /**
+   * RouteProtection findUniqueOrThrow
+   */
+  export type RouteProtectionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RouteProtection
+     */
+    select?: RouteProtectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RouteProtection
+     */
+    omit?: RouteProtectionOmit<ExtArgs> | null
+    /**
+     * Filter, which RouteProtection to fetch.
+     */
+    where: RouteProtectionWhereUniqueInput
+  }
+
+  /**
+   * RouteProtection findFirst
+   */
+  export type RouteProtectionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RouteProtection
+     */
+    select?: RouteProtectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RouteProtection
+     */
+    omit?: RouteProtectionOmit<ExtArgs> | null
+    /**
+     * Filter, which RouteProtection to fetch.
+     */
+    where?: RouteProtectionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of RouteProtections to fetch.
+     */
+    orderBy?: RouteProtectionOrderByWithRelationInput | RouteProtectionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for RouteProtections.
+     */
+    cursor?: RouteProtectionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` RouteProtections from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` RouteProtections.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of RouteProtections.
+     */
+    distinct?: RouteProtectionScalarFieldEnum | RouteProtectionScalarFieldEnum[]
+  }
+
+  /**
+   * RouteProtection findFirstOrThrow
+   */
+  export type RouteProtectionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RouteProtection
+     */
+    select?: RouteProtectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RouteProtection
+     */
+    omit?: RouteProtectionOmit<ExtArgs> | null
+    /**
+     * Filter, which RouteProtection to fetch.
+     */
+    where?: RouteProtectionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of RouteProtections to fetch.
+     */
+    orderBy?: RouteProtectionOrderByWithRelationInput | RouteProtectionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for RouteProtections.
+     */
+    cursor?: RouteProtectionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` RouteProtections from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` RouteProtections.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of RouteProtections.
+     */
+    distinct?: RouteProtectionScalarFieldEnum | RouteProtectionScalarFieldEnum[]
+  }
+
+  /**
+   * RouteProtection findMany
+   */
+  export type RouteProtectionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RouteProtection
+     */
+    select?: RouteProtectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RouteProtection
+     */
+    omit?: RouteProtectionOmit<ExtArgs> | null
+    /**
+     * Filter, which RouteProtections to fetch.
+     */
+    where?: RouteProtectionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of RouteProtections to fetch.
+     */
+    orderBy?: RouteProtectionOrderByWithRelationInput | RouteProtectionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for listing RouteProtections.
+     */
+    cursor?: RouteProtectionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` RouteProtections from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` RouteProtections.
+     */
+    skip?: number
+    distinct?: RouteProtectionScalarFieldEnum | RouteProtectionScalarFieldEnum[]
+  }
+
+  /**
+   * RouteProtection create
+   */
+  export type RouteProtectionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RouteProtection
+     */
+    select?: RouteProtectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RouteProtection
+     */
+    omit?: RouteProtectionOmit<ExtArgs> | null
+    /**
+     * The data needed to create a RouteProtection.
+     */
+    data: XOR<RouteProtectionCreateInput, RouteProtectionUncheckedCreateInput>
+  }
+
+  /**
+   * RouteProtection createMany
+   */
+  export type RouteProtectionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many RouteProtections.
+     */
+    data: RouteProtectionCreateManyInput | RouteProtectionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * RouteProtection update
+   */
+  export type RouteProtectionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RouteProtection
+     */
+    select?: RouteProtectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RouteProtection
+     */
+    omit?: RouteProtectionOmit<ExtArgs> | null
+    /**
+     * The data needed to update a RouteProtection.
+     */
+    data: XOR<RouteProtectionUpdateInput, RouteProtectionUncheckedUpdateInput>
+    /**
+     * Choose, which RouteProtection to update.
+     */
+    where: RouteProtectionWhereUniqueInput
+  }
+
+  /**
+   * RouteProtection updateMany
+   */
+  export type RouteProtectionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update RouteProtections.
+     */
+    data: XOR<RouteProtectionUpdateManyMutationInput, RouteProtectionUncheckedUpdateManyInput>
+    /**
+     * Filter which RouteProtections to update
+     */
+    where?: RouteProtectionWhereInput
+    /**
+     * Limit how many RouteProtections to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * RouteProtection upsert
+   */
+  export type RouteProtectionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RouteProtection
+     */
+    select?: RouteProtectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RouteProtection
+     */
+    omit?: RouteProtectionOmit<ExtArgs> | null
+    /**
+     * The filter to search for the RouteProtection to update in case it exists.
+     */
+    where: RouteProtectionWhereUniqueInput
+    /**
+     * In case the RouteProtection found by the `where` argument doesn't exist, create a new RouteProtection with this data.
+     */
+    create: XOR<RouteProtectionCreateInput, RouteProtectionUncheckedCreateInput>
+    /**
+     * In case the RouteProtection was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<RouteProtectionUpdateInput, RouteProtectionUncheckedUpdateInput>
+  }
+
+  /**
+   * RouteProtection delete
+   */
+  export type RouteProtectionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RouteProtection
+     */
+    select?: RouteProtectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RouteProtection
+     */
+    omit?: RouteProtectionOmit<ExtArgs> | null
+    /**
+     * Filter which RouteProtection to delete.
+     */
+    where: RouteProtectionWhereUniqueInput
+  }
+
+  /**
+   * RouteProtection deleteMany
+   */
+  export type RouteProtectionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which RouteProtections to delete
+     */
+    where?: RouteProtectionWhereInput
+    /**
+     * Limit how many RouteProtections to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * RouteProtection without action
+   */
+  export type RouteProtectionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RouteProtection
+     */
+    select?: RouteProtectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RouteProtection
+     */
+    omit?: RouteProtectionOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Passkey
+   */
+
+  export type AggregatePasskey = {
+    _count: PasskeyCountAggregateOutputType | null
+    _avg: PasskeyAvgAggregateOutputType | null
+    _sum: PasskeySumAggregateOutputType | null
+    _min: PasskeyMinAggregateOutputType | null
+    _max: PasskeyMaxAggregateOutputType | null
+  }
+
+  export type PasskeyAvgAggregateOutputType = {
+    counter: number | null
+  }
+
+  export type PasskeySumAggregateOutputType = {
+    counter: number | null
+  }
+
+  export type PasskeyMinAggregateOutputType = {
+    id: string | null
+    name: string | null
+    publicKey: string | null
+    userId: string | null
+    credentialID: string | null
+    counter: number | null
+    deviceType: string | null
+    backedUp: boolean | null
+    transports: string | null
+    createdAt: Date | null
+    aaguid: string | null
+  }
+
+  export type PasskeyMaxAggregateOutputType = {
+    id: string | null
+    name: string | null
+    publicKey: string | null
+    userId: string | null
+    credentialID: string | null
+    counter: number | null
+    deviceType: string | null
+    backedUp: boolean | null
+    transports: string | null
+    createdAt: Date | null
+    aaguid: string | null
+  }
+
+  export type PasskeyCountAggregateOutputType = {
+    id: number
+    name: number
+    publicKey: number
+    userId: number
+    credentialID: number
+    counter: number
+    deviceType: number
+    backedUp: number
+    transports: number
+    createdAt: number
+    aaguid: number
+    _all: number
+  }
+
+
+  export type PasskeyAvgAggregateInputType = {
+    counter?: true
+  }
+
+  export type PasskeySumAggregateInputType = {
+    counter?: true
+  }
+
+  export type PasskeyMinAggregateInputType = {
+    id?: true
+    name?: true
+    publicKey?: true
+    userId?: true
+    credentialID?: true
+    counter?: true
+    deviceType?: true
+    backedUp?: true
+    transports?: true
+    createdAt?: true
+    aaguid?: true
+  }
+
+  export type PasskeyMaxAggregateInputType = {
+    id?: true
+    name?: true
+    publicKey?: true
+    userId?: true
+    credentialID?: true
+    counter?: true
+    deviceType?: true
+    backedUp?: true
+    transports?: true
+    createdAt?: true
+    aaguid?: true
+  }
+
+  export type PasskeyCountAggregateInputType = {
+    id?: true
+    name?: true
+    publicKey?: true
+    userId?: true
+    credentialID?: true
+    counter?: true
+    deviceType?: true
+    backedUp?: true
+    transports?: true
+    createdAt?: true
+    aaguid?: true
+    _all?: true
+  }
+
+  export type PasskeyAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Passkey to aggregate.
+     */
+    where?: PasskeyWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Passkeys to fetch.
+     */
+    orderBy?: PasskeyOrderByWithRelationInput | PasskeyOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the start position
+     */
+    cursor?: PasskeyWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Passkeys from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Passkeys.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Count returned Passkeys
+     **/
+    _count?: true | PasskeyCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to average
+     **/
+    _avg?: PasskeyAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to sum
+     **/
+    _sum?: PasskeySumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the minimum value
+     **/
+    _min?: PasskeyMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the maximum value
+     **/
+    _max?: PasskeyMaxAggregateInputType
+  }
+
+  export type GetPasskeyAggregateType<T extends PasskeyAggregateArgs> = {
+    [P in keyof T & keyof AggregatePasskey]: P extends '_count' | 'count'
+        ? T[P] extends true
+            ? number
+            : GetScalarType<T[P], AggregatePasskey[P]>
+        : GetScalarType<T[P], AggregatePasskey[P]>
+  }
+
+
+  export type PasskeyGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PasskeyWhereInput
+    orderBy?: PasskeyOrderByWithAggregationInput | PasskeyOrderByWithAggregationInput[]
+    by: PasskeyScalarFieldEnum[] | PasskeyScalarFieldEnum
+    having?: PasskeyScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PasskeyCountAggregateInputType | true
+    _avg?: PasskeyAvgAggregateInputType
+    _sum?: PasskeySumAggregateInputType
+    _min?: PasskeyMinAggregateInputType
+    _max?: PasskeyMaxAggregateInputType
+  }
+
+  export type PasskeyGroupByOutputType = {
+    id: string
+    name: string | null
+    publicKey: string
+    userId: string
+    credentialID: string
+    counter: number
+    deviceType: string
+    backedUp: boolean
+    transports: string | null
+    createdAt: Date | null
+    aaguid: string | null
+    _count: PasskeyCountAggregateOutputType | null
+    _avg: PasskeyAvgAggregateOutputType | null
+    _sum: PasskeySumAggregateOutputType | null
+    _min: PasskeyMinAggregateOutputType | null
+    _max: PasskeyMaxAggregateOutputType | null
+  }
+
+  type GetPasskeyGroupByPayload<T extends PasskeyGroupByArgs> = Prisma.PrismaPromise<
+      Array<
+          PickEnumerable<PasskeyGroupByOutputType, T['by']> &
+          {
+            [P in ((keyof T) & (keyof PasskeyGroupByOutputType))]: P extends '_count'
+              ? T[P] extends boolean
+                  ? number
+                  : GetScalarType<T[P], PasskeyGroupByOutputType[P]>
+              : GetScalarType<T[P], PasskeyGroupByOutputType[P]>
+          }
+      >
+  >
+
+
+  export type PasskeySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    publicKey?: boolean
+    userId?: boolean
+    credentialID?: boolean
+    counter?: boolean
+    deviceType?: boolean
+    backedUp?: boolean
+    transports?: boolean
+    createdAt?: boolean
+    aaguid?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["passkey"]>
+
+
+  export type PasskeySelectScalar = {
+    id?: boolean
+    name?: boolean
+    publicKey?: boolean
+    userId?: boolean
+    credentialID?: boolean
+    counter?: boolean
+    deviceType?: boolean
+    backedUp?: boolean
+    transports?: boolean
+    createdAt?: boolean
+    aaguid?: boolean
+  }
+
+  export type PasskeyOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "publicKey" | "userId" | "credentialID" | "counter" | "deviceType" | "backedUp" | "transports" | "createdAt" | "aaguid", ExtArgs["result"]["passkey"]>
+  export type PasskeyInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $PasskeyPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Passkey"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      name: string | null
+      publicKey: string
+      userId: string
+      credentialID: string
+      counter: number
+      deviceType: string
+      backedUp: boolean
+      transports: string | null
+      createdAt: Date | null
+      aaguid: string | null
+    }, ExtArgs["result"]["passkey"]>
+    composites: {}
+  }
+
+  type PasskeyGetPayload<S extends boolean | null | undefined | PasskeyDefaultArgs> = $Result.GetResult<Prisma.$PasskeyPayload, S>
+
+  type PasskeyCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+      Omit<PasskeyFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+    select?: PasskeyCountAggregateInputType | true
+  }
+
+  export interface PasskeyDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Passkey'], meta: { name: 'Passkey' } }
+
+    /**
+     * Find zero or one Passkey that matches the filter.
+     * @param {PasskeyFindUniqueArgs} args - Arguments to find a Passkey
+     * @example
+     * // Get one Passkey
+     * const passkey = await prisma.passkey.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PasskeyFindUniqueArgs>(args: SelectSubset<T, PasskeyFindUniqueArgs<ExtArgs>>): Prisma__PasskeyClient<$Result.GetResult<Prisma.$PasskeyPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Passkey that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {PasskeyFindUniqueOrThrowArgs} args - Arguments to find a Passkey
+     * @example
+     * // Get one Passkey
+     * const passkey = await prisma.passkey.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PasskeyFindUniqueOrThrowArgs>(args: SelectSubset<T, PasskeyFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PasskeyClient<$Result.GetResult<Prisma.$PasskeyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Passkey that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PasskeyFindFirstArgs} args - Arguments to find a Passkey
+     * @example
+     * // Get one Passkey
+     * const passkey = await prisma.passkey.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PasskeyFindFirstArgs>(args?: SelectSubset<T, PasskeyFindFirstArgs<ExtArgs>>): Prisma__PasskeyClient<$Result.GetResult<Prisma.$PasskeyPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Passkey that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PasskeyFindFirstOrThrowArgs} args - Arguments to find a Passkey
+     * @example
+     * // Get one Passkey
+     * const passkey = await prisma.passkey.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PasskeyFindFirstOrThrowArgs>(args?: SelectSubset<T, PasskeyFindFirstOrThrowArgs<ExtArgs>>): Prisma__PasskeyClient<$Result.GetResult<Prisma.$PasskeyPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Passkeys that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PasskeyFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Passkeys
+     * const passkeys = await prisma.passkey.findMany()
+     *
+     * // Get first 10 Passkeys
+     * const passkeys = await prisma.passkey.findMany({ take: 10 })
+     *
+     * // Only select the `id`
+     * const passkeyWithIdOnly = await prisma.passkey.findMany({ select: { id: true } })
+     *
+     */
+    findMany<T extends PasskeyFindManyArgs>(args?: SelectSubset<T, PasskeyFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PasskeyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Passkey.
+     * @param {PasskeyCreateArgs} args - Arguments to create a Passkey.
+     * @example
+     * // Create one Passkey
+     * const Passkey = await prisma.passkey.create({
+     *   data: {
+     *     // ... data to create a Passkey
+     *   }
+     * })
+     *
+     */
+    create<T extends PasskeyCreateArgs>(args: SelectSubset<T, PasskeyCreateArgs<ExtArgs>>): Prisma__PasskeyClient<$Result.GetResult<Prisma.$PasskeyPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Passkeys.
+     * @param {PasskeyCreateManyArgs} args - Arguments to create many Passkeys.
+     * @example
+     * // Create many Passkeys
+     * const passkey = await prisma.passkey.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     */
+    createMany<T extends PasskeyCreateManyArgs>(args?: SelectSubset<T, PasskeyCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a Passkey.
+     * @param {PasskeyDeleteArgs} args - Arguments to delete one Passkey.
+     * @example
+     * // Delete one Passkey
+     * const Passkey = await prisma.passkey.delete({
+     *   where: {
+     *     // ... filter to delete one Passkey
+     *   }
+     * })
+     *
+     */
+    delete<T extends PasskeyDeleteArgs>(args: SelectSubset<T, PasskeyDeleteArgs<ExtArgs>>): Prisma__PasskeyClient<$Result.GetResult<Prisma.$PasskeyPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Passkey.
+     * @param {PasskeyUpdateArgs} args - Arguments to update one Passkey.
+     * @example
+     * // Update one Passkey
+     * const passkey = await prisma.passkey.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    update<T extends PasskeyUpdateArgs>(args: SelectSubset<T, PasskeyUpdateArgs<ExtArgs>>): Prisma__PasskeyClient<$Result.GetResult<Prisma.$PasskeyPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Passkeys.
+     * @param {PasskeyDeleteManyArgs} args - Arguments to filter Passkeys to delete.
+     * @example
+     * // Delete a few Passkeys
+     * const { count } = await prisma.passkey.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     *
+     */
+    deleteMany<T extends PasskeyDeleteManyArgs>(args?: SelectSubset<T, PasskeyDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Passkeys.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PasskeyUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Passkeys
+     * const passkey = await prisma.passkey.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    updateMany<T extends PasskeyUpdateManyArgs>(args: SelectSubset<T, PasskeyUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Passkey.
+     * @param {PasskeyUpsertArgs} args - Arguments to update or create a Passkey.
+     * @example
+     * // Update or create a Passkey
+     * const passkey = await prisma.passkey.upsert({
+     *   create: {
+     *     // ... data to create a Passkey
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Passkey we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PasskeyUpsertArgs>(args: SelectSubset<T, PasskeyUpsertArgs<ExtArgs>>): Prisma__PasskeyClient<$Result.GetResult<Prisma.$PasskeyPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Passkeys.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PasskeyCountArgs} args - Arguments to filter Passkeys to count.
+     * @example
+     * // Count the number of Passkeys
+     * const count = await prisma.passkey.count({
+     *   where: {
+     *     // ... the filter for the Passkeys we want to count
+     *   }
+     * })
+     **/
+    count<T extends PasskeyCountArgs>(
+        args?: Subset<T, PasskeyCountArgs>,
+    ): Prisma.PrismaPromise<
+        T extends $Utils.Record<'select', any>
+            ? T['select'] extends true
+                ? number
+                : GetScalarType<T['select'], PasskeyCountAggregateOutputType>
+            : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Passkey.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PasskeyAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+     **/
+    aggregate<T extends PasskeyAggregateArgs>(args: Subset<T, PasskeyAggregateArgs>): Prisma.PrismaPromise<GetPasskeyAggregateType<T>>
+
+    /**
+     * Group by Passkey.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PasskeyGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     *
+     **/
+    groupBy<
+        T extends PasskeyGroupByArgs,
+        HasSelectOrTake extends Or<
+            Extends<'skip', Keys<T>>,
+            Extends<'take', Keys<T>>
+        >,
+        OrderByArg extends True extends HasSelectOrTake
+            ? { orderBy: PasskeyGroupByArgs['orderBy'] }
+            : { orderBy?: PasskeyGroupByArgs['orderBy'] },
+        OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+        ByFields extends MaybeTupleToUnion<T['by']>,
+        ByValid extends Has<ByFields, OrderFields>,
+        HavingFields extends GetHavingFields<T['having']>,
+        HavingValid extends Has<ByFields, HavingFields>,
+        ByEmpty extends T['by'] extends never[] ? True : False,
+        InputErrors extends ByEmpty extends True
+            ? `Error: "by" must not be empty.`
+            : HavingValid extends False
+                ? {
+                  [P in HavingFields]: P extends ByFields
+                      ? never
+                      : P extends string
+                          ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+                          : [
+                            Error,
+                            'Field ',
+                            P,
+                            ` in "having" needs to be provided in "by"`,
+                          ]
+                }[HavingFields]
+                : 'take' extends Keys<T>
+                    ? 'orderBy' extends Keys<T>
+                        ? ByValid extends True
+                            ? {}
+                            : {
+                              [P in OrderFields]: P extends ByFields
+                                  ? never
+                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                            }[OrderFields]
+                        : 'Error: If you provide "take", you also need to provide "orderBy"'
+                    : 'skip' extends Keys<T>
+                        ? 'orderBy' extends Keys<T>
+                            ? ByValid extends True
+                                ? {}
+                                : {
+                                  [P in OrderFields]: P extends ByFields
+                                      ? never
+                                      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                }[OrderFields]
+                            : 'Error: If you provide "skip", you also need to provide "orderBy"'
+                        : ByValid extends True
+                            ? {}
+                            : {
+                              [P in OrderFields]: P extends ByFields
+                                  ? never
+                                  : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                            }[OrderFields]
+    >(args: SubsetIntersection<T, PasskeyGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPasskeyGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+
+    /**
+     * Fields of the Passkey model
+     */
+    readonly fields: PasskeyFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Passkey.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PasskeyClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+  /**
+   * Fields of the Passkey model
+   */
+  interface PasskeyFieldRefs {
+    readonly id: FieldRef<"Passkey", 'String'>
+    readonly name: FieldRef<"Passkey", 'String'>
+    readonly publicKey: FieldRef<"Passkey", 'String'>
+    readonly userId: FieldRef<"Passkey", 'String'>
+    readonly credentialID: FieldRef<"Passkey", 'String'>
+    readonly counter: FieldRef<"Passkey", 'Int'>
+    readonly deviceType: FieldRef<"Passkey", 'String'>
+    readonly backedUp: FieldRef<"Passkey", 'Boolean'>
+    readonly transports: FieldRef<"Passkey", 'String'>
+    readonly createdAt: FieldRef<"Passkey", 'DateTime'>
+    readonly aaguid: FieldRef<"Passkey", 'String'>
+  }
+
+
+  // Custom InputTypes
+  /**
+   * Passkey findUnique
+   */
+  export type PasskeyFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Passkey
+     */
+    select?: PasskeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Passkey
+     */
+    omit?: PasskeyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PasskeyInclude<ExtArgs> | null
+    /**
+     * Filter, which Passkey to fetch.
+     */
+    where: PasskeyWhereUniqueInput
+  }
+
+  /**
+   * Passkey findUniqueOrThrow
+   */
+  export type PasskeyFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Passkey
+     */
+    select?: PasskeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Passkey
+     */
+    omit?: PasskeyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PasskeyInclude<ExtArgs> | null
+    /**
+     * Filter, which Passkey to fetch.
+     */
+    where: PasskeyWhereUniqueInput
+  }
+
+  /**
+   * Passkey findFirst
+   */
+  export type PasskeyFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Passkey
+     */
+    select?: PasskeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Passkey
+     */
+    omit?: PasskeyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PasskeyInclude<ExtArgs> | null
+    /**
+     * Filter, which Passkey to fetch.
+     */
+    where?: PasskeyWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Passkeys to fetch.
+     */
+    orderBy?: PasskeyOrderByWithRelationInput | PasskeyOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for Passkeys.
+     */
+    cursor?: PasskeyWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Passkeys from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Passkeys.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of Passkeys.
+     */
+    distinct?: PasskeyScalarFieldEnum | PasskeyScalarFieldEnum[]
+  }
+
+  /**
+   * Passkey findFirstOrThrow
+   */
+  export type PasskeyFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Passkey
+     */
+    select?: PasskeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Passkey
+     */
+    omit?: PasskeyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PasskeyInclude<ExtArgs> | null
+    /**
+     * Filter, which Passkey to fetch.
+     */
+    where?: PasskeyWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Passkeys to fetch.
+     */
+    orderBy?: PasskeyOrderByWithRelationInput | PasskeyOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for Passkeys.
+     */
+    cursor?: PasskeyWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Passkeys from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Passkeys.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of Passkeys.
+     */
+    distinct?: PasskeyScalarFieldEnum | PasskeyScalarFieldEnum[]
+  }
+
+  /**
+   * Passkey findMany
+   */
+  export type PasskeyFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Passkey
+     */
+    select?: PasskeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Passkey
+     */
+    omit?: PasskeyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PasskeyInclude<ExtArgs> | null
+    /**
+     * Filter, which Passkeys to fetch.
+     */
+    where?: PasskeyWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Passkeys to fetch.
+     */
+    orderBy?: PasskeyOrderByWithRelationInput | PasskeyOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for listing Passkeys.
+     */
+    cursor?: PasskeyWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Passkeys from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Passkeys.
+     */
+    skip?: number
+    distinct?: PasskeyScalarFieldEnum | PasskeyScalarFieldEnum[]
+  }
+
+  /**
+   * Passkey create
+   */
+  export type PasskeyCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Passkey
+     */
+    select?: PasskeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Passkey
+     */
+    omit?: PasskeyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PasskeyInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Passkey.
+     */
+    data: XOR<PasskeyCreateInput, PasskeyUncheckedCreateInput>
+  }
+
+  /**
+   * Passkey createMany
+   */
+  export type PasskeyCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Passkeys.
+     */
+    data: PasskeyCreateManyInput | PasskeyCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Passkey update
+   */
+  export type PasskeyUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Passkey
+     */
+    select?: PasskeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Passkey
+     */
+    omit?: PasskeyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PasskeyInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Passkey.
+     */
+    data: XOR<PasskeyUpdateInput, PasskeyUncheckedUpdateInput>
+    /**
+     * Choose, which Passkey to update.
+     */
+    where: PasskeyWhereUniqueInput
+  }
+
+  /**
+   * Passkey updateMany
+   */
+  export type PasskeyUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Passkeys.
+     */
+    data: XOR<PasskeyUpdateManyMutationInput, PasskeyUncheckedUpdateManyInput>
+    /**
+     * Filter which Passkeys to update
+     */
+    where?: PasskeyWhereInput
+    /**
+     * Limit how many Passkeys to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Passkey upsert
+   */
+  export type PasskeyUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Passkey
+     */
+    select?: PasskeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Passkey
+     */
+    omit?: PasskeyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PasskeyInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Passkey to update in case it exists.
+     */
+    where: PasskeyWhereUniqueInput
+    /**
+     * In case the Passkey found by the `where` argument doesn't exist, create a new Passkey with this data.
+     */
+    create: XOR<PasskeyCreateInput, PasskeyUncheckedCreateInput>
+    /**
+     * In case the Passkey was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PasskeyUpdateInput, PasskeyUncheckedUpdateInput>
+  }
+
+  /**
+   * Passkey delete
+   */
+  export type PasskeyDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Passkey
+     */
+    select?: PasskeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Passkey
+     */
+    omit?: PasskeyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PasskeyInclude<ExtArgs> | null
+    /**
+     * Filter which Passkey to delete.
+     */
+    where: PasskeyWhereUniqueInput
+  }
+
+  /**
+   * Passkey deleteMany
+   */
+  export type PasskeyDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Passkeys to delete
+     */
+    where?: PasskeyWhereInput
+    /**
+     * Limit how many Passkeys to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Passkey without action
+   */
+  export type PasskeyDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Passkey
+     */
+    select?: PasskeySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Passkey
+     */
+    omit?: PasskeyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PasskeyInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -18483,6 +20599,34 @@ export namespace Prisma {
   export type JwksScalarFieldEnum = (typeof JwksScalarFieldEnum)[keyof typeof JwksScalarFieldEnum]
 
 
+  export const RouteProtectionScalarFieldEnum: {
+    id: 'id',
+    route: 'route',
+    isRoleProtected: 'isRoleProtected',
+    roleProtection: 'roleProtection',
+    isAuthenticatedProtected: 'isAuthenticatedProtected'
+  };
+
+  export type RouteProtectionScalarFieldEnum = (typeof RouteProtectionScalarFieldEnum)[keyof typeof RouteProtectionScalarFieldEnum]
+
+
+  export const PasskeyScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    publicKey: 'publicKey',
+    userId: 'userId',
+    credentialID: 'credentialID',
+    counter: 'counter',
+    deviceType: 'deviceType',
+    backedUp: 'backedUp',
+    transports: 'transports',
+    createdAt: 'createdAt',
+    aaguid: 'aaguid'
+  };
+
+  export type PasskeyScalarFieldEnum = (typeof PasskeyScalarFieldEnum)[keyof typeof PasskeyScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -18671,6 +20815,29 @@ export namespace Prisma {
   export type JwksOrderByRelevanceFieldEnum = (typeof JwksOrderByRelevanceFieldEnum)[keyof typeof JwksOrderByRelevanceFieldEnum]
 
 
+  export const RouteProtectionOrderByRelevanceFieldEnum: {
+    id: 'id',
+    route: 'route',
+    roleProtection: 'roleProtection'
+  };
+
+  export type RouteProtectionOrderByRelevanceFieldEnum = (typeof RouteProtectionOrderByRelevanceFieldEnum)[keyof typeof RouteProtectionOrderByRelevanceFieldEnum]
+
+
+  export const PasskeyOrderByRelevanceFieldEnum: {
+    id: 'id',
+    name: 'name',
+    publicKey: 'publicKey',
+    userId: 'userId',
+    credentialID: 'credentialID',
+    deviceType: 'deviceType',
+    transports: 'transports',
+    aaguid: 'aaguid'
+  };
+
+  export type PasskeyOrderByRelevanceFieldEnum = (typeof PasskeyOrderByRelevanceFieldEnum)[keyof typeof PasskeyOrderByRelevanceFieldEnum]
+
+
   /**
    * Field references
    */
@@ -18744,6 +20911,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationListRelationFilter
     Ticket?: TicketListRelationFilter
     apikeys?: ApikeyListRelationFilter
+    passkeys?: PasskeyListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -18771,6 +20939,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationOrderByRelationAggregateInput
     Ticket?: TicketOrderByRelationAggregateInput
     apikeys?: ApikeyOrderByRelationAggregateInput
+    passkeys?: PasskeyOrderByRelationAggregateInput
     _relevance?: UserOrderByRelevanceInput
   }
 
@@ -18802,6 +20971,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationListRelationFilter
     Ticket?: TicketListRelationFilter
     apikeys?: ApikeyListRelationFilter
+    passkeys?: PasskeyListRelationFilter
   }, "id" | "email" | "username">
 
   export type UserOrderByWithAggregationInput = {
@@ -19881,6 +22051,147 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"Jwks"> | Date | string
   }
 
+  export type RouteProtectionWhereInput = {
+    AND?: RouteProtectionWhereInput | RouteProtectionWhereInput[]
+    OR?: RouteProtectionWhereInput[]
+    NOT?: RouteProtectionWhereInput | RouteProtectionWhereInput[]
+    id?: StringFilter<"RouteProtection"> | string
+    route?: StringFilter<"RouteProtection"> | string
+    isRoleProtected?: BoolFilter<"RouteProtection"> | boolean
+    roleProtection?: StringFilter<"RouteProtection"> | string
+    isAuthenticatedProtected?: BoolFilter<"RouteProtection"> | boolean
+  }
+
+  export type RouteProtectionOrderByWithRelationInput = {
+    id?: SortOrder
+    route?: SortOrder
+    isRoleProtected?: SortOrder
+    roleProtection?: SortOrder
+    isAuthenticatedProtected?: SortOrder
+    _relevance?: RouteProtectionOrderByRelevanceInput
+  }
+
+  export type RouteProtectionWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    route?: string
+    AND?: RouteProtectionWhereInput | RouteProtectionWhereInput[]
+    OR?: RouteProtectionWhereInput[]
+    NOT?: RouteProtectionWhereInput | RouteProtectionWhereInput[]
+    isRoleProtected?: BoolFilter<"RouteProtection"> | boolean
+    roleProtection?: StringFilter<"RouteProtection"> | string
+    isAuthenticatedProtected?: BoolFilter<"RouteProtection"> | boolean
+  }, "id" | "route">
+
+  export type RouteProtectionOrderByWithAggregationInput = {
+    id?: SortOrder
+    route?: SortOrder
+    isRoleProtected?: SortOrder
+    roleProtection?: SortOrder
+    isAuthenticatedProtected?: SortOrder
+    _count?: RouteProtectionCountOrderByAggregateInput
+    _max?: RouteProtectionMaxOrderByAggregateInput
+    _min?: RouteProtectionMinOrderByAggregateInput
+  }
+
+  export type RouteProtectionScalarWhereWithAggregatesInput = {
+    AND?: RouteProtectionScalarWhereWithAggregatesInput | RouteProtectionScalarWhereWithAggregatesInput[]
+    OR?: RouteProtectionScalarWhereWithAggregatesInput[]
+    NOT?: RouteProtectionScalarWhereWithAggregatesInput | RouteProtectionScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"RouteProtection"> | string
+    route?: StringWithAggregatesFilter<"RouteProtection"> | string
+    isRoleProtected?: BoolWithAggregatesFilter<"RouteProtection"> | boolean
+    roleProtection?: StringWithAggregatesFilter<"RouteProtection"> | string
+    isAuthenticatedProtected?: BoolWithAggregatesFilter<"RouteProtection"> | boolean
+  }
+
+  export type PasskeyWhereInput = {
+    AND?: PasskeyWhereInput | PasskeyWhereInput[]
+    OR?: PasskeyWhereInput[]
+    NOT?: PasskeyWhereInput | PasskeyWhereInput[]
+    id?: StringFilter<"Passkey"> | string
+    name?: StringNullableFilter<"Passkey"> | string | null
+    publicKey?: StringFilter<"Passkey"> | string
+    userId?: StringFilter<"Passkey"> | string
+    credentialID?: StringFilter<"Passkey"> | string
+    counter?: IntFilter<"Passkey"> | number
+    deviceType?: StringFilter<"Passkey"> | string
+    backedUp?: BoolFilter<"Passkey"> | boolean
+    transports?: StringNullableFilter<"Passkey"> | string | null
+    createdAt?: DateTimeNullableFilter<"Passkey"> | Date | string | null
+    aaguid?: StringNullableFilter<"Passkey"> | string | null
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type PasskeyOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrderInput | SortOrder
+    publicKey?: SortOrder
+    userId?: SortOrder
+    credentialID?: SortOrder
+    counter?: SortOrder
+    deviceType?: SortOrder
+    backedUp?: SortOrder
+    transports?: SortOrderInput | SortOrder
+    createdAt?: SortOrderInput | SortOrder
+    aaguid?: SortOrderInput | SortOrder
+    user?: UserOrderByWithRelationInput
+    _relevance?: PasskeyOrderByRelevanceInput
+  }
+
+  export type PasskeyWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: PasskeyWhereInput | PasskeyWhereInput[]
+    OR?: PasskeyWhereInput[]
+    NOT?: PasskeyWhereInput | PasskeyWhereInput[]
+    name?: StringNullableFilter<"Passkey"> | string | null
+    publicKey?: StringFilter<"Passkey"> | string
+    userId?: StringFilter<"Passkey"> | string
+    credentialID?: StringFilter<"Passkey"> | string
+    counter?: IntFilter<"Passkey"> | number
+    deviceType?: StringFilter<"Passkey"> | string
+    backedUp?: BoolFilter<"Passkey"> | boolean
+    transports?: StringNullableFilter<"Passkey"> | string | null
+    createdAt?: DateTimeNullableFilter<"Passkey"> | Date | string | null
+    aaguid?: StringNullableFilter<"Passkey"> | string | null
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type PasskeyOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrderInput | SortOrder
+    publicKey?: SortOrder
+    userId?: SortOrder
+    credentialID?: SortOrder
+    counter?: SortOrder
+    deviceType?: SortOrder
+    backedUp?: SortOrder
+    transports?: SortOrderInput | SortOrder
+    createdAt?: SortOrderInput | SortOrder
+    aaguid?: SortOrderInput | SortOrder
+    _count?: PasskeyCountOrderByAggregateInput
+    _avg?: PasskeyAvgOrderByAggregateInput
+    _max?: PasskeyMaxOrderByAggregateInput
+    _min?: PasskeyMinOrderByAggregateInput
+    _sum?: PasskeySumOrderByAggregateInput
+  }
+
+  export type PasskeyScalarWhereWithAggregatesInput = {
+    AND?: PasskeyScalarWhereWithAggregatesInput | PasskeyScalarWhereWithAggregatesInput[]
+    OR?: PasskeyScalarWhereWithAggregatesInput[]
+    NOT?: PasskeyScalarWhereWithAggregatesInput | PasskeyScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Passkey"> | string
+    name?: StringNullableWithAggregatesFilter<"Passkey"> | string | null
+    publicKey?: StringWithAggregatesFilter<"Passkey"> | string
+    userId?: StringWithAggregatesFilter<"Passkey"> | string
+    credentialID?: StringWithAggregatesFilter<"Passkey"> | string
+    counter?: IntWithAggregatesFilter<"Passkey"> | number
+    deviceType?: StringWithAggregatesFilter<"Passkey"> | string
+    backedUp?: BoolWithAggregatesFilter<"Passkey"> | boolean
+    transports?: StringNullableWithAggregatesFilter<"Passkey"> | string | null
+    createdAt?: DateTimeNullableWithAggregatesFilter<"Passkey"> | Date | string | null
+    aaguid?: StringNullableWithAggregatesFilter<"Passkey"> | string | null
+  }
+
   export type UserCreateInput = {
     id: string
     name: string
@@ -19906,6 +22217,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
     Ticket?: TicketCreateNestedManyWithoutUserInput
     apikeys?: ApikeyCreateNestedManyWithoutUserInput
+    passkeys?: PasskeyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -19933,6 +22245,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
     Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
     apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
+    passkeys?: PasskeyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -19960,6 +22273,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
     Ticket?: TicketUpdateManyWithoutUserNestedInput
     apikeys?: ApikeyUpdateManyWithoutUserNestedInput
+    passkeys?: PasskeyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -19987,6 +22301,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
     Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
     apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
+    passkeys?: PasskeyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -21106,6 +23421,159 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type RouteProtectionCreateInput = {
+    id: string
+    route: string
+    isRoleProtected: boolean
+    roleProtection: string
+    isAuthenticatedProtected: boolean
+  }
+
+  export type RouteProtectionUncheckedCreateInput = {
+    id: string
+    route: string
+    isRoleProtected: boolean
+    roleProtection: string
+    isAuthenticatedProtected: boolean
+  }
+
+  export type RouteProtectionUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    route?: StringFieldUpdateOperationsInput | string
+    isRoleProtected?: BoolFieldUpdateOperationsInput | boolean
+    roleProtection?: StringFieldUpdateOperationsInput | string
+    isAuthenticatedProtected?: BoolFieldUpdateOperationsInput | boolean
+  }
+
+  export type RouteProtectionUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    route?: StringFieldUpdateOperationsInput | string
+    isRoleProtected?: BoolFieldUpdateOperationsInput | boolean
+    roleProtection?: StringFieldUpdateOperationsInput | string
+    isAuthenticatedProtected?: BoolFieldUpdateOperationsInput | boolean
+  }
+
+  export type RouteProtectionCreateManyInput = {
+    id: string
+    route: string
+    isRoleProtected: boolean
+    roleProtection: string
+    isAuthenticatedProtected: boolean
+  }
+
+  export type RouteProtectionUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    route?: StringFieldUpdateOperationsInput | string
+    isRoleProtected?: BoolFieldUpdateOperationsInput | boolean
+    roleProtection?: StringFieldUpdateOperationsInput | string
+    isAuthenticatedProtected?: BoolFieldUpdateOperationsInput | boolean
+  }
+
+  export type RouteProtectionUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    route?: StringFieldUpdateOperationsInput | string
+    isRoleProtected?: BoolFieldUpdateOperationsInput | boolean
+    roleProtection?: StringFieldUpdateOperationsInput | string
+    isAuthenticatedProtected?: BoolFieldUpdateOperationsInput | boolean
+  }
+
+  export type PasskeyCreateInput = {
+    id: string
+    name?: string | null
+    publicKey: string
+    credentialID: string
+    counter: number
+    deviceType: string
+    backedUp: boolean
+    transports?: string | null
+    createdAt?: Date | string | null
+    aaguid?: string | null
+    user: UserCreateNestedOneWithoutPasskeysInput
+  }
+
+  export type PasskeyUncheckedCreateInput = {
+    id: string
+    name?: string | null
+    publicKey: string
+    userId: string
+    credentialID: string
+    counter: number
+    deviceType: string
+    backedUp: boolean
+    transports?: string | null
+    createdAt?: Date | string | null
+    aaguid?: string | null
+  }
+
+  export type PasskeyUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    publicKey?: StringFieldUpdateOperationsInput | string
+    credentialID?: StringFieldUpdateOperationsInput | string
+    counter?: IntFieldUpdateOperationsInput | number
+    deviceType?: StringFieldUpdateOperationsInput | string
+    backedUp?: BoolFieldUpdateOperationsInput | boolean
+    transports?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    aaguid?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneRequiredWithoutPasskeysNestedInput
+  }
+
+  export type PasskeyUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    publicKey?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    credentialID?: StringFieldUpdateOperationsInput | string
+    counter?: IntFieldUpdateOperationsInput | number
+    deviceType?: StringFieldUpdateOperationsInput | string
+    backedUp?: BoolFieldUpdateOperationsInput | boolean
+    transports?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    aaguid?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type PasskeyCreateManyInput = {
+    id: string
+    name?: string | null
+    publicKey: string
+    userId: string
+    credentialID: string
+    counter: number
+    deviceType: string
+    backedUp: boolean
+    transports?: string | null
+    createdAt?: Date | string | null
+    aaguid?: string | null
+  }
+
+  export type PasskeyUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    publicKey?: StringFieldUpdateOperationsInput | string
+    credentialID?: StringFieldUpdateOperationsInput | string
+    counter?: IntFieldUpdateOperationsInput | number
+    deviceType?: StringFieldUpdateOperationsInput | string
+    backedUp?: BoolFieldUpdateOperationsInput | boolean
+    transports?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    aaguid?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type PasskeyUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    publicKey?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    credentialID?: StringFieldUpdateOperationsInput | string
+    counter?: IntFieldUpdateOperationsInput | number
+    deviceType?: StringFieldUpdateOperationsInput | string
+    backedUp?: BoolFieldUpdateOperationsInput | boolean
+    transports?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    aaguid?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[]
@@ -21228,6 +23696,12 @@ export namespace Prisma {
     none?: ApikeyWhereInput
   }
 
+  export type PasskeyListRelationFilter = {
+    every?: PasskeyWhereInput
+    some?: PasskeyWhereInput
+    none?: PasskeyWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -21270,6 +23744,10 @@ export namespace Prisma {
   }
 
   export type ApikeyOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type PasskeyOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -22129,6 +24607,92 @@ export namespace Prisma {
     createdAt?: SortOrder
   }
 
+  export type RouteProtectionOrderByRelevanceInput = {
+    fields: RouteProtectionOrderByRelevanceFieldEnum | RouteProtectionOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type RouteProtectionCountOrderByAggregateInput = {
+    id?: SortOrder
+    route?: SortOrder
+    isRoleProtected?: SortOrder
+    roleProtection?: SortOrder
+    isAuthenticatedProtected?: SortOrder
+  }
+
+  export type RouteProtectionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    route?: SortOrder
+    isRoleProtected?: SortOrder
+    roleProtection?: SortOrder
+    isAuthenticatedProtected?: SortOrder
+  }
+
+  export type RouteProtectionMinOrderByAggregateInput = {
+    id?: SortOrder
+    route?: SortOrder
+    isRoleProtected?: SortOrder
+    roleProtection?: SortOrder
+    isAuthenticatedProtected?: SortOrder
+  }
+
+  export type PasskeyOrderByRelevanceInput = {
+    fields: PasskeyOrderByRelevanceFieldEnum | PasskeyOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type PasskeyCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    publicKey?: SortOrder
+    userId?: SortOrder
+    credentialID?: SortOrder
+    counter?: SortOrder
+    deviceType?: SortOrder
+    backedUp?: SortOrder
+    transports?: SortOrder
+    createdAt?: SortOrder
+    aaguid?: SortOrder
+  }
+
+  export type PasskeyAvgOrderByAggregateInput = {
+    counter?: SortOrder
+  }
+
+  export type PasskeyMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    publicKey?: SortOrder
+    userId?: SortOrder
+    credentialID?: SortOrder
+    counter?: SortOrder
+    deviceType?: SortOrder
+    backedUp?: SortOrder
+    transports?: SortOrder
+    createdAt?: SortOrder
+    aaguid?: SortOrder
+  }
+
+  export type PasskeyMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    publicKey?: SortOrder
+    userId?: SortOrder
+    credentialID?: SortOrder
+    counter?: SortOrder
+    deviceType?: SortOrder
+    backedUp?: SortOrder
+    transports?: SortOrder
+    createdAt?: SortOrder
+    aaguid?: SortOrder
+  }
+
+  export type PasskeySumOrderByAggregateInput = {
+    counter?: SortOrder
+  }
+
   export type AccountCreateNestedManyWithoutUserInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -22199,6 +24763,13 @@ export namespace Prisma {
     connect?: ApikeyWhereUniqueInput | ApikeyWhereUniqueInput[]
   }
 
+  export type PasskeyCreateNestedManyWithoutUserInput = {
+    create?: XOR<PasskeyCreateWithoutUserInput, PasskeyUncheckedCreateWithoutUserInput> | PasskeyCreateWithoutUserInput[] | PasskeyUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PasskeyCreateOrConnectWithoutUserInput | PasskeyCreateOrConnectWithoutUserInput[]
+    createMany?: PasskeyCreateManyUserInputEnvelope
+    connect?: PasskeyWhereUniqueInput | PasskeyWhereUniqueInput[]
+  }
+
   export type AccountUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -22267,6 +24838,13 @@ export namespace Prisma {
     connectOrCreate?: ApikeyCreateOrConnectWithoutUserInput | ApikeyCreateOrConnectWithoutUserInput[]
     createMany?: ApikeyCreateManyUserInputEnvelope
     connect?: ApikeyWhereUniqueInput | ApikeyWhereUniqueInput[]
+  }
+
+  export type PasskeyUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<PasskeyCreateWithoutUserInput, PasskeyUncheckedCreateWithoutUserInput> | PasskeyCreateWithoutUserInput[] | PasskeyUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PasskeyCreateOrConnectWithoutUserInput | PasskeyCreateOrConnectWithoutUserInput[]
+    createMany?: PasskeyCreateManyUserInputEnvelope
+    connect?: PasskeyWhereUniqueInput | PasskeyWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -22433,6 +25011,20 @@ export namespace Prisma {
     deleteMany?: ApikeyScalarWhereInput | ApikeyScalarWhereInput[]
   }
 
+  export type PasskeyUpdateManyWithoutUserNestedInput = {
+    create?: XOR<PasskeyCreateWithoutUserInput, PasskeyUncheckedCreateWithoutUserInput> | PasskeyCreateWithoutUserInput[] | PasskeyUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PasskeyCreateOrConnectWithoutUserInput | PasskeyCreateOrConnectWithoutUserInput[]
+    upsert?: PasskeyUpsertWithWhereUniqueWithoutUserInput | PasskeyUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: PasskeyCreateManyUserInputEnvelope
+    set?: PasskeyWhereUniqueInput | PasskeyWhereUniqueInput[]
+    disconnect?: PasskeyWhereUniqueInput | PasskeyWhereUniqueInput[]
+    delete?: PasskeyWhereUniqueInput | PasskeyWhereUniqueInput[]
+    connect?: PasskeyWhereUniqueInput | PasskeyWhereUniqueInput[]
+    update?: PasskeyUpdateWithWhereUniqueWithoutUserInput | PasskeyUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: PasskeyUpdateManyWithWhereWithoutUserInput | PasskeyUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: PasskeyScalarWhereInput | PasskeyScalarWhereInput[]
+  }
+
   export type AccountUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -22571,6 +25163,20 @@ export namespace Prisma {
     update?: ApikeyUpdateWithWhereUniqueWithoutUserInput | ApikeyUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: ApikeyUpdateManyWithWhereWithoutUserInput | ApikeyUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: ApikeyScalarWhereInput | ApikeyScalarWhereInput[]
+  }
+
+  export type PasskeyUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<PasskeyCreateWithoutUserInput, PasskeyUncheckedCreateWithoutUserInput> | PasskeyCreateWithoutUserInput[] | PasskeyUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PasskeyCreateOrConnectWithoutUserInput | PasskeyCreateOrConnectWithoutUserInput[]
+    upsert?: PasskeyUpsertWithWhereUniqueWithoutUserInput | PasskeyUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: PasskeyCreateManyUserInputEnvelope
+    set?: PasskeyWhereUniqueInput | PasskeyWhereUniqueInput[]
+    disconnect?: PasskeyWhereUniqueInput | PasskeyWhereUniqueInput[]
+    delete?: PasskeyWhereUniqueInput | PasskeyWhereUniqueInput[]
+    connect?: PasskeyWhereUniqueInput | PasskeyWhereUniqueInput[]
+    update?: PasskeyUpdateWithWhereUniqueWithoutUserInput | PasskeyUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: PasskeyUpdateManyWithWhereWithoutUserInput | PasskeyUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: PasskeyScalarWhereInput | PasskeyScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutSessionsInput = {
@@ -23131,6 +25737,20 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutApikeysInput, UserUpdateWithoutApikeysInput>, UserUncheckedUpdateWithoutApikeysInput>
   }
 
+  export type UserCreateNestedOneWithoutPasskeysInput = {
+    create?: XOR<UserCreateWithoutPasskeysInput, UserUncheckedCreateWithoutPasskeysInput>
+    connectOrCreate?: UserCreateOrConnectWithoutPasskeysInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutPasskeysNestedInput = {
+    create?: XOR<UserCreateWithoutPasskeysInput, UserUncheckedCreateWithoutPasskeysInput>
+    connectOrCreate?: UserCreateOrConnectWithoutPasskeysInput
+    upsert?: UserUpsertWithoutPasskeysInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutPasskeysInput, UserUpdateWithoutPasskeysInput>, UserUncheckedUpdateWithoutPasskeysInput>
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[]
@@ -23677,6 +26297,42 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type PasskeyCreateWithoutUserInput = {
+    id: string
+    name?: string | null
+    publicKey: string
+    credentialID: string
+    counter: number
+    deviceType: string
+    backedUp: boolean
+    transports?: string | null
+    createdAt?: Date | string | null
+    aaguid?: string | null
+  }
+
+  export type PasskeyUncheckedCreateWithoutUserInput = {
+    id: string
+    name?: string | null
+    publicKey: string
+    credentialID: string
+    counter: number
+    deviceType: string
+    backedUp: boolean
+    transports?: string | null
+    createdAt?: Date | string | null
+    aaguid?: string | null
+  }
+
+  export type PasskeyCreateOrConnectWithoutUserInput = {
+    where: PasskeyWhereUniqueInput
+    create: XOR<PasskeyCreateWithoutUserInput, PasskeyUncheckedCreateWithoutUserInput>
+  }
+
+  export type PasskeyCreateManyUserInputEnvelope = {
+    data: PasskeyCreateManyUserInput | PasskeyCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type AccountUpsertWithWhereUniqueWithoutUserInput = {
     where: AccountWhereUniqueInput
     update: XOR<AccountUpdateWithoutUserInput, AccountUncheckedUpdateWithoutUserInput>
@@ -23982,6 +26638,39 @@ export namespace Prisma {
     metadata?: StringNullableFilter<"Apikey"> | string | null
   }
 
+  export type PasskeyUpsertWithWhereUniqueWithoutUserInput = {
+    where: PasskeyWhereUniqueInput
+    update: XOR<PasskeyUpdateWithoutUserInput, PasskeyUncheckedUpdateWithoutUserInput>
+    create: XOR<PasskeyCreateWithoutUserInput, PasskeyUncheckedCreateWithoutUserInput>
+  }
+
+  export type PasskeyUpdateWithWhereUniqueWithoutUserInput = {
+    where: PasskeyWhereUniqueInput
+    data: XOR<PasskeyUpdateWithoutUserInput, PasskeyUncheckedUpdateWithoutUserInput>
+  }
+
+  export type PasskeyUpdateManyWithWhereWithoutUserInput = {
+    where: PasskeyScalarWhereInput
+    data: XOR<PasskeyUpdateManyMutationInput, PasskeyUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type PasskeyScalarWhereInput = {
+    AND?: PasskeyScalarWhereInput | PasskeyScalarWhereInput[]
+    OR?: PasskeyScalarWhereInput[]
+    NOT?: PasskeyScalarWhereInput | PasskeyScalarWhereInput[]
+    id?: StringFilter<"Passkey"> | string
+    name?: StringNullableFilter<"Passkey"> | string | null
+    publicKey?: StringFilter<"Passkey"> | string
+    userId?: StringFilter<"Passkey"> | string
+    credentialID?: StringFilter<"Passkey"> | string
+    counter?: IntFilter<"Passkey"> | number
+    deviceType?: StringFilter<"Passkey"> | string
+    backedUp?: BoolFilter<"Passkey"> | boolean
+    transports?: StringNullableFilter<"Passkey"> | string | null
+    createdAt?: DateTimeNullableFilter<"Passkey"> | Date | string | null
+    aaguid?: StringNullableFilter<"Passkey"> | string | null
+  }
+
   export type UserCreateWithoutSessionsInput = {
     id: string
     name: string
@@ -24006,6 +26695,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
     Ticket?: TicketCreateNestedManyWithoutUserInput
     apikeys?: ApikeyCreateNestedManyWithoutUserInput
+    passkeys?: PasskeyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -24032,6 +26722,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
     Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
     apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
+    passkeys?: PasskeyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -24074,6 +26765,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
     Ticket?: TicketUpdateManyWithoutUserNestedInput
     apikeys?: ApikeyUpdateManyWithoutUserNestedInput
+    passkeys?: PasskeyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -24100,6 +26792,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
     Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
     apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
+    passkeys?: PasskeyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutAccountsInput = {
@@ -24126,6 +26819,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
     Ticket?: TicketCreateNestedManyWithoutUserInput
     apikeys?: ApikeyCreateNestedManyWithoutUserInput
+    passkeys?: PasskeyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAccountsInput = {
@@ -24152,6 +26846,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
     Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
     apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
+    passkeys?: PasskeyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAccountsInput = {
@@ -24194,6 +26889,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
     Ticket?: TicketUpdateManyWithoutUserNestedInput
     apikeys?: ApikeyUpdateManyWithoutUserNestedInput
+    passkeys?: PasskeyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -24220,6 +26916,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
     Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
     apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
+    passkeys?: PasskeyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type MemberCreateWithoutOrganizationInput = {
@@ -24355,6 +27052,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
     Ticket?: TicketCreateNestedManyWithoutUserInput
     apikeys?: ApikeyCreateNestedManyWithoutUserInput
+    passkeys?: PasskeyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutMembersInput = {
@@ -24381,6 +27079,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
     Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
     apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
+    passkeys?: PasskeyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutMembersInput = {
@@ -24454,6 +27153,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
     Ticket?: TicketUpdateManyWithoutUserNestedInput
     apikeys?: ApikeyUpdateManyWithoutUserNestedInput
+    passkeys?: PasskeyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMembersInput = {
@@ -24480,6 +27180,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
     Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
     apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
+    passkeys?: PasskeyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type OrganizationCreateWithoutInvitationsInput = {
@@ -24531,6 +27232,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
     Ticket?: TicketCreateNestedManyWithoutUserInput
     apikeys?: ApikeyCreateNestedManyWithoutUserInput
+    passkeys?: PasskeyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutInvitationsInput = {
@@ -24557,6 +27259,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
     Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
     apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
+    passkeys?: PasskeyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutInvitationsInput = {
@@ -24630,6 +27333,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
     Ticket?: TicketUpdateManyWithoutUserNestedInput
     apikeys?: ApikeyUpdateManyWithoutUserNestedInput
+    passkeys?: PasskeyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutInvitationsInput = {
@@ -24656,6 +27360,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
     Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
     apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
+    passkeys?: PasskeyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutTwofactorsInput = {
@@ -24682,6 +27387,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
     Ticket?: TicketCreateNestedManyWithoutUserInput
     apikeys?: ApikeyCreateNestedManyWithoutUserInput
+    passkeys?: PasskeyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutTwofactorsInput = {
@@ -24708,6 +27414,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
     Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
     apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
+    passkeys?: PasskeyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutTwofactorsInput = {
@@ -24750,6 +27457,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
     Ticket?: TicketUpdateManyWithoutUserNestedInput
     apikeys?: ApikeyUpdateManyWithoutUserNestedInput
+    passkeys?: PasskeyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutTwofactorsInput = {
@@ -24776,6 +27484,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
     Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
     apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
+    passkeys?: PasskeyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type MessageCreateWithoutChannelInput = {
@@ -24882,6 +27591,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
     Ticket?: TicketCreateNestedManyWithoutUserInput
     apikeys?: ApikeyCreateNestedManyWithoutUserInput
+    passkeys?: PasskeyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutMessagesInput = {
@@ -24908,6 +27618,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
     Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
     apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
+    passkeys?: PasskeyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutMessagesInput = {
@@ -24967,6 +27678,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
     Ticket?: TicketUpdateManyWithoutUserNestedInput
     apikeys?: ApikeyUpdateManyWithoutUserNestedInput
+    passkeys?: PasskeyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMessagesInput = {
@@ -24993,6 +27705,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
     Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
     apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
+    passkeys?: PasskeyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ChannelUpsertWithoutMessageInput = {
@@ -25042,6 +27755,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
     Ticket?: TicketCreateNestedManyWithoutUserInput
     apikeys?: ApikeyCreateNestedManyWithoutUserInput
+    passkeys?: PasskeyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutEventInput = {
@@ -25068,6 +27782,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
     Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
     apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
+    passkeys?: PasskeyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutEventInput = {
@@ -25158,6 +27873,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
     Ticket?: TicketUpdateManyWithoutUserNestedInput
     apikeys?: ApikeyUpdateManyWithoutUserNestedInput
+    passkeys?: PasskeyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEventInput = {
@@ -25184,6 +27900,7 @@ export namespace Prisma {
     EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
     Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
     apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
+    passkeys?: PasskeyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type RoleSlotUpsertWithWhereUniqueWithoutEventInput = {
@@ -25356,6 +28073,7 @@ export namespace Prisma {
     Event?: EventCreateNestedManyWithoutUserInput
     Ticket?: TicketCreateNestedManyWithoutUserInput
     apikeys?: ApikeyCreateNestedManyWithoutUserInput
+    passkeys?: PasskeyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutEventRegistrationInput = {
@@ -25382,6 +28100,7 @@ export namespace Prisma {
     Event?: EventUncheckedCreateNestedManyWithoutUserInput
     Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
     apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
+    passkeys?: PasskeyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutEventRegistrationInput = {
@@ -25472,6 +28191,7 @@ export namespace Prisma {
     Event?: EventUpdateManyWithoutUserNestedInput
     Ticket?: TicketUpdateManyWithoutUserNestedInput
     apikeys?: ApikeyUpdateManyWithoutUserNestedInput
+    passkeys?: PasskeyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEventRegistrationInput = {
@@ -25498,6 +28218,7 @@ export namespace Prisma {
     Event?: EventUncheckedUpdateManyWithoutUserNestedInput
     Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
     apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
+    passkeys?: PasskeyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type RoleSlotUpsertWithoutRegistrationsInput = {
@@ -25601,6 +28322,7 @@ export namespace Prisma {
     Event?: EventCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
     apikeys?: ApikeyCreateNestedManyWithoutUserInput
+    passkeys?: PasskeyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutTicketInput = {
@@ -25627,6 +28349,7 @@ export namespace Prisma {
     Event?: EventUncheckedCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
     apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
+    passkeys?: PasskeyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutTicketInput = {
@@ -25692,6 +28415,7 @@ export namespace Prisma {
     Event?: EventUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
     apikeys?: ApikeyUpdateManyWithoutUserNestedInput
+    passkeys?: PasskeyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutTicketInput = {
@@ -25718,6 +28442,7 @@ export namespace Prisma {
     Event?: EventUncheckedUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
     apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
+    passkeys?: PasskeyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutApikeysInput = {
@@ -25744,6 +28469,7 @@ export namespace Prisma {
     Event?: EventCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
     Ticket?: TicketCreateNestedManyWithoutUserInput
+    passkeys?: PasskeyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutApikeysInput = {
@@ -25770,6 +28496,7 @@ export namespace Prisma {
     Event?: EventUncheckedCreateNestedManyWithoutUserInput
     EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
     Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
+    passkeys?: PasskeyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutApikeysInput = {
@@ -25812,6 +28539,7 @@ export namespace Prisma {
     Event?: EventUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
     Ticket?: TicketUpdateManyWithoutUserNestedInput
+    passkeys?: PasskeyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutApikeysInput = {
@@ -25838,6 +28566,131 @@ export namespace Prisma {
     Event?: EventUncheckedUpdateManyWithoutUserNestedInput
     EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
     Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
+    passkeys?: PasskeyUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutPasskeysInput = {
+    id: string
+    name: string
+    email: string
+    emailVerified: boolean
+    image?: string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+    role?: string | null
+    banned?: boolean | null
+    banReason?: string | null
+    banExpires?: Date | string | null
+    twoFactorEnabled?: boolean | null
+    username?: string | null
+    displayUsername?: string | null
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    messages?: MessageCreateNestedManyWithoutUserInput
+    members?: MemberCreateNestedManyWithoutUserInput
+    invitations?: InvitationCreateNestedManyWithoutUserInput
+    twofactors?: TwoFactorCreateNestedManyWithoutUserInput
+    Event?: EventCreateNestedManyWithoutUserInput
+    EventRegistration?: EventRegistrationCreateNestedManyWithoutUserInput
+    Ticket?: TicketCreateNestedManyWithoutUserInput
+    apikeys?: ApikeyCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutPasskeysInput = {
+    id: string
+    name: string
+    email: string
+    emailVerified: boolean
+    image?: string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+    role?: string | null
+    banned?: boolean | null
+    banReason?: string | null
+    banExpires?: Date | string | null
+    twoFactorEnabled?: boolean | null
+    username?: string | null
+    displayUsername?: string | null
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    members?: MemberUncheckedCreateNestedManyWithoutUserInput
+    invitations?: InvitationUncheckedCreateNestedManyWithoutUserInput
+    twofactors?: TwoFactorUncheckedCreateNestedManyWithoutUserInput
+    Event?: EventUncheckedCreateNestedManyWithoutUserInput
+    EventRegistration?: EventRegistrationUncheckedCreateNestedManyWithoutUserInput
+    Ticket?: TicketUncheckedCreateNestedManyWithoutUserInput
+    apikeys?: ApikeyUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutPasskeysInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutPasskeysInput, UserUncheckedCreateWithoutPasskeysInput>
+  }
+
+  export type UserUpsertWithoutPasskeysInput = {
+    update: XOR<UserUpdateWithoutPasskeysInput, UserUncheckedUpdateWithoutPasskeysInput>
+    create: XOR<UserCreateWithoutPasskeysInput, UserUncheckedCreateWithoutPasskeysInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutPasskeysInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutPasskeysInput, UserUncheckedUpdateWithoutPasskeysInput>
+  }
+
+  export type UserUpdateWithoutPasskeysInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: NullableStringFieldUpdateOperationsInput | string | null
+    banned?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    banReason?: NullableStringFieldUpdateOperationsInput | string | null
+    banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
+    members?: MemberUpdateManyWithoutUserNestedInput
+    invitations?: InvitationUpdateManyWithoutUserNestedInput
+    twofactors?: TwoFactorUpdateManyWithoutUserNestedInput
+    Event?: EventUpdateManyWithoutUserNestedInput
+    EventRegistration?: EventRegistrationUpdateManyWithoutUserNestedInput
+    Ticket?: TicketUpdateManyWithoutUserNestedInput
+    apikeys?: ApikeyUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutPasskeysInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: NullableStringFieldUpdateOperationsInput | string | null
+    banned?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    banReason?: NullableStringFieldUpdateOperationsInput | string | null
+    banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    twoFactorEnabled?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    displayUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    members?: MemberUncheckedUpdateManyWithoutUserNestedInput
+    invitations?: InvitationUncheckedUpdateManyWithoutUserNestedInput
+    twofactors?: TwoFactorUncheckedUpdateManyWithoutUserNestedInput
+    Event?: EventUncheckedUpdateManyWithoutUserNestedInput
+    EventRegistration?: EventRegistrationUncheckedUpdateManyWithoutUserNestedInput
+    Ticket?: TicketUncheckedUpdateManyWithoutUserNestedInput
+    apikeys?: ApikeyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type AccountCreateManyUserInput = {
@@ -25943,6 +28796,19 @@ export namespace Prisma {
     updatedAt: Date | string
     permissions?: string | null
     metadata?: string | null
+  }
+
+  export type PasskeyCreateManyUserInput = {
+    id: string
+    name?: string | null
+    publicKey: string
+    credentialID: string
+    counter: number
+    deviceType: string
+    backedUp: boolean
+    transports?: string | null
+    createdAt?: Date | string | null
+    aaguid?: string | null
   }
 
   export type AccountUpdateWithoutUserInput = {
@@ -26259,6 +29125,45 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     permissions?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type PasskeyUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    publicKey?: StringFieldUpdateOperationsInput | string
+    credentialID?: StringFieldUpdateOperationsInput | string
+    counter?: IntFieldUpdateOperationsInput | number
+    deviceType?: StringFieldUpdateOperationsInput | string
+    backedUp?: BoolFieldUpdateOperationsInput | boolean
+    transports?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    aaguid?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type PasskeyUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    publicKey?: StringFieldUpdateOperationsInput | string
+    credentialID?: StringFieldUpdateOperationsInput | string
+    counter?: IntFieldUpdateOperationsInput | number
+    deviceType?: StringFieldUpdateOperationsInput | string
+    backedUp?: BoolFieldUpdateOperationsInput | boolean
+    transports?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    aaguid?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type PasskeyUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    publicKey?: StringFieldUpdateOperationsInput | string
+    credentialID?: StringFieldUpdateOperationsInput | string
+    counter?: IntFieldUpdateOperationsInput | number
+    deviceType?: StringFieldUpdateOperationsInput | string
+    backedUp?: BoolFieldUpdateOperationsInput | boolean
+    transports?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    aaguid?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type MemberCreateManyOrganizationInput = {

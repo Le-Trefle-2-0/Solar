@@ -14,6 +14,7 @@ import {
     twoFactor,
     username
 } from "better-auth/plugins";
+import {passkey} from "better-auth/plugins/passkey";
 
 const prisma = new PrismaClient();
 export const auth = betterAuth({
@@ -61,7 +62,8 @@ export const auth = betterAuth({
         }),
         jwt(),
         bearer(),
-        dashboardPlugin()
+        dashboardPlugin(),
+        passkey()
     ],
     account: {
         accountLinking: {

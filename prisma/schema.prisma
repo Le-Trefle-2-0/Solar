@@ -40,6 +40,8 @@ model User {
 
   apikeys Apikey[]
 
+  passkeys Passkey[]
+
   @@unique([username])
   @@map("user")
 }
@@ -246,4 +248,32 @@ model Jwks {
   createdAt  DateTime
 
   @@map("jwks")
+}
+
+model RouteProtection {
+  id                       String  @id
+  route                    String
+  isRoleProtected          Boolean
+  roleProtection           String  @db.Text
+  isAuthenticatedProtected Boolean
+
+  @@unique([route])
+  @@map("routeProtection")
+}
+
+model Passkey {
+  id           String    @id
+  name         String?   @db.Text
+  publicKey    String    @db.Text
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  credentialID String    @db.Text
+  counter      Int
+  deviceType   String    @db.Text
+  backedUp     Boolean
+  transports   String?   @db.Text
+  createdAt    DateTime?
+  aaguid       String?   @db.Text
+
+  @@map("passkey")
 }
