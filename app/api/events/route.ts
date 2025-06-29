@@ -35,18 +35,18 @@ export async function POST(req: NextRequest) {
         });
     }
 
-    const perm = await auth.api.userHasPermission({
-        body: {
-            userId: session?.user.id,
-            permissions: {
-                event: ['view']
-            }
-        }
-    });
-
-    if (!perm.success) {
-        return new Response('Unauthorized', {status: 401,});
-    }
+    // const perm = await auth.api.userHasPermission({
+    //     body: {
+    //         userId: session?.user.id,
+    //         permissions: {
+    //             event: ['view']
+    //         }
+    //     }
+    // });
+    //
+    // if (!perm.success) {
+    //     return new Response('Unauthorized', {status: 401,});
+    // }
 
     try {
         const body = await req.json();
@@ -72,18 +72,18 @@ export async function GET() {
         });
     }
 
-    const perm = await auth.api.userHasPermission({
-        body: {
-            userId: session?.user.id,
-            permissions: {
-                event: ['view']
-            }
-        }
-    });
-
-    if (!perm.success) {
-        return new Response('Unauthorized', {status: 401,});
-    }
+    // const perm = await auth.api.userHasPermission({
+    //     body: {
+    //         userId: session?.user.id,
+    //         permissions: {
+    //             event: ['view']
+    //         }
+    //     }
+    // });
+    //
+    // if (!perm.success) {
+    //     return new Response('Unauthorized', {status: 401,});
+    // }
 
     try {
         const events = await getEvents();
