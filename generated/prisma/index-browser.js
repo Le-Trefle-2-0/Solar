@@ -255,7 +255,15 @@ exports.Prisma.TicketScalarFieldEnum = {
   channelName: 'channelName',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  assignedUserId: 'assignedUserId'
+    assignedUserId: 'assignedUserId',
+    statusName: 'statusName',
+    statusLabel: 'statusLabel'
+};
+
+exports.Prisma.TicketStatusScalarFieldEnum = {
+    id: 'id',
+    name: 'name',
+    label: 'label'
 };
 
 exports.Prisma.ApikeyScalarFieldEnum = {
@@ -425,7 +433,14 @@ exports.Prisma.TicketOrderByRelevanceFieldEnum = {
   discordUserID: 'discordUserID',
   channelId: 'channelId',
   channelName: 'channelName',
-  assignedUserId: 'assignedUserId'
+    assignedUserId: 'assignedUserId',
+    statusName: 'statusName',
+    statusLabel: 'statusLabel'
+};
+
+exports.Prisma.TicketStatusOrderByRelevanceFieldEnum = {
+    name: 'name',
+    label: 'label'
 };
 
 exports.Prisma.ApikeyOrderByRelevanceFieldEnum = {
@@ -478,6 +493,7 @@ exports.Prisma.ModelName = {
   RoleSlot: 'RoleSlot',
   EventRegistration: 'EventRegistration',
   Ticket: 'Ticket',
+    TicketStatus: 'TicketStatus',
   Apikey: 'Apikey',
     Jwks: 'Jwks',
     RouteProtection: 'RouteProtection',

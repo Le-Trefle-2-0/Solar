@@ -10,6 +10,15 @@ async function main() {
                 name: "Permanence"
             }
     });
+
+    await prisma.ticketStatus.createMany({
+        data: [
+            {name: "waiting", label: "Non-Assignée"},
+            {name: "started", label: "En cours"},
+            {name: "closed", label: "En attente de transmission"},
+            {name: "commented", label: "Terminée"},
+        ]
+    })
 }
 
 main()
