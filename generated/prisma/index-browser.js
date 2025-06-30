@@ -255,15 +255,15 @@ exports.Prisma.TicketScalarFieldEnum = {
   channelName: 'channelName',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-    assignedUserId: 'assignedUserId',
-    statusName: 'statusName',
-    statusLabel: 'statusLabel'
+  assignedUserId: 'assignedUserId',
+  statusName: 'statusName',
+  statusLabel: 'statusLabel'
 };
 
 exports.Prisma.TicketStatusScalarFieldEnum = {
-    id: 'id',
-    name: 'name',
-    label: 'label'
+  id: 'id',
+  name: 'name',
+  label: 'label'
 };
 
 exports.Prisma.ApikeyScalarFieldEnum = {
@@ -298,25 +298,25 @@ exports.Prisma.JwksScalarFieldEnum = {
 };
 
 exports.Prisma.RouteProtectionScalarFieldEnum = {
-    id: 'id',
-    route: 'route',
-    isRoleProtected: 'isRoleProtected',
-    roleProtection: 'roleProtection',
-    isAuthenticatedProtected: 'isAuthenticatedProtected'
+  id: 'id',
+  route: 'route',
+  isRoleProtected: 'isRoleProtected',
+  roleProtection: 'roleProtection',
+  isAuthenticatedProtected: 'isAuthenticatedProtected'
 };
 
 exports.Prisma.PasskeyScalarFieldEnum = {
-    id: 'id',
-    name: 'name',
-    publicKey: 'publicKey',
-    userId: 'userId',
-    credentialID: 'credentialID',
-    counter: 'counter',
-    deviceType: 'deviceType',
-    backedUp: 'backedUp',
-    transports: 'transports',
-    createdAt: 'createdAt',
-    aaguid: 'aaguid'
+  id: 'id',
+  name: 'name',
+  publicKey: 'publicKey',
+  userId: 'userId',
+  credentialID: 'credentialID',
+  counter: 'counter',
+  deviceType: 'deviceType',
+  backedUp: 'backedUp',
+  transports: 'transports',
+  createdAt: 'createdAt',
+  aaguid: 'aaguid'
 };
 
 exports.Prisma.SortOrder = {
@@ -433,14 +433,14 @@ exports.Prisma.TicketOrderByRelevanceFieldEnum = {
   discordUserID: 'discordUserID',
   channelId: 'channelId',
   channelName: 'channelName',
-    assignedUserId: 'assignedUserId',
-    statusName: 'statusName',
-    statusLabel: 'statusLabel'
+  assignedUserId: 'assignedUserId',
+  statusName: 'statusName',
+  statusLabel: 'statusLabel'
 };
 
 exports.Prisma.TicketStatusOrderByRelevanceFieldEnum = {
-    name: 'name',
-    label: 'label'
+  name: 'name',
+  label: 'label'
 };
 
 exports.Prisma.ApikeyOrderByRelevanceFieldEnum = {
@@ -461,20 +461,20 @@ exports.Prisma.JwksOrderByRelevanceFieldEnum = {
 };
 
 exports.Prisma.RouteProtectionOrderByRelevanceFieldEnum = {
-    id: 'id',
-    route: 'route',
-    roleProtection: 'roleProtection'
+  id: 'id',
+  route: 'route',
+  roleProtection: 'roleProtection'
 };
 
 exports.Prisma.PasskeyOrderByRelevanceFieldEnum = {
-    id: 'id',
-    name: 'name',
-    publicKey: 'publicKey',
-    userId: 'userId',
-    credentialID: 'credentialID',
-    deviceType: 'deviceType',
-    transports: 'transports',
-    aaguid: 'aaguid'
+  id: 'id',
+  name: 'name',
+  publicKey: 'publicKey',
+  userId: 'userId',
+  credentialID: 'credentialID',
+  deviceType: 'deviceType',
+  transports: 'transports',
+  aaguid: 'aaguid'
 };
 
 
@@ -493,11 +493,11 @@ exports.Prisma.ModelName = {
   RoleSlot: 'RoleSlot',
   EventRegistration: 'EventRegistration',
   Ticket: 'Ticket',
-    TicketStatus: 'TicketStatus',
+  TicketStatus: 'TicketStatus',
   Apikey: 'Apikey',
-    Jwks: 'Jwks',
-    RouteProtection: 'RouteProtection',
-    Passkey: 'Passkey'
+  Jwks: 'Jwks',
+  RouteProtection: 'RouteProtection',
+  Passkey: 'Passkey'
 };
 
 /**

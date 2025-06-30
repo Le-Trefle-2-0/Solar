@@ -4,7 +4,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCircle} from "@fortawesome/free-solid-svg-icons";
 import GifPicker from "gif-picker-react";
 import EmojiPicker, {EmojiStyle} from "emoji-picker-react";
-import {Laugh, PhoneCall, Send, TvMinimalPlay} from "lucide-react";
+import {Bot, Laugh, PhoneCall, Send, TvMinimalPlay} from "lucide-react";
 import {FormEvent, useEffect, useRef, useState} from "react";
 import {Msg} from "@/lib/interface";
 import {z, ZodError} from "zod";
@@ -48,7 +48,8 @@ export function Chat(props: { channelID: string }) {
             author: {
                 id: session?.user.id as string,
                 name: session?.user.displayUsername as string || session?.user.name as string,
-                image: session?.user.image as string
+                image: session?.user.image as string,
+                role: session?.user.role as string,
             },
             timestamp: Date.now(),
             channel: {
@@ -224,6 +225,10 @@ export function Chat(props: { channelID: string }) {
 
     const tenorGifRegex = /^https:\/\/media\.tenor\.com\/[A-Za-z0-9_-]+\/[A-Za-z0-9_-]+\.gif$/;
 
+    const roleColor = {
+        bot: "font-semibold text-sm text-gray-900 flex flex-row gap-3"
+    }
+
     return (
         <div className="flex flex-col h-screen p-3 gap-4 w-full" onKeyDown={(e) => {
             if (!nonChar.includes(e.key) && !gifOpen) {
@@ -238,8 +243,12 @@ export function Chat(props: { channelID: string }) {
                                height={48} className="rounded-xl max-h-[48px]"/>
                         <div>
                             <div className="flex flex-row items-center gap-4">
-                                <span className="font-semibold text-sm text-gray-900">
+                                <span
+                                    className={author.role == 'bot' ? "font-semibold text-sm text-blue-800 flex flex-row gap-3" : "font-semibold text-sm text-gray-900 flex flex-row gap-3"}>
                                     {author.name}
+                                    {
+                                        author.role == "bot" ? <Bot className="-translate-y-1"/> : null
+                                    }
                                 </span>
                                 <span className="font-light text-sm text-gray-900">
                                     {new Date(timestamp).toLocaleString('fr-FR')}

@@ -84,7 +84,7 @@ export type EventRegistration = $Result.DefaultSelection<Prisma.$EventRegistrati
 export type Ticket = $Result.DefaultSelection<Prisma.$TicketPayload>
 /**
  * Model TicketStatus
- *
+ * 
  */
 export type TicketStatus = $Result.DefaultSelection<Prisma.$TicketStatusPayload>
 /**
