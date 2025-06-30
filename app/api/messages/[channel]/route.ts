@@ -69,6 +69,7 @@ export async function POST(req: NextRequest) {
             id: z.string(),
             name: z.string(),
             image: z.string(),
+            role: z.string(),
         }),
         content: z.string(),
         timestamp: z.number(),

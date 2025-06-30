@@ -3,6 +3,7 @@ export interface Msg {
         id: string;
         name: string;
         image: string;
+        role: string;
     },
     content: string;
     timestamp: number;
