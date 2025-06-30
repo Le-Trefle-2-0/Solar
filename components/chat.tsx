@@ -4,7 +4,17 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCircle} from "@fortawesome/free-solid-svg-icons";
 import GifPicker from "gif-picker-react";
 import EmojiPicker, {EmojiStyle} from "emoji-picker-react";
-import {Bot, Laugh, PhoneCall, Send, TvMinimalPlay} from "lucide-react";
+import {
+    Bot,
+    Check,
+    ChevronsUpDown,
+    Laugh,
+    MessageCircleOff,
+    PhoneCall,
+    Send,
+    TvMinimalPlay,
+    UserRoundPlus
+} from "lucide-react";
 import {FormEvent, useEffect, useRef, useState} from "react";
 import {Msg} from "@/lib/interface";
 import {z, ZodError} from "zod";
@@ -13,6 +23,24 @@ import {saveMessage} from "@/lib/messageManager";
 import {useSession} from "@/lib/auth-client";
 import {io, Socket} from "socket.io-client";
 import Peer from "peerjs";
+import {Button} from "@/components/ui";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import {zodResolver} from "@hookform/resolvers/zod"
+import {useForm} from "react-hook-form"
+import {cn} from "@/lib/utils"
+import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,} from "@/components/ui/command"
+import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form"
+import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover"
 
 export function Chat(props: { channelID: string }) {
     const channelID = props.channelID;
@@ -225,8 +253,29 @@ export function Chat(props: { channelID: string }) {
 
     const tenorGifRegex = /^https:\/\/media\.tenor\.com\/[A-Za-z0-9_-]+\/[A-Za-z0-9_-]+\.gif$/;
 
-    const roleColor = {
-        bot: "font-semibold text-sm text-gray-900 flex flex-row gap-3"
+    const FormSchema = z.object({
+        volunteer: z.string({
+            required_error: "Merci de sélectionner un Bénévole Écoutant",
+        }),
+    });
+
+    const available = [
+        {label: "BE1", value: "ID1"},
+        {label: "BE2", value: "ID2"},
+    ] as const
+
+    const form = useForm<z.infer<typeof FormSchema>>({
+        resolver: zodResolver(FormSchema),
+    });
+
+    function onSubmit(data: z.infer<typeof FormSchema>) {
+        toast("You submitted the following values", {
+            description: (
+                <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
+          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+        </pre>
+            ),
+        })
     }
 
     return (
@@ -298,8 +347,119 @@ export function Chat(props: { channelID: string }) {
             </div>
 
             {channelID !== "1" ?
-                <div className="fixed top-6 right-6">
-                    <PhoneCall color={callColor} onClick={handleCall}/>
+                <div className="fixed top-6 right-6 flex flex-row gap-2">
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button variant="outline">
+                                <UserRoundPlus/> Attribuer
+                            </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Merci de choisir le bénévole à attribuer</AlertDialogTitle>
+                            </AlertDialogHeader>
+                            <Form {...form}>
+                                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                                    <FormField
+                                        control={form.control}
+                                        name="volunteer"
+                                        render={({field}) => (
+                                            <FormItem className="flex flex-col">
+                                                <FormLabel>Bénévole Écoutant</FormLabel>
+                                                <Popover>
+                                                    <PopoverTrigger asChild>
+                                                        <FormControl>
+                                                            <Button
+                                                                variant="outline"
+                                                                role="combobox"
+                                                                className={cn(
+                                                                    "w-[350px] justify-between",
+                                                                    !field.value && "text-muted-foreground"
+                                                                )}
+                                                            >
+                                                                {field.value
+                                                                    ? available.find(
+                                                                        (available) => available.value === field.value
+                                                                    )?.label
+                                                                    : "Sélectionner le bénévole"}
+                                                                <ChevronsUpDown className="opacity-50"/>
+                                                            </Button>
+                                                        </FormControl>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="w-[350px] p-0">
+                                                        <Command>
+                                                            <CommandInput
+                                                                placeholder="Rechercher un bénévole..."
+                                                                className="h-9"
+                                                            />
+                                                            <CommandList>
+                                                                <CommandEmpty>Aucun bénévole trouvé</CommandEmpty>
+                                                                <CommandGroup>
+                                                                    {available.map((available) => (
+                                                                        <CommandItem
+                                                                            value={available.label}
+                                                                            key={available.value}
+                                                                            onSelect={() => {
+                                                                                form.setValue("volunteer", available.value)
+                                                                            }}
+                                                                        >
+                                                                            {available.label}
+                                                                            <Check
+                                                                                className={cn(
+                                                                                    "ml-auto",
+                                                                                    available.value === field.value
+                                                                                        ? "opacity-100"
+                                                                                        : "opacity-0"
+                                                                                )}
+                                                                            />
+                                                                        </CommandItem>
+                                                                    ))}
+                                                                </CommandGroup>
+                                                            </CommandList>
+                                                        </Command>
+                                                    </PopoverContent>
+                                                </Popover>
+                                                <FormDescription>
+                                                    Le bénévole aura ensuite accès à l'écoute
+                                                </FormDescription>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                        <Button type="submit">Submit</Button>
+                                    </AlertDialogFooter>
+                                </form>
+                            </Form>
+                        </AlertDialogContent>
+                    </AlertDialog>
+
+                    <Button variant='outline' color={callColor} onClick={handleCall}>
+                        <PhoneCall color={callColor}/> Démarrer un vocal
+                    </Button>
+
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button variant="destructive">
+                                <MessageCircleOff/> Fermer l'écoute
+                            </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Attention, êtes vous certain ?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    La fermeture d'une écoute est irréversible. Pour simplement retourner au chat de
+                                    permanence merci d'utiliser l'onglet latéral.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                <AlertDialogAction>Fermer l'écoute</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
                 </div> : null
             }
 
