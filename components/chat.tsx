@@ -237,33 +237,58 @@ export function Chat(props: { channelID: string }) {
         }} tabIndex={0} ref={rootDivRef}>
             <video className='w-0 h-0' playsInline ref={callingVideoRef} autoPlay/>
             <div className="flex flex-col flex-grow overflow-y-auto gap-6">
-                {chat.map(({author, content, timestamp}, key) => (
-                    <div className="w-full flex flex-row gap-2" key={key}>
-                        <Image src={(author.image ? author.image : '/logo.svg')} alt="Image de profil" width={48}
-                               height={48} className="rounded-xl max-h-[48px]"/>
-                        <div>
-                            <div className="flex flex-row items-center gap-4">
-                                <span
-                                    className={author.role == 'bot' ? "font-semibold text-sm text-blue-800 flex flex-row gap-3" : "font-semibold text-sm text-gray-900 flex flex-row gap-3"}>
-                                    {author.name}
-                                    {
-                                        author.role == "bot" ? <Bot className="-translate-y-1"/> : null
-                                    }
-                                </span>
-                                <span className="font-light text-sm text-gray-900">
-                                    {new Date(timestamp).toLocaleString('fr-FR')}
-                                </span>
-                            </div>
-                            <h3 className="text-lg text-gray-900 whitespace-pre-wrap">
-                                {
-                                    tenorGifRegex.test(content) ?
-                                        <Image src={content} alt={"gif"} height={256} width={256} unoptimized/> :
+                {chat.map(({author, content, timestamp}, key) => {
+                    const showAuthorInfo = key === 0 || chat[key - 1].author.id !== author.id;
+
+                    return (
+                        <div className="w-full flex flex-row gap-2" key={key}>
+                            {showAuthorInfo && (
+                                <Image
+                                    src={author.image ? author.image : '/logo.svg'}
+                                    alt="Image de profil"
+                                    width={48}
+                                    height={48}
+                                    className="rounded-xl max-h-[48px]"
+                                />
+                            )}
+                            <div className={!showAuthorInfo ? "ml-14" : ""}>
+                                {showAuthorInfo && (
+                                    <div className="flex flex-row items-center gap-4">
+                        <span
+                            className={
+                                author.role === 'bot'
+                                    ? "font-semibold text-sm text-blue-800 flex flex-row gap-3"
+                                    : "font-semibold text-sm text-gray-900 flex flex-row gap-3"
+                            }
+                        >
+                            {author.name}
+                            {author.role === "bot" && <Bot className="-translate-y-1"/>}
+                        </span>
+                                        <span className="font-light text-sm text-gray-900">
+                            {new Date(timestamp).toLocaleString('fr-FR')}
+                        </span>
+                                    </div>
+                                )}
+                                <h3 className="text-lg text-gray-900 whitespace-pre-wrap break-words max-w-full">
+                                    {tenorGifRegex.test(content) ? (
+                                        <Image
+                                            src={content}
+                                            alt="gif"
+                                            height={256}
+                                            width={256}
+                                            unoptimized
+                                        />
+                                    ) : (
                                         content
-                                }
-                            </h3>
+                                    )}
+                                </h3>
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
+
+
+
                 <div ref={messagesListRef} className="h-px"/>
             </div>
             <div className={showTyping ? 'flex flex-row gap-1 relative left-2 bottom-3' : 'hidden'}>
