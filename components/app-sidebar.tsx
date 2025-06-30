@@ -63,7 +63,6 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
                     url: '/app/ticket/' + ticket.channelId,
                     icon: MessageSquareLock
                 }));
-                console.log([...baseData, ...items])
                 setData(data => [...baseData, ...items]);
             })
             .catch(err => console.error('Failed to load tickets:', err));
