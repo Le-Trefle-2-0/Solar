@@ -16,7 +16,7 @@ import {
     UserRoundPlus
 } from "lucide-react";
 import {FormEvent, useEffect, useRef, useState} from "react";
-import {Msg} from "@/lib/interface";
+import {formVolunteer, Msg} from "@/lib/interface";
 import {z, ZodError} from "zod";
 import {toast} from "sonner";
 import {saveMessage} from "@/lib/messageManager";
@@ -62,6 +62,7 @@ export function Chat(props: { channelID: string }) {
     const [idToCall, setIdToCall] = useState('');
     const [localStream, setLocalStream] = useState<MediaStream | null>(null);
     const [callColor, setCallColor] = useState<string>("#000");
+    const [available, setAvailable] = useState<formVolunteer[]>([]);
 
     const messageSchema = z
         .string()
@@ -165,6 +166,17 @@ export function Chat(props: { channelID: string }) {
             .then(data => {
                 setChannelName(data.name)
             })
+        fetch(`/api/events/getAvailable`)
+            .then(res => res.json())
+            .then(data => {
+                setAvailable(prevAvailable => [
+                    ...prevAvailable,
+                    ...data.map((user: { name: any; id: any; }) => ({
+                        label: user.name,
+                        value: user.id
+                    }))
+                ]);
+            })
         fetch("/api/auth/token").then(async res => {
             const body = await res.json();
             if (body.token) {
@@ -198,6 +210,11 @@ export function Chat(props: { channelID: string }) {
         return () => {
         }
     }, []);
+
+    useEffect(() => {
+        // This effect will log the updated `available` array whenever it changes
+        console.log(available);
+    }, [available]);
 
     const nonChar = [
         // Navigation
@@ -259,11 +276,6 @@ export function Chat(props: { channelID: string }) {
         }),
     });
 
-    const available = [
-        {label: "BE1", value: "ID1"},
-        {label: "BE2", value: "ID2"},
-    ] as const
-
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
     });
@@ -280,9 +292,9 @@ export function Chat(props: { channelID: string }) {
 
     return (
         <div className="flex flex-col h-screen p-3 gap-4 w-full" onKeyDown={(e) => {
-            if (!nonChar.includes(e.key) && !gifOpen) {
-                textRef.current?.focus();
-            }
+            // if (!nonChar.includes(e.key) && !gifOpen) {
+            //     textRef.current?.focus();
+            // }
         }} tabIndex={0} ref={rootDivRef}>
             <video className='w-0 h-0' playsInline ref={callingVideoRef} autoPlay/>
             <div className="flex flex-col flex-grow overflow-y-auto gap-6">
@@ -429,7 +441,9 @@ export function Chat(props: { channelID: string }) {
 
                                     <AlertDialogFooter>
                                         <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                        <Button type="submit">Submit</Button>
+                                        <AlertDialogAction asChild>
+                                            <Button type="submit">Valider</Button>
+                                        </AlertDialogAction>
                                     </AlertDialogFooter>
                                 </form>
                             </Form>
