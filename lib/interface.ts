@@ -17,6 +17,14 @@ export interface formVolunteer {
     value: string,
 }
 
+export interface DisplayAccount {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    username?: string;
+}
+
 export type RoleSlotInput = {
     role: string;
     goalCount: number;

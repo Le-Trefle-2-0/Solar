@@ -1,7 +1,7 @@
 "use client"
 import * as React from "react"
 import {useEffect, useRef, useState} from "react"
-import {CalendarDays, House, MessageSquareLock, MessagesSquare} from "lucide-react"
+import {CalendarDays, House, MessageSquareLock, MessagesSquare, ShieldUser} from "lucide-react"
 import {NavProjects} from "@/components/nav-projects"
 import {
     Sidebar,
@@ -34,6 +34,11 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
             url: "/app/planning",
             icon: CalendarDays,
         },
+        {
+            name: "Administration",
+            url: "/app/admin",
+            icon: ShieldUser
+        },
     ]
     const [data, setData] = useState([
         {
@@ -50,6 +55,11 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
             name: "Planning",
             url: "/app/planning",
             icon: CalendarDays,
+        },
+        {
+            name: "Administration",
+            url: "/app/admin",
+            icon: ShieldUser
         },
     ]);
     const socketRef = useRef<Socket | null>(null);
