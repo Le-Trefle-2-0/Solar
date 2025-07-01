@@ -12,6 +12,11 @@ export interface Msg {
     }
 }
 
+export interface formVolunteer {
+    label: string,
+    value: string,
+}
+
 export type RoleSlotInput = {
     role: string;
     goalCount: number;
