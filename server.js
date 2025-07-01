@@ -118,6 +118,8 @@ app.prepare().then(() => {
         })
     });
 
+    global.io = io;
+
     httpsServer
         .once("error", (err) => {
             console.error(err);
