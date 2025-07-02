@@ -21,108 +21,108 @@ import {
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {Input} from "@/components/ui/input";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table";
 import {DisplayAccount} from "@/lib/interface";
+import {useRouter} from "next/navigation";
 
-export const columns: ColumnDef<DisplayAccount>[] = [
-    {
-        id: "select",
-        header: ({table}) => (
-            <Checkbox
-                checked={
-                    table.getIsAllPageRowsSelected() ||
-                    (table.getIsSomePageRowsSelected() && "indeterminate")
-                }
-                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                aria-label="Select all"
-            />
-        ),
-        cell: ({row}) => (
-            <Checkbox
-                checked={row.getIsSelected()}
-                onCheckedChange={(value) => row.toggleSelected(!!value)}
-                aria-label="Select row"
-            />
-        ),
-        enableSorting: false,
-        enableHiding: false,
-    },
-    {
-        accessorKey: "name",
-        header: ({column}) => {
-            return (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Nom
-                    <ArrowUpDown/>
-                </Button>
-            );
-        },
-        cell: ({row}) => <div>{row.getValue("name")}</div>,
-    },
-    {
-        accessorKey: "username",
-        header: ({column}) => {
-            return (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Pseudo
-                    <ArrowUpDown/>
-                </Button>
-            );
-        },
-        cell: ({row}) => <div>{row.getValue("username") || 'Non défini'}</div>,
-    },
-    {
-        accessorKey: "email",
-        header: "Email",
-        cell: ({row}) => <div className="lowercase">{row.getValue("email")}</div>,
-    },
-    {
-        accessorKey: "role",
-        header: () => <div className="text-right">Role</div>,
-        cell: ({row}) => {
-            return <div className="text-right">{row.getValue("role")}</div>;
-        },
-    },
-    {
-        id: "actions",
-        enableHiding: false,
-        cell: ({row}) => {
-            const account = row.original;
-            return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Ouvrir le menu</span>
-                            <MoreHorizontal/>
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>Voir le profil</DropdownMenuItem>
-                        <DropdownMenuItem>Voir l'historique d'écoute</DropdownMenuItem>
-                        <DropdownMenuSeparator/>
-                        <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(account.id)}
-                        >
-                            Copier l'identifiant
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            );
-        },
-    },
-];
+// export const columns: ColumnDef<DisplayAccount>[] = [
+//     {
+//         id: "select",
+//         header: ({table}) => (
+//             <Checkbox
+//                 checked={
+//                     table.getIsAllPageRowsSelected() ||
+//                     (table.getIsSomePageRowsSelected() && "indeterminate")
+//                 }
+//                 onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+//                 aria-label="Select all"
+//             />
+//         ),
+//         cell: ({row}) => (
+//             <Checkbox
+//                 checked={row.getIsSelected()}
+//                 onCheckedChange={(value) => row.toggleSelected(!!value)}
+//                 aria-label="Select row"
+//             />
+//         ),
+//         enableSorting: false,
+//         enableHiding: false,
+//     },
+//     {
+//         accessorKey: "name",
+//         header: ({column}) => {
+//             return (
+//                 <Button
+//                     variant="ghost"
+//                     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+//                 >
+//                     Nom
+//                     <ArrowUpDown/>
+//                 </Button>
+//             );
+//         },
+//         cell: ({row}) => <div>{row.getValue("name")}</div>,
+//     },
+//     {
+//         accessorKey: "username",
+//         header: ({column}) => {
+//             return (
+//                 <Button
+//                     variant="ghost"
+//                     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+//                 >
+//                     Pseudo
+//                     <ArrowUpDown/>
+//                 </Button>
+//             );
+//         },
+//         cell: ({row}) => <div>{row.getValue("username") || 'Non défini'}</div>,
+//     },
+//     {
+//         accessorKey: "email",
+//         header: "Email",
+//         cell: ({row}) => <div className="lowercase">{row.getValue("email")}</div>,
+//     },
+//     {
+//         accessorKey: "role",
+//         header: () => <div className="text-right">Role</div>,
+//         cell: ({row}) => {
+//             return <div className="text-right">{row.getValue("role")}</div>;
+//         },
+//     },
+//     {
+//         id: "actions",
+//         enableHiding: false,
+//         cell: ({row}) => {
+//             const account = row.original;
+//             return (
+//                 <DropdownMenu>
+//                     <DropdownMenuTrigger asChild>
+//                         <Button variant="ghost" className="h-8 w-8 p-0">
+//                             <span className="sr-only">Ouvrir le menu</span>
+//                             <MoreHorizontal/>
+//                         </Button>
+//                     </DropdownMenuTrigger>
+//                     <DropdownMenuContent align="end">
+//                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
+//                         <DropdownMenuItem onClick={() => router.push(`/app/admin/user/${account.id}`)}>Voir le profil</DropdownMenuItem>
+//                         <DropdownMenuItem>Voir l'historique d'écoute</DropdownMenuItem>
+//                         <DropdownMenuSeparator/>
+//                         <DropdownMenuItem
+//                             onClick={() => navigator.clipboard.writeText(account.id)}
+//                         >
+//                             Copier l'identifiant
+//                         </DropdownMenuItem>
+//                     </DropdownMenuContent>
+//                 </DropdownMenu>
+//             );
+//         },
+//     },
+// ];
 
 interface DataTableProps {
     data: DisplayAccount[];
@@ -133,9 +133,105 @@ export function DataTable({data}: DataTableProps) {
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
         []
     );
+    const router = useRouter();
     const [columnVisibility, setColumnVisibility] =
         React.useState<VisibilityState>({});
     const [rowSelection, setRowSelection] = React.useState({});
+    const columns: ColumnDef<DisplayAccount>[] = [
+        {
+            id: "select",
+            header: ({table}) => (
+                <Checkbox
+                    checked={
+                        table.getIsAllPageRowsSelected() ||
+                        (table.getIsSomePageRowsSelected() && "indeterminate")
+                    }
+                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                    aria-label="Select all"
+                />
+            ),
+            cell: ({row}) => (
+                <Checkbox
+                    checked={row.getIsSelected()}
+                    onCheckedChange={(value) => row.toggleSelected(!!value)}
+                    aria-label="Select row"
+                />
+            ),
+            enableSorting: false,
+            enableHiding: false,
+        },
+        {
+            accessorKey: "name",
+            header: ({column}) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    >
+                        Nom
+                        <ArrowUpDown/>
+                    </Button>
+                );
+            },
+            cell: ({row}) => <div>{row.getValue("name")}</div>,
+        },
+        {
+            accessorKey: "username",
+            header: ({column}) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    >
+                        Pseudo
+                        <ArrowUpDown/>
+                    </Button>
+                );
+            },
+            cell: ({row}) => <div>{row.getValue("username") || 'Non défini'}</div>,
+        },
+        {
+            accessorKey: "email",
+            header: "Email",
+            cell: ({row}) => <div className="lowercase">{row.getValue("email")}</div>,
+        },
+        {
+            accessorKey: "role",
+            header: () => <div className="text-right">Role</div>,
+            cell: ({row}) => {
+                return <div className="text-right">{row.getValue("role")}</div>;
+            },
+        },
+        {
+            id: "actions",
+            enableHiding: false,
+            cell: ({row}) => {
+                const account = row.original;
+                return (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Ouvrir le menu</span>
+                                <MoreHorizontal/>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            {/*<DropdownMenuLabel>Actions</DropdownMenuLabel>*/}
+                            <DropdownMenuItem onClick={() => router.push(`/app/admin/user/${account.id}`)}>Voir le
+                                profil</DropdownMenuItem>
+                            <DropdownMenuItem>Voir l'historique d'écoute</DropdownMenuItem>
+                            <DropdownMenuSeparator/>
+                            <DropdownMenuItem
+                                onClick={() => navigator.clipboard.writeText(account.id)}
+                            >
+                                Copier l'identifiant
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                );
+            },
+        },
+    ];
 
     const table = useReactTable({
         data,
