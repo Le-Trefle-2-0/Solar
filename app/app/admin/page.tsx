@@ -12,7 +12,6 @@ async function getData(): Promise<DisplayAccount[]> {
         email: acc.email,
         role: acc.role as string,
     }))
-    console.log(accMap)
     return accMap;
 }
 
