@@ -12,9 +12,23 @@ import {
 import {locale} from "@/app/auth/[pathname]/view";
 import {CircleX} from "lucide-react";
 import {useRouter} from "next/navigation";
+import {useEffect} from "react";
 
 export default function SettingsPage() {
     const router = useRouter();
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                router.back();
+            }
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [router]);
+
     return (
         <div className="flex justify-center py-12 px-4">
             <div className="fixed top-6 right-6 cursor-pointer" onClick={() => router.back()}>
