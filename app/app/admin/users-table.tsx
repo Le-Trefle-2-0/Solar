@@ -183,7 +183,8 @@ export function UsersTable({data}: DataTableProps) {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuItem>Voir le profil</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => router.push(`/app/admin/user/${account.id}`)}>Voir le
+                                    profil</DropdownMenuItem>
                                 <DropdownMenuItem>Voir l'historique d'écoute</DropdownMenuItem>
                                 <DropdownMenuSeparator/>
                                 <DropdownMenuItem
