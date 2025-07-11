@@ -1,3 +1,4 @@
+"use client";
 import {
     APIKeysCard,
     ChangeEmailCard,
@@ -9,11 +10,17 @@ import {
     UpdateUsernameCard
 } from "@daveyplate/better-auth-ui"
 import {locale} from "@/app/auth/[pathname]/view";
+import {CircleX} from "lucide-react";
+import {useRouter} from "next/navigation";
 
 export default function SettingsPage() {
+    const router = useRouter();
     return (
         <div className="flex justify-center py-12 px-4">
-            <div className="flex flex-col gap-6 w-full mx-auto py-12 px-4">
+            <div className="fixed top-6 right-6 cursor-pointer" onClick={() => router.back()}>
+                <CircleX color="#202020"/>
+            </div>
+            <div className="flex flex-col gap-6 w-full mx-auto p-12">
                 <UpdateAvatarCard localization={locale}/>
                 <UpdateUsernameCard localization={locale}/>
                 <ChangeEmailCard localization={locale}/>

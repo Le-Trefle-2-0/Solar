@@ -23,7 +23,7 @@ export function Providers({children}: { children: ReactNode }) {
             }}
             Link={Link}
             settings={{
-                url: "/app/settings"
+                url: "/settings"
             }}
             additionalFields={{
                 newsletter: {
