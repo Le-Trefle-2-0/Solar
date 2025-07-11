@@ -22,6 +22,7 @@ import {
     IdCardLanyard,
     MoreHorizontal,
     Trash,
+    UserPen,
     UserPlus
 } from "lucide-react";
 import {Button} from "@/components/ui/button";
@@ -170,7 +171,55 @@ export function UsersTable({data}: DataTableProps) {
             enableHiding: false,
             cell: ({row}) => {
                 const account = row.original;
-                const [dialogOpen, setDialogOpen] = useState(false);
+                const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+                const [editDialogOpen, setEditDialogOpen] = useState(false);
+
+                const roles = [
+                    {label: "Responsable de pôle/Admin", value: "admin"},
+                    {label: "Référent Bénévoles Écoutants", value: "manager"},
+                    {label: "Bénévole en Formation", value: "training"},
+                    {label: "Bénévole Écoutant", value: "volunteer"},
+                ] as const
+                const FormSchema = z.object({
+                    role: z.enum(["admin", "manager", "training", "volunteer"]),
+                });
+
+                async function onSubmit(formData: z.infer<typeof FormSchema>) {
+                    const user = await authClient.admin.setRole({
+                        userId: account.id,
+                        role: formData.role,
+                    });
+
+                    if (user.error) return toast("Erreur lors de la création", {
+                        description: (
+                            <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
+                              <code className="text-white">{JSON.stringify(user.error)}</code>
+                            </pre>
+                        )
+                    })
+
+                    const userData = user.data.user;
+                    setUsers((prev) =>
+                        prev.map((u) =>
+                            u.id === userData.id
+                                ? {
+                                    ...u,
+                                    role: userData.role as string,
+                                }
+                                : u
+                        )
+                    );
+
+                    setDialogOpen(false);
+                    form.reset();
+                }
+
+                const form = useForm<z.infer<typeof FormSchema>>({
+                    resolver: zodResolver(FormSchema),
+                    defaultValues: {
+                        role: account.role as ("admin" | "manager" | "training" | "volunteer"),
+                    },
+                });
 
                 return (
                     <>
@@ -193,13 +242,17 @@ export function UsersTable({data}: DataTableProps) {
                                     <IdCardLanyard/> Copier l'identifiant
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator/>
-                                <DropdownMenuItem onClick={() => setDialogOpen(true)}>
+                                <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                                    <UserPen/> Modifier le rôle
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)}
+                                                  className="text-destructive">
                                     <Trash/> Supprimer l'utilisateur
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
 
-                        <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
                             <AlertDialogContent>
                                 <AlertDialogHeader>
                                     <AlertDialogTitle>Êtes-vous sûr de supprimer le compte
@@ -224,6 +277,80 @@ export function UsersTable({data}: DataTableProps) {
                                 </AlertDialogFooter>
                             </AlertDialogContent>
                         </AlertDialog>
+
+                        <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+                            <DialogContent className="sm:max-w-[425px]">
+                                <DialogHeader>
+                                    <DialogTitle>Modifier le rôle de {account.name}</DialogTitle>
+                                </DialogHeader>
+                                <Form {...form}>
+                                    <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+                                        <div className="grid gap-3">
+                                            <FormField
+                                                control={form.control}
+                                                name="role"
+                                                render={({field}) => (
+                                                    <FormItem className="flex flex-col">
+                                                        <FormLabel>Rôle</FormLabel>
+                                                        <Popover>
+                                                            <PopoverTrigger asChild>
+                                                                <FormControl>
+                                                                    <Button
+                                                                        variant="outline"
+                                                                        role="combobox"
+                                                                        className={cn(
+                                                                            "w-full justify-between",
+                                                                            !field.value && "text-muted-foreground"
+                                                                        )}
+                                                                    >
+                                                                        {field.value
+                                                                            ? roles.find((role) => role.value === field.value)?.label
+                                                                            : "Sélectionner un rôle"}
+                                                                        <ChevronsUpDown className="opacity-50"/>
+                                                                    </Button>
+                                                                </FormControl>
+                                                            </PopoverTrigger>
+                                                            <PopoverContent className="w-full p-0">
+                                                                <Command>
+                                                                    <CommandList>
+                                                                        <CommandGroup>
+                                                                            {roles.map((role) => (
+                                                                                <CommandItem
+                                                                                    value={role.label}
+                                                                                    key={role.value}
+                                                                                    onSelect={() => {
+                                                                                        form.setValue("role", role.value);
+                                                                                    }}
+                                                                                >
+                                                                                    {role.label}
+                                                                                    <Check
+                                                                                        className={cn(
+                                                                                            "ml-auto",
+                                                                                            role.value === field.value ? "opacity-100" : "opacity-0"
+                                                                                        )}
+                                                                                    />
+                                                                                </CommandItem>
+                                                                            ))}
+                                                                        </CommandGroup>
+                                                                    </CommandList>
+                                                                </Command>
+                                                            </PopoverContent>
+                                                        </Popover>
+                                                        <FormMessage/>
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+                                        <DialogFooter>
+                                            <DialogClose asChild>
+                                                <Button variant="outline">Annuler</Button>
+                                            </DialogClose>
+                                            <Button type="submit" className="cursor-pointer">Enregistrer</Button>
+                                        </DialogFooter>
+                                    </form>
+                                </Form>
+                            </DialogContent>
+                        </Dialog>
                     </>
                 );
             },
