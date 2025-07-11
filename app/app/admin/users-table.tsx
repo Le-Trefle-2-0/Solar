@@ -211,6 +211,7 @@ export function UsersTable({data}: DataTableProps) {
                     );
 
                     setDialogOpen(false);
+                    toast("Rôle modifié")
                     form.reset();
                 }
 
