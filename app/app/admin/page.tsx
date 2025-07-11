@@ -1,4 +1,4 @@
-import {DataTable} from "./data-table"
+import {UsersTable} from "./users-table"
 import {DisplayAccount} from "@/lib/interface";
 import prisma from "@/lib/prisma";
 
@@ -11,17 +11,16 @@ async function getData(): Promise<DisplayAccount[]> {
         username: acc.username as string,
         email: acc.email,
         role: acc.role as string,
-    }))
-    console.log(accMap)
+    }));
     return accMap;
 }
 
-export default async function DemoPage() {
+export default async function Admin() {
     const data = await getData()
 
     return (
         <div className="container mx-auto p-6">
-            <DataTable data={data}/>
+            <UsersTable data={data}/>
         </div>
     )
 }
