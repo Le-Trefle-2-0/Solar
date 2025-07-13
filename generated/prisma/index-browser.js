@@ -257,7 +257,10 @@ exports.Prisma.TicketScalarFieldEnum = {
   updatedAt: 'updatedAt',
   assignedUserId: 'assignedUserId',
   statusName: 'statusName',
-  statusLabel: 'statusLabel'
+    statusLabel: 'statusLabel',
+    problematic: 'problematic',
+    observations: 'observations',
+    info: 'info'
 };
 
 exports.Prisma.TicketStatusScalarFieldEnum = {
@@ -435,7 +438,10 @@ exports.Prisma.TicketOrderByRelevanceFieldEnum = {
   channelName: 'channelName',
   assignedUserId: 'assignedUserId',
   statusName: 'statusName',
-  statusLabel: 'statusLabel'
+    statusLabel: 'statusLabel',
+    problematic: 'problematic',
+    observations: 'observations',
+    info: 'info'
 };
 
 exports.Prisma.TicketStatusOrderByRelevanceFieldEnum = {

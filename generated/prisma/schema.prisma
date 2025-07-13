@@ -202,18 +202,21 @@ model EventRegistration {
 }
 
 model Ticket {
-  id          Int          @id @default(autoincrement())
+  id           Int          @id @default(autoincrement())
   discordUserID  String
-  channelId   String?
-  channelName String?
-  channel     Channel?     @relation(fields: [channelId, channelName], references: [id, name], onDelete: Cascade)
+  channelId    String?      @unique
+  channelName  String?
+  channel      Channel?     @relation(fields: [channelId, channelName], references: [id, name], onDelete: Cascade)
   createdAt      DateTime
   updatedAt      DateTime
-  user        User?        @relation(fields: [assignedUserId], references: [id])
+  user         User?        @relation(fields: [assignedUserId], references: [id])
   assignedUserId String?
-  statusName  String
-  statusLabel String
-  status      TicketStatus @relation(fields: [statusName, statusLabel], references: [name, label])
+  statusName   String
+  statusLabel  String
+  status       TicketStatus @relation(fields: [statusName, statusLabel], references: [name, label])
+  problematic  String?
+  observations String?
+  info         String?
 }
 
 model TicketStatus {

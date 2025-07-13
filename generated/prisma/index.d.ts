@@ -15551,6 +15551,9 @@ export namespace Prisma {
     assignedUserId: string | null
       statusName: string | null
       statusLabel: string | null
+      problematic: string | null
+      observations: string | null
+      info: string | null
   }
 
   export type TicketMaxAggregateOutputType = {
@@ -15563,6 +15566,9 @@ export namespace Prisma {
     assignedUserId: string | null
       statusName: string | null
       statusLabel: string | null
+      problematic: string | null
+      observations: string | null
+      info: string | null
   }
 
   export type TicketCountAggregateOutputType = {
@@ -15575,6 +15581,9 @@ export namespace Prisma {
     assignedUserId: number
       statusName: number
       statusLabel: number
+      problematic: number
+      observations: number
+      info: number
     _all: number
   }
 
@@ -15597,6 +15606,9 @@ export namespace Prisma {
     assignedUserId?: true
       statusName?: true
       statusLabel?: true
+      problematic?: true
+      observations?: true
+      info?: true
   }
 
   export type TicketMaxAggregateInputType = {
@@ -15609,6 +15621,9 @@ export namespace Prisma {
     assignedUserId?: true
       statusName?: true
       statusLabel?: true
+      problematic?: true
+      observations?: true
+      info?: true
   }
 
   export type TicketCountAggregateInputType = {
@@ -15621,6 +15636,9 @@ export namespace Prisma {
     assignedUserId?: true
       statusName?: true
       statusLabel?: true
+      problematic?: true
+      observations?: true
+      info?: true
     _all?: true
   }
 
@@ -15718,6 +15736,9 @@ export namespace Prisma {
     assignedUserId: string | null
       statusName: string
       statusLabel: string
+      problematic: string | null
+      observations: string | null
+      info: string | null
     _count: TicketCountAggregateOutputType | null
     _avg: TicketAvgAggregateOutputType | null
     _sum: TicketSumAggregateOutputType | null
@@ -15749,6 +15770,9 @@ export namespace Prisma {
     assignedUserId?: boolean
       statusName?: boolean
       statusLabel?: boolean
+      problematic?: boolean
+      observations?: boolean
+      info?: boolean
     channel?: boolean | Ticket$channelArgs<ExtArgs>
     user?: boolean | Ticket$userArgs<ExtArgs>
       status?: boolean | TicketStatusDefaultArgs<ExtArgs>
@@ -15766,9 +15790,12 @@ export namespace Prisma {
     assignedUserId?: boolean
       statusName?: boolean
       statusLabel?: boolean
+      problematic?: boolean
+      observations?: boolean
+      info?: boolean
   }
 
-    export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "discordUserID" | "channelId" | "channelName" | "createdAt" | "updatedAt" | "assignedUserId" | "statusName" | "statusLabel", ExtArgs["result"]["ticket"]>
+    export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "discordUserID" | "channelId" | "channelName" | "createdAt" | "updatedAt" | "assignedUserId" | "statusName" | "statusLabel" | "problematic" | "observations" | "info", ExtArgs["result"]["ticket"]>
   export type TicketInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     channel?: boolean | Ticket$channelArgs<ExtArgs>
     user?: boolean | Ticket$userArgs<ExtArgs>
@@ -15792,6 +15819,9 @@ export namespace Prisma {
       assignedUserId: string | null
         statusName: string
         statusLabel: string
+        problematic: string | null
+        observations: string | null
+        info: string | null
     }, ExtArgs["result"]["ticket"]>
     composites: {}
   }
@@ -16173,6 +16203,9 @@ export namespace Prisma {
     readonly assignedUserId: FieldRef<"Ticket", 'String'>
         readonly statusName: FieldRef<"Ticket", 'String'>
         readonly statusLabel: FieldRef<"Ticket", 'String'>
+        readonly problematic: FieldRef<"Ticket", 'String'>
+        readonly observations: FieldRef<"Ticket", 'String'>
+        readonly info: FieldRef<"Ticket", 'String'>
   }
 
 
@@ -21659,7 +21692,10 @@ export namespace Prisma {
     updatedAt: 'updatedAt',
       assignedUserId: 'assignedUserId',
       statusName: 'statusName',
-      statusLabel: 'statusLabel'
+      statusLabel: 'statusLabel',
+      problematic: 'problematic',
+      observations: 'observations',
+      info: 'info'
   };
 
   export type TicketScalarFieldEnum = (typeof TicketScalarFieldEnum)[keyof typeof TicketScalarFieldEnum]
@@ -21900,7 +21936,10 @@ export namespace Prisma {
     channelName: 'channelName',
       assignedUserId: 'assignedUserId',
       statusName: 'statusName',
-      statusLabel: 'statusLabel'
+      statusLabel: 'statusLabel',
+      problematic: 'problematic',
+      observations: 'observations',
+      info: 'info'
   };
 
   export type TicketOrderByRelevanceFieldEnum = (typeof TicketOrderByRelevanceFieldEnum)[keyof typeof TicketOrderByRelevanceFieldEnum]
@@ -22936,6 +22975,9 @@ export namespace Prisma {
     assignedUserId?: StringNullableFilter<"Ticket"> | string | null
       statusName?: StringFilter<"Ticket"> | string
       statusLabel?: StringFilter<"Ticket"> | string
+      problematic?: StringNullableFilter<"Ticket"> | string | null
+      observations?: StringNullableFilter<"Ticket"> | string | null
+      info?: StringNullableFilter<"Ticket"> | string | null
     channel?: XOR<ChannelNullableScalarRelationFilter, ChannelWhereInput> | null
     user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
       status?: XOR<TicketStatusScalarRelationFilter, TicketStatusWhereInput>
@@ -22951,6 +22993,9 @@ export namespace Prisma {
     assignedUserId?: SortOrderInput | SortOrder
       statusName?: SortOrder
       statusLabel?: SortOrder
+      problematic?: SortOrderInput | SortOrder
+      observations?: SortOrderInput | SortOrder
+      info?: SortOrderInput | SortOrder
     channel?: ChannelOrderByWithRelationInput
     user?: UserOrderByWithRelationInput
       status?: TicketStatusOrderByWithRelationInput
@@ -22959,21 +23004,24 @@ export namespace Prisma {
 
   export type TicketWhereUniqueInput = Prisma.AtLeast<{
     id?: number
+      channelId?: string
     AND?: TicketWhereInput | TicketWhereInput[]
     OR?: TicketWhereInput[]
     NOT?: TicketWhereInput | TicketWhereInput[]
     discordUserID?: StringFilter<"Ticket"> | string
-    channelId?: StringNullableFilter<"Ticket"> | string | null
     channelName?: StringNullableFilter<"Ticket"> | string | null
     createdAt?: DateTimeFilter<"Ticket"> | Date | string
     updatedAt?: DateTimeFilter<"Ticket"> | Date | string
     assignedUserId?: StringNullableFilter<"Ticket"> | string | null
       statusName?: StringFilter<"Ticket"> | string
       statusLabel?: StringFilter<"Ticket"> | string
+      problematic?: StringNullableFilter<"Ticket"> | string | null
+      observations?: StringNullableFilter<"Ticket"> | string | null
+      info?: StringNullableFilter<"Ticket"> | string | null
     channel?: XOR<ChannelNullableScalarRelationFilter, ChannelWhereInput> | null
     user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
       status?: XOR<TicketStatusScalarRelationFilter, TicketStatusWhereInput>
-  }, "id">
+  }, "id" | "channelId">
 
   export type TicketOrderByWithAggregationInput = {
     id?: SortOrder
@@ -22985,6 +23033,9 @@ export namespace Prisma {
     assignedUserId?: SortOrderInput | SortOrder
       statusName?: SortOrder
       statusLabel?: SortOrder
+      problematic?: SortOrderInput | SortOrder
+      observations?: SortOrderInput | SortOrder
+      info?: SortOrderInput | SortOrder
     _count?: TicketCountOrderByAggregateInput
     _avg?: TicketAvgOrderByAggregateInput
     _max?: TicketMaxOrderByAggregateInput
@@ -23005,6 +23056,9 @@ export namespace Prisma {
     assignedUserId?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
       statusName?: StringWithAggregatesFilter<"Ticket"> | string
       statusLabel?: StringWithAggregatesFilter<"Ticket"> | string
+      problematic?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
+      observations?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
+      info?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
   }
 
     export type TicketStatusWhereInput = {
@@ -24338,6 +24392,9 @@ export namespace Prisma {
     discordUserID: string
     createdAt: Date | string
     updatedAt: Date | string
+      problematic?: string | null
+      observations?: string | null
+      info?: string | null
     channel?: ChannelCreateNestedOneWithoutTicketInput
     user?: UserCreateNestedOneWithoutTicketInput
       status: TicketStatusCreateNestedOneWithoutTicketInput
@@ -24353,12 +24410,18 @@ export namespace Prisma {
     assignedUserId?: string | null
       statusName: string
       statusLabel: string
+      problematic?: string | null
+      observations?: string | null
+      info?: string | null
   }
 
   export type TicketUpdateInput = {
     discordUserID?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+      problematic?: NullableStringFieldUpdateOperationsInput | string | null
+      observations?: NullableStringFieldUpdateOperationsInput | string | null
+      info?: NullableStringFieldUpdateOperationsInput | string | null
     channel?: ChannelUpdateOneWithoutTicketNestedInput
     user?: UserUpdateOneWithoutTicketNestedInput
       status?: TicketStatusUpdateOneRequiredWithoutTicketNestedInput
@@ -24374,6 +24437,9 @@ export namespace Prisma {
     assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
       statusName?: StringFieldUpdateOperationsInput | string
       statusLabel?: StringFieldUpdateOperationsInput | string
+      problematic?: NullableStringFieldUpdateOperationsInput | string | null
+      observations?: NullableStringFieldUpdateOperationsInput | string | null
+      info?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type TicketCreateManyInput = {
@@ -24386,12 +24452,18 @@ export namespace Prisma {
     assignedUserId?: string | null
       statusName: string
       statusLabel: string
+      problematic?: string | null
+      observations?: string | null
+      info?: string | null
   }
 
   export type TicketUpdateManyMutationInput = {
     discordUserID?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+      problematic?: NullableStringFieldUpdateOperationsInput | string | null
+      observations?: NullableStringFieldUpdateOperationsInput | string | null
+      info?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type TicketUncheckedUpdateManyInput = {
@@ -24404,6 +24476,9 @@ export namespace Prisma {
     assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
       statusName?: StringFieldUpdateOperationsInput | string
       statusLabel?: StringFieldUpdateOperationsInput | string
+      problematic?: NullableStringFieldUpdateOperationsInput | string | null
+      observations?: NullableStringFieldUpdateOperationsInput | string | null
+      info?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
     export type TicketStatusCreateInput = {
@@ -25681,6 +25756,9 @@ export namespace Prisma {
     assignedUserId?: SortOrder
       statusName?: SortOrder
       statusLabel?: SortOrder
+      problematic?: SortOrder
+      observations?: SortOrder
+      info?: SortOrder
   }
 
   export type TicketAvgOrderByAggregateInput = {
@@ -25697,6 +25775,9 @@ export namespace Prisma {
     assignedUserId?: SortOrder
       statusName?: SortOrder
       statusLabel?: SortOrder
+      problematic?: SortOrder
+      observations?: SortOrder
+      info?: SortOrder
   }
 
   export type TicketMinOrderByAggregateInput = {
@@ -25709,6 +25790,9 @@ export namespace Prisma {
     assignedUserId?: SortOrder
       statusName?: SortOrder
       statusLabel?: SortOrder
+      problematic?: SortOrder
+      observations?: SortOrder
+      info?: SortOrder
   }
 
   export type TicketSumOrderByAggregateInput = {
@@ -27632,6 +27716,9 @@ export namespace Prisma {
     discordUserID: string
     createdAt: Date | string
     updatedAt: Date | string
+      problematic?: string | null
+      observations?: string | null
+      info?: string | null
     channel?: ChannelCreateNestedOneWithoutTicketInput
       status: TicketStatusCreateNestedOneWithoutTicketInput
   }
@@ -27645,6 +27732,9 @@ export namespace Prisma {
     updatedAt: Date | string
       statusName: string
       statusLabel: string
+      problematic?: string | null
+      observations?: string | null
+      info?: string | null
   }
 
   export type TicketCreateOrConnectWithoutUserInput = {
@@ -28011,6 +28101,9 @@ export namespace Prisma {
     assignedUserId?: StringNullableFilter<"Ticket"> | string | null
       statusName?: StringFilter<"Ticket"> | string
       statusLabel?: StringFilter<"Ticket"> | string
+      problematic?: StringNullableFilter<"Ticket"> | string | null
+      observations?: StringNullableFilter<"Ticket"> | string | null
+      info?: StringNullableFilter<"Ticket"> | string | null
   }
 
   export type ApikeyUpsertWithWhereUniqueWithoutUserInput = {
@@ -28932,6 +29025,9 @@ export namespace Prisma {
     discordUserID: string
     createdAt: Date | string
     updatedAt: Date | string
+      problematic?: string | null
+      observations?: string | null
+      info?: string | null
     user?: UserCreateNestedOneWithoutTicketInput
       status: TicketStatusCreateNestedOneWithoutTicketInput
   }
@@ -28944,6 +29040,9 @@ export namespace Prisma {
     assignedUserId?: string | null
       statusName: string
       statusLabel: string
+      problematic?: string | null
+      observations?: string | null
+      info?: string | null
   }
 
   export type TicketCreateOrConnectWithoutChannelInput = {
@@ -29910,6 +30009,9 @@ export namespace Prisma {
         discordUserID: string
         createdAt: Date | string
         updatedAt: Date | string
+        problematic?: string | null
+        observations?: string | null
+        info?: string | null
         channel?: ChannelCreateNestedOneWithoutTicketInput
         user?: UserCreateNestedOneWithoutTicketInput
     }
@@ -29922,6 +30024,9 @@ export namespace Prisma {
         createdAt: Date | string
         updatedAt: Date | string
         assignedUserId?: string | null
+        problematic?: string | null
+        observations?: string | null
+        info?: string | null
     }
 
     export type TicketCreateOrConnectWithoutStatusInput = {
@@ -30280,6 +30385,9 @@ export namespace Prisma {
     updatedAt: Date | string
       statusName: string
       statusLabel: string
+      problematic?: string | null
+      observations?: string | null
+      info?: string | null
   }
 
   export type ApikeyCreateManyUserInput = {
@@ -30544,6 +30652,9 @@ export namespace Prisma {
     discordUserID?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+      problematic?: NullableStringFieldUpdateOperationsInput | string | null
+      observations?: NullableStringFieldUpdateOperationsInput | string | null
+      info?: NullableStringFieldUpdateOperationsInput | string | null
     channel?: ChannelUpdateOneWithoutTicketNestedInput
       status?: TicketStatusUpdateOneRequiredWithoutTicketNestedInput
   }
@@ -30557,6 +30668,9 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
       statusName?: StringFieldUpdateOperationsInput | string
       statusLabel?: StringFieldUpdateOperationsInput | string
+      problematic?: NullableStringFieldUpdateOperationsInput | string | null
+      observations?: NullableStringFieldUpdateOperationsInput | string | null
+      info?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type TicketUncheckedUpdateManyWithoutUserInput = {
@@ -30568,6 +30682,9 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
       statusName?: StringFieldUpdateOperationsInput | string
       statusLabel?: StringFieldUpdateOperationsInput | string
+      problematic?: NullableStringFieldUpdateOperationsInput | string | null
+      observations?: NullableStringFieldUpdateOperationsInput | string | null
+      info?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ApikeyUpdateWithoutUserInput = {
@@ -30757,6 +30874,9 @@ export namespace Prisma {
     assignedUserId?: string | null
       statusName: string
       statusLabel: string
+      problematic?: string | null
+      observations?: string | null
+      info?: string | null
   }
 
   export type MessageUpdateWithoutChannelInput = {
@@ -30783,6 +30903,9 @@ export namespace Prisma {
     discordUserID?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+      problematic?: NullableStringFieldUpdateOperationsInput | string | null
+      observations?: NullableStringFieldUpdateOperationsInput | string | null
+      info?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneWithoutTicketNestedInput
       status?: TicketStatusUpdateOneRequiredWithoutTicketNestedInput
   }
@@ -30795,6 +30918,9 @@ export namespace Prisma {
     assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
       statusName?: StringFieldUpdateOperationsInput | string
       statusLabel?: StringFieldUpdateOperationsInput | string
+      problematic?: NullableStringFieldUpdateOperationsInput | string | null
+      observations?: NullableStringFieldUpdateOperationsInput | string | null
+      info?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type TicketUncheckedUpdateManyWithoutChannelInput = {
@@ -30805,6 +30931,9 @@ export namespace Prisma {
     assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
       statusName?: StringFieldUpdateOperationsInput | string
       statusLabel?: StringFieldUpdateOperationsInput | string
+      problematic?: NullableStringFieldUpdateOperationsInput | string | null
+      observations?: NullableStringFieldUpdateOperationsInput | string | null
+      info?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type RoleSlotCreateManyEventInput = {
@@ -30897,12 +31026,18 @@ export namespace Prisma {
         createdAt: Date | string
         updatedAt: Date | string
         assignedUserId?: string | null
+        problematic?: string | null
+        observations?: string | null
+        info?: string | null
     }
 
     export type TicketUpdateWithoutStatusInput = {
         discordUserID?: StringFieldUpdateOperationsInput | string
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
         updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        problematic?: NullableStringFieldUpdateOperationsInput | string | null
+        observations?: NullableStringFieldUpdateOperationsInput | string | null
+        info?: NullableStringFieldUpdateOperationsInput | string | null
         channel?: ChannelUpdateOneWithoutTicketNestedInput
         user?: UserUpdateOneWithoutTicketNestedInput
     }
@@ -30915,6 +31050,9 @@ export namespace Prisma {
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
         updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
         assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
+        problematic?: NullableStringFieldUpdateOperationsInput | string | null
+        observations?: NullableStringFieldUpdateOperationsInput | string | null
+        info?: NullableStringFieldUpdateOperationsInput | string | null
     }
 
     export type TicketUncheckedUpdateManyWithoutStatusInput = {
@@ -30925,6 +31063,9 @@ export namespace Prisma {
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
         updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
         assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
+        problematic?: NullableStringFieldUpdateOperationsInput | string | null
+        observations?: NullableStringFieldUpdateOperationsInput | string | null
+        info?: NullableStringFieldUpdateOperationsInput | string | null
     }
 
 

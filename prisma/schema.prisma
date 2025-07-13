@@ -205,7 +205,7 @@ model EventRegistration {
 model Ticket {
   id             Int      @id @default(autoincrement())
   discordUserID  String
-  channelId   String?
+  channelId    String? @unique
   channelName String?
   channel     Channel? @relation(fields: [channelId, channelName], references: [id, name], onDelete: Cascade)
   createdAt      DateTime
@@ -215,6 +215,9 @@ model Ticket {
   statusName  String
   statusLabel String
   status      TicketStatus @relation(fields: [statusName, statusLabel], references: [name, label])
+  problematic  String?
+  observations String?
+  info         String?
 }
 
 model TicketStatus {
