@@ -15,7 +15,8 @@ async function getData(id: string): Promise<Tickets[]> {
         createdAt: new Date(ticket.createdAt),
         problematic: ticket.problematic,
         observations: ticket.observations,
-        info: ticket.info
+        info: ticket.info,
+        channelID: ticket.channelId as string,
     }));
 }
 

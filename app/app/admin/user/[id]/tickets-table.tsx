@@ -13,18 +13,20 @@ import {
     useReactTable,
     VisibilityState,
 } from "@tanstack/react-table";
-import {ArrowUpDown, ChevronDown} from "lucide-react";
+import {ArrowUpDown, ChevronDown, MoreHorizontal} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Checkbox} from "@/components/ui/checkbox";
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
+    DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {Input} from "@/components/ui/input";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table";
 import {Tickets} from "@/lib/interface";
+import {useRouter} from "next/navigation";
 
 interface DataTableProps {
     data: Tickets[];
@@ -38,6 +40,7 @@ export function TicketsTable({data}: DataTableProps) {
     const [columnVisibility, setColumnVisibility] =
         React.useState<VisibilityState>({});
     const [rowSelection, setRowSelection] = React.useState({});
+    const router = useRouter();
 
     const columns: ColumnDef<Tickets>[] = [
         {
@@ -93,43 +96,42 @@ export function TicketsTable({data}: DataTableProps) {
             cell: ({row}) => <div>{new Date(row.getValue("createdAt")).toLocaleDateString()}</div>,
         },
         {
-            accessorKey: "email",
-            header: "Email",
-            cell: ({row}) => <div className="lowercase">{row.getValue("email")}</div>,
+            accessorKey: "status",
+            header: "Status",
+            cell: ({row}) => <div className="lowercase text-right">{row.getValue("status")}</div>,
         },
-        // {
-        //     accessorKey: "role",
-        //     header: () => <div className="text-right">Role</div>,
-        //     cell: ({row}) => {
-        //         return <div className="text-right">{row.getValue("role")}</div>;
-        //     },
-        // },
-        // {
-        //     id: "actions",
-        //     enableHiding: false,
-        //     cell: ({row}) => {
-        //         const account = row.original;
-        //
-        //         return (
-        //             <>
-        //                 <DropdownMenu>
-        //                     <DropdownMenuTrigger asChild>
-        //                         <Button variant="ghost" className="h-8 w-8 p-0">
-        //                             <span className="sr-only">Ouvrir le menu</span>
-        //                             <MoreHorizontal/>
-        //                         </Button>
-        //                     </DropdownMenuTrigger>
-        //                     <DropdownMenuContent align="end">
-        //                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-        //                         <DropdownMenuItem>Voir le profil</DropdownMenuItem>
-        //                         <DropdownMenuItem>Voir l'historique d'écoute</DropdownMenuItem>
-        //                         <DropdownMenuSeparator/>
-        //                     </DropdownMenuContent>
-        //                 </DropdownMenu>
-        //             </>
-        //         );
-        //     },
-        // },
+        {
+            id: "actions",
+            enableHiding: false,
+            cell: ({row}) => {
+                const ticket = row.original;
+
+                return (
+                    <>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                    <span className="sr-only">Ouvrir le menu</span>
+                                    <MoreHorizontal/>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            {
+                                ticket.status == "Terminée" ?
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem>Consulter la transmission</DropdownMenuItem>
+                                        <DropdownMenuItem>Consulter le transcript</DropdownMenuItem>
+                                    </DropdownMenuContent> :
+                                    <DropdownMenuContent>
+                                        <DropdownMenuItem
+                                            onClick={() => router.push(`/app/ticket/${ticket.channelID}`)}>Voir
+                                            l'écoute</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                            }
+                        </DropdownMenu>
+                    </>
+                );
+            },
+        },
     ];
 
     const table = useReactTable({
