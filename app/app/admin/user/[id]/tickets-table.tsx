@@ -97,7 +97,7 @@ export function TicketsTable({data}: DataTableProps) {
         },
         {
             accessorKey: "status",
-            header: "Status",
+            header: () => <div className="text-right">Status</div>,
             cell: ({row}) => <div className="lowercase text-right">{row.getValue("status")}</div>,
         },
         {
