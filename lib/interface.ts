@@ -25,6 +25,15 @@ export interface DisplayAccount {
     username?: string;
 }
 
+export interface Tickets {
+    id: number;
+    status: string;
+    createdAt: Date;
+    problematic: string | null;
+    observations: string | null;
+    info: string | null;
+}
+
 export type RoleSlotInput = {
     role: string;
     goalCount: number;
