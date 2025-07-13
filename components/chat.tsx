@@ -212,7 +212,6 @@ export function Chat(props: { channelID: string }) {
     }, []);
 
     useEffect(() => {
-        // This effect will log the updated `available` array whenever it changes
         console.log(available);
     }, [available]);
 
@@ -280,13 +279,39 @@ export function Chat(props: { channelID: string }) {
         resolver: zodResolver(FormSchema),
     });
 
-    function onSubmit(data: z.infer<typeof FormSchema>) {
-        toast("You submitted the following values", {
-            description: (
-                <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-            ),
+    function assign(data: z.infer<typeof FormSchema>) {
+        fetch(`/api/tickets/findBy/channelID`, {
+            method: "POST",
+            body: JSON.stringify({
+                channelID: channelID,
+            }),
+        }).then(res => res.json()).then(res => {
+            if (!res.success) return toast("Erreur lors de l'assignement", {
+                description: (
+                    <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
+                      <code className="text-white">{JSON.stringify(res.error, null, 2)}</code>
+                    </pre>
+                ),
+            })
+            fetch(`/api/tickets/assign`, {
+                method: "POST",
+                body: JSON.stringify({
+                    ticketID: res.ticket.id,
+                    assignmentID: data.volunteer
+                }),
+            }).then(res => res.json()).then(res => {
+                if (res.success) {
+                    toast('Le bénévole a été assigné.')
+                } else {
+                    return toast("Erreur lors de l'assignement", {
+                        description: (
+                            <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
+                              <code className="text-white">{JSON.stringify(res.error, null, 2)}</code>
+                            </pre>
+                        ),
+                    })
+                }
+            })
         })
     }
 
@@ -371,7 +396,7 @@ export function Chat(props: { channelID: string }) {
                                 <AlertDialogTitle>Merci de choisir le bénévole à attribuer</AlertDialogTitle>
                             </AlertDialogHeader>
                             <Form {...form}>
-                                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                                <form onSubmit={form.handleSubmit(assign)} className="space-y-6">
                                     <FormField
                                         control={form.control}
                                         name="volunteer"
