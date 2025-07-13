@@ -1,21 +1,37 @@
-"use client";
-import {useParams} from "next/navigation";
-import {useEffect, useState} from "react";
-import {User} from "better-auth";
+import {Tickets} from "@/lib/interface";
+import prisma from "@/lib/prisma";
+import {TicketsTable} from "./tickets-table";
 
-export default function TicketChat() {
-    const {id} = useParams();
-    const [user, setUser] = useState<User | null>(null);
+async function getData(id: string): Promise<Tickets[]> {
+    // Fetch data from your API here.
+    const tickets = await prisma.ticket.findMany({
+        where: {
+            assignedUserId: id
+        }
+    });
+    return tickets.map(ticket => ({
+        id: ticket.id,
+        status: ticket.statusLabel,
+        createdAt: new Date(ticket.createdAt),
+        problematic: ticket.problematic,
+        observations: ticket.observations,
+        info: ticket.info
+    }));
+}
 
-    useEffect(() => {
-        fetch(`/api/users/${id}`)
-            .then(res => res.json())
-            .then(data => setUser(data))
-    }, []);
+export default async function TicketChat({
+                                             params
+                                         }: {
+    params: Promise<{ id: string }>
+}) {
+    const {id} = await params;
+    const data = await getData(id)
 
     return (
         <div>
-            {user?.name}
+            <div className="container mx-auto p-6">
+                <TicketsTable data={data}/>
+            </div>
         </div>
     );
 }

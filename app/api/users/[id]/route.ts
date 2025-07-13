@@ -6,6 +6,7 @@ export async function GET(
     {params}: { params: Promise<{ id: string }> }
 ) {
     const {id} = await params;
+    console.log(id);
     const user = await prisma.user.findFirst({
         where: {
             id
@@ -15,3 +16,5 @@ export async function GET(
     if (!user) return new NextResponse('Not found', {status: 404})
     return Response.json(user)
 }
+
+//
