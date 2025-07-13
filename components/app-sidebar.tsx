@@ -1,7 +1,7 @@
 "use client"
 import * as React from "react"
 import {useEffect, useRef, useState} from "react"
-import {CalendarDays, House, MessageSquareLock, MessagesSquare, ShieldUser} from "lucide-react"
+import {CalendarDays, Ear, House, MessagesSquare, ShieldUser} from "lucide-react"
 import {NavProjects} from "@/components/nav-projects"
 import {
     Sidebar,
@@ -71,7 +71,7 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
                 const items = ticketList.map((ticket: { channelName: string; channelId: string }) => ({
                     name: ticket.channelName,
                     url: '/app/ticket/' + ticket.channelId,
-                    icon: MessageSquareLock
+                    icon: Ear
                 }));
                 setData(data => [...baseData, ...items]);
             })
