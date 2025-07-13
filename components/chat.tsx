@@ -41,6 +41,7 @@ import {cn} from "@/lib/utils"
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,} from "@/components/ui/command"
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form"
 import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover"
+import type {Ticket} from "@/generated/prisma/client"
 
 export function Chat(props: { channelID: string }) {
     const channelID = props.channelID;
@@ -48,6 +49,7 @@ export function Chat(props: { channelID: string }) {
     const [emojiOpen, setEmojiOpen] = useState(false);
     const [gifOpen, setGifOpen] = useState(false);
     const [showTyping, setShowTyping] = useState(false);
+    const [ticket, setTicket] = useState<Ticket>();
     const [currentMsg, setCurrentMsg] = useState("");
     const [channelName, setChannelName] = useState("le chat");
     const [chat, setChat] = useState<Msg[]>([])
@@ -165,7 +167,20 @@ export function Chat(props: { channelID: string }) {
             .then(res => res.json())
             .then(data => {
                 setChannelName(data.name)
-            })
+            });
+
+        fetch(`/api/tickets/findBy/channelID`, {
+            method: "POST",
+            body: JSON.stringify({
+                channelID: channelID,
+            }),
+        }).then(res => res.json()).then(data => {
+            try {
+                setTicket(data.ticket);
+            } catch (e) {
+                console.log(e);
+            }
+        });
         fetch(`/api/events/getAvailable`)
             .then(res => res.json())
             .then(data => {
@@ -173,7 +188,10 @@ export function Chat(props: { channelID: string }) {
                     ...prevAvailable,
                     ...data.map((user: { name: any; id: any; }) => ({
                         label: user.name,
-                        value: user.id
+                        value: {
+                            id: user.id,
+                            name: user.name,
+                        }
                     }))
                 ]);
             })
@@ -210,10 +228,6 @@ export function Chat(props: { channelID: string }) {
         return () => {
         }
     }, []);
-
-    useEffect(() => {
-        console.log(available);
-    }, [available]);
 
     const nonChar = [
         // Navigation
@@ -270,8 +284,11 @@ export function Chat(props: { channelID: string }) {
     const tenorGifRegex = /^https:\/\/media\.tenor\.com\/[A-Za-z0-9_-]+\/[A-Za-z0-9_-]+\.gif$/;
 
     const FormSchema = z.object({
-        volunteer: z.string({
-            required_error: "Merci de sélectionner un Bénévole Écoutant",
+        volunteer: z.object({
+            id: z.string({
+                required_error: "Merci de sélectionner un Bénévole Écoutant",
+            }),
+            name: z.string(),
         }),
     });
 
@@ -280,38 +297,24 @@ export function Chat(props: { channelID: string }) {
     });
 
     function assign(data: z.infer<typeof FormSchema>) {
-        fetch(`/api/tickets/findBy/channelID`, {
+        fetch(`/api/tickets/assign`, {
             method: "POST",
             body: JSON.stringify({
-                channelID: channelID,
+                ticketID: ticket?.id,
+                assignmentID: data.volunteer.id
             }),
         }).then(res => res.json()).then(res => {
-            if (!res.success) return toast("Erreur lors de l'assignement", {
-                description: (
-                    <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
-                      <code className="text-white">{JSON.stringify(res.error, null, 2)}</code>
-                    </pre>
-                ),
-            })
-            fetch(`/api/tickets/assign`, {
-                method: "POST",
-                body: JSON.stringify({
-                    ticketID: res.ticket.id,
-                    assignmentID: data.volunteer
-                }),
-            }).then(res => res.json()).then(res => {
-                if (res.success) {
-                    toast('Le bénévole a été assigné.')
-                } else {
-                    return toast("Erreur lors de l'assignement", {
-                        description: (
-                            <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
-                              <code className="text-white">{JSON.stringify(res.error, null, 2)}</code>
-                            </pre>
-                        ),
-                    })
-                }
-            })
+            if (res.success) {
+                toast(`L'écoute à été attribuée à ${data.volunteer.name}`)
+            } else {
+                return toast("Erreur lors de l'attribution", {
+                    description: (
+                        <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
+                          <code className="text-white">{JSON.stringify(res.error, null, 2)}</code>
+                        </pre>
+                    ),
+                })
+            }
         })
     }
 
@@ -416,7 +419,7 @@ export function Chat(props: { channelID: string }) {
                                                             >
                                                                 {field.value
                                                                     ? available.find(
-                                                                        (available) => available.value === field.value
+                                                                        (available) => available.value.name === field.value.name
                                                                     )?.label
                                                                     : "Sélectionner le bénévole"}
                                                                 <ChevronsUpDown className="opacity-50"/>
@@ -435,7 +438,7 @@ export function Chat(props: { channelID: string }) {
                                                                     {available.map((available) => (
                                                                         <CommandItem
                                                                             value={available.label}
-                                                                            key={available.value}
+                                                                            key={available.value.id}
                                                                             onSelect={() => {
                                                                                 form.setValue("volunteer", available.value)
                                                                             }}
@@ -495,7 +498,18 @@ export function Chat(props: { channelID: string }) {
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                                 <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                <AlertDialogAction>Fermer l'écoute</AlertDialogAction>
+                                <Button variant="destructive" onClick={() => {
+                                    fetch('/api/tickets/close', {
+                                        method: 'POST',
+                                        body: JSON.stringify({
+                                            id: ticket?.id
+                                        })
+                                    }).then(res => res.json()).then(res => {
+
+                                    })
+                                }}>
+                                    Fermer l'écoute
+                                </Button>
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
