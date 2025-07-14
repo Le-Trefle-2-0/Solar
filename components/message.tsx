@@ -54,6 +54,7 @@ export function Message(props: {
     const {socket} = useSocket();
 
     const tenorGifRegex = /^https:\/\/media\.tenor\.com\/[A-Za-z0-9_-]+\/[A-Za-z0-9_-]+\.gif$/;
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
 
     const showDateSeparator = prevDate !== null && new Date(currentDate).toDateString() !== new Date(prevDate).toDateString()
 
@@ -240,12 +241,70 @@ export function Message(props: {
                     )}
                     <h3 className="text-lg text-gray-900 whitespace-pre-wrap break-words max-w-full">
                         {tenorGifRegex.test(content) ? (
-                            <Image src={content} alt="gif" height={256} width={256} unoptimized
-                                   className="rounded-xl p-2"/>
+                            <Image
+                                src={content}
+                                alt="gif"
+                                height={256}
+                                width={256}
+                                unoptimized
+                                className="rounded-xl p-2"
+                            />
                         ) : (
-                            content
+                            content.split(/(https?:\/\/[^\s]+)/g).map((part, i) => {
+                                if (/https?:\/\/[^\s]+/.test(part)) {
+                                    return (
+                                        <a
+                                            key={`link-${i}`}
+                                            href={part}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-blue-600 underline"
+                                        >
+                                            {part}
+                                        </a>
+                                    );
+                                } else {
+                                    const markdownRegex = /(\*\*([^*]+)\*\*|\*([^*]+)\*|__(.+?)__)/g;
+
+                                    const elements = [];
+                                    let lastIndex = 0;
+                                    let match;
+
+                                    while ((match = markdownRegex.exec(part)) !== null) {
+                                        if (match.index > lastIndex) {
+                                            elements.push(part.slice(lastIndex, match.index));
+                                        }
+
+                                        const [fullMatch, , boldText, italicText, underlineText] = match;
+
+                                        if (boldText) {
+                                            elements.push(
+                                                <strong key={`bold-${i}-${match.index}`}>{boldText}</strong>
+                                            );
+                                        } else if (italicText) {
+                                            elements.push(
+                                                <em key={`italic-${i}-${match.index}`}>{italicText}</em>
+                                            );
+                                        } else if (underlineText) {
+                                            elements.push(
+                                                <u key={`underline-${i}-${match.index}`}>{underlineText}</u>
+                                            );
+                                        }
+
+                                        lastIndex = match.index + fullMatch.length;
+                                    }
+
+                                    if (lastIndex < part.length) {
+                                        elements.push(part.slice(lastIndex));
+                                    }
+
+                                    return <React.Fragment key={`text-${i}`}>{elements}</React.Fragment>;
+                                }
+                            })
                         )}
                     </h3>
+
+
                     {Object.entries(reactionMap ?? {}).length > 0 && (
                         <div className="flex flex-row gap-2 mt-2">
                             {Object.entries(reactionMap ?? {}).map(([emoji, list]) => (
