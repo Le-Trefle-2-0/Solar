@@ -115,6 +115,16 @@ app.prepare().then(() => {
 
         socket.on('update', () => {
             socket.to('update').emit('updateRequest')
+        });
+
+        socket.on('reaction', (data) => {
+            console.log(data);
+            socket.to(data.channelId).emit('reactionAdd', data.reaction);
+        });
+
+        socket.on('reactionRemove', (data) => {
+            console.log(data);
+            socket.to(data.channelId).emit('reactionRemove', data.reactionID);
         })
     });
 

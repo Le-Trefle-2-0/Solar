@@ -1,11 +1,10 @@
 "use client";
-import Image from "next/image";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCircle} from "@fortawesome/free-solid-svg-icons";
 import GifPicker from "gif-picker-react";
-import EmojiPicker, {EmojiStyle} from "emoji-picker-react";
+// import EmojiPicker, {EmojiStyle} from "emoji-picker-react";
+import {EmojiPicker, EmojiPickerContent, EmojiPickerFooter, EmojiPickerSearch,} from "@/components/ui/emoji-picker";
 import {
-    Bot,
     Check,
     ChevronsUpDown,
     Laugh,
@@ -15,15 +14,15 @@ import {
     TvMinimalPlay,
     UserRoundPlus
 } from "lucide-react";
-import {FormEvent, useEffect, useRef, useState} from "react";
-import {formVolunteer, Msg} from "@/lib/interface";
+import React, {FormEvent, useEffect, useRef, useState} from "react";
+import {formVolunteer, Msg, MsgWithID} from "@/lib/interface";
 import {z, ZodError} from "zod";
 import {toast} from "sonner";
 import {saveMessage} from "@/lib/messageManager";
 import {useSession} from "@/lib/auth-client";
 import {io, Socket} from "socket.io-client";
 import Peer from "peerjs";
-import {Button} from "@/components/ui";
+import {Button, Textarea} from "@/components/ui";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -41,21 +40,25 @@ import {cn} from "@/lib/utils"
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,} from "@/components/ui/command"
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form"
 import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover"
-import type {Ticket} from "@/generated/prisma/client"
+import type {Reaction, Ticket} from "@/generated/prisma/client"
+import {useRouter} from "next/navigation";
+import {Message} from "@/components/message";
 
 export function Chat(props: { channelID: string }) {
     const channelID = props.channelID;
     const {data: session} = useSession();
+    const router = useRouter();
     const [emojiOpen, setEmojiOpen] = useState(false);
     const [gifOpen, setGifOpen] = useState(false);
     const [showTyping, setShowTyping] = useState(false);
     const [ticket, setTicket] = useState<Ticket>();
     const [currentMsg, setCurrentMsg] = useState("");
     const [channelName, setChannelName] = useState("le chat");
-    const [chat, setChat] = useState<Msg[]>([])
+    const [chat, setChat] = useState<MsgWithID[]>([])
     const formRef = useRef<HTMLFormElement>(null);
     const textRef = useRef<HTMLTextAreaElement>(null);
     const rootDivRef = useRef<HTMLDivElement>(null);
+    const emojiPickerRef = useRef<HTMLDivElement>(null);
     const socketRef = useRef<Socket | null>(null);
     const messagesListRef = useRef<HTMLDivElement>(null);
     const myVideoRef = useRef<HTMLVideoElement>(null);
@@ -74,7 +77,7 @@ export function Chat(props: { channelID: string }) {
         });
 
 
-    const sendMessage = (content: string) => {
+    const sendMessage = async (content: string) => {
         const msg: Msg = {
             author: {
                 id: session?.user.id as string,
@@ -86,12 +89,13 @@ export function Chat(props: { channelID: string }) {
             channel: {
                 id: channelID,
             },
+            reactions: [],
             content
         }
 
-        saveMessage(msg)
+        const savedMessage = await saveMessage(msg)
         socketRef.current?.emit("sendMessage", msg);
-        setChat((pre) => [...pre, msg])
+        setChat((pre) => [...pre, msg as MsgWithID])
     }
 
     const sendForm = async (e: FormEvent<HTMLFormElement>) => {
@@ -184,8 +188,7 @@ export function Chat(props: { channelID: string }) {
         fetch(`/api/events/getAvailable`)
             .then(res => res.json())
             .then(data => {
-                setAvailable(prevAvailable => [
-                    ...prevAvailable,
+                setAvailable([
                     ...data.map((user: { name: any; id: any; }) => ({
                         label: user.name,
                         value: {
@@ -208,7 +211,7 @@ export function Chat(props: { channelID: string }) {
                 });
 
                 socketRef.current?.on("message", (data: Msg) => {
-                    setChat((pre) => [...pre, data])
+                    setChat((pre) => [...pre, data as MsgWithID])
                 });
 
                 let timer: NodeJS.Timeout;
@@ -281,8 +284,6 @@ export function Chat(props: { channelID: string }) {
         "Unidentified"
     ];
 
-    const tenorGifRegex = /^https:\/\/media\.tenor\.com\/[A-Za-z0-9_-]+\/[A-Za-z0-9_-]+\.gif$/;
-
     const FormSchema = z.object({
         volunteer: z.object({
             id: z.string({
@@ -325,61 +326,47 @@ export function Chat(props: { channelID: string }) {
             // }
         }} tabIndex={0} ref={rootDivRef}>
             <video className='w-0 h-0' playsInline ref={callingVideoRef} autoPlay/>
-            <div className="flex flex-col flex-grow overflow-y-auto gap-6">
-                {chat.map(({author, content, timestamp}, key) => {
-                    const showAuthorInfo = key === 0 || chat[key - 1].author.id !== author.id;
+            <div className="flex flex-col flex-grow overflow-y-auto mt-10">
+                {chat.map(({author, content, timestamp, reactions, id}, key) => {
+                    const prevMessage = key > 0 ? chat[key - 1] : null
+                    const nextMessage = key < chat.length - 1 ? chat[key + 1] : null
+                    const currentDate = new Date(timestamp).getTime()
+                    const prevDate = prevMessage ? new Date(prevMessage.timestamp).getTime() : null
+                    const nextDate = nextMessage ? new Date(nextMessage.timestamp).getTime() : null
+
+                    const isSameAuthorAsPrev = prevMessage && prevMessage.author.id === author.id
+                    const isWithin10MinOfPrev = prevDate !== null && Math.abs(currentDate - prevDate) / 60000 < 10
+                    const showAuthorInfo = !isSameAuthorAsPrev || !isWithin10MinOfPrev
+
+                    const isSameAuthorAsNext = nextMessage && nextMessage.author.id === author.id
+                    const isWithin10MinOfNext = nextDate !== null && Math.abs(nextDate - currentDate) / 60000 < 10
+                    const isLastInBlock = !isSameAuthorAsNext || !isWithin10MinOfNext
 
                     return (
-                        <div className="w-full flex flex-row gap-2" key={key}>
-                            {showAuthorInfo && (
-                                <Image
-                                    src={author.image ? author.image : '/logo.svg'}
-                                    alt="Image de profil"
-                                    width={48}
-                                    height={48}
-                                    className="rounded-xl max-h-[48px]"
-                                />
-                            )}
-                            <div className={!showAuthorInfo ? "ml-14" : ""}>
-                                {showAuthorInfo && (
-                                    <div className="flex flex-row items-center gap-4">
-                        <span
-                            className={
-                                author.role === 'bot'
-                                    ? "font-semibold text-sm text-blue-800 flex flex-row gap-3"
-                                    : "font-semibold text-sm text-gray-900 flex flex-row gap-3"
-                            }
-                        >
-                            {author.name}
-                            {author.role === "bot" && <Bot className="-translate-y-1"/>}
-                        </span>
-                                        <span className="font-light text-sm text-gray-900">
-                            {new Date(timestamp).toLocaleString('fr-FR')}
-                        </span>
-                                    </div>
-                                )}
-                                <h3 className="text-lg text-gray-900 whitespace-pre-wrap break-words max-w-full">
-                                    {tenorGifRegex.test(content) ? (
-                                        <Image
-                                            src={content}
-                                            alt="gif"
-                                            height={256}
-                                            width={256}
-                                            unoptimized
-                                        />
-                                    ) : (
-                                        content
-                                    )}
-                                </h3>
-                            </div>
-                        </div>
-                    );
+                        <Message
+                            prevDate={prevDate as number}
+                            currentDate={currentDate}
+                            timestamp={timestamp}
+                            reactions={reactions as Reaction[]}
+                            key={key}
+                            isLastInBlock={isLastInBlock}
+                            showAuthorInfo={showAuthorInfo}
+                            isAuthor={author.id === session?.user.id}
+                            profilePicture={author.image}
+                            authorRole={author.role}
+                            authorName={author.name}
+                            content={content}
+                            userID={session?.user.id as string}
+                            socket={socketRef}
+                            id={id as number}
+                            channelId={channelID}
+                        />
+                    )
                 })}
-
-
-
                 <div ref={messagesListRef} className="h-px"/>
             </div>
+
+
             <div className={showTyping ? 'flex flex-row gap-1 relative left-2 bottom-3' : 'hidden'}>
                 <FontAwesomeIcon icon={faCircle} className="text-gray-400 animate-opacityPulse1"/>
                 <FontAwesomeIcon icon={faCircle} className="text-gray-400 animate-opacityPulse2"/>
@@ -523,17 +510,10 @@ export function Chat(props: { channelID: string }) {
                         setGifOpen(false);
                     }}/>
                 </div>
-                <div className="absolute right-2 bottom-15">
-                    <EmojiPicker emojiStyle={EmojiStyle.TWITTER} onEmojiClick={(emoji) => {
-                        setCurrentMsg(currentMsg + ' ' + emoji.emoji);
-                        setEmojiOpen(false);
-                        textRef.current?.focus();
-                    }} open={emojiOpen}/>
-                </div>
 
                 <form ref={formRef} onSubmit={(e) => sendForm(e)}
                       className='flex flex-row w-full gap-2 items-center'>
-                    <textarea
+                    <Textarea
                         placeholder={`Envoyer un message dans ${channelName}`}
                         onChange={(e) => {
                             setCurrentMsg(e.target.value)
@@ -551,13 +531,28 @@ export function Chat(props: { channelID: string }) {
                         value={currentMsg}
                         className="w-full flex flex-row outline-main outline-1 p-2 rounded-lg resize-none"
                     />
-                    <Laugh onClick={() => {
-                        if (emojiOpen) setEmojiOpen(false);
-                        else {
-                            setEmojiOpen(true);
-                            if (gifOpen) setGifOpen(false);
-                        }
-                    }} className={emojiOpen ? 'cursor-pointer text-main' : 'cursor-pointer'} width={42}/>
+                    <Popover onOpenChange={setEmojiOpen} open={emojiOpen}>
+                        <PopoverTrigger asChild>
+                            <Laugh className="cursor-pointer" width={42}/>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-fit p-0">
+                            <EmojiPicker
+                                className="h-[342px]"
+                                onEmojiSelect={({emoji}) => {
+                                    if (currentMsg.length > 0) setCurrentMsg(currentMsg + ' ' + emoji);
+                                    else setCurrentMsg(emoji);
+                                    setEmojiOpen(false);
+                                    textRef.current?.focus();
+                                    console.log(emoji);
+                                }}
+                                locale="fr"
+                            >
+                                <EmojiPickerSearch/>
+                                <EmojiPickerContent/>
+                                <EmojiPickerFooter/>
+                            </EmojiPicker>
+                        </PopoverContent>
+                    </Popover>
 
                     <TvMinimalPlay onClick={() => {
                         if (gifOpen) setGifOpen(false);

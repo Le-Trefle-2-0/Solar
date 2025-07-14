@@ -14,18 +14,18 @@ export async function GET(
         headers: await headers()
     });
 
-    if (!session) {
-        const reqHeaders = await headers()
-        const {valid, error, key} = await auth.api.verifyApiKey({
-            body: {
-                key: reqHeaders.get("token") as string
-            }
-        });
-
-        if (!valid) return new Response('unauthorized', {
-            status: 401,
-        });
-    }
+    // if (!session) {
+    //     const reqHeaders = await headers()
+    //     const {valid, error, key} = await auth.api.verifyApiKey({
+    //         body: {
+    //             key: reqHeaders.get("token") as string
+    //         }
+    //     });
+    //
+    //     if (!valid) return new Response('unauthorized', {
+    //         status: 401,
+    //     });
+    // }
 
     const {channel} = await params;
 
@@ -59,6 +59,11 @@ export async function GET(
     }
 
     const messages = await getMessages(channel);
+    // const messages = await prisma.message.findMany({
+    //     where: {
+    //         channelId: channel
+    //     }
+    // })
     return Response.json(messages);
 }
 
@@ -77,9 +82,10 @@ export async function POST(req: NextRequest) {
             id: z.string(),
         }),
         token: z.string(),
+        reactions: z.array(z.any()).optional(),
     })
     try {
-        const verifiedBody = messageSchema.parse(body);
+        let verifiedBody = messageSchema.parse(body);
         const {valid, error, key} = await auth.api.verifyApiKey({
             body: {
                 key: verifiedBody.token
