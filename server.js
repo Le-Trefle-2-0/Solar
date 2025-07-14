@@ -59,6 +59,20 @@ async function validateAPIKey(token) {
     }
 }
 
+async function getChannels(id) {
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/channels`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({id}),
+        });
+        const body = await res.json();
+        if (body.success) return body.accessedChannelIDs
+    } catch (error) {
+        return null;
+    }
+}
+
 app.prepare().then(() => {
     const sslOptions = {
         key: fs.readFileSync(process.env.SSL_KEY_PATH),
@@ -87,7 +101,8 @@ app.prepare().then(() => {
             if (socket.handshake.auth.token) {
                 validToken = await validateAPIKey(socket.handshake.auth.token);
             }
-            // console.log(validJWT, validToken);
+            if (validJWT) socket.user = validJWT;
+            if (validToken) socket.user = validToken.user;
             if (!validJWT && !validToken) {
                 throw new Error("Invalid API key");
             }
@@ -98,15 +113,18 @@ app.prepare().then(() => {
     });
 
     io.on("connection", async (socket) => {
+        const userID = socket.user.id;
+        const channels = await getChannels(userID)
+        for (let id of channels) {
+            socket.join(id)
+        }
+
         socket.on("ping", (callback) => {
             callback();
-        })
-        socket.on("listen", (data) => {
-            socket.join(data.id);
         });
 
         socket.on("sendMessage", (data) => {
-            socket.to(data.channel.id).emit("message", data);
+            socket.broadcast.to(data.channel.id).emit("message", data);
         });
 
         socket.on('typing', (data) => {
@@ -118,12 +136,10 @@ app.prepare().then(() => {
         });
 
         socket.on('reaction', (data) => {
-            console.log(data);
-            socket.to(data.channelId).emit('reactionAdd', data.reaction);
+            socket.broadcast.to(data.channelId).emit('reactionAdd', data.reaction);
         });
 
         socket.on('reactionRemove', (data) => {
-            console.log(data);
             socket.to(data.channelId).emit('reactionRemove', data.reactionID);
         })
     });
