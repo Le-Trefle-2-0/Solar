@@ -1,12 +1,23 @@
-"use client";
-import {useParams} from "next/navigation";
 import {Chat} from "@/components/chat";
+import prisma from "@/lib/prisma";
 
-export default function TicketChat() {
-    const {id} = useParams();
+export default async function TicketChat({
+                                             params
+                                         }: {
+    params: Promise<{ id: string, status: number }>
+}) {
+    const {id, status} = await params;
+    const ticket = await prisma.ticket.findUnique({
+        where: {
+            channelId: id as string
+        },
+        include: {
+            status: true
+        }
+    })
 
     return (
 
-        <Chat channelID={id as string}/>
+        <Chat channelID={id as string} statusID={ticket?.status.id as number}/>
     );
 }

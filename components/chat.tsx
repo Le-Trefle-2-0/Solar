@@ -44,8 +44,8 @@ import {useRouter} from "next/navigation";
 import {Message} from "@/components/message";
 import {useSocket} from "@/context/Socket";
 
-export function Chat(props: { channelID: string }) {
-    const channelID = props.channelID;
+export function Chat(props: { channelID: string, statusID: number }) {
+    const {channelID, statusID} = props;
     const {data: session} = useSession();
     const {socket, setChannelID} = useSocket();
     const router = useRouter();
