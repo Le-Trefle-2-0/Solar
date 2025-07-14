@@ -3,7 +3,6 @@ import prisma from "@/lib/prisma";
 import {Msg, MsgWithID} from '@/lib/interface'
 
 export const saveMessage = async (msg: Msg) => {
-    return new Promise(async (resolve, reject) => {
         const message = await prisma.message.create({
             data: {
                 createdAt: new Date(),
@@ -13,8 +12,7 @@ export const saveMessage = async (msg: Msg) => {
             }
         });
 
-        resolve(message);
-    })
+    return (message);
 }
 
 export const getMessages = async (channelId: string) => {
