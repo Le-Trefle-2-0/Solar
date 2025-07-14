@@ -1,3 +1,5 @@
+import type {Reaction} from "@/generated/prisma/client"
+
 export interface Msg {
     author: {
         id: string;
@@ -9,12 +11,20 @@ export interface Msg {
     timestamp: number;
     channel: {
         id: string;
-    }
+    },
+    reactions: Reaction[] | null;
+}
+
+export interface MsgWithID extends Msg {
+    id: number;
 }
 
 export interface formVolunteer {
     label: string,
-    value: string,
+    value: {
+        id: string;
+        name: string;
+    },
 }
 
 export interface DisplayAccount {
