@@ -179,6 +179,41 @@ export function Chat(props: { channelID: string }) {
                 setShowTyping(false);
             }, 5000)
         });
+
+        socket.on('reactionAdd', (data) => {
+            console.log("REACTION ADD", data);
+            setChat(prev =>
+                prev.map(message => {
+                    if (message.id === data.messageID) {
+                        return {
+                            ...message,
+                            reactions: [...(message.reactions ?? []), data]
+                        };
+                    }
+                    return message;
+                })
+            );
+        });
+
+        socket.on('reactionRemove', (data) => {
+            console.log("REACTION REMOVE", data);
+            setChat(prev =>
+                prev.map(message => {
+                    if (message.id === data.messageID) {
+                        return {
+                            ...message,
+                            reactions: (message.reactions ?? []).filter(r => r.id !== data.id)
+                        };
+                    }
+                    return message;
+                })
+            );
+        });
+
+        return () => {
+            socket.off('reactionAdd');
+            socket.off('reactionRemove');
+        };
     }, [socket]);
 
     useEffect(() => {
@@ -341,7 +376,7 @@ export function Chat(props: { channelID: string }) {
                             currentDate={currentDate}
                             timestamp={timestamp}
                             reactions={reactions as Reaction[]}
-                            key={key}
+                            key={id}  // better: use unique id instead of array index
                             isLastInBlock={isLastInBlock}
                             showAuthorInfo={showAuthorInfo}
                             isAuthor={author.id === session?.user.id}
@@ -350,11 +385,10 @@ export function Chat(props: { channelID: string }) {
                             authorName={author.name}
                             content={content}
                             userID={session?.user.id as string}
-                            socket={socketRef}
                             id={id as number}
                             channelId={channelID}
                         />
-                    )
+                    );
                 })}
                 <div ref={messagesListRef} className="h-px"/>
             </div>

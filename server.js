@@ -136,11 +136,12 @@ app.prepare().then(() => {
         });
 
         socket.on('reaction', (data) => {
+            console.log(data);
             socket.broadcast.to(data.channelId).emit('reactionAdd', data.reaction);
         });
 
         socket.on('reactionRemove', (data) => {
-            socket.to(data.channelId).emit('reactionRemove', data.reactionID);
+            socket.to(data.channelId).emit('reactionRemove', data.reaction);
         })
     });
 

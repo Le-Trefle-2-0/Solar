@@ -1,6 +1,6 @@
 "use client";
 import type {Reaction} from "@/generated/prisma";
-import React, {RefObject, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {
     Badge,
     Button,
@@ -16,8 +16,8 @@ import {
 import {EmojiPicker, EmojiPickerContent, EmojiPickerFooter, EmojiPickerSearch} from "@/components/ui/emoji-picker";
 import {Bot, Ellipsis, IdCardLanyard, Reply, SmilePlus, Trash2} from "lucide-react";
 import Image from "next/image";
-import {Socket} from "socket.io-client";
 import {toast} from "sonner";
+import {useSocket} from "@/context/Socket";
 
 export function Message(props: {
     prevDate: number,
@@ -32,7 +32,6 @@ export function Message(props: {
     authorName: string,
     content: string,
     userID: string,
-    socket: RefObject<Socket | null>,
     id: number,
     channelId: string,
 }) {
@@ -49,10 +48,10 @@ export function Message(props: {
         authorName,
         content,
         userID,
-        socket,
         id,
         channelId
     } = props;
+    const {socket} = useSocket();
 
     const tenorGifRegex = /^https:\/\/media\.tenor\.com\/[A-Za-z0-9_-]+\/[A-Za-z0-9_-]+\.gif$/;
 
@@ -63,6 +62,10 @@ export function Message(props: {
     const yesterday = new Date()
     yesterday.setDate(now.getDate() - 1)
     const [reactionList, setReactionList] = useState<Reaction[]>(reactions);
+
+    useEffect(() => {
+        setReactionList(reactions ?? []);
+    }, [reactions]);
 
     const isToday = dateObj.toDateString() === now.toDateString()
     const isYesterday = dateObj.toDateString() === yesterday.toDateString()
@@ -91,18 +94,6 @@ export function Message(props: {
 
     const [isOpen, setIsOpen] = useState(false);
 
-    socket.current?.on('reactionAdd', (data) => {
-        console.log(data);
-        setReactionList((reactions) => [...reactions, data]);
-    });
-
-    socket.current?.on('reactionRemove', (data) => {
-        console.log(data);
-        setReactionList(prev =>
-            (prev ?? []).filter(r => r.id !== data)
-        );
-    })
-
     const sendReaction = (emoji: string) => {
         fetch('/api/reaction', {
             method: "POST",
@@ -115,7 +106,7 @@ export function Message(props: {
             }),
         }).then(res => res.json()).then(res => {
             if (!res.success) return toast("Erreur lors de l'ajout de la réaction")
-            socket.current?.emit("reaction", {channelId, reaction: res.reaction});
+            socket?.emit("reaction", {channelId, reaction: res.reaction});
             setReactionList((reactions) => [...reactions, res.reaction]);
         });
     }
@@ -133,7 +124,7 @@ export function Message(props: {
         }).then(res => res.json())
             .then(res => {
                 if (res.success) {
-                    socket.current?.emit("reactionRemove", {channelId, reactionID});
+                    socket?.emit("reactionRemove", {channelId, reaction: res.reaction});
                     setReactionList(prev =>
                         (prev ?? []).filter(r => r.id !== reactionID)
                     );
