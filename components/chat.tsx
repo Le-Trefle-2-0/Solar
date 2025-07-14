@@ -2,7 +2,6 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCircle} from "@fortawesome/free-solid-svg-icons";
 import GifPicker from "gif-picker-react";
-// import EmojiPicker, {EmojiStyle} from "emoji-picker-react";
 import {EmojiPicker, EmojiPickerContent, EmojiPickerFooter, EmojiPickerSearch,} from "@/components/ui/emoji-picker";
 import {
     Check,
