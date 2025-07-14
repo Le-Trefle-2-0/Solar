@@ -132,7 +132,7 @@ app.prepare().then(() => {
         });
 
         socket.on('update', () => {
-            socket.to('update').emit('updateRequest')
+            socket.broadcast.emit('updateRequest')
         });
 
         socket.on('reaction', (data) => {

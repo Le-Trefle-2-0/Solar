@@ -66,6 +66,10 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
     const socketRef = useRef<Socket | null>(null);
     const {socket} = useSocket();
 
+    socket?.on('updateRequest', () => {
+        updateTickets();
+    })
+
     const updateTickets = () => {
         fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/tickets`)
             .then((res) => res.json())
@@ -83,12 +87,6 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
     useEffect(() => {
         updateTickets()
     }, []);
-
-    useEffect(() => {
-        socket?.on('updateRequest', () => {
-            updateTickets();
-        })
-    }, [socket]);
 
     return (
         <Sidebar variant="inset" {...props}>
