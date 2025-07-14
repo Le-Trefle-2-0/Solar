@@ -44,6 +44,7 @@ model User {
 
   @@unique([username])
   @@map("user")
+  Reaction Reaction[]
 }
 
 model Session {
@@ -164,6 +165,17 @@ model Message {
   channelId String
   channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
   content   Bytes
+
+  Reaction Reaction[]
+}
+
+model Reaction {
+  id        String  @id @default(cuid())
+  emoji     String
+  messageID Int
+  message   Message @relation(fields: [messageID], references: [id])
+  userID    String
+  user      User    @relation(fields: [userID], references: [id])
 }
 
 model Event {

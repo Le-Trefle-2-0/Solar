@@ -222,6 +222,13 @@ exports.Prisma.MessageScalarFieldEnum = {
   content: 'content'
 };
 
+exports.Prisma.ReactionScalarFieldEnum = {
+  id: 'id',
+  emoji: 'emoji',
+  messageID: 'messageID',
+  userID: 'userID'
+};
+
 exports.Prisma.EventScalarFieldEnum = {
   id: 'id',
   title: 'title',
@@ -257,10 +264,10 @@ exports.Prisma.TicketScalarFieldEnum = {
   updatedAt: 'updatedAt',
   assignedUserId: 'assignedUserId',
   statusName: 'statusName',
-    statusLabel: 'statusLabel',
-    problematic: 'problematic',
-    observations: 'observations',
-    info: 'info'
+  statusLabel: 'statusLabel',
+  problematic: 'problematic',
+  observations: 'observations',
+  info: 'info'
 };
 
 exports.Prisma.TicketStatusScalarFieldEnum = {
@@ -412,6 +419,12 @@ exports.Prisma.MessageOrderByRelevanceFieldEnum = {
   channelId: 'channelId'
 };
 
+exports.Prisma.ReactionOrderByRelevanceFieldEnum = {
+  id: 'id',
+  emoji: 'emoji',
+  userID: 'userID'
+};
+
 exports.Prisma.EventOrderByRelevanceFieldEnum = {
   id: 'id',
   title: 'title',
@@ -438,10 +451,10 @@ exports.Prisma.TicketOrderByRelevanceFieldEnum = {
   channelName: 'channelName',
   assignedUserId: 'assignedUserId',
   statusName: 'statusName',
-    statusLabel: 'statusLabel',
-    problematic: 'problematic',
-    observations: 'observations',
-    info: 'info'
+  statusLabel: 'statusLabel',
+  problematic: 'problematic',
+  observations: 'observations',
+  info: 'info'
 };
 
 exports.Prisma.TicketStatusOrderByRelevanceFieldEnum = {
@@ -495,6 +508,7 @@ exports.Prisma.ModelName = {
   TwoFactor: 'TwoFactor',
   Channel: 'Channel',
   Message: 'Message',
+  Reaction: 'Reaction',
   Event: 'Event',
   RoleSlot: 'RoleSlot',
   EventRegistration: 'EventRegistration',

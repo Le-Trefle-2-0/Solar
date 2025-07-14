@@ -40,6 +40,7 @@ model User {
   apikeys Apikey[]
 
   passkeys Passkey[]
+  Reaction Reaction[]
 
   @@unique([username])
   @@map("user")
@@ -163,6 +164,17 @@ model Message {
   channelId String
   channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
   content   Bytes
+
+  Reaction Reaction[]
+}
+
+model Reaction {
+  id        String  @id @default(cuid())
+  emoji     String
+  messageID Int
+  message   Message @relation(fields: [messageID], references: [id])
+  userID    String
+  user      User    @relation(fields: [userID], references: [id])
 }
 
 model Event {
