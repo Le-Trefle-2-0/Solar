@@ -4,6 +4,7 @@ import {AppSidebar} from "@/components/app-sidebar";
 import {redirect} from "next/navigation";
 import {auth} from "@/lib/auth";
 import {headers} from "next/headers";
+import {SocketProvider} from "@/context/Socket";
 
 export const metadata: Metadata = {
     title: "Solar - Le Trèfle 2.0",
@@ -20,13 +21,15 @@ export default async function RootLayout({
     });
     if (!session) redirect('/auth/sign-in')
     return (
-        <SidebarProvider>
-            <AppSidebar className="border-r-main border-r"/>
-            <div className="h-full w-full overflow-hidden">
-                <SidebarTrigger className="fixed"/>
-                {children}
-            </div>
-        </SidebarProvider>
+        <SocketProvider>
+            <SidebarProvider>
+                <AppSidebar className="border-r-main border-r"/>
+                <div className="h-full w-full overflow-hidden">
+                    <SidebarTrigger className="fixed"/>
+                    {children}
+                </div>
+            </SidebarProvider>
+        </SocketProvider>
         // </div>
     );
 }

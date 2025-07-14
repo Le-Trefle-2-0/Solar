@@ -15,7 +15,8 @@ import {
 import Image from "next/image";
 import logo from "@/public/logo.svg";
 import {UserButton} from "@daveyplate/better-auth-ui";
-import {io, Socket} from "socket.io-client";
+import {Socket} from "socket.io-client";
+import {useSocket} from "@/context/Socket";
 
 export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
     const baseData = [
@@ -63,6 +64,7 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
         },
     ]);
     const socketRef = useRef<Socket | null>(null);
+    const {socket} = useSocket();
 
     const updateTickets = () => {
         fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/tickets`)
@@ -83,26 +85,10 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
     }, []);
 
     useEffect(() => {
-        fetch("/api/auth/token").then(async res => {
-            const body = await res.json();
-            if (body.token) {
-                socketRef.current = io(process.env.NEXT_PUBLIC_APP_URL, {
-                    auth: {
-                        jwt: body.token
-                    },
-                    transports: ['websocket'],
-                    withCredentials: true,
-                    rejectUnauthorized: (process.env.NODE_ENV == 'production')
-                });
-
-                socketRef.current?.emit('listen', {id: 'update'})
-
-                socketRef.current?.on('updateRequest', () => {
-                    updateTickets();
-                })
-            }
+        socket?.on('updateRequest', () => {
+            updateTickets();
         })
-    }, []);
+    }, [socket]);
 
     return (
         <Sidebar variant="inset" {...props}>

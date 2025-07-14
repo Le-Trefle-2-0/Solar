@@ -20,7 +20,7 @@ import {z, ZodError} from "zod";
 import {toast} from "sonner";
 import {saveMessage} from "@/lib/messageManager";
 import {useSession} from "@/lib/auth-client";
-import {io, Socket} from "socket.io-client";
+import {Socket} from "socket.io-client";
 import Peer from "peerjs";
 import {Button, Textarea} from "@/components/ui";
 import {
@@ -43,10 +43,12 @@ import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover"
 import type {Reaction, Ticket} from "@/generated/prisma/client"
 import {useRouter} from "next/navigation";
 import {Message} from "@/components/message";
+import {useSocket} from "@/context/Socket";
 
 export function Chat(props: { channelID: string }) {
     const channelID = props.channelID;
     const {data: session} = useSession();
+    const {socket, setChannelID} = useSocket();
     const router = useRouter();
     const [emojiOpen, setEmojiOpen] = useState(false);
     const [gifOpen, setGifOpen] = useState(false);
@@ -94,7 +96,7 @@ export function Chat(props: { channelID: string }) {
         }
 
         const savedMessage = await saveMessage(msg)
-        socketRef.current?.emit("sendMessage", msg);
+        socket?.emit("sendMessage", msg);
         setChat((pre) => [...pre, msg as MsgWithID])
     }
 
@@ -115,7 +117,7 @@ export function Chat(props: { channelID: string }) {
     }
 
     const sendTyping = async () => {
-        await socketRef.current?.emit('typing', {id: channelID});
+        await socket?.emit('typing', {id: channelID});
     }
 
     const handleCall = async () => {
@@ -161,6 +163,25 @@ export function Chat(props: { channelID: string }) {
     };
 
     useEffect(() => {
+        if (!socket) return;
+
+        let timer: NodeJS.Timeout;
+
+        socket.on("message", (data: Msg) => {
+            setChat((pre) => [...pre, data as MsgWithID])
+            if (timer) clearTimeout(timer)
+        });
+
+        socket.on('typingIndicator', () => {
+            setShowTyping(true);
+            if (timer) clearTimeout(timer);
+            timer = setTimeout(() => {
+                setShowTyping(false);
+            }, 5000)
+        });
+    }, [socket]);
+
+    useEffect(() => {
         fetch(`/api/messages/${channelID}`)
             .then(res => res.json())
             .then(data => {
@@ -198,34 +219,6 @@ export function Chat(props: { channelID: string }) {
                     }))
                 ]);
             })
-        fetch("/api/auth/token").then(async res => {
-            const body = await res.json();
-            if (body.token) {
-                socketRef.current = io(process.env.NEXT_PUBLIC_APP_URL, {
-                    auth: {
-                        jwt: body.token
-                    },
-                    transports: ['websocket'],
-                    withCredentials: true,
-                    rejectUnauthorized: (process.env.NODE_ENV == 'production')
-                });
-
-                socketRef.current?.on("message", (data: Msg) => {
-                    setChat((pre) => [...pre, data as MsgWithID])
-                });
-
-                let timer: NodeJS.Timeout;
-                socketRef.current?.on('typingIndicator', () => {
-                    setShowTyping(true);
-                    if (timer) clearTimeout(timer);
-                    timer = setTimeout(() => {
-                        setShowTyping(false);
-                    }, 5000)
-                });
-
-                socketRef.current?.emit('listen', {id: channelID})
-            }
-        })
         rootDivRef.current?.focus();
 
         return () => {
