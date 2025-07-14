@@ -16,7 +16,7 @@ import {
 } from "better-auth/plugins";
 import {passkey} from "better-auth/plugins/passkey";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient;
 export const auth = betterAuth({
     database: prismaAdapter(prisma, {
         provider: "mysql", // or "mysql", "postgresql", ...etc
@@ -49,7 +49,7 @@ export const auth = betterAuth({
                 training, volunteer, manager, bot, admin
             },
             adminRoles: ['admin'],
-            defaultRole: 'admin'
+            defaultRole: 'admin',
             // defaultRole: process.env.NODE_ENV === "production" ? "training" : "admin",
         }),
         organization(),

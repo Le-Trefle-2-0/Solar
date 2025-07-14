@@ -20,6 +20,7 @@ import {
     ChevronDown,
     ChevronsUpDown,
     IdCardLanyard,
+    Info,
     MoreHorizontal,
     Trash,
     UserPen,
@@ -32,7 +33,6 @@ import {
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -160,6 +160,22 @@ export function UsersTable({data}: DataTableProps) {
             cell: ({row}) => <div className="lowercase">{row.getValue("email")}</div>,
         },
         {
+            accessorKey: "lastTicketTimestamp",
+            header: ({column}) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    >
+                        Dernière écoute
+                        <ArrowUpDown/>
+                    </Button>
+                );
+            },
+            cell: ({row}) =>
+                <div>{row.getValue("lastTicketTimestamp") == 0 ? "Aucune écoute récente" : new Date(row.getValue("lastTicketTimestamp")).toLocaleDateString('fr-FR')}</div>,
+        },
+        {
             accessorKey: "role",
             header: () => <div className="text-right">Role</div>,
             cell: ({row}) => {
@@ -232,10 +248,9 @@ export function UsersTable({data}: DataTableProps) {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuItem onClick={() => router.push(`/app/admin/user/${account.id}`)}>Voir le
-                                    profil</DropdownMenuItem>
-                                <DropdownMenuItem>Voir l'historique d'écoute</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => router.push(`/app/admin/user/${account.id}`)}>
+                                    <Info/> Voir le profil
+                                </DropdownMenuItem>
                                 <DropdownMenuSeparator/>
                                 <DropdownMenuItem
                                     onClick={() => navigator.clipboard.writeText(account.id)}
@@ -411,6 +426,7 @@ export function UsersTable({data}: DataTableProps) {
                 name: userData.name,
                 email: userData.email,
                 role: userData.role as string,
+                lastTicketTimestamp: 0,
             },
         ]);
 

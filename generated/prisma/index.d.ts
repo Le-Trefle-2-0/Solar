@@ -64,52 +64,52 @@ export type Channel = $Result.DefaultSelection<Prisma.$ChannelPayload>
 export type Message = $Result.DefaultSelection<Prisma.$MessagePayload>
 /**
  * Model Reaction
- *
+ * 
  */
 export type Reaction = $Result.DefaultSelection<Prisma.$ReactionPayload>
 /**
  * Model Event
- *
+ * 
  */
 export type Event = $Result.DefaultSelection<Prisma.$EventPayload>
 /**
  * Model RoleSlot
- *
+ * 
  */
 export type RoleSlot = $Result.DefaultSelection<Prisma.$RoleSlotPayload>
 /**
  * Model EventRegistration
- *
+ * 
  */
 export type EventRegistration = $Result.DefaultSelection<Prisma.$EventRegistrationPayload>
 /**
  * Model Ticket
- *
+ * 
  */
 export type Ticket = $Result.DefaultSelection<Prisma.$TicketPayload>
 /**
  * Model TicketStatus
- *
+ * 
  */
 export type TicketStatus = $Result.DefaultSelection<Prisma.$TicketStatusPayload>
 /**
  * Model Apikey
- *
+ * 
  */
 export type Apikey = $Result.DefaultSelection<Prisma.$ApikeyPayload>
 /**
  * Model Jwks
- *
+ * 
  */
 export type Jwks = $Result.DefaultSelection<Prisma.$JwksPayload>
 /**
  * Model RouteProtection
- *
+ * 
  */
 export type RouteProtection = $Result.DefaultSelection<Prisma.$RouteProtectionPayload>
 /**
  * Model Passkey
- *
+ * 
  */
 export type Passkey = $Result.DefaultSelection<Prisma.$PasskeyPayload>
 
@@ -226,7 +226,7 @@ export class PrismaClient<
    *   prisma.user.create({ data: { name: 'Alice' } }),
    * ])
    * ```
-   *
+   * 
    * Read more in our [docs](https://www.prisma.io/docs/concepts/components/prisma-client/transactions).
    */
   $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>

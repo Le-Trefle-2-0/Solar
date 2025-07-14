@@ -33,6 +33,7 @@ export interface DisplayAccount {
     email: string;
     role: string;
     username?: string;
+    lastTicketTimestamp: number;
 }
 
 export interface Tickets {
