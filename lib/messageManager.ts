@@ -1,6 +1,6 @@
 "use server"
 import prisma from "@/lib/prisma";
-import {Msg} from '@/lib/interface'
+import {Msg, MsgWithID} from '@/lib/interface'
 
 export const saveMessage = async (msg: Msg) => {
     return new Promise(async (resolve, reject) => {
@@ -24,7 +24,7 @@ export const getMessages = async (channelId: string) => {
         }
     });
 
-    let messages: Msg[] = []
+    let messages: MsgWithID[] = []
     for (const msg of message) {
         let user = await prisma.user.findUnique({
             where: {
@@ -32,7 +32,14 @@ export const getMessages = async (channelId: string) => {
             }
         });
 
+        const reactions = await prisma.reaction.findMany({
+            where: {
+                messageID: msg.id,
+            }
+        });
+
         if (user) messages.push({
+            id: msg.id,
             author: {
                 id: user.id,
                 image: user.image as string,
@@ -43,7 +50,8 @@ export const getMessages = async (channelId: string) => {
             timestamp: new Date(msg.createdAt).getTime(),
             channel: {
                 id: '1',
-            }
+            },
+            reactions: reactions,
         });
     }
     return messages;
