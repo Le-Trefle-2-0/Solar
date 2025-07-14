@@ -232,7 +232,7 @@ model Ticket {
 }
 
 model TicketStatus {
-  id     BigInt   @id @default(autoincrement())
+  id Int @id @default(autoincrement())
   name   String   @unique(map: "name") @db.VarChar(192)
   label  String   @db.VarChar(192)
   ticket Ticket[]

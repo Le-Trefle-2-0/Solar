@@ -17763,17 +17763,17 @@ export namespace Prisma {
     }
 
     export type TicketStatusSumAggregateOutputType = {
-        id: bigint | null
+        id: number | null
     }
 
     export type TicketStatusMinAggregateOutputType = {
-        id: bigint | null
+        id: number | null
         name: string | null
         label: string | null
     }
 
     export type TicketStatusMaxAggregateOutputType = {
-        id: bigint | null
+        id: number | null
         name: string | null
         label: string | null
     }
@@ -17898,7 +17898,7 @@ export namespace Prisma {
     }
 
     export type TicketStatusGroupByOutputType = {
-        id: bigint
+        id: number
         name: string
         label: string
         _count: TicketStatusCountAggregateOutputType | null
@@ -17949,7 +17949,7 @@ export namespace Prisma {
             ticket: Prisma.$TicketPayload<ExtArgs>[]
         }
         scalars: $Extensions.GetPayloadResult<{
-            id: bigint
+            id: number
             name: string
             label: string
         }, ExtArgs["result"]["ticketStatus"]>
@@ -18326,7 +18326,7 @@ export namespace Prisma {
      * Fields of the TicketStatus model
      */
     interface TicketStatusFieldRefs {
-        readonly id: FieldRef<"TicketStatus", 'BigInt'>
+        readonly id: FieldRef<"TicketStatus", 'Int'>
         readonly name: FieldRef<"TicketStatus", 'String'>
         readonly label: FieldRef<"TicketStatus", 'String'>
     }
@@ -23195,13 +23195,6 @@ export namespace Prisma {
 
 
     /**
-     * Reference to a field of type 'BigInt'
-     */
-    export type BigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt'>
-
-
-
-  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -24287,7 +24280,7 @@ export namespace Prisma {
         AND?: TicketStatusWhereInput | TicketStatusWhereInput[]
         OR?: TicketStatusWhereInput[]
         NOT?: TicketStatusWhereInput | TicketStatusWhereInput[]
-        id?: BigIntFilter<"TicketStatus"> | bigint | number
+        id?: IntFilter<"TicketStatus"> | number
         name?: StringFilter<"TicketStatus"> | string
         label?: StringFilter<"TicketStatus"> | string
         ticket?: TicketListRelationFilter
@@ -24302,7 +24295,7 @@ export namespace Prisma {
     }
 
     export type TicketStatusWhereUniqueInput = Prisma.AtLeast<{
-        id?: bigint | number
+        id?: number
         name?: string
         name_label?: TicketStatusNameLabelCompoundUniqueInput
         AND?: TicketStatusWhereInput | TicketStatusWhereInput[]
@@ -24327,7 +24320,7 @@ export namespace Prisma {
         AND?: TicketStatusScalarWhereWithAggregatesInput | TicketStatusScalarWhereWithAggregatesInput[]
         OR?: TicketStatusScalarWhereWithAggregatesInput[]
         NOT?: TicketStatusScalarWhereWithAggregatesInput | TicketStatusScalarWhereWithAggregatesInput[]
-        id?: BigIntWithAggregatesFilter<"TicketStatus"> | bigint | number
+        id?: IntWithAggregatesFilter<"TicketStatus"> | number
         name?: StringWithAggregatesFilter<"TicketStatus"> | string
         label?: StringWithAggregatesFilter<"TicketStatus"> | string
   }
@@ -25759,47 +25752,44 @@ export namespace Prisma {
   }
 
     export type TicketStatusCreateInput = {
-        id?: bigint | number
         name: string
         label: string
         ticket?: TicketCreateNestedManyWithoutStatusInput
     }
 
     export type TicketStatusUncheckedCreateInput = {
-        id?: bigint | number
+        id?: number
         name: string
         label: string
         ticket?: TicketUncheckedCreateNestedManyWithoutStatusInput
     }
 
     export type TicketStatusUpdateInput = {
-        id?: BigIntFieldUpdateOperationsInput | bigint | number
         name?: StringFieldUpdateOperationsInput | string
         label?: StringFieldUpdateOperationsInput | string
         ticket?: TicketUpdateManyWithoutStatusNestedInput
     }
 
     export type TicketStatusUncheckedUpdateInput = {
-        id?: BigIntFieldUpdateOperationsInput | bigint | number
+        id?: IntFieldUpdateOperationsInput | number
         name?: StringFieldUpdateOperationsInput | string
         label?: StringFieldUpdateOperationsInput | string
         ticket?: TicketUncheckedUpdateManyWithoutStatusNestedInput
     }
 
     export type TicketStatusCreateManyInput = {
-        id?: bigint | number
+        id?: number
         name: string
         label: string
     }
 
     export type TicketStatusUpdateManyMutationInput = {
-        id?: BigIntFieldUpdateOperationsInput | bigint | number
         name?: StringFieldUpdateOperationsInput | string
         label?: StringFieldUpdateOperationsInput | string
     }
 
     export type TicketStatusUncheckedUpdateManyInput = {
-        id?: BigIntFieldUpdateOperationsInput | bigint | number
+        id?: IntFieldUpdateOperationsInput | number
         name?: StringFieldUpdateOperationsInput | string
         label?: StringFieldUpdateOperationsInput | string
   }
@@ -27126,17 +27116,6 @@ export namespace Prisma {
     id?: SortOrder
   }
 
-    export type BigIntFilter<$PrismaModel = never> = {
-        equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-        in?: bigint[] | number[]
-        notIn?: bigint[] | number[]
-        lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-        lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-        gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-        gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-        not?: NestedBigIntFilter<$PrismaModel> | bigint | number
-    }
-
     export type TicketStatusOrderByRelevanceInput = {
         fields: TicketStatusOrderByRelevanceFieldEnum | TicketStatusOrderByRelevanceFieldEnum[]
         sort: SortOrder
@@ -27172,22 +27151,6 @@ export namespace Prisma {
 
     export type TicketStatusSumOrderByAggregateInput = {
         id?: SortOrder
-    }
-
-    export type BigIntWithAggregatesFilter<$PrismaModel = never> = {
-        equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-        in?: bigint[] | number[]
-        notIn?: bigint[] | number[]
-        lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-        lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-        gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-        gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-        not?: NestedBigIntWithAggregatesFilter<$PrismaModel> | bigint | number
-        _count?: NestedIntFilter<$PrismaModel>
-        _avg?: NestedFloatFilter<$PrismaModel>
-        _sum?: NestedBigIntFilter<$PrismaModel>
-        _min?: NestedBigIntFilter<$PrismaModel>
-        _max?: NestedBigIntFilter<$PrismaModel>
     }
 
   export type IntNullableFilter<$PrismaModel = never> = {
@@ -28588,14 +28551,6 @@ export namespace Prisma {
         connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
     }
 
-    export type BigIntFieldUpdateOperationsInput = {
-        set?: bigint | number
-        increment?: bigint | number
-        decrement?: bigint | number
-        multiply?: bigint | number
-        divide?: bigint | number
-    }
-
     export type TicketUpdateManyWithoutStatusNestedInput = {
         create?: XOR<TicketCreateWithoutStatusInput, TicketUncheckedCreateWithoutStatusInput> | TicketCreateWithoutStatusInput[] | TicketUncheckedCreateWithoutStatusInput[]
         connectOrCreate?: TicketCreateOrConnectWithoutStatusInput | TicketCreateOrConnectWithoutStatusInput[]
@@ -28867,33 +28822,6 @@ export namespace Prisma {
     _min?: NestedBytesFilter<$PrismaModel>
     _max?: NestedBytesFilter<$PrismaModel>
   }
-
-    export type NestedBigIntFilter<$PrismaModel = never> = {
-        equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-        in?: bigint[] | number[]
-        notIn?: bigint[] | number[]
-        lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-        lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-        gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-        gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-        not?: NestedBigIntFilter<$PrismaModel> | bigint | number
-    }
-
-    export type NestedBigIntWithAggregatesFilter<$PrismaModel = never> = {
-        equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-        in?: bigint[] | number[]
-        notIn?: bigint[] | number[]
-        lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-        lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-        gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-        gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-        not?: NestedBigIntWithAggregatesFilter<$PrismaModel> | bigint | number
-        _count?: NestedIntFilter<$PrismaModel>
-        _avg?: NestedFloatFilter<$PrismaModel>
-        _sum?: NestedBigIntFilter<$PrismaModel>
-        _min?: NestedBigIntFilter<$PrismaModel>
-        _max?: NestedBigIntFilter<$PrismaModel>
-    }
 
   export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
@@ -31615,13 +31543,12 @@ export namespace Prisma {
   }
 
     export type TicketStatusCreateWithoutTicketInput = {
-        id?: bigint | number
         name: string
         label: string
     }
 
     export type TicketStatusUncheckedCreateWithoutTicketInput = {
-        id?: bigint | number
+        id?: number
         name: string
         label: string
     }
@@ -31733,13 +31660,12 @@ export namespace Prisma {
     }
 
     export type TicketStatusUpdateWithoutTicketInput = {
-        id?: BigIntFieldUpdateOperationsInput | bigint | number
         name?: StringFieldUpdateOperationsInput | string
         label?: StringFieldUpdateOperationsInput | string
     }
 
     export type TicketStatusUncheckedUpdateWithoutTicketInput = {
-        id?: BigIntFieldUpdateOperationsInput | bigint | number
+        id?: IntFieldUpdateOperationsInput | number
         name?: StringFieldUpdateOperationsInput | string
         label?: StringFieldUpdateOperationsInput | string
     }
