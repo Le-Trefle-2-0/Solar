@@ -18,22 +18,24 @@ export async function POST(req: NextRequest) {
             const ticket = await prisma.ticket.findUnique({
                 where: {
                     channelId: channel.id,
+                },
+                include: {
+                    status: true
                 }
             });
             if (ticket) {
-                const perm = await auth.api.userHasPermission({
-                    body: {
-                        userId: verifiedBody.id,
-                        permissions: {
-                            tickets: ['read_all']
-                        }
-                    }
-                });
-
-                if (perm.success) accessedChannelIDs.push(channel.id);
-                else if (ticket.assignedUserId == verifiedBody.id) accessedChannelIDs.push(channel.id);
-
-                console.log(perm);
+                if (ticket.status.id !== 4) {
+                    const perm = await auth.api.userHasPermission({
+                        body: {
+                            userId: verifiedBody.id,
+                            permissions: {
+                                tickets: ['read_all']
+                            }
+                        },
+                    });
+                    if (perm.success) accessedChannelIDs.push(channel.id);
+                    else if (ticket.assignedUserId == verifiedBody.id) accessedChannelIDs.push(channel.id);
+                }
             }
         }
 

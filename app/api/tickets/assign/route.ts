@@ -31,17 +31,29 @@ export async function POST(req: NextRequest) {
 
         if (!user) return new Response('User not found', {status: 400});
 
+        const status = await prisma.ticketStatus.findUnique({
+            where: {
+                name: "started"
+            }
+        });
+
+        if (!status) return NextResponse.json({success: false, error: status}, {status: 500});
+
         const update = await prisma.ticket.update({
             where: {
                 id: verifiedBody.ticketID,
             },
+            include: {
+                status: true,
+            },
             data: {
                 assignedUserId: user.id,
                 updatedAt: new Date(),
-                statusName: 'started',
-                statusLabel: "En cours",
+                statusName: status.name,
+                statusLabel: status.label,
             }
-        })
+
+        });
 
         return NextResponse.json({success: true, update}, {status: 200});
 

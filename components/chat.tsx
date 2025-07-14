@@ -8,6 +8,7 @@ import {
     ChevronsUpDown,
     Laugh,
     MessageCircleOff,
+    NotebookPen,
     PhoneCall,
     Send,
     TvMinimalPlay,
@@ -46,6 +47,7 @@ import {useSocket} from "@/context/Socket";
 
 export function Chat(props: { channelID: string, statusID: number }) {
     const {channelID, statusID} = props;
+    const [status, setStatus] = useState(statusID);
     const {data: session} = useSession();
     const {socket, setChannelID} = useSocket();
     const router = useRouter();
@@ -369,12 +371,50 @@ export function Chat(props: { channelID: string, statusID: number }) {
         }).then(res => res.json()).then(res => {
             if (res.success) {
                 toast(`L'écoute à été attribuée à ${data.volunteer.name}`)
+                setStatus(2)
             } else {
                 return toast("Erreur lors de l'attribution", {
                     description: (
                         <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
                           <code className="text-white">{JSON.stringify(res.error, null, 2)}</code>
                         </pre>
+                    ),
+                })
+            }
+        })
+    }
+
+    const transmissionSchema = z.object({
+        problematic: z.string(),
+        observations: z.string(),
+        info: z.string().optional(),
+    });
+
+    const transmissionForm = useForm<z.infer<typeof transmissionSchema>>({
+        resolver: zodResolver(transmissionSchema),
+    });
+
+    function transmission(data: z.infer<typeof transmissionSchema>) {
+        fetch('/api/tickets/transmission', {
+            method: "POST",
+            body: JSON.stringify({
+                channelID,
+                problematic: data.problematic,
+                observations: data.observations,
+                info: data.info,
+            })
+        }).then(res => res.json()).then(res => {
+            if (res.success) {
+                toast("Transmission envoyée")
+                setTimeout(() => {
+                    router.push("/app/chat")
+                }, 2000)
+            } else {
+                return toast("Erreur lors de la transmission", {
+                    description: (
+                        <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
+                  <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+                </pre>
                     ),
                 })
             }
@@ -438,7 +478,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                 <div className="fixed top-6 right-6 flex flex-row gap-2">
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
-                            <Button variant="outline">
+                            <Button variant="outline" disabled={status == 3 || status == 4}>
                                 <UserRoundPlus/> Attribuer
                             </Button>
                         </AlertDialogTrigger>
@@ -526,13 +566,13 @@ export function Chat(props: { channelID: string, statusID: number }) {
                         </AlertDialogContent>
                     </AlertDialog>
 
-                    <Button variant='outline' color={callColor} onClick={handleCall}>
+                    <Button variant='outline' color={callColor} onClick={handleCall} disabled={status !== 2}>
                         <PhoneCall color={callColor}/> Démarrer un vocal
                     </Button>
 
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
-                            <Button variant="destructive">
+                            <Button variant="destructive" disabled={status == 3 || status == 4}>
                                 <MessageCircleOff/> Fermer l'écoute
                             </Button>
                         </AlertDialogTrigger>
@@ -546,19 +586,98 @@ export function Chat(props: { channelID: string, statusID: number }) {
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                                 <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                <Button variant="destructive" onClick={() => {
-                                    fetch('/api/tickets/close', {
-                                        method: 'POST',
-                                        body: JSON.stringify({
-                                            id: ticket?.id
+                                <AlertDialogAction asChild>
+                                    <Button variant="destructive" onClick={() => {
+                                        fetch('/api/tickets/close', {
+                                            method: 'POST',
+                                            body: JSON.stringify({
+                                                channelID: channelID
+                                            })
+                                        }).then(res => res.json()).then(res => {
+                                            if (res.success) {
+                                                setStatus(3)
+                                            }
                                         })
-                                    }).then(res => res.json()).then(res => {
-
-                                    })
-                                }}>
-                                    Fermer l'écoute
-                                </Button>
+                                    }}>
+                                        Fermer l'écoute
+                                    </Button>
+                                </AlertDialogAction>
                             </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button variant="outline" disabled={status == 4}>
+                                <NotebookPen/> Transmission
+                            </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Merci de remplir la fiche de transmission</AlertDialogTitle>
+                            </AlertDialogHeader>
+                            <Form {...transmissionForm}>
+                                <form onSubmit={transmissionForm.handleSubmit(transmission)} className="space-y-6">
+                                    <FormField
+                                        control={transmissionForm.control}
+                                        name="problematic"
+                                        render={({field}) => (
+                                            <FormItem className="flex flex-col">
+                                                <FormLabel>Problématique de l'écoute* :</FormLabel>
+                                                <FormControl>
+                                                    <Textarea
+                                                        placeholder="Problématique..."
+                                                        className="resize-none"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={transmissionForm.control}
+                                        name="observations"
+                                        render={({field}) => (
+                                            <FormItem className="flex flex-col">
+                                                <FormLabel>Observations générales* :</FormLabel>
+                                                <FormControl>
+                                                    <Textarea
+                                                        placeholder="Observations..."
+                                                        className="resize-none"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={transmissionForm.control}
+                                        name="info"
+                                        render={({field}) => (
+                                            <FormItem className="flex flex-col">
+                                                <FormLabel>Informations supplémentaires (optionnel) :</FormLabel>
+                                                <FormControl>
+                                                    <Textarea
+                                                        placeholder="Informations..."
+                                                        className="resize-none"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                        <AlertDialogAction asChild>
+                                            <Button type="submit">Envoyer</Button>
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </form>
+                            </Form>
                         </AlertDialogContent>
                     </AlertDialog>
                 </div> : null
@@ -580,6 +699,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                             setCurrentMsg(e.target.value)
                             sendTyping()
                         }}
+                        disabled={status == 3 || status == 4}
                         ref={textRef}
                         onKeyDown={(e) => {
                             if (e.key === "Enter" && !e.shiftKey) {
