@@ -14,6 +14,12 @@ const httpPort = process.env.HTTP_PORT || 80;
 const app = next({dev, hostname, port});
 const handler = app.getRequestHandler();
 
+setInterval(() => {
+    const used = process.memoryUsage();
+    console.log(`Memory: RSS=${(used.rss / 1024 / 1024).toFixed(1)} MB, HeapUsed=${(used.heapUsed / 1024 / 1024).toFixed(1)} MB, HeapTotal=${(used.heapTotal / 1024 / 1024).toFixed(1)} MB`);
+}, 10000); // every 10s
+
+
 if (process.env.NODE_ENV !== 'production') {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     const originalFetch = global.fetch || (await import('node-fetch')).default;
