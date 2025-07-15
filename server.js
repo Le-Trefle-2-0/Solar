@@ -67,7 +67,7 @@ async function getChannels(id) {
             body: JSON.stringify({id}),
         });
         const body = await res.json();
-        if (body.success) return body.accessedChannelIDs
+        if (body.success) return body.accessedChannels
     } catch (error) {
         return null;
     }
@@ -115,7 +115,8 @@ app.prepare().then(() => {
     io.on("connection", async (socket) => {
         const userID = socket.user.id;
         const channels = await getChannels(userID)
-        for (let id of channels) {
+        for (let channel of channels) {
+            const id = channel.id;
             socket.join(id)
             const userObject = {
                 id: socket.user.id,
@@ -124,6 +125,17 @@ app.prepare().then(() => {
                 role: socket.user.role
             };
             socket.to(id).emit("joined", userObject);
+
+            const sockets = await io.in(id).fetchSockets();
+
+            const users = sockets.map(s => ({
+                id: s.user.id,
+                username: s.user.displayUsername || s.user.name,
+                image: s.user.image,
+                role: s.user.role
+            }));
+
+            io.in(id).emit("userList", users);
         }
 
         let lastSeen = Date.now();
@@ -152,15 +164,21 @@ app.prepare().then(() => {
             }
         }, 5000);
 
-        socket.on("disconnect", () => {
-            for (let id of channels) {
-                const userObject = {
-                    id: socket.user.id,
-                    username: socket.user.displayUsername || socket.user.name,
-                    image: socket.user.image,
-                    role: socket.user.role
-                };
-                socket.to(id).emit("left", userObject);
+        socket.on("disconnect", async () => {
+            if (!channels) return;
+            for (let channel of channels) {
+                const channelID = channel.id;
+                socket.to(channelID).emit("left", socket.user);
+
+                const sockets = await io.in(channelID).fetchSockets();
+                const users = sockets.map(s => ({
+                    id: s.user.id,
+                    username: s.user.displayUsername || s.user.name,
+                    image: s.user.image,
+                    role: s.user.role
+                }));
+
+                io.in(channelID).emit("userList", users);
             }
             clearInterval(interval);
         });

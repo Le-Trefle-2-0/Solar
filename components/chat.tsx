@@ -189,6 +189,29 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
         let timer: NodeJS.Timeout;
 
+        function handleConnect() {
+            console.log('handling connection')
+            if (!socket) return console.log('no socket');
+            socket.emit('getOnlineUsers', {channelID}, (users: {
+                id: string;
+                image: string | null;
+                role: string;
+                username: string
+            }[]) => {
+                console.log('users connected', users);
+                setOnlineUsers(users);
+            });
+        }
+
+        function handleUserList(users: UserFromList[]) {
+            console.log("Received user list:", users);
+            setOnlineUsers(users);
+        }
+
+        socket.on("userList", handleUserList);
+
+        socket.on('connect', handleConnect);
+
         socket.on("message", (data: Msg) => {
             setChat((pre) => [...pre, data as MsgWithID])
             if (timer) clearTimeout(timer)
@@ -256,33 +279,8 @@ export function Chat(props: { channelID: string, statusID: number }) {
             );
         });
 
-        socket.emit('getOnlineUsers', {channelID}, (users: {
-            id: string;
-            image: string | null;
-            role: string;
-            username: string
-        }[]) => {
-            console.log(users);
-            setOnlineUsers(users);
-        });
-
-        socket.on('joined', (user) => {
-            console.log("USER CONNECTED", user);
-            setOnlineUsers(prev => {
-                if (prev.some(u => u.id === user.id)) return prev;
-                return [...prev, user];
-            });
-        });
-
-        socket.on('left', (user) => {
-            console.log("USER DISCONNECTED", user);
-            setOnlineUsers(prev => prev.filter(u => u.id !== user.id));
-        });
-
-
         return () => {
-            socket.off('userOnline');
-            socket.off('userOffline');
+            socket.off('userList');
             socket.off('reactionAdd');
             socket.off('reactionRemove');
         };
@@ -328,7 +326,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                     }))
                 ]);
             })
-        rootDivRef.current?.focus();
+        // rootDivRef.current?.focus();
 
         return () => {
         }
