@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "node server.js NODE_ENV=dev",
     "build": "next build",
-    "start": "node server.js NODE_ENV=production",
+    "start": "NODE_ENV=production node --max-old-space-size=4096 server.js ",
     "lint": "next lint",
     "postinstall": "flowbite-react patch"
   },
