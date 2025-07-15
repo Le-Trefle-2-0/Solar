@@ -2,6 +2,7 @@ import {NextRequest, NextResponse} from "next/server";
 import {z} from "zod";
 import prisma from "@/lib/prisma";
 import {auth} from "@/lib/auth";
+import type {Channel} from "@/generated/prisma/client"
 
 export async function POST(req: NextRequest) {
     const bodySchema = z.object({
@@ -12,9 +13,9 @@ export async function POST(req: NextRequest) {
     try {
         const verifiedBody = bodySchema.parse(body);
         const channels = await prisma.channel.findMany();
-        const accessedChannelIDs: string[] = [];
+        const accessedChannels: Channel[] = [];
         for (const channel of channels) {
-            if (channel.id == "1") accessedChannelIDs.push(channel.id);
+            if (channel.id == "1") accessedChannels.push(channel);
             const ticket = await prisma.ticket.findUnique({
                 where: {
                     channelId: channel.id,
@@ -33,13 +34,13 @@ export async function POST(req: NextRequest) {
                             }
                         },
                     });
-                    if (perm.success) accessedChannelIDs.push(channel.id);
-                    else if (ticket.assignedUserId == verifiedBody.id) accessedChannelIDs.push(channel.id);
+                    if (perm.success) accessedChannels.push(channel);
+                    else if (ticket.assignedUserId == verifiedBody.id) accessedChannels.push(channel);
                 }
             }
         }
 
-        return NextResponse.json({success: true, accessedChannelIDs}, {status: 200});
+        return NextResponse.json({success: true, accessedChannels}, {status: 200});
     } catch (error) {
         if (error instanceof z.ZodError) {
             return NextResponse.json({success: false, error: error.flatten()}, {status: 400})
