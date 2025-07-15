@@ -174,6 +174,16 @@ export function Chat(props: { channelID: string, statusID: number }) {
         }
     };
 
+    type UserFromList = {
+        id: string;
+        username: string;
+        image: string | null;
+        role: string;
+    };
+
+    const [onlineUsers, setOnlineUsers] = useState<UserFromList[]>([]);
+
+
     useEffect(() => {
         if (!socket) return;
 
@@ -246,7 +256,33 @@ export function Chat(props: { channelID: string, statusID: number }) {
             );
         });
 
+        socket.emit('getOnlineUsers', {channelID}, (users: {
+            id: string;
+            image: string | null;
+            role: string;
+            username: string
+        }[]) => {
+            console.log(users);
+            setOnlineUsers(users);
+        });
+
+        socket.on('joined', (user) => {
+            console.log("USER CONNECTED", user);
+            setOnlineUsers(prev => {
+                if (prev.some(u => u.id === user.id)) return prev;
+                return [...prev, user];
+            });
+        });
+
+        socket.on('left', (user) => {
+            console.log("USER DISCONNECTED", user);
+            setOnlineUsers(prev => prev.filter(u => u.id !== user.id));
+        });
+
+
         return () => {
+            socket.off('userOnline');
+            socket.off('userOffline');
             socket.off('reactionAdd');
             socket.off('reactionRemove');
         };
@@ -265,18 +301,20 @@ export function Chat(props: { channelID: string, statusID: number }) {
                 setChannelName(data.name)
             });
 
-        fetch(`/api/tickets/findBy/channelID`, {
-            method: "POST",
-            body: JSON.stringify({
-                channelID: channelID,
-            }),
-        }).then(res => res.json()).then(data => {
-            try {
-                setTicket(data.ticket);
-            } catch (e) {
-                console.log(e);
-            }
-        });
+        if (channelID !== "1") {
+            fetch(`/api/tickets/findBy/channelID`, {
+                method: "POST",
+                body: JSON.stringify({
+                    channelID: channelID,
+                }),
+            }).then(res => res.json()).then(data => {
+                try {
+                    setTicket(data.ticket);
+                } catch (e) {
+                    console.log(e);
+                }
+            });
+        }
         fetch(`/api/events/getAvailable`)
             .then(res => res.json())
             .then(data => {
@@ -421,12 +459,17 @@ export function Chat(props: { channelID: string, statusID: number }) {
         })
     }
 
+    const roleOrderAndLabels: Record<string, string> = {
+        bot: "Robot",
+        admin: "Administrateur",
+        manager: "Référent Bénévole Écoutant",
+        volunteer: "Bénévole Écoutant",
+        training: "Bénévole en formation"
+    };
+
     return (
-        <div className="flex flex-col h-screen p-3 gap-4 w-full" onKeyDown={(e) => {
-            // if (!nonChar.includes(e.key) && !gifOpen) {
-            //     textRef.current?.focus();
-            // }
-        }} tabIndex={0} ref={rootDivRef}>
+        <div className="flex flex-row items-center justify-center w-full">
+            <div className="flex flex-col h-screen p-3 gap-4 w-full" tabIndex={0} ref={rootDivRef}>
             <video className='w-0 h-0' playsInline ref={callingVideoRef} autoPlay/>
             <div className="flex flex-col flex-grow overflow-y-auto mt-10">
                 {chat.map(({author, content, timestamp, reactions, id}, key) => {
@@ -745,6 +788,44 @@ export function Chat(props: { channelID: string, statusID: number }) {
                     <button className='cursor-pointer'><Send width={42}/></button>
                 </form>
             </div>
+        </div>
+            <div className="flex flex-col w-80 h-screen outline-1 p-4 overflow-y-auto">
+                {Object.entries(
+                    onlineUsers.reduce((acc, user) => {
+                        if (!acc[user.role]) acc[user.role] = [];
+                        acc[user.role].push(user);
+                        return acc;
+                    }, {} as Record<string, typeof onlineUsers>)
+                ).sort(
+                    ([roleA], [roleB]) =>
+                        Object.keys(roleOrderAndLabels).indexOf(roleA) -
+                        Object.keys(roleOrderAndLabels).indexOf(roleB)
+                ).map(([role, users]) => (
+                    <div key={role} className="mb-4">
+                        <h4 className="text-md font-semibold text-gray-700 mb-2 capitalize">
+                            {roleOrderAndLabels[role] || role}
+                        </h4>
+                        <div className="flex flex-col gap-2">
+                            {users.map(user => (
+                                <div
+                                    key={user.id}
+                                    className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                                >
+                                    <img
+                                        src={user.image || "/logo.svg"}
+                                        alt={user.username}
+                                        className="w-8 h-8 rounded-lg object-cover"
+                                    />
+                                    <span className="text-sm text-gray-900 dark:text-gray-100 truncate">
+                                    {user.username}
+                                  </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                ))}
+            </div>
+
         </div>
     );
 }
