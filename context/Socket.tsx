@@ -30,6 +30,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({childre
             if (data.token) {
                 const s = await initSocket(data.token);
                 setSocket(s);
+                setInterval(() => s?.emit('heartbeat'), 5000)
             }
         };
         init();

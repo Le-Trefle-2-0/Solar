@@ -117,7 +117,66 @@ app.prepare().then(() => {
         const channels = await getChannels(userID)
         for (let id of channels) {
             socket.join(id)
+            const userObject = {
+                id: socket.user.id,
+                username: socket.user.displayUsername || socket.user.name,
+                image: socket.user.image,
+                role: socket.user.role
+            };
+            socket.to(id).emit("joined", userObject);
         }
+
+        let lastSeen = Date.now();
+
+        socket.onAny(() => {
+            lastSeen = Date.now();
+        });
+
+        socket.on("heartbeat", () => {
+            lastSeen = Date.now();
+        });
+
+        const interval = setInterval(() => {
+            if (Date.now() - lastSeen > 10000) {
+                for (let id of channels) {
+                    const userObject = {
+                        id: socket.user.id,
+                        username: socket.user.displayUsername || socket.user.name,
+                        image: socket.user.image,
+                        role: socket.user.role
+                    };
+                    socket.to(id).emit("left", userObject);
+                }
+                socket.disconnect(true);
+                clearInterval(interval);
+            }
+        }, 5000);
+
+        socket.on("disconnect", () => {
+            for (let id of channels) {
+                const userObject = {
+                    id: socket.user.id,
+                    username: socket.user.displayUsername || socket.user.name,
+                    image: socket.user.image,
+                    role: socket.user.role
+                };
+                socket.to(id).emit("left", userObject);
+            }
+            clearInterval(interval);
+        });
+
+        socket.on('getOnlineUsers', async (data, callback) => {
+            const sockets = await io.in(data.channelID).fetchSockets();
+
+            const users = sockets.map(s => ({
+                id: s.user.id,
+                username: s.user.displayUsername || s.user.name,
+                image: s.user.image,
+                role: s.user.role
+            }));
+
+            callback(users);
+        });
 
         socket.on("ping", (callback) => {
             callback();
