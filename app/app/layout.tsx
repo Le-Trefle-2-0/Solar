@@ -25,11 +25,10 @@ export default async function RootLayout({
             <SidebarProvider>
                 <AppSidebar className="border-r-main border-r"/>
                 <div className="h-full w-full overflow-hidden">
-                    <SidebarTrigger className="fixed"/>
+                    <SidebarTrigger className="fixed z-10 m-3"/>
                     {children}
                 </div>
             </SidebarProvider>
         </SocketProvider>
-        // </div>
     );
 }
