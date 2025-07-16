@@ -733,7 +733,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
                     <div className="sticky bottom-0">
                         <div className={gifOpen ? "block absolute right-2 bottom-15" : "hidden"}>
-                            <GifPicker tenorApiKey={"AIzaSyDUnTsv0aerH1JSzXRmKTVrpx3YEz3e_RM"} onGifClick={(gif) => {
+                            <GifPicker tenorApiKey={process.env.NEXT_PUBLIC_TENOR_KEY as string} onGifClick={(gif) => {
                                 sendMessage(gif.url)
                                 setGifOpen(false);
                             }}/>
@@ -840,43 +840,6 @@ export function Chat(props: { channelID: string, statusID: number }) {
                         ))}
                     </SidebarContent>
                 </Sidebar>
-                {/*<div className="flex flex-col w-80 h-screen border-l-main border-l p-4 overflow-y-auto">*/}
-                {/*    {Object.entries(*/}
-                {/*        onlineUsers.reduce((acc, user) => {*/}
-                {/*            if (!acc[user.role]) acc[user.role] = [];*/}
-                {/*            acc[user.role].push(user);*/}
-                {/*            return acc;*/}
-                {/*        }, {} as Record<string, typeof onlineUsers>)*/}
-                {/*    ).sort(*/}
-                {/*        ([roleA], [roleB]) =>*/}
-                {/*            Object.keys(roleOrderAndLabels).indexOf(roleA) -*/}
-                {/*            Object.keys(roleOrderAndLabels).indexOf(roleB)*/}
-                {/*    ).map(([role, users]) => (*/}
-                {/*        <div key={role} className="mb-4">*/}
-                {/*            <h4 className="text-md font-semibold text-gray-700 mb-2 capitalize">*/}
-                {/*                {roleOrderAndLabels[role] || role}*/}
-                {/*            </h4>*/}
-                {/*            <div className="flex flex-col gap-2">*/}
-                {/*                {users.map(user => (*/}
-                {/*                    <div*/}
-                {/*                        key={user.id}*/}
-                {/*                        className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"*/}
-                {/*                    >*/}
-                {/*                        <img*/}
-                {/*                            src={user.image || "/logo.svg"}*/}
-                {/*                            alt={user.username}*/}
-                {/*                            className="w-8 h-8 rounded-lg object-cover"*/}
-                {/*                        />*/}
-                {/*                        <span className="text-sm text-gray-900 dark:text-gray-100 truncate">*/}
-                {/*                        {user.username}*/}
-                {/*                      </span>*/}
-                {/*                    </div>*/}
-                {/*                ))}*/}
-                {/*            </div>*/}
-                {/*        </div>*/}
-                {/*    ))}*/}
-                {/*</div>*/}
-
             </div>
         </SidebarProvider>
     );
