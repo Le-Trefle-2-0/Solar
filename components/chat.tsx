@@ -7,7 +7,6 @@ import {
     Check,
     ChevronsUpDown,
     Laugh,
-    Menu,
     MessageCircleOff,
     NotebookPen,
     PhoneCall,
@@ -23,16 +22,7 @@ import {saveMessage} from "@/lib/messageManager";
 import {useSession} from "@/lib/auth-client";
 import {Socket} from "socket.io-client";
 import Peer from "peerjs";
-import {
-    Button,
-    Sidebar,
-    SidebarContent,
-    SidebarGroup,
-    SidebarHeader,
-    SidebarProvider,
-    Textarea,
-    useSidebar
-} from "@/components/ui";
+import {Button, Textarea, useSidebar} from "@/components/ui";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -479,8 +469,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
     };
 
     return (
-        <SidebarProvider>
-            <div className="flex flex-row items-center justify-center w-full">
+        <div className="flex flex-row items-center justify-center w-full">
                 <div className="flex flex-col relative h-screen p-3 gap-4 w-full" tabIndex={0} ref={rootDivRef}>
                     <video className='w-0 h-0' playsInline ref={callingVideoRef} autoPlay/>
                     <div className="flex flex-col flex-grow overflow-y-auto mt-10">
@@ -742,13 +731,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                 </Form>
                             </AlertDialogContent>
                         </AlertDialog>
-
-                        <Button variant="outline" onClick={toggleSidebar}>
-                            <Menu/>
-                        </Button>
                     </div>
-
-                    {/*<SidebarTrigger className="absolute right-0 z-10 m-3" />*/}
 
                     <div className="sticky bottom-0">
                         <div className={gifOpen ? "block absolute right-2 bottom-15" : "hidden"}>
@@ -814,13 +797,14 @@ export function Chat(props: { channelID: string, statusID: number }) {
                     </div>
                 </div>
 
-                <Sidebar variant="inset" side="right" className="border-l-main border-l">
-                    <SidebarHeader>
+            <div className="hidden lg:flex flex-col justify-start h-screen w-80 p-6 gap-3 border-l-main border-l">
+                <div>
                         <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">{channelName}</h3>
-                        <small
-                            className="text-sm leading-none font-medium">{onlineUsers.length} utilisateur{onlineUsers.length >= 2 ? "s" : null} connecté{onlineUsers.length >= 2 ? "s" : null}</small>
-                    </SidebarHeader>
-                    <SidebarContent>
+                    <small className="text-sm leading-none font-medium">
+                        {onlineUsers.length} utilisateur{onlineUsers.length >= 2 ? "s" : null} connecté{onlineUsers.length >= 2 ? "s" : null}
+                    </small>
+                </div>
+                <div className="flex flex-col">
                         {Object.entries(
                             onlineUsers.reduce((acc, user) => {
                                 if (!acc[user.role]) acc[user.role] = [];
@@ -832,34 +816,31 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                 Object.keys(roleOrderAndLabels).indexOf(roleA) -
                                 Object.keys(roleOrderAndLabels).indexOf(roleB)
                         ).map(([role, users]) => (
-                            <SidebarGroup key={role}>
-                                <div className="mb-4">
-                                    <h4 className="text-md font-semibold text-gray-700 mb-2 capitalize">
-                                        {roleOrderAndLabels[role] || role}
-                                    </h4>
-                                    <div className="flex flex-col gap-2">
-                                        {users.map(user => (
-                                            <div
-                                                key={user.id}
-                                                className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-                                            >
-                                                <img
-                                                    src={user.image || "/logo.svg"}
-                                                    alt={user.username}
-                                                    className="w-8 h-8 rounded-lg object-cover"
-                                                />
-                                                <span className="text-sm text-gray-900 dark:text-gray-100 truncate">
-                                                {user.username}
-                                              </span>
-                                            </div>
-                                        ))}
-                                    </div>
+                            <div key={role} className="mb-4">
+                                <h4 className="text-md font-semibold text-gray-700 mb-2 capitalize">
+                                    {roleOrderAndLabels[role] || role}
+                                </h4>
+                                <div className="flex flex-col gap-2">
+                                    {users.map(user => (
+                                        <div
+                                            key={user.id}
+                                            className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                                        >
+                                            <img
+                                                src={user.image || "/logo.svg"}
+                                                alt={user.username}
+                                                className="w-8 h-8 rounded-lg object-cover"
+                                            />
+                                            <span className="text-sm text-gray-900 dark:text-gray-100 truncate">
+                                        {user.username}
+                                      </span>
+                                        </div>
+                                    ))}
                                 </div>
-                            </SidebarGroup>
+                            </div>
                         ))}
-                    </SidebarContent>
-                </Sidebar>
+                </div>
             </div>
-        </SidebarProvider>
+        </div>
     );
 }
