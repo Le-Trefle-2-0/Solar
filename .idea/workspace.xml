@@ -1,0 +1,589 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="add dynamic volunteer list retrieval">
+      <change afterPath="$PROJECT_DIR$/app/app/admin/columns.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/app/admin/data-table.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/app/admin/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/app-sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/app-sidebar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/table.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/interface.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/interface.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="tsconfig.json" />
+        <option value="CSS File" />
+        <option value="JavaScript File" />
+        <option value="TypeScript File" />
+        <option value="TypeScript JSX File" />
+      </list>
+    </option>
+  </component>
+  <component name="FormatOnSaveOptions">
+    <option name="myRunOnSave" value="false" />
+    <option name="myAllFileTypesSelected" value="true" />
+    <option name="mySelectedFileTypes">
+      <set />
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="beta-1.0-updated" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="HARD" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;PaulPR-44&quot;
+  }
+}</component>
+  <component name="GithubProjectSettings">
+    <option name="branchProtectionPatterns">
+      <list>
+        <option value="Main" />
+      </list>
+    </option>
+  </component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Le-Trefle-2-0/Solar.git&quot;,
+    &quot;accountId&quot;: &quot;aa84fc37-7a25-4061-a16d-6cd63ff7a22f&quot;
+  }
+}</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="ProjectErrors" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
+  <component name="ProjectId" id="2y5enfk6v7qnKkFGLHy191opMjZ" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;remake&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/admin/WebstormProjects/Solar/app/app/chat&quot;,
+    &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\admin\\WebstormProjects\\Solar\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mysql&quot;
+    ]
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\admin\WebstormProjects\Solar\app\app\chat" />
+      <recent name="$PROJECT_DIR$/app/app/chat" />
+      <recent name="$PROJECT_DIR$/components/ui/modals" />
+      <recent name="$PROJECT_DIR$/lib" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\admin\WebstormProjects\Solar\ssl" />
+      <recent name="$PROJECT_DIR$/app" />
+      <recent name="C:\Users\admin\WebstormProjects\Solar\app\api\messages" />
+      <recent name="C:\Users\admin\WebstormProjects\Solar\lib" />
+      <recent name="C:\Users\admin\WebstormProjects\Solar\public" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-WS-243.25659.40" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="" />
+      <created>1749129029242</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1749129029242</updated>
+      <workItem from="1749129030358" duration="8079000" />
+      <workItem from="1749387412260" duration="1223000" />
+      <workItem from="1749388665920" duration="7169000" />
+      <workItem from="1749471981714" duration="4976000" />
+      <workItem from="1749477012478" duration="15760000" />
+      <workItem from="1749913419546" duration="1325000" />
+      <workItem from="1750256176404" duration="27172000" />
+      <workItem from="1750317616997" duration="272000" />
+      <workItem from="1750317896164" duration="6375000" />
+      <workItem from="1750325497089" duration="5738000" />
+      <workItem from="1750343385303" duration="1148000" />
+      <workItem from="1750344542615" duration="13911000" />
+      <workItem from="1750363667156" duration="9319000" />
+      <workItem from="1750427135972" duration="32156000" />
+      <workItem from="1750726875409" duration="13460000" />
+    </task>
+    <task id="LOCAL-00008" summary="update password recovery system">
+      <option name="closed" value="true" />
+      <created>1749470676615</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1749470676615</updated>
+    </task>
+    <task id="LOCAL-00009" summary="autofix unused imports">
+      <option name="closed" value="true" />
+      <created>1749470914261</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1749470914261</updated>
+    </task>
+    <task id="LOCAL-00010" summary="update auth style and translate pages to french">
+      <option name="closed" value="true" />
+      <created>1749473074490</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1749473074490</updated>
+    </task>
+    <task id="LOCAL-00011" summary="install auth plugins">
+      <option name="closed" value="true" />
+      <created>1749477683069</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1749477683069</updated>
+    </task>
+    <task id="LOCAL-00012" summary="update prisma schema for plugins">
+      <option name="closed" value="true" />
+      <created>1749477728445</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1749477728445</updated>
+    </task>
+    <task id="LOCAL-00013" summary="base app layout">
+      <option name="closed" value="true" />
+      <created>1749477787312</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1749477787312</updated>
+    </task>
+    <task id="LOCAL-00014" summary="sidebar styling">
+      <option name="closed" value="true" />
+      <created>1749514590389</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1749514590389</updated>
+    </task>
+    <task id="LOCAL-00015" summary="base app interface layout">
+      <option name="closed" value="true" />
+      <created>1749522876431</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1749522876431</updated>
+    </task>
+    <task id="LOCAL-00016" summary="install socket.io">
+      <option name="closed" value="true" />
+      <created>1749547285771</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1749547285771</updated>
+    </task>
+    <task id="LOCAL-00017" summary="setup socket server">
+      <option name="closed" value="true" />
+      <created>1750260978496</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1750260978496</updated>
+    </task>
+    <task id="LOCAL-00018" summary="auth ui update">
+      <option name="closed" value="true" />
+      <created>1750261079133</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1750261079133</updated>
+    </task>
+    <task id="LOCAL-00019" summary="update prisma schema">
+      <option name="closed" value="true" />
+      <created>1750285059162</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1750285059162</updated>
+    </task>
+    <task id="LOCAL-00020" summary="prisma client update">
+      <option name="closed" value="true" />
+      <created>1750285082078</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1750285082078</updated>
+    </task>
+    <task id="LOCAL-00021" summary="add typing interfaces">
+      <option name="closed" value="true" />
+      <created>1750285100163</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1750285100163</updated>
+    </task>
+    <task id="LOCAL-00022" summary="include message managing and fetching route">
+      <option name="closed" value="true" />
+      <created>1750285130172</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1750285130172</updated>
+    </task>
+    <task id="LOCAL-00023" summary="update sidebar width">
+      <option name="closed" value="true" />
+      <created>1750285142236</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1750285142236</updated>
+    </task>
+    <task id="LOCAL-00024" summary="chat page with instant socket messaging and database storage and fetching">
+      <option name="closed" value="true" />
+      <created>1750285185292</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1750285185292</updated>
+    </task>
+    <task id="LOCAL-00025" summary="WebStorm update">
+      <option name="closed" value="true" />
+      <created>1750285205272</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1750285205272</updated>
+    </task>
+    <task id="LOCAL-00026" summary="add react-input-emoji package">
+      <option name="closed" value="true" />
+      <created>1750285220906</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1750285220906</updated>
+    </task>
+    <task id="LOCAL-00027" summary="add emoji selector to message sending">
+      <option name="closed" value="true" />
+      <created>1750288120949</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1750288120949</updated>
+    </task>
+    <task id="LOCAL-00028" summary="clean up console.log">
+      <option name="closed" value="true" />
+      <created>1750288190511</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1750288190511</updated>
+    </task>
+    <task id="LOCAL-00029" summary="remove double styling property">
+      <option name="closed" value="true" />
+      <created>1750288272068</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1750288272068</updated>
+    </task>
+    <task id="LOCAL-00030" summary="update database and text components to save long strings and line breaks">
+      <option name="closed" value="true" />
+      <created>1750324502631</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1750324502632</updated>
+    </task>
+    <task id="LOCAL-00031" summary="update better-auth-ui to 2.0 and add Discord OAuth support">
+      <option name="closed" value="true" />
+      <created>1750424112157</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1750424112157</updated>
+    </task>
+    <task id="LOCAL-00032" summary="fix message fetching">
+      <option name="closed" value="true" />
+      <created>1750424507773</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1750424507773</updated>
+    </task>
+    <task id="LOCAL-00033" summary="add dynamic ticket links in sidebar">
+      <option name="closed" value="true" />
+      <created>1750426899116</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1750426899116</updated>
+    </task>
+    <task id="LOCAL-00034" summary="add dynamic ticket page">
+      <option name="closed" value="true" />
+      <created>1750426910945</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1750426910945</updated>
+    </task>
+    <task id="LOCAL-00035" summary="remove placeholder dashboard page">
+      <option name="closed" value="true" />
+      <created>1750683047338</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1750683047338</updated>
+    </task>
+    <task id="LOCAL-00036" summary="adapt server and chat page to handle secure websocket connexion">
+      <option name="closed" value="true" />
+      <created>1750683154094</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1750683154094</updated>
+    </task>
+    <task id="LOCAL-00037" summary="install shadcn components">
+      <option name="closed" value="true" />
+      <created>1750683507543</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1750683507543</updated>
+    </task>
+    <task id="LOCAL-00038" summary="base ui setup">
+      <option name="closed" value="true" />
+      <created>1750684455908</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1750684455908</updated>
+    </task>
+    <task id="LOCAL-00039" summary="components.json install">
+      <option name="closed" value="true" />
+      <created>1750684924361</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1750684924361</updated>
+    </task>
+    <task id="LOCAL-00040" summary="update responsive sidebar">
+      <option name="closed" value="true" />
+      <created>1750723515593</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1750723515593</updated>
+    </task>
+    <task id="LOCAL-00041" summary="update message retrieving including username">
+      <option name="closed" value="true" />
+      <created>1750724634772</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1750724634772</updated>
+    </task>
+    <task id="LOCAL-00042" summary="remove unused console.log">
+      <option name="closed" value="true" />
+      <created>1750725638026</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1750725638026</updated>
+    </task>
+    <task id="LOCAL-00043" summary="update app layout and chat ui styling">
+      <option name="closed" value="true" />
+      <created>1750725657844</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1750725657844</updated>
+    </task>
+    <task id="LOCAL-00044" summary="remove old auth pages">
+      <option name="closed" value="true" />
+      <created>1750727345697</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1750727345697</updated>
+    </task>
+    <task id="LOCAL-00045" summary="ui update">
+      <option name="closed" value="true" />
+      <created>1750729550940</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1750729550940</updated>
+    </task>
+    <task id="LOCAL-00046" summary="update socket connection property in chat and ui update">
+      <option name="closed" value="true" />
+      <created>1750814061836</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1750814061836</updated>
+    </task>
+    <task id="LOCAL-00047" summary="update ticket page to sync with chat update">
+      <option name="closed" value="true" />
+      <created>1750814234942</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1750814234942</updated>
+    </task>
+    <task id="LOCAL-00048" summary="prisma update">
+      <option name="closed" value="true" />
+      <created>1751292086586</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1751292086586</updated>
+    </task>
+    <task id="LOCAL-00049" summary="include role data in message info">
+      <option name="closed" value="true" />
+      <created>1751292126571</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1751292126571</updated>
+    </task>
+    <task id="LOCAL-00050" summary="remove unused console.log">
+      <option name="closed" value="true" />
+      <created>1751292620762</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1751292620762</updated>
+    </task>
+    <task id="LOCAL-00051" summary="update message rendering to handle multi message from single user and text wrapping">
+      <option name="closed" value="true" />
+      <created>1751293485105</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1751293485105</updated>
+    </task>
+    <task id="LOCAL-00052" summary="add temporary getAvailable endpoint">
+      <option name="closed" value="true" />
+      <created>1751331512506</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1751331512506</updated>
+    </task>
+    <task id="LOCAL-00053" summary="export socket as global">
+      <option name="closed" value="true" />
+      <created>1751331522470</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1751331522470</updated>
+    </task>
+    <task id="LOCAL-00054" summary="add formVolunteer interface">
+      <option name="closed" value="true" />
+      <created>1751331539091</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1751331539091</updated>
+    </task>
+    <task id="LOCAL-00055" summary="add assignment api endpoint">
+      <option name="closed" value="true" />
+      <created>1751331556176</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1751331556176</updated>
+    </task>
+    <task id="LOCAL-00056" summary="add dynamic volunteer list retrieval">
+      <option name="closed" value="true" />
+      <created>1751332397346</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1751332397346</updated>
+    </task>
+    <option name="localTasksCounter" value="57" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="add dynamic ticket links in sidebar" />
+    <MESSAGE value="add dynamic ticket page" />
+    <MESSAGE value="update userManager" />
+    <MESSAGE value="add event management api endpoint" />
+    <MESSAGE value="remove placeholder dashboard page" />
+    <MESSAGE value="adapt server and chat page to handle secure websocket connexion" />
+    <MESSAGE value="install shadcn components" />
+    <MESSAGE value="base ui setup" />
+    <MESSAGE value="components.json install" />
+    <MESSAGE value="update responsive sidebar" />
+    <MESSAGE value="update message retrieving including username" />
+    <MESSAGE value="update app layout and chat ui styling" />
+    <MESSAGE value="remove old auth pages" />
+    <MESSAGE value="ui update" />
+    <MESSAGE value="update socket connection property in chat and ui update" />
+    <MESSAGE value="update ticket page to sync with chat update" />
+    <MESSAGE value="prisma update" />
+    <MESSAGE value="include role data in message info" />
+    <MESSAGE value="remove unused console.log" />
+    <MESSAGE value="update message rendering to handle multi message from single user and text wrapping" />
+    <MESSAGE value="add temporary getAvailable endpoint" />
+    <MESSAGE value="export socket as global" />
+    <MESSAGE value="add formVolunteer interface" />
+    <MESSAGE value="add assignment api endpoint" />
+    <MESSAGE value="add dynamic volunteer list retrieval" />
+    <option name="LAST_COMMIT_MESSAGE" value="add dynamic volunteer list retrieval" />
+    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
+    <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
+  </component>
+</project>

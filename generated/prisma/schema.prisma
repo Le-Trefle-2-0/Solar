@@ -1,0 +1,305 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id
+  name          String    @db.Text
+  email         String    @unique
+  emailVerified Boolean
+  image         String?   @db.Text
+  createdAt     DateTime
+  updatedAt     DateTime
+  accounts      Account[]
+  sessions      Session[]
+  messages      Message[]
+
+  role       String?   @db.Text
+  banned     Boolean?
+  banReason  String?   @db.Text
+  banExpires DateTime?
+
+  members     Member[]
+  invitations Invitation[]
+
+  twoFactorEnabled  Boolean?
+  twofactors        TwoFactor[]
+  Event             Event[]
+  EventRegistration EventRegistration[]
+
+  username        String?
+  displayUsername String?  @db.Text
+  Ticket          Ticket[]
+
+  apikeys Apikey[]
+
+  passkeys Passkey[]
+  Reaction Reaction[]
+
+  @@unique([username])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?  @db.Text
+  userAgent String?  @db.Text
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  impersonatedBy String? @db.Text
+
+  activeOrganizationId String? @db.Text
+
+  @@index([userId], map: "session_userId_fkey")
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String    @db.Text
+  providerId            String    @db.Text
+  userId                String
+  accessToken           String?   @db.Text
+  refreshToken          String?   @db.Text
+  idToken               String?   @db.Text
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?   @db.Text
+  password              String?   @db.Text
+  createdAt             DateTime
+  updatedAt             DateTime
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "account_userId_fkey")
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String    @db.Text
+  value      String    @db.Text
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
+}
+
+model Organization {
+  id          String       @id
+  name        String       @db.Text
+  slug        String?
+  logo        String?      @db.Text
+  createdAt   DateTime
+  metadata    String?      @db.Text
+  members     Member[]
+  invitations Invitation[]
+
+  @@unique([slug])
+  @@map("organization")
+}
+
+model Member {
+  id             String       @id
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role           String       @db.Text
+  createdAt      DateTime
+
+  @@map("member")
+}
+
+model Invitation {
+  id             String       @id
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  email          String       @db.Text
+  role           String?      @db.Text
+  status         String       @db.Text
+  expiresAt      DateTime
+  inviterId      String
+  user           User         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
+
+  @@map("invitation")
+}
+
+model TwoFactor {
+  id          String @id
+  secret      String @db.Text
+  backupCodes String @db.Text
+  userId      String
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("twoFactor")
+}
+
+model Channel {
+  id   String @id @default(cuid())
+  name String
+
+  Message Message[]
+  Ticket  Ticket[]
+
+  @@unique([id, name])
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channelId String
+  channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  content   Bytes
+
+  Reaction Reaction[]
+}
+
+model Reaction {
+  id        String  @id @default(cuid())
+  emoji     String
+  messageID Int
+  message   Message @relation(fields: [messageID], references: [id])
+  userID    String
+  user      User    @relation(fields: [userID], references: [id])
+}
+
+model Event {
+  id            String              @id @default(cuid())
+  title         String
+  description   String?
+  start         DateTime
+  end           DateTime
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  userId        String
+  user          User                @relation(fields: [userId], references: [id])
+  roleSlots     RoleSlot[]
+  registrations EventRegistration[]
+}
+
+model RoleSlot {
+  id            String              @id @default(cuid())
+  role          String
+  goalCount     Int
+  event         Event               @relation(fields: [eventId], references: [id])
+  eventId       String
+  registrations EventRegistration[]
+}
+
+model EventRegistration {
+  id           String   @id @default(cuid())
+  user         User     @relation(fields: [userId], references: [id])
+  userId       String
+  roleSlot     RoleSlot @relation(fields: [roleSlotId], references: [id])
+  roleSlotId   String
+  registeredAt DateTime @default(now())
+  Event        Event?   @relation(fields: [eventId], references: [id])
+  eventId      String?
+
+  @@unique([userId, roleSlotId])
+}
+
+model Ticket {
+  id           Int          @id @default(autoincrement())
+  discordUserID  String
+  channelId    String?      @unique
+  channelName  String?
+  channel      Channel?     @relation(fields: [channelId, channelName], references: [id, name], onDelete: Cascade)
+  createdAt      DateTime
+  updatedAt      DateTime
+  user         User?        @relation(fields: [assignedUserId], references: [id])
+  assignedUserId String?
+  statusName   String
+  statusLabel  String
+  status       TicketStatus @relation(fields: [statusName, statusLabel], references: [name, label])
+  problematic  String?
+  observations String?
+  info         String?
+}
+
+model TicketStatus {
+  id Int @id @default(autoincrement())
+  name   String   @unique(map: "name") @db.VarChar(192)
+  label  String   @db.VarChar(192)
+  ticket Ticket[]
+
+  @@unique([name, label])
+}
+
+model Apikey {
+  id                  String    @id
+  name                String?   @db.Text
+  start               String?   @db.Text
+  prefix              String?   @db.Text
+  key                 String    @db.Text
+  userId              String
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refillInterval      Int?
+  refillAmount        Int?
+  lastRefillAt        DateTime?
+  enabled             Boolean?
+  rateLimitEnabled    Boolean?
+  rateLimitTimeWindow Int?
+  rateLimitMax        Int?
+  requestCount        Int?
+  remaining           Int?
+  lastRequest         DateTime?
+  expiresAt           DateTime?
+  createdAt           DateTime
+  updatedAt           DateTime
+  permissions         String?   @db.Text
+  metadata            String?   @db.Text
+
+  @@map("apikey")
+}
+
+model Jwks {
+  id         String   @id
+  publicKey  String   @db.Text
+  privateKey String   @db.Text
+  createdAt  DateTime
+
+  @@map("jwks")
+}
+
+model RouteProtection {
+  id                       String  @id
+  route                    String
+  isRoleProtected          Boolean
+  roleProtection           String  @db.Text
+  isAuthenticatedProtected Boolean
+
+  @@unique([route])
+  @@map("routeProtection")
+}
+
+model Passkey {
+  id           String    @id
+  name         String?   @db.Text
+  publicKey    String    @db.Text
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  credentialID String    @db.Text
+  counter      Int
+  deviceType   String    @db.Text
+  backedUp     Boolean
+  transports   String?   @db.Text
+  createdAt    DateTime?
+  aaguid       String?   @db.Text
+
+  @@map("passkey")
+}

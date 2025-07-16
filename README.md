@@ -1,38 +1,36 @@
-# Le Trèfle 2.0 - Solar
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-Application web pour l'association [Le Trèfle 2.0](https://letrefle.org/) permettant la prise en charge des écoutes de maniere optimisée et securisée, sans les contraintes techniques et pratiques de la prise en charge directement via Discord.
+## Getting Started
 
-## Spécifications :
+First, run the development server:
 
-| **Version**              | Beta 1.0              |
-|:------------------------:|:---------------------:|
-| **Date de publication**  | Lundi 20 octobre 2023 |
-| **Utilisation destinée** | Test interne          |
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Bugs connus :
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-[**La validation des codes d'authentification a deux facteurs ne fonctionne pas**](https://github.com/Le-Trefle-2-0/Solar/issues/19)
-*Contournement : ne pas activer l'A2F sur les comptes*
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-[**Les messages transmis au bot ne sont pas convertis en format UTF-8 avant envoi**](https://github.com/Le-Trefle-2-0/Solar/issues/1), causant la réception de certains caracteres illisibles.
-*Courtournement : Aucun*
+## Learn More
 
-## Bugs corrigés :
+To learn more about Next.js, take a look at the following resources:
 
-Premiere version, aucune correction de bugs signalés.
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-## Objectifs :
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-Test a moyenne/grande échelle du systeme d'écoute, de planning ainsi que de lien avec le bot. Grace aux fonctionnalités déja implémentées.
-Fonctionnalités présentes :
+## Deploy on Vercel
 
-- Ouverture des écoutes par les utilisateurs via le bot.
-- Planification et inscription aux permanences via le planning.
-- Chat de permanence disponible pendant les permanences.
-- Assignation des écoutes aux BE par le RBE.
-- Réinitialisation du mot de passe par l'envoi d'un courriel.
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-## Informations supplémentaires :
-
-- Le chat de permanence se ferme automatiquement immédiatement a la fin de l'événement au quel il est lié, ce sera changé a l'avenir.
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

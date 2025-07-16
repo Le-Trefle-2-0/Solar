@@ -1,5 +1,7 @@
+
 generator client {
   provider = "prisma-client-js"
+  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -7,155 +9,298 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model account_calendar_event {
-  account_id        BigInt
-  calendar_event_id BigInt
-  accounts          accounts        @relation(fields: [account_id], references: [id], onUpdate: Restrict, map: "account_calendar_event_ibfk_1")
-  calendar_events   calendar_events @relation(fields: [calendar_event_id], references: [id], onUpdate: Restrict, map: "account_calendar_event_ibfk_2")
+model User {
+  id            String    @id
+  name          String    @db.Text
+  email         String    @unique
+  emailVerified Boolean
+  image         String?   @db.Text
+  createdAt     DateTime
+  updatedAt     DateTime
+  accounts      Account[]
+  sessions      Session[]
+  messages Message[]
 
-  @@id([account_id, calendar_event_id])
-  @@index([calendar_event_id], map: "calendar_event_id")
+  role       String?   @db.Text
+  banned     Boolean?
+  banReason  String?   @db.Text
+  banExpires DateTime?
+
+  members     Member[]
+  invitations Invitation[]
+
+  twoFactorEnabled  Boolean?
+  twofactors        TwoFactor[]
+  Event             Event[]
+  EventRegistration EventRegistration[]
+
+  username        String?
+  displayUsername String? @db.Text
+  Ticket          Ticket[]
+
+  apikeys Apikey[]
+
+  passkeys Passkey[]
+
+  @@unique([username])
+  @@map("user")
+  Reaction Reaction[]
 }
 
-model account_listen {
-  account_id BigInt
-  listen_id  BigInt
-  accounts   accounts @relation(fields: [account_id], references: [id], onUpdate: Restrict, map: "account_listen_ibfk_1")
-  listens    listens  @relation(fields: [listen_id], references: [id], onUpdate: Restrict, map: "account_listen_ibfk_2")
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?  @db.Text
+  userAgent String?  @db.Text
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@id([account_id, listen_id])
-  @@index([listen_id], map: "listen_id")
+  impersonatedBy String? @db.Text
+
+  activeOrganizationId String? @db.Text
+
+  @@index([userId], map: "session_userId_fkey")
+  @@map("session")
 }
 
-model accounts {
-  id                     BigInt                   @id @default(autoincrement())
-  name                   String                   @unique(map: "name") @db.VarChar(192)
-  email                  String                   @unique(map: "email") @db.VarChar(192)
-  password               String                   @db.VarChar(192)
-  recovery_token         String?                  @db.VarChar(192)
-  last_listen_date       DateTime?                @db.Date
-  listen_count           Int                      @default(0)
-  role_id                BigInt
-  roles                  roles                    @relation(fields: [role_id], references: [id], onUpdate: Restrict, map: "accounts_ibfk_1")
-  account_calendar_event account_calendar_event[]
-  account_listen         account_listen[]
-  calendar_events        calendar_events[]
-  event_messages         event_messages[]
-  messages               messages[]
+model Account {
+  id                    String    @id
+  accountId             String    @db.Text
+  providerId            String    @db.Text
+  userId                String
+  accessToken           String?   @db.Text
+  refreshToken          String?   @db.Text
+  idToken               String?   @db.Text
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?   @db.Text
+  password              String?   @db.Text
+  createdAt             DateTime
+  updatedAt             DateTime
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  otp_enabled            Boolean                  @default(false)
-  otp_token              String?                  @db.VarChar(192) @default("")
-
-  @@index([role_id], map: "role_id")
+  @@index([userId], map: "account_userId_fkey")
+  @@map("account")
 }
 
-model calendar_event_message {
-  calendar_event_id BigInt
-  event_message_id  BigInt
-  calendar_events   calendar_events @relation(fields: [calendar_event_id], references: [id], onUpdate: Restrict, map: "calendar_event_message_ibfk_1")
-  event_messages    event_messages  @relation(fields: [event_message_id], references: [id], onUpdate: Restrict, map: "calendar_event_message_ibfk_2")
+model Verification {
+  id         String    @id
+  identifier String    @db.Text
+  value      String    @db.Text
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
 
-  @@id([calendar_event_id, event_message_id])
-  @@index([event_message_id], map: "event_message_id")
+  @@map("verification")
 }
 
-model calendar_event_role_needed {
-  role_id           BigInt
-  calendar_event_id BigInt
-  number            Int
-  calendar_events   calendar_events @relation(fields: [calendar_event_id], references: [id], onUpdate: Restrict, map: "calendar_event_role_needed_ibfk_2")
-  roles             roles           @relation(fields: [role_id], references: [id], onUpdate: Restrict, map: "calendar_event_role_needed_ibfk_1")
+model Organization {
+  id          String       @id
+  name        String       @db.Text
+  slug        String?
+  logo        String?      @db.Text
+  createdAt   DateTime
+  metadata    String?      @db.Text
+  members     Member[]
+  invitations Invitation[]
 
-  @@id([role_id, calendar_event_id])
-  @@index([calendar_event_id], map: "calendar_event_id")
+  @@unique([slug])
+  @@map("organization")
 }
 
-model event_types {
-  id   BigInt @id @default(autoincrement())
-  name String @unique(map: "name") @db.VarChar(192)
-  label String @db.VarChar(192)
-  calendar_events calendar_events[]
+model Member {
+  id             String       @id
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role           String       @db.Text
+  createdAt      DateTime
+
+  @@map("member")
 }
 
-model calendar_events {
-  id                         BigInt                       @id @default(autoincrement())
-  subject                    String                       @db.VarChar(192)
-  date_start                 DateTime                     @db.Date
-  date_end                   DateTime?                    @db.Date
-  daily_time_start           DateTime                     @db.Time(0)
-  daily_time_end             DateTime                     @db.Time(0)
-  creator_id                 BigInt
-  accounts                   accounts                     @relation(fields: [creator_id], references: [id], onUpdate: Restrict, map: "calendar_events_ibfk_1")
-  type_id                    BigInt
-  type                       event_types                   @relation(fields: [type_id], references: [id], onUpdate: Restrict, map: "calendar_events_ibfk_2")
-  account_calendar_event     account_calendar_event[]
-  calendar_event_message     calendar_event_message[]
-  calendar_event_role_needed calendar_event_role_needed[]
+model Invitation {
+  id             String       @id
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  email          String       @db.Text
+  role           String?      @db.Text
+  status         String       @db.Text
+  expiresAt      DateTime
+  inviterId      String
+  user           User         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
 
-  @@index([creator_id], map: "creator_id")
+  @@map("invitation")
 }
 
-model event_messages {
-  id                     BigInt                   @id @default(autoincrement())
-  content_encrypted      String                   @db.Text
-  is_double_encrypted    Boolean                  @default(dbgenerated("b'0'")) @db.Bit(1)
-  account_id             BigInt
-  accounts               accounts                 @relation(fields: [account_id], references: [id], onUpdate: Restrict, map: "event_messages_ibfk_1")
-  calendar_event_message calendar_event_message[]
+model TwoFactor {
+  id          String @id
+  secret      String @db.Text
+  backupCodes String @db.Text
+  userId      String
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([account_id], map: "account_id")
+  @@map("twoFactor")
 }
 
-model listen_message {
-  listen_id  BigInt
-  message_id BigInt
-  listens    listens  @relation(fields: [listen_id], references: [id], onUpdate: Restrict, map: "listen_message_ibfk_1")
-  messages   messages @relation(fields: [message_id], references: [id], onUpdate: Restrict, map: "listen_message_ibfk_2")
+model Channel {
+  id   String @id @default(cuid())
+  name String
 
-  @@id([listen_id, message_id])
-  @@index([message_id], map: "message_id")
+  Message Message[]
+  Ticket  Ticket[]
+
+  @@unique([id, name])
 }
 
-model listen_status {
-  id      BigInt    @id @default(autoincrement())
-  name    String    @unique(map: "name") @db.VarChar(192)
-  label   String    @db.VarChar(192)
-  listens listens[]
+model Message {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channelId String
+  channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  content   Bytes
+
+  Reaction Reaction[]
 }
 
-model listens {
-  id                                    BigInt           @id @default(autoincrement())
-  user_discord_id_encrypted             String           @db.VarChar(192)
-  user_age_encrypted                    String           @db.VarChar(192)
-  main_subject_encrypted                String           @db.Text
-  date_time_start                       DateTime         @db.DateTime(0)
-  volunteer_notes_encrypted             String?          @db.Text
-  volunteer_main_observations_encrypted String?          @db.Text
-  is_user_minor                         Boolean          @db.Bit(1)
-  listen_status_id                      BigInt
-  listen_status                         listen_status    @relation(fields: [listen_status_id], references: [id], onUpdate: Restrict, map: "listens_ibfk_1")
-  account_listen                        account_listen[]
-  listen_message                        listen_message[]
-
-  @@index([listen_status_id], map: "listen_status_id")
+model Reaction {
+  id        String  @id @default(cuid())
+  emoji     String
+  messageID Int
+  message   Message @relation(fields: [messageID], references: [id])
+  userID    String
+  user      User    @relation(fields: [userID], references: [id])
 }
 
-model messages {
-  id                        BigInt           @id @default(autoincrement())
-  content_encrypted         String           @db.Text
-  is_double_encrypted       Boolean          @default(dbgenerated("b'0'")) @db.Bit(1)
-  discord_message_encrypted String           @db.Text
-  account_id                BigInt
-  accounts                  accounts         @relation(fields: [account_id], references: [id], onUpdate: Restrict, map: "messages_ibfk_1")
-  listen_message            listen_message[]
-
-  @@index([account_id], map: "account_id")
+model Event {
+  id            String              @id @default(cuid())
+  title         String
+  description   String?
+  start         DateTime
+  end           DateTime
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  userId        String
+  user          User                @relation(fields: [userId], references: [id])
+  roleSlots     RoleSlot[]
+  registrations EventRegistration[]
 }
 
-model roles {
-  id                         BigInt                       @id @default(autoincrement())
-  name                       String                       @unique(map: "name") @db.VarChar(192)
-  label                      String                       @db.VarChar(192)
-  accounts                   accounts[]
-  calendar_event_role_needed calendar_event_role_needed[]
+model RoleSlot {
+  id            String              @id @default(cuid())
+  role          String
+  goalCount     Int
+  event         Event               @relation(fields: [eventId], references: [id])
+  eventId       String
+  registrations EventRegistration[]
+}
+
+model EventRegistration {
+  id           String   @id @default(cuid())
+  user         User     @relation(fields: [userId], references: [id])
+  userId       String
+  roleSlot     RoleSlot @relation(fields: [roleSlotId], references: [id])
+  roleSlotId   String
+  registeredAt DateTime @default(now())
+  Event        Event?   @relation(fields: [eventId], references: [id])
+  eventId      String?
+
+  @@unique([userId, roleSlotId])
+}
+
+model Ticket {
+  id             Int      @id @default(autoincrement())
+  discordUserID  String
+  channelId    String? @unique
+  channelName String?
+  channel     Channel? @relation(fields: [channelId, channelName], references: [id, name], onDelete: Cascade)
+  createdAt      DateTime
+  updatedAt      DateTime
+  user           User?    @relation(fields: [assignedUserId], references: [id])
+  assignedUserId String?
+  statusName  String
+  statusLabel String
+  status      TicketStatus @relation(fields: [statusName, statusLabel], references: [name, label])
+  problematic  String?
+  observations String?
+  info         String?
+}
+
+model TicketStatus {
+  id Int @id @default(autoincrement())
+  name   String   @unique(map: "name") @db.VarChar(192)
+  label  String   @db.VarChar(192)
+  ticket Ticket[]
+
+  @@unique([name, label])
+}
+
+model Apikey {
+  id                  String    @id
+  name                String?   @db.Text
+  start               String?   @db.Text
+  prefix              String?   @db.Text
+  key                 String    @db.Text
+  userId              String
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refillInterval      Int?
+  refillAmount        Int?
+  lastRefillAt        DateTime?
+  enabled             Boolean?
+  rateLimitEnabled    Boolean?
+  rateLimitTimeWindow Int?
+  rateLimitMax        Int?
+  requestCount        Int?
+  remaining           Int?
+  lastRequest         DateTime?
+  expiresAt           DateTime?
+  createdAt           DateTime
+  updatedAt           DateTime
+  permissions         String?   @db.Text
+  metadata            String?   @db.Text
+
+  @@map("apikey")
+}
+
+model Jwks {
+  id         String   @id
+  publicKey  String   @db.Text
+  privateKey String   @db.Text
+  createdAt  DateTime
+
+  @@map("jwks")
+}
+
+model RouteProtection {
+  id                       String  @id
+  route                    String
+  isRoleProtected          Boolean
+  roleProtection           String  @db.Text
+  isAuthenticatedProtected Boolean
+
+  @@unique([route])
+  @@map("routeProtection")
+}
+
+model Passkey {
+  id           String    @id
+  name         String?   @db.Text
+  publicKey    String    @db.Text
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  credentialID String    @db.Text
+  counter      Int
+  deviceType   String    @db.Text
+  backedUp     Boolean
+  transports   String?   @db.Text
+  createdAt    DateTime?
+  aaguid       String?   @db.Text
+
+  @@map("passkey")
 }
