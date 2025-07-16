@@ -470,7 +470,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
     return (
         <SidebarProvider>
             <div className="flex flex-row items-center justify-center w-full">
-                <div className="flex flex-col h-screen p-3 gap-4 w-full" tabIndex={0} ref={rootDivRef}>
+                <div className="flex flex-col relative h-screen p-3 gap-4 w-full" tabIndex={0} ref={rootDivRef}>
                     <video className='w-0 h-0' playsInline ref={callingVideoRef} autoPlay/>
                     <div className="flex flex-col flex-grow overflow-y-auto mt-10">
                         {chat.map(({author, content, timestamp, reactions, id}, key) => {
@@ -519,7 +519,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                     </div>
 
                     {channelID !== "1" ?
-                        <div className="fixed top-6 right-6 flex flex-row gap-2">
+                        <div className="absolute top-6 right-6 flex flex-row gap-2">
                             <AlertDialog>
                                 <AlertDialogTrigger asChild>
                                     <Button variant="outline" disabled={status == 3 || status == 4}>
