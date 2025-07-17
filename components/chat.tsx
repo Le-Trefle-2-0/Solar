@@ -216,8 +216,10 @@ export function Chat(props: { channelID: string, statusID: number }) {
         socket.on('connect', handleConnect);
 
         socket.on("message", (data: Msg) => {
-            setChat((pre) => [...pre, data as MsgWithID])
-            if (timer) clearTimeout(timer)
+            if (data.channel.id === channelID) {
+                setChat((pre) => [...pre, data as MsgWithID])
+                if (timer) clearTimeout(timer)
+            }
         });
 
         socket.on('typingIndicator', () => {
@@ -656,8 +658,8 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
-                                <Button className={channelID == "1" || status !== 4 ? "hidden" : "flex"}
-                                        variant="outline" disabled={status == 4}>
+                                <Button className={channelID == "1" || status !== 3 ? "hidden" : "flex"}
+                                        variant="outline" disabled={status !== 3}>
                                     <NotebookPen/> Transmission
                                 </Button>
                             </AlertDialogTrigger>
@@ -734,13 +736,6 @@ export function Chat(props: { channelID: string, statusID: number }) {
                     </div>
 
                     <div className="sticky bottom-0">
-                        <div className={gifOpen ? "block absolute right-2 bottom-15" : "hidden"}>
-                            <GifPicker tenorApiKey={process.env.NEXT_PUBLIC_TENOR_KEY as string} onGifClick={(gif) => {
-                                sendMessage(gif.url)
-                                setGifOpen(false);
-                            }}/>
-                        </div>
-
                         <form ref={formRef} onSubmit={(e) => sendForm(e)}
                               className='flex flex-row w-full gap-2 items-center'>
                             <Textarea
@@ -762,9 +757,12 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                 value={currentMsg}
                                 className="w-full flex flex-row outline-main outline-1 p-2 rounded-lg resize-none"
                             />
+
                             <Popover onOpenChange={setEmojiOpen} open={emojiOpen}>
                                 <PopoverTrigger asChild>
-                                    <Laugh className="cursor-pointer" width={42}/>
+                                    <Button variant="ghost" size="icon" disabled={status == 3 || status == 4}>
+                                        <Laugh/>
+                                    </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-fit p-0">
                                     <EmojiPicker
@@ -785,14 +783,25 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                 </PopoverContent>
                             </Popover>
 
-                            <TvMinimalPlay onClick={() => {
-                                if (gifOpen) setGifOpen(false);
-                                else {
-                                    setGifOpen(true);
-                                    if (emojiOpen) setEmojiOpen(false);
-                                }
-                            }} className={gifOpen ? 'cursor-pointer text-main' : 'cursor-pointer'} width={42}/>
-                            <button className='cursor-pointer'><Send width={42}/></button>
+                            <Popover onOpenChange={setGifOpen} open={gifOpen}>
+                                <PopoverTrigger asChild>
+                                    <Button variant="ghost" size="icon" disabled={status == 3 || status == 4}>
+                                        <TvMinimalPlay/>
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-fit p-0">
+                                    <GifPicker tenorApiKey={process.env.NEXT_PUBLIC_TENOR_KEY as string}
+                                               onGifClick={(gif) => {
+                                                   sendMessage(gif.url)
+                                                   setGifOpen(false);
+                                               }}/>
+                                </PopoverContent>
+                            </Popover>
+
+                            <Button variant="ghost" size="icon" disabled={status == 3 || status == 4}>
+                                <Send/>
+                            </Button>
+                            {/*<button className='cursor-pointer'><Send width={42}/></button>*/}
                         </form>
                     </div>
                 </div>
