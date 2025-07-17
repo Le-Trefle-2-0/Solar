@@ -53,7 +53,40 @@ export function Message(props: {
     } = props;
     const {socket} = useSocket();
 
-    const tenorGifRegex = /^https:\/\/media\.tenor\.com\/[A-Za-z0-9_-]+\/[A-Za-z0-9_-]+\.gif$/;
+    const mediaTenorGifRegex = /^https:\/\/media\.tenor\.com\/[A-Za-z0-9_-]+\/[A-Za-z0-9_-]+\.gif$/;
+    const tenorViewRegex = /^https:\/\/tenor\.com\/view\/[A-Za-z0-9_-]+-gif-(\d+)$/;
+
+    const [resolvedTenorGif, setResolvedTenorGif] = useState<string | null>(null);
+    const [loadingTenorGif, setLoadingTenorGif] = useState(false);
+
+    useEffect(() => {
+        const match = content.match(tenorViewRegex);
+        if (match) {
+            const id = match[1];
+            const fetchTenorGif = async () => {
+                try {
+                    const res = await fetch(`https://tenor.googleapis.com/v2/posts?ids=${id}&key=${process.env.NEXT_PUBLIC_TENOR_KEY}`);
+                    const data = await res.json();
+                    // The actual structure might differ: adjust if needed
+                    const mediaUrl = data?.results?.[0]?.media_formats?.gif?.url
+                        || data?.results?.[0]?.media_formats?.mediumgif?.url;
+                    if (mediaUrl) {
+                        setResolvedTenorGif(mediaUrl);
+                    } else {
+                        setResolvedTenorGif(null);
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch Tenor GIF:", error);
+                    setResolvedTenorGif(null);
+                }
+            };
+            fetchTenorGif();
+        } else {
+            setResolvedTenorGif(null);
+        }
+    }, [content]);
+
+
     const urlRegex = /(https?:\/\/[^\s]+)/g;
 
     const showDateSeparator = prevDate !== null && new Date(currentDate).toDateString() !== new Date(prevDate).toDateString()
@@ -74,7 +107,7 @@ export function Message(props: {
     const formattedDate = isToday
         ? dateObj.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})
         : isYesterday
-            ? `Hier ${dateObj.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}`
+            ? `Hier à ${dateObj.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}`
             : dateObj.toLocaleDateString('fr-FR', {
                 weekday: 'long',
                 year: 'numeric',
@@ -153,7 +186,7 @@ export function Message(props: {
                 </div>
             )}
             <div
-                className={`relative group w-full flex flex-row gap-2 ${isLastInBlock ? 'mb-6' : ''} hover:bg-gray-100 rounded-lg px-2`}>
+                className={`relative group w-full flex flex-row gap-2 ${isLastInBlock ? 'mb-6' : 'mb-1'} hover:bg-gray-100 rounded-lg px-2`}>
                 <div
                     className="absolute -top-4 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <Popover onOpenChange={setIsOpen} open={isOpen}>
@@ -184,12 +217,12 @@ export function Message(props: {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => toast("Fonctionnalité encore non disponible")}>
                                 <Reply/> Répondre
                             </DropdownMenuItem>
                             {
                                 isAuthor ?
-                                    <DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => toast("Fonctionnalité encore non disponible")}>
                                         <Trash2/> Supprimer
                                     </DropdownMenuItem> : null
                             }
@@ -240,9 +273,9 @@ export function Message(props: {
                         </div>
                     )}
                     <h3 className="text-lg text-gray-900 whitespace-pre-wrap break-words max-w-full">
-                        {tenorGifRegex.test(content) ? (
+                        {mediaTenorGifRegex.test(content) || resolvedTenorGif ? (
                             <Image
-                                src={content}
+                                src={resolvedTenorGif || content}
                                 alt="gif"
                                 height={256}
                                 width={256}
@@ -265,45 +298,31 @@ export function Message(props: {
                                     );
                                 } else {
                                     const markdownRegex = /(\*\*([^*]+)\*\*|\*([^*]+)\*|__(.+?)__)/g;
-
                                     const elements = [];
                                     let lastIndex = 0;
                                     let match;
-
                                     while ((match = markdownRegex.exec(part)) !== null) {
                                         if (match.index > lastIndex) {
                                             elements.push(part.slice(lastIndex, match.index));
                                         }
-
                                         const [fullMatch, , boldText, italicText, underlineText] = match;
-
                                         if (boldText) {
-                                            elements.push(
-                                                <strong key={`bold-${i}-${match.index}`}>{boldText}</strong>
-                                            );
+                                            elements.push(<strong key={`bold-${i}-${match.index}`}>{boldText}</strong>);
                                         } else if (italicText) {
-                                            elements.push(
-                                                <em key={`italic-${i}-${match.index}`}>{italicText}</em>
-                                            );
+                                            elements.push(<em key={`italic-${i}-${match.index}`}>{italicText}</em>);
                                         } else if (underlineText) {
-                                            elements.push(
-                                                <u key={`underline-${i}-${match.index}`}>{underlineText}</u>
-                                            );
+                                            elements.push(<u key={`underline-${i}-${match.index}`}>{underlineText}</u>);
                                         }
-
                                         lastIndex = match.index + fullMatch.length;
                                     }
-
                                     if (lastIndex < part.length) {
                                         elements.push(part.slice(lastIndex));
                                     }
-
-                                    return <React.Fragment key={`text-${i}`}>{elements}</React.Fragment>;
+                                    return <React.Fragment key={i}>{elements}</React.Fragment>;
                                 }
                             })
                         )}
                     </h3>
-
 
                     {Object.entries(reactionMap ?? {}).length > 0 && (
                         <div className="flex flex-row gap-2 mt-2">
