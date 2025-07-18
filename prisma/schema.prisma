@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -41,10 +40,10 @@ model User {
   apikeys Apikey[]
 
   passkeys Passkey[]
+  Reaction Reaction[]
 
   @@unique([username])
   @@map("user")
-  Reaction Reaction[]
 }
 
 model Session {
@@ -153,6 +152,7 @@ model Channel {
 
   Message Message[]
   Ticket  Ticket[]
+  Event Event[]
 
   @@unique([id, name])
 }
@@ -188,6 +188,8 @@ model Event {
   updatedAt     DateTime            @updatedAt
   userId        String
   user          User                @relation(fields: [userId], references: [id])
+  channelID String
+  channel   Channel @relation(fields: [channelID], references: [id])
   roleSlots     RoleSlot[]
   registrations EventRegistration[]
 }
@@ -216,18 +218,18 @@ model EventRegistration {
 }
 
 model Ticket {
-  id             Int      @id @default(autoincrement())
+  id           Int          @id @default(autoincrement())
   discordUserID  String
-  channelId    String? @unique
-  channelName String?
-  channel     Channel? @relation(fields: [channelId, channelName], references: [id, name], onDelete: Cascade)
+  channelId    String?      @unique
+  channelName  String?
+  channel      Channel?     @relation(fields: [channelId, channelName], references: [id, name], onDelete: Cascade)
   createdAt      DateTime
   updatedAt      DateTime
-  user           User?    @relation(fields: [assignedUserId], references: [id])
+  user         User?        @relation(fields: [assignedUserId], references: [id])
   assignedUserId String?
-  statusName  String
-  statusLabel String
-  status      TicketStatus @relation(fields: [statusName, statusLabel], references: [name, label])
+  statusName   String
+  statusLabel  String
+  status       TicketStatus @relation(fields: [statusName, statusLabel], references: [name, label])
   problematic  String?
   observations String?
   info         String?
