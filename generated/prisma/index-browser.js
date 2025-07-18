@@ -237,7 +237,8 @@ exports.Prisma.EventScalarFieldEnum = {
   end: 'end',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  userId: 'userId'
+    userId: 'userId',
+    channelID: 'channelID'
 };
 
 exports.Prisma.RoleSlotScalarFieldEnum = {
@@ -430,7 +431,8 @@ exports.Prisma.EventOrderByRelevanceFieldEnum = {
   id: 'id',
   title: 'title',
   description: 'description',
-  userId: 'userId'
+    userId: 'userId',
+    channelID: 'channelID'
 };
 
 exports.Prisma.RoleSlotOrderByRelevanceFieldEnum = {

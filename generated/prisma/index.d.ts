@@ -4,10 +4,11 @@
 **/
 
 import * as runtime from './runtime/library.js';
-import $Public = runtime.Types.Public;
-import $Utils = runtime.Types.Utils;
-import $Extensions = runtime.Types.Extensions;
-import $Result = runtime.Types.Result;
+import $Types = runtime.Types // general types
+import $Public = runtime.Types.Public
+import $Utils = runtime.Types.Utils
+import $Extensions = runtime.Types.Extensions
+import $Result = runtime.Types.Result
 
 export type PrismaPromise<T> = $Public.PrismaPromise<T>
 
@@ -440,48 +441,38 @@ export class PrismaClient<
 }
 
 export namespace Prisma {
-    export import DMMF = runtime.DMMF;
+    export import DMMF = runtime.DMMF
+
+    export type PrismaPromise<T> = $Public.PrismaPromise<T>
+
     /**
      * Validator
      */
-    export import validator = runtime.Public.validator;
+    export import validator = runtime.Public.validator
+
     /**
      * Prisma Errors
      */
-    export import PrismaClientKnownRequestError = runtime.PrismaClientKnownRequestError;
-    export import PrismaClientUnknownRequestError = runtime.PrismaClientUnknownRequestError;
-    export import PrismaClientRustPanicError = runtime.PrismaClientRustPanicError;
-    export import PrismaClientInitializationError = runtime.PrismaClientInitializationError;
-    export import PrismaClientValidationError = runtime.PrismaClientValidationError;
+    export import PrismaClientKnownRequestError = runtime.PrismaClientKnownRequestError
+    export import PrismaClientUnknownRequestError = runtime.PrismaClientUnknownRequestError
+    export import PrismaClientRustPanicError = runtime.PrismaClientRustPanicError
+    export import PrismaClientInitializationError = runtime.PrismaClientInitializationError
+    export import PrismaClientValidationError = runtime.PrismaClientValidationError
+
     /**
      * Re-export of sql-template-tag
      */
-    export import sql = runtime.sqltag;
-    export import empty = runtime.empty;
-    export import join = runtime.join;
-    export import raw = runtime.raw;
-    export import Sql = runtime.Sql;
+    export import sql = runtime.sqltag
+    export import empty = runtime.empty
+    export import join = runtime.join
+    export import raw = runtime.raw
+    export import Sql = runtime.Sql
+
+
     /**
      * Decimal.js
      */
-    export import Decimal = runtime.Decimal;
-    /**
-     * Extensions
-     */
-    export import Extension = $Extensions.UserArgs;
-    export import getExtensionContext = runtime.Extensions.getExtensionContext;
-    export import Args = $Public.Args;
-    export import Payload = $Public.Payload;
-    export import Result = $Public.Result;
-    export import Exact = $Public.Exact;
-    export import JsonObject = runtime.JsonObject;
-    export import JsonArray = runtime.JsonArray;
-    export import JsonValue = runtime.JsonValue;
-    export import InputJsonObject = runtime.InputJsonObject;
-    export import InputJsonArray = runtime.InputJsonArray;
-    export import InputJsonValue = runtime.InputJsonValue;
-
-    export type PrismaPromise<T> = $Public.PrismaPromise<T>
+    export import Decimal = runtime.Decimal
 
     export type DecimalJsLike = runtime.DecimalJsLike
 
@@ -493,6 +484,15 @@ export namespace Prisma {
   export type MetricHistogram = runtime.MetricHistogram
   export type MetricHistogramBucket = runtime.MetricHistogramBucket
 
+    /**
+     * Extensions
+     */
+    export import Extension = $Extensions.UserArgs
+    export import getExtensionContext = runtime.Extensions.getExtensionContext
+    export import Args = $Public.Args
+    export import Payload = $Public.Payload
+    export import Result = $Public.Result
+    export import Exact = $Public.Exact
 
     /**
    * Prisma Client JS version: 6.9.0
@@ -504,6 +504,17 @@ export namespace Prisma {
 
   export const prismaVersion: PrismaVersion
 
+    /**
+     * Utility Types
+     */
+
+
+    export import JsonObject = runtime.JsonObject
+    export import JsonArray = runtime.JsonArray
+    export import JsonValue = runtime.JsonValue
+    export import InputJsonObject = runtime.InputJsonObject
+    export import InputJsonArray = runtime.InputJsonArray
+    export import InputJsonValue = runtime.InputJsonValue
 
     /**
    * Types of the values used to represent different kinds of `null` values when working with JSON fields.
@@ -2598,11 +2609,13 @@ export namespace Prisma {
   export type ChannelCountOutputType = {
     Message: number
     Ticket: number
+      Event: number
   }
 
   export type ChannelCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     Message?: boolean | ChannelCountOutputTypeCountMessageArgs
     Ticket?: boolean | ChannelCountOutputTypeCountTicketArgs
+      Event?: boolean | ChannelCountOutputTypeCountEventArgs
   }
 
   // Custom InputTypes
@@ -2629,6 +2642,13 @@ export namespace Prisma {
   export type ChannelCountOutputTypeCountTicketArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: TicketWhereInput
   }
+
+    /**
+     * ChannelCountOutputType without action
+     */
+    export type ChannelCountOutputTypeCountEventArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        where?: EventWhereInput
+    }
 
 
     /**
@@ -10953,6 +10973,7 @@ export namespace Prisma {
     name?: boolean
     Message?: boolean | Channel$MessageArgs<ExtArgs>
     Ticket?: boolean | Channel$TicketArgs<ExtArgs>
+      Event?: boolean | Channel$EventArgs<ExtArgs>
     _count?: boolean | ChannelCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["channel"]>
 
@@ -10967,6 +10988,7 @@ export namespace Prisma {
   export type ChannelInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     Message?: boolean | Channel$MessageArgs<ExtArgs>
     Ticket?: boolean | Channel$TicketArgs<ExtArgs>
+      Event?: boolean | Channel$EventArgs<ExtArgs>
     _count?: boolean | ChannelCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -10975,6 +10997,7 @@ export namespace Prisma {
     objects: {
       Message: Prisma.$MessagePayload<ExtArgs>[]
       Ticket: Prisma.$TicketPayload<ExtArgs>[]
+        Event: Prisma.$EventPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -11322,6 +11345,8 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     Message<T extends Channel$MessageArgs<ExtArgs> = {}>(args?: Subset<T, Channel$MessageArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     Ticket<T extends Channel$TicketArgs<ExtArgs> = {}>(args?: Subset<T, Channel$TicketArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+
+      Event<T extends Channel$EventArgs<ExtArgs> = {}>(args?: Subset<T, Channel$EventArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -11740,6 +11765,30 @@ export namespace Prisma {
     skip?: number
     distinct?: TicketScalarFieldEnum | TicketScalarFieldEnum[]
   }
+
+    /**
+     * Channel.Event
+     */
+    export type Channel$EventArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the Event
+         */
+        select?: EventSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the Event
+         */
+        omit?: EventOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: EventInclude<ExtArgs> | null
+        where?: EventWhereInput
+        orderBy?: EventOrderByWithRelationInput | EventOrderByWithRelationInput[]
+        cursor?: EventWhereUniqueInput
+        take?: number
+        skip?: number
+        distinct?: EventScalarFieldEnum | EventScalarFieldEnum[]
+    }
 
   /**
    * Channel without action
@@ -13732,6 +13781,7 @@ export namespace Prisma {
     createdAt: Date | null
     updatedAt: Date | null
     userId: string | null
+      channelID: string | null
   }
 
   export type EventMaxAggregateOutputType = {
@@ -13743,6 +13793,7 @@ export namespace Prisma {
     createdAt: Date | null
     updatedAt: Date | null
     userId: string | null
+      channelID: string | null
   }
 
   export type EventCountAggregateOutputType = {
@@ -13754,6 +13805,7 @@ export namespace Prisma {
     createdAt: number
     updatedAt: number
     userId: number
+      channelID: number
     _all: number
   }
 
@@ -13767,6 +13819,7 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     userId?: true
+      channelID?: true
   }
 
   export type EventMaxAggregateInputType = {
@@ -13778,6 +13831,7 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     userId?: true
+      channelID?: true
   }
 
   export type EventCountAggregateInputType = {
@@ -13789,6 +13843,7 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     userId?: true
+      channelID?: true
     _all?: true
   }
 
@@ -13871,6 +13926,7 @@ export namespace Prisma {
     createdAt: Date
     updatedAt: Date
     userId: string
+      channelID: string
     _count: EventCountAggregateOutputType | null
     _min: EventMinAggregateOutputType | null
     _max: EventMaxAggregateOutputType | null
@@ -13899,7 +13955,9 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     userId?: boolean
+      channelID?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
+      channel?: boolean | ChannelDefaultArgs<ExtArgs>
     roleSlots?: boolean | Event$roleSlotsArgs<ExtArgs>
     registrations?: boolean | Event$registrationsArgs<ExtArgs>
     _count?: boolean | EventCountOutputTypeDefaultArgs<ExtArgs>
@@ -13916,11 +13974,13 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     userId?: boolean
+      channelID?: boolean
   }
 
-  export type EventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "start" | "end" | "createdAt" | "updatedAt" | "userId", ExtArgs["result"]["event"]>
+    export type EventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "start" | "end" | "createdAt" | "updatedAt" | "userId" | "channelID", ExtArgs["result"]["event"]>
   export type EventInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
+      channel?: boolean | ChannelDefaultArgs<ExtArgs>
     roleSlots?: boolean | Event$roleSlotsArgs<ExtArgs>
     registrations?: boolean | Event$registrationsArgs<ExtArgs>
     _count?: boolean | EventCountOutputTypeDefaultArgs<ExtArgs>
@@ -13930,6 +13990,7 @@ export namespace Prisma {
     name: "Event"
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
+        channel: Prisma.$ChannelPayload<ExtArgs>
       roleSlots: Prisma.$RoleSlotPayload<ExtArgs>[]
       registrations: Prisma.$EventRegistrationPayload<ExtArgs>[]
     }
@@ -13942,6 +14003,7 @@ export namespace Prisma {
       createdAt: Date
       updatedAt: Date
       userId: string
+        channelID: string
     }, ExtArgs["result"]["event"]>
     composites: {}
   }
@@ -14284,6 +14346,8 @@ export namespace Prisma {
   export interface Prisma__EventClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+
+      channel<T extends ChannelDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ChannelDefaultArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     roleSlots<T extends Event$roleSlotsArgs<ExtArgs> = {}>(args?: Subset<T, Event$roleSlotsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoleSlotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     registrations<T extends Event$registrationsArgs<ExtArgs> = {}>(args?: Subset<T, Event$registrationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventRegistrationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
@@ -14321,6 +14385,7 @@ export namespace Prisma {
     readonly createdAt: FieldRef<"Event", 'DateTime'>
     readonly updatedAt: FieldRef<"Event", 'DateTime'>
     readonly userId: FieldRef<"Event", 'String'>
+        readonly channelID: FieldRef<"Event", 'String'>
   }
 
 
@@ -22818,7 +22883,8 @@ export namespace Prisma {
     end: 'end',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
-    userId: 'userId'
+      userId: 'userId',
+      channelID: 'channelID'
   };
 
   export type EventScalarFieldEnum = (typeof EventScalarFieldEnum)[keyof typeof EventScalarFieldEnum]
@@ -23077,7 +23143,8 @@ export namespace Prisma {
     id: 'id',
     title: 'title',
     description: 'description',
-    userId: 'userId'
+      userId: 'userId',
+      channelID: 'channelID'
   };
 
   export type EventOrderByRelevanceFieldEnum = (typeof EventOrderByRelevanceFieldEnum)[keyof typeof EventOrderByRelevanceFieldEnum]
@@ -23837,6 +23904,7 @@ export namespace Prisma {
     name?: StringFilter<"Channel"> | string
     Message?: MessageListRelationFilter
     Ticket?: TicketListRelationFilter
+      Event?: EventListRelationFilter
   }
 
   export type ChannelOrderByWithRelationInput = {
@@ -23844,6 +23912,7 @@ export namespace Prisma {
     name?: SortOrder
     Message?: MessageOrderByRelationAggregateInput
     Ticket?: TicketOrderByRelationAggregateInput
+      Event?: EventOrderByRelationAggregateInput
     _relevance?: ChannelOrderByRelevanceInput
   }
 
@@ -23856,6 +23925,7 @@ export namespace Prisma {
     name?: StringFilter<"Channel"> | string
     Message?: MessageListRelationFilter
     Ticket?: TicketListRelationFilter
+      Event?: EventListRelationFilter
   }, "id" | "id_name">
 
   export type ChannelOrderByWithAggregationInput = {
@@ -24006,7 +24076,9 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Event"> | Date | string
     updatedAt?: DateTimeFilter<"Event"> | Date | string
     userId?: StringFilter<"Event"> | string
+      channelID?: StringFilter<"Event"> | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
+      channel?: XOR<ChannelScalarRelationFilter, ChannelWhereInput>
     roleSlots?: RoleSlotListRelationFilter
     registrations?: EventRegistrationListRelationFilter
   }
@@ -24020,7 +24092,9 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     userId?: SortOrder
+      channelID?: SortOrder
     user?: UserOrderByWithRelationInput
+      channel?: ChannelOrderByWithRelationInput
     roleSlots?: RoleSlotOrderByRelationAggregateInput
     registrations?: EventRegistrationOrderByRelationAggregateInput
     _relevance?: EventOrderByRelevanceInput
@@ -24038,7 +24112,9 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Event"> | Date | string
     updatedAt?: DateTimeFilter<"Event"> | Date | string
     userId?: StringFilter<"Event"> | string
+      channelID?: StringFilter<"Event"> | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
+      channel?: XOR<ChannelScalarRelationFilter, ChannelWhereInput>
     roleSlots?: RoleSlotListRelationFilter
     registrations?: EventRegistrationListRelationFilter
   }, "id">
@@ -24052,6 +24128,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     userId?: SortOrder
+      channelID?: SortOrder
     _count?: EventCountOrderByAggregateInput
     _max?: EventMaxOrderByAggregateInput
     _min?: EventMinOrderByAggregateInput
@@ -24069,6 +24146,7 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"Event"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Event"> | Date | string
     userId?: StringWithAggregatesFilter<"Event"> | string
+      channelID?: StringWithAggregatesFilter<"Event"> | string
   }
 
   export type RoleSlotWhereInput = {
@@ -25347,6 +25425,7 @@ export namespace Prisma {
     name: string
     Message?: MessageCreateNestedManyWithoutChannelInput
     Ticket?: TicketCreateNestedManyWithoutChannelInput
+      Event?: EventCreateNestedManyWithoutChannelInput
   }
 
   export type ChannelUncheckedCreateInput = {
@@ -25354,6 +25433,7 @@ export namespace Prisma {
     name: string
     Message?: MessageUncheckedCreateNestedManyWithoutChannelInput
     Ticket?: TicketUncheckedCreateNestedManyWithoutChannelInput
+      Event?: EventUncheckedCreateNestedManyWithoutChannelInput
   }
 
   export type ChannelUpdateInput = {
@@ -25361,6 +25441,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     Message?: MessageUpdateManyWithoutChannelNestedInput
     Ticket?: TicketUpdateManyWithoutChannelNestedInput
+      Event?: EventUpdateManyWithoutChannelNestedInput
   }
 
   export type ChannelUncheckedUpdateInput = {
@@ -25368,6 +25449,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     Message?: MessageUncheckedUpdateManyWithoutChannelNestedInput
     Ticket?: TicketUncheckedUpdateManyWithoutChannelNestedInput
+      Event?: EventUncheckedUpdateManyWithoutChannelNestedInput
   }
 
   export type ChannelCreateManyInput = {
@@ -25496,6 +25578,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutEventInput
+      channel: ChannelCreateNestedOneWithoutEventInput
     roleSlots?: RoleSlotCreateNestedManyWithoutEventInput
     registrations?: EventRegistrationCreateNestedManyWithoutEventInput
   }
@@ -25509,6 +25592,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     userId: string
+      channelID: string
     roleSlots?: RoleSlotUncheckedCreateNestedManyWithoutEventInput
     registrations?: EventRegistrationUncheckedCreateNestedManyWithoutEventInput
   }
@@ -25522,6 +25606,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutEventNestedInput
+      channel?: ChannelUpdateOneRequiredWithoutEventNestedInput
     roleSlots?: RoleSlotUpdateManyWithoutEventNestedInput
     registrations?: EventRegistrationUpdateManyWithoutEventNestedInput
   }
@@ -25535,6 +25620,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
+      channelID?: StringFieldUpdateOperationsInput | string
     roleSlots?: RoleSlotUncheckedUpdateManyWithoutEventNestedInput
     registrations?: EventRegistrationUncheckedUpdateManyWithoutEventNestedInput
   }
@@ -25548,6 +25634,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     userId: string
+      channelID: string
   }
 
   export type EventUpdateManyMutationInput = {
@@ -25569,6 +25656,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
+      channelID?: StringFieldUpdateOperationsInput | string
   }
 
   export type RoleSlotCreateInput = {
@@ -26958,6 +27046,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     userId?: SortOrder
+      channelID?: SortOrder
   }
 
   export type EventMaxOrderByAggregateInput = {
@@ -26969,6 +27058,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     userId?: SortOrder
+      channelID?: SortOrder
   }
 
   export type EventMinOrderByAggregateInput = {
@@ -26980,6 +27070,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     userId?: SortOrder
+      channelID?: SortOrder
   }
 
   export type EventScalarRelationFilter = {
@@ -28141,6 +28232,13 @@ export namespace Prisma {
     connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
   }
 
+    export type EventCreateNestedManyWithoutChannelInput = {
+        create?: XOR<EventCreateWithoutChannelInput, EventUncheckedCreateWithoutChannelInput> | EventCreateWithoutChannelInput[] | EventUncheckedCreateWithoutChannelInput[]
+        connectOrCreate?: EventCreateOrConnectWithoutChannelInput | EventCreateOrConnectWithoutChannelInput[]
+        createMany?: EventCreateManyChannelInputEnvelope
+        connect?: EventWhereUniqueInput | EventWhereUniqueInput[]
+    }
+
   export type MessageUncheckedCreateNestedManyWithoutChannelInput = {
     create?: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput> | MessageCreateWithoutChannelInput[] | MessageUncheckedCreateWithoutChannelInput[]
     connectOrCreate?: MessageCreateOrConnectWithoutChannelInput | MessageCreateOrConnectWithoutChannelInput[]
@@ -28154,6 +28252,13 @@ export namespace Prisma {
     createMany?: TicketCreateManyChannelInputEnvelope
     connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
   }
+
+    export type EventUncheckedCreateNestedManyWithoutChannelInput = {
+        create?: XOR<EventCreateWithoutChannelInput, EventUncheckedCreateWithoutChannelInput> | EventCreateWithoutChannelInput[] | EventUncheckedCreateWithoutChannelInput[]
+        connectOrCreate?: EventCreateOrConnectWithoutChannelInput | EventCreateOrConnectWithoutChannelInput[]
+        createMany?: EventCreateManyChannelInputEnvelope
+        connect?: EventWhereUniqueInput | EventWhereUniqueInput[]
+    }
 
   export type MessageUpdateManyWithoutChannelNestedInput = {
     create?: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput> | MessageCreateWithoutChannelInput[] | MessageUncheckedCreateWithoutChannelInput[]
@@ -28183,6 +28288,20 @@ export namespace Prisma {
     deleteMany?: TicketScalarWhereInput | TicketScalarWhereInput[]
   }
 
+    export type EventUpdateManyWithoutChannelNestedInput = {
+        create?: XOR<EventCreateWithoutChannelInput, EventUncheckedCreateWithoutChannelInput> | EventCreateWithoutChannelInput[] | EventUncheckedCreateWithoutChannelInput[]
+        connectOrCreate?: EventCreateOrConnectWithoutChannelInput | EventCreateOrConnectWithoutChannelInput[]
+        upsert?: EventUpsertWithWhereUniqueWithoutChannelInput | EventUpsertWithWhereUniqueWithoutChannelInput[]
+        createMany?: EventCreateManyChannelInputEnvelope
+        set?: EventWhereUniqueInput | EventWhereUniqueInput[]
+        disconnect?: EventWhereUniqueInput | EventWhereUniqueInput[]
+        delete?: EventWhereUniqueInput | EventWhereUniqueInput[]
+        connect?: EventWhereUniqueInput | EventWhereUniqueInput[]
+        update?: EventUpdateWithWhereUniqueWithoutChannelInput | EventUpdateWithWhereUniqueWithoutChannelInput[]
+        updateMany?: EventUpdateManyWithWhereWithoutChannelInput | EventUpdateManyWithWhereWithoutChannelInput[]
+        deleteMany?: EventScalarWhereInput | EventScalarWhereInput[]
+    }
+
   export type MessageUncheckedUpdateManyWithoutChannelNestedInput = {
     create?: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput> | MessageCreateWithoutChannelInput[] | MessageUncheckedCreateWithoutChannelInput[]
     connectOrCreate?: MessageCreateOrConnectWithoutChannelInput | MessageCreateOrConnectWithoutChannelInput[]
@@ -28210,6 +28329,20 @@ export namespace Prisma {
     updateMany?: TicketUpdateManyWithWhereWithoutChannelInput | TicketUpdateManyWithWhereWithoutChannelInput[]
     deleteMany?: TicketScalarWhereInput | TicketScalarWhereInput[]
   }
+
+    export type EventUncheckedUpdateManyWithoutChannelNestedInput = {
+        create?: XOR<EventCreateWithoutChannelInput, EventUncheckedCreateWithoutChannelInput> | EventCreateWithoutChannelInput[] | EventUncheckedCreateWithoutChannelInput[]
+        connectOrCreate?: EventCreateOrConnectWithoutChannelInput | EventCreateOrConnectWithoutChannelInput[]
+        upsert?: EventUpsertWithWhereUniqueWithoutChannelInput | EventUpsertWithWhereUniqueWithoutChannelInput[]
+        createMany?: EventCreateManyChannelInputEnvelope
+        set?: EventWhereUniqueInput | EventWhereUniqueInput[]
+        disconnect?: EventWhereUniqueInput | EventWhereUniqueInput[]
+        delete?: EventWhereUniqueInput | EventWhereUniqueInput[]
+        connect?: EventWhereUniqueInput | EventWhereUniqueInput[]
+        update?: EventUpdateWithWhereUniqueWithoutChannelInput | EventUpdateWithWhereUniqueWithoutChannelInput[]
+        updateMany?: EventUpdateManyWithWhereWithoutChannelInput | EventUpdateManyWithWhereWithoutChannelInput[]
+        deleteMany?: EventScalarWhereInput | EventScalarWhereInput[]
+    }
 
   export type UserCreateNestedOneWithoutMessagesInput = {
     create?: XOR<UserCreateWithoutMessagesInput, UserUncheckedCreateWithoutMessagesInput>
@@ -28327,6 +28460,12 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+    export type ChannelCreateNestedOneWithoutEventInput = {
+        create?: XOR<ChannelCreateWithoutEventInput, ChannelUncheckedCreateWithoutEventInput>
+        connectOrCreate?: ChannelCreateOrConnectWithoutEventInput
+        connect?: ChannelWhereUniqueInput
+    }
+
   export type RoleSlotCreateNestedManyWithoutEventInput = {
     create?: XOR<RoleSlotCreateWithoutEventInput, RoleSlotUncheckedCreateWithoutEventInput> | RoleSlotCreateWithoutEventInput[] | RoleSlotUncheckedCreateWithoutEventInput[]
     connectOrCreate?: RoleSlotCreateOrConnectWithoutEventInput | RoleSlotCreateOrConnectWithoutEventInput[]
@@ -28362,6 +28501,14 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutEventInput, UserUpdateWithoutEventInput>, UserUncheckedUpdateWithoutEventInput>
   }
+
+    export type ChannelUpdateOneRequiredWithoutEventNestedInput = {
+        create?: XOR<ChannelCreateWithoutEventInput, ChannelUncheckedCreateWithoutEventInput>
+        connectOrCreate?: ChannelCreateOrConnectWithoutEventInput
+        upsert?: ChannelUpsertWithoutEventInput
+        connect?: ChannelWhereUniqueInput
+        update?: XOR<XOR<ChannelUpdateToOneWithWhereWithoutEventInput, ChannelUpdateWithoutEventInput>, ChannelUncheckedUpdateWithoutEventInput>
+    }
 
   export type RoleSlotUpdateManyWithoutEventNestedInput = {
     create?: XOR<RoleSlotCreateWithoutEventInput, RoleSlotUncheckedCreateWithoutEventInput> | RoleSlotCreateWithoutEventInput[] | RoleSlotUncheckedCreateWithoutEventInput[]
@@ -29059,6 +29206,7 @@ export namespace Prisma {
     end: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
+      channel: ChannelCreateNestedOneWithoutEventInput
     roleSlots?: RoleSlotCreateNestedManyWithoutEventInput
     registrations?: EventRegistrationCreateNestedManyWithoutEventInput
   }
@@ -29071,6 +29219,7 @@ export namespace Prisma {
     end: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
+      channelID: string
     roleSlots?: RoleSlotUncheckedCreateNestedManyWithoutEventInput
     registrations?: EventRegistrationUncheckedCreateNestedManyWithoutEventInput
   }
@@ -29462,6 +29611,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Event"> | Date | string
     updatedAt?: DateTimeFilter<"Event"> | Date | string
     userId?: StringFilter<"Event"> | string
+      channelID?: StringFilter<"Event"> | string
   }
 
   export type EventRegistrationUpsertWithWhereUniqueWithoutUserInput = {
@@ -30522,6 +30672,42 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+    export type EventCreateWithoutChannelInput = {
+        id?: string
+        title: string
+        description?: string | null
+        start: Date | string
+        end: Date | string
+        createdAt?: Date | string
+        updatedAt?: Date | string
+        user: UserCreateNestedOneWithoutEventInput
+        roleSlots?: RoleSlotCreateNestedManyWithoutEventInput
+        registrations?: EventRegistrationCreateNestedManyWithoutEventInput
+    }
+
+    export type EventUncheckedCreateWithoutChannelInput = {
+        id?: string
+        title: string
+        description?: string | null
+        start: Date | string
+        end: Date | string
+        createdAt?: Date | string
+        updatedAt?: Date | string
+        userId: string
+        roleSlots?: RoleSlotUncheckedCreateNestedManyWithoutEventInput
+        registrations?: EventRegistrationUncheckedCreateNestedManyWithoutEventInput
+    }
+
+    export type EventCreateOrConnectWithoutChannelInput = {
+        where: EventWhereUniqueInput
+        create: XOR<EventCreateWithoutChannelInput, EventUncheckedCreateWithoutChannelInput>
+    }
+
+    export type EventCreateManyChannelInputEnvelope = {
+        data: EventCreateManyChannelInput | EventCreateManyChannelInput[]
+        skipDuplicates?: boolean
+    }
+
   export type MessageUpsertWithWhereUniqueWithoutChannelInput = {
     where: MessageWhereUniqueInput
     update: XOR<MessageUpdateWithoutChannelInput, MessageUncheckedUpdateWithoutChannelInput>
@@ -30553,6 +30739,22 @@ export namespace Prisma {
     where: TicketScalarWhereInput
     data: XOR<TicketUpdateManyMutationInput, TicketUncheckedUpdateManyWithoutChannelInput>
   }
+
+    export type EventUpsertWithWhereUniqueWithoutChannelInput = {
+        where: EventWhereUniqueInput
+        update: XOR<EventUpdateWithoutChannelInput, EventUncheckedUpdateWithoutChannelInput>
+        create: XOR<EventCreateWithoutChannelInput, EventUncheckedCreateWithoutChannelInput>
+    }
+
+    export type EventUpdateWithWhereUniqueWithoutChannelInput = {
+        where: EventWhereUniqueInput
+        data: XOR<EventUpdateWithoutChannelInput, EventUncheckedUpdateWithoutChannelInput>
+    }
+
+    export type EventUpdateManyWithWhereWithoutChannelInput = {
+        where: EventScalarWhereInput
+        data: XOR<EventUpdateManyMutationInput, EventUncheckedUpdateManyWithoutChannelInput>
+    }
 
   export type UserCreateWithoutMessagesInput = {
     id: string
@@ -30619,12 +30821,14 @@ export namespace Prisma {
     id?: string
     name: string
     Ticket?: TicketCreateNestedManyWithoutChannelInput
+      Event?: EventCreateNestedManyWithoutChannelInput
   }
 
   export type ChannelUncheckedCreateWithoutMessageInput = {
     id?: string
     name: string
     Ticket?: TicketUncheckedCreateNestedManyWithoutChannelInput
+      Event?: EventUncheckedCreateNestedManyWithoutChannelInput
   }
 
   export type ChannelCreateOrConnectWithoutMessageInput = {
@@ -30736,12 +30940,14 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     Ticket?: TicketUpdateManyWithoutChannelNestedInput
+      Event?: EventUpdateManyWithoutChannelNestedInput
   }
 
   export type ChannelUncheckedUpdateWithoutMessageInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     Ticket?: TicketUncheckedUpdateManyWithoutChannelNestedInput
+      Event?: EventUncheckedUpdateManyWithoutChannelNestedInput
   }
 
     export type ReactionUpsertWithWhereUniqueWithoutMessageInput = {
@@ -30995,6 +31201,25 @@ export namespace Prisma {
     create: XOR<UserCreateWithoutEventInput, UserUncheckedCreateWithoutEventInput>
   }
 
+    export type ChannelCreateWithoutEventInput = {
+        id?: string
+        name: string
+        Message?: MessageCreateNestedManyWithoutChannelInput
+        Ticket?: TicketCreateNestedManyWithoutChannelInput
+    }
+
+    export type ChannelUncheckedCreateWithoutEventInput = {
+        id?: string
+        name: string
+        Message?: MessageUncheckedCreateNestedManyWithoutChannelInput
+        Ticket?: TicketUncheckedCreateNestedManyWithoutChannelInput
+    }
+
+    export type ChannelCreateOrConnectWithoutEventInput = {
+        where: ChannelWhereUniqueInput
+        create: XOR<ChannelCreateWithoutEventInput, ChannelUncheckedCreateWithoutEventInput>
+    }
+
   export type RoleSlotCreateWithoutEventInput = {
     id?: string
     role: string
@@ -31112,6 +31337,31 @@ export namespace Prisma {
       Reaction?: ReactionUncheckedUpdateManyWithoutUserNestedInput
   }
 
+    export type ChannelUpsertWithoutEventInput = {
+        update: XOR<ChannelUpdateWithoutEventInput, ChannelUncheckedUpdateWithoutEventInput>
+        create: XOR<ChannelCreateWithoutEventInput, ChannelUncheckedCreateWithoutEventInput>
+        where?: ChannelWhereInput
+    }
+
+    export type ChannelUpdateToOneWithWhereWithoutEventInput = {
+        where?: ChannelWhereInput
+        data: XOR<ChannelUpdateWithoutEventInput, ChannelUncheckedUpdateWithoutEventInput>
+    }
+
+    export type ChannelUpdateWithoutEventInput = {
+        id?: StringFieldUpdateOperationsInput | string
+        name?: StringFieldUpdateOperationsInput | string
+        Message?: MessageUpdateManyWithoutChannelNestedInput
+        Ticket?: TicketUpdateManyWithoutChannelNestedInput
+    }
+
+    export type ChannelUncheckedUpdateWithoutEventInput = {
+        id?: StringFieldUpdateOperationsInput | string
+        name?: StringFieldUpdateOperationsInput | string
+        Message?: MessageUncheckedUpdateManyWithoutChannelNestedInput
+        Ticket?: TicketUncheckedUpdateManyWithoutChannelNestedInput
+    }
+
   export type RoleSlotUpsertWithWhereUniqueWithoutEventInput = {
     where: RoleSlotWhereUniqueInput
     update: XOR<RoleSlotUpdateWithoutEventInput, RoleSlotUncheckedUpdateWithoutEventInput>
@@ -31164,6 +31414,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutEventInput
+      channel: ChannelCreateNestedOneWithoutEventInput
     registrations?: EventRegistrationCreateNestedManyWithoutEventInput
   }
 
@@ -31176,6 +31427,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     userId: string
+      channelID: string
     registrations?: EventRegistrationUncheckedCreateNestedManyWithoutEventInput
   }
 
@@ -31228,6 +31480,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutEventNestedInput
+      channel?: ChannelUpdateOneRequiredWithoutEventNestedInput
     registrations?: EventRegistrationUpdateManyWithoutEventNestedInput
   }
 
@@ -31240,6 +31493,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
+      channelID?: StringFieldUpdateOperationsInput | string
     registrations?: EventRegistrationUncheckedUpdateManyWithoutEventNestedInput
   }
 
@@ -31350,6 +31604,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutEventInput
+      channel: ChannelCreateNestedOneWithoutEventInput
     roleSlots?: RoleSlotCreateNestedManyWithoutEventInput
   }
 
@@ -31362,6 +31617,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     userId: string
+      channelID: string
     roleSlots?: RoleSlotUncheckedCreateNestedManyWithoutEventInput
   }
 
@@ -31484,6 +31740,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutEventNestedInput
+      channel?: ChannelUpdateOneRequiredWithoutEventNestedInput
     roleSlots?: RoleSlotUpdateManyWithoutEventNestedInput
   }
 
@@ -31496,6 +31753,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
+      channelID?: StringFieldUpdateOperationsInput | string
     roleSlots?: RoleSlotUncheckedUpdateManyWithoutEventNestedInput
   }
 
@@ -31503,12 +31761,14 @@ export namespace Prisma {
     id?: string
     name: string
     Message?: MessageCreateNestedManyWithoutChannelInput
+      Event?: EventCreateNestedManyWithoutChannelInput
   }
 
   export type ChannelUncheckedCreateWithoutTicketInput = {
     id?: string
     name: string
     Message?: MessageUncheckedCreateNestedManyWithoutChannelInput
+      Event?: EventUncheckedCreateNestedManyWithoutChannelInput
   }
 
   export type ChannelCreateOrConnectWithoutTicketInput = {
@@ -31608,12 +31868,14 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     Message?: MessageUpdateManyWithoutChannelNestedInput
+      Event?: EventUpdateManyWithoutChannelNestedInput
   }
 
   export type ChannelUncheckedUpdateWithoutTicketInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     Message?: MessageUncheckedUpdateManyWithoutChannelNestedInput
+      Event?: EventUncheckedUpdateManyWithoutChannelNestedInput
   }
 
   export type UserUpsertWithoutTicketInput = {
@@ -32075,6 +32337,7 @@ export namespace Prisma {
     end: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
+      channelID: string
   }
 
   export type EventRegistrationCreateManyUserInput = {
@@ -32317,6 +32580,7 @@ export namespace Prisma {
     end?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+      channel?: ChannelUpdateOneRequiredWithoutEventNestedInput
     roleSlots?: RoleSlotUpdateManyWithoutEventNestedInput
     registrations?: EventRegistrationUpdateManyWithoutEventNestedInput
   }
@@ -32329,6 +32593,7 @@ export namespace Prisma {
     end?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+      channelID?: StringFieldUpdateOperationsInput | string
     roleSlots?: RoleSlotUncheckedUpdateManyWithoutEventNestedInput
     registrations?: EventRegistrationUncheckedUpdateManyWithoutEventNestedInput
   }
@@ -32341,6 +32606,7 @@ export namespace Prisma {
     end?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+      channelID?: StringFieldUpdateOperationsInput | string
   }
 
   export type EventRegistrationUpdateWithoutUserInput = {
@@ -32613,6 +32879,17 @@ export namespace Prisma {
       info?: string | null
   }
 
+    export type EventCreateManyChannelInput = {
+        id?: string
+        title: string
+        description?: string | null
+        start: Date | string
+        end: Date | string
+        createdAt?: Date | string
+        updatedAt?: Date | string
+        userId: string
+    }
+
   export type MessageUpdateWithoutChannelInput = {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     content?: BytesFieldUpdateOperationsInput | Uint8Array
@@ -32671,6 +32948,43 @@ export namespace Prisma {
       observations?: NullableStringFieldUpdateOperationsInput | string | null
       info?: NullableStringFieldUpdateOperationsInput | string | null
   }
+
+    export type EventUpdateWithoutChannelInput = {
+        id?: StringFieldUpdateOperationsInput | string
+        title?: StringFieldUpdateOperationsInput | string
+        description?: NullableStringFieldUpdateOperationsInput | string | null
+        start?: DateTimeFieldUpdateOperationsInput | Date | string
+        end?: DateTimeFieldUpdateOperationsInput | Date | string
+        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        user?: UserUpdateOneRequiredWithoutEventNestedInput
+        roleSlots?: RoleSlotUpdateManyWithoutEventNestedInput
+        registrations?: EventRegistrationUpdateManyWithoutEventNestedInput
+    }
+
+    export type EventUncheckedUpdateWithoutChannelInput = {
+        id?: StringFieldUpdateOperationsInput | string
+        title?: StringFieldUpdateOperationsInput | string
+        description?: NullableStringFieldUpdateOperationsInput | string | null
+        start?: DateTimeFieldUpdateOperationsInput | Date | string
+        end?: DateTimeFieldUpdateOperationsInput | Date | string
+        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        userId?: StringFieldUpdateOperationsInput | string
+        roleSlots?: RoleSlotUncheckedUpdateManyWithoutEventNestedInput
+        registrations?: EventRegistrationUncheckedUpdateManyWithoutEventNestedInput
+    }
+
+    export type EventUncheckedUpdateManyWithoutChannelInput = {
+        id?: StringFieldUpdateOperationsInput | string
+        title?: StringFieldUpdateOperationsInput | string
+        description?: NullableStringFieldUpdateOperationsInput | string | null
+        start?: DateTimeFieldUpdateOperationsInput | Date | string
+        end?: DateTimeFieldUpdateOperationsInput | Date | string
+        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        userId?: StringFieldUpdateOperationsInput | string
+    }
 
     export type ReactionCreateManyMessageInput = {
         id?: string
