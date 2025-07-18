@@ -41,7 +41,7 @@ export function Providers({children}: { children: ReactNode }) {
             }}
         >
             {children}
-            <Toaster/>
+            <Toaster richColors position="top-center"/>
         </AuthUIProvider>
     )
 }
