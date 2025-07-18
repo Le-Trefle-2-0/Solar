@@ -14754,6 +14754,7 @@ export namespace Prisma {
     id: string | null
     role: string | null
     goalCount: number | null
+      part: string | null
     eventId: string | null
   }
 
@@ -14761,6 +14762,7 @@ export namespace Prisma {
     id: string | null
     role: string | null
     goalCount: number | null
+      part: string | null
     eventId: string | null
   }
 
@@ -14768,6 +14770,7 @@ export namespace Prisma {
     id: number
     role: number
     goalCount: number
+      part: number
     eventId: number
     _all: number
   }
@@ -14785,6 +14788,7 @@ export namespace Prisma {
     id?: true
     role?: true
     goalCount?: true
+      part?: true
     eventId?: true
   }
 
@@ -14792,6 +14796,7 @@ export namespace Prisma {
     id?: true
     role?: true
     goalCount?: true
+      part?: true
     eventId?: true
   }
 
@@ -14799,6 +14804,7 @@ export namespace Prisma {
     id?: true
     role?: true
     goalCount?: true
+      part?: true
     eventId?: true
     _all?: true
   }
@@ -14891,6 +14897,7 @@ export namespace Prisma {
     id: string
     role: string
     goalCount: number
+      part: string | null
     eventId: string
     _count: RoleSlotCountAggregateOutputType | null
     _avg: RoleSlotAvgAggregateOutputType | null
@@ -14917,6 +14924,7 @@ export namespace Prisma {
     id?: boolean
     role?: boolean
     goalCount?: boolean
+      part?: boolean
     eventId?: boolean
     event?: boolean | EventDefaultArgs<ExtArgs>
     registrations?: boolean | RoleSlot$registrationsArgs<ExtArgs>
@@ -14929,10 +14937,11 @@ export namespace Prisma {
     id?: boolean
     role?: boolean
     goalCount?: boolean
+      part?: boolean
     eventId?: boolean
   }
 
-  export type RoleSlotOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "role" | "goalCount" | "eventId", ExtArgs["result"]["roleSlot"]>
+    export type RoleSlotOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "role" | "goalCount" | "part" | "eventId", ExtArgs["result"]["roleSlot"]>
   export type RoleSlotInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     event?: boolean | EventDefaultArgs<ExtArgs>
     registrations?: boolean | RoleSlot$registrationsArgs<ExtArgs>
@@ -14949,6 +14958,7 @@ export namespace Prisma {
       id: string
       role: string
       goalCount: number
+        part: string | null
       eventId: string
     }, ExtArgs["result"]["roleSlot"]>
     composites: {}
@@ -15323,6 +15333,7 @@ export namespace Prisma {
     readonly id: FieldRef<"RoleSlot", 'String'>
     readonly role: FieldRef<"RoleSlot", 'String'>
     readonly goalCount: FieldRef<"RoleSlot", 'Int'>
+        readonly part: FieldRef<"RoleSlot", 'String'>
     readonly eventId: FieldRef<"RoleSlot", 'String'>
   }
 
@@ -22817,6 +22828,7 @@ export namespace Prisma {
     id: 'id',
     role: 'role',
     goalCount: 'goalCount',
+      part: 'part',
     eventId: 'eventId'
   };
 
@@ -23074,6 +23086,7 @@ export namespace Prisma {
   export const RoleSlotOrderByRelevanceFieldEnum: {
     id: 'id',
     role: 'role',
+      part: 'part',
     eventId: 'eventId'
   };
 
@@ -24065,6 +24078,7 @@ export namespace Prisma {
     id?: StringFilter<"RoleSlot"> | string
     role?: StringFilter<"RoleSlot"> | string
     goalCount?: IntFilter<"RoleSlot"> | number
+      part?: StringNullableFilter<"RoleSlot"> | string | null
     eventId?: StringFilter<"RoleSlot"> | string
     event?: XOR<EventScalarRelationFilter, EventWhereInput>
     registrations?: EventRegistrationListRelationFilter
@@ -24074,6 +24088,7 @@ export namespace Prisma {
     id?: SortOrder
     role?: SortOrder
     goalCount?: SortOrder
+      part?: SortOrderInput | SortOrder
     eventId?: SortOrder
     event?: EventOrderByWithRelationInput
     registrations?: EventRegistrationOrderByRelationAggregateInput
@@ -24087,6 +24102,7 @@ export namespace Prisma {
     NOT?: RoleSlotWhereInput | RoleSlotWhereInput[]
     role?: StringFilter<"RoleSlot"> | string
     goalCount?: IntFilter<"RoleSlot"> | number
+      part?: StringNullableFilter<"RoleSlot"> | string | null
     eventId?: StringFilter<"RoleSlot"> | string
     event?: XOR<EventScalarRelationFilter, EventWhereInput>
     registrations?: EventRegistrationListRelationFilter
@@ -24096,6 +24112,7 @@ export namespace Prisma {
     id?: SortOrder
     role?: SortOrder
     goalCount?: SortOrder
+      part?: SortOrderInput | SortOrder
     eventId?: SortOrder
     _count?: RoleSlotCountOrderByAggregateInput
     _avg?: RoleSlotAvgOrderByAggregateInput
@@ -24111,6 +24128,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"RoleSlot"> | string
     role?: StringWithAggregatesFilter<"RoleSlot"> | string
     goalCount?: IntWithAggregatesFilter<"RoleSlot"> | number
+      part?: StringNullableWithAggregatesFilter<"RoleSlot"> | string | null
     eventId?: StringWithAggregatesFilter<"RoleSlot"> | string
   }
 
@@ -25557,6 +25575,7 @@ export namespace Prisma {
     id?: string
     role: string
     goalCount: number
+      part?: string | null
     event: EventCreateNestedOneWithoutRoleSlotsInput
     registrations?: EventRegistrationCreateNestedManyWithoutRoleSlotInput
   }
@@ -25565,6 +25584,7 @@ export namespace Prisma {
     id?: string
     role: string
     goalCount: number
+      part?: string | null
     eventId: string
     registrations?: EventRegistrationUncheckedCreateNestedManyWithoutRoleSlotInput
   }
@@ -25573,6 +25593,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     goalCount?: IntFieldUpdateOperationsInput | number
+      part?: NullableStringFieldUpdateOperationsInput | string | null
     event?: EventUpdateOneRequiredWithoutRoleSlotsNestedInput
     registrations?: EventRegistrationUpdateManyWithoutRoleSlotNestedInput
   }
@@ -25581,6 +25602,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     goalCount?: IntFieldUpdateOperationsInput | number
+      part?: NullableStringFieldUpdateOperationsInput | string | null
     eventId?: StringFieldUpdateOperationsInput | string
     registrations?: EventRegistrationUncheckedUpdateManyWithoutRoleSlotNestedInput
   }
@@ -25589,6 +25611,7 @@ export namespace Prisma {
     id?: string
     role: string
     goalCount: number
+      part?: string | null
     eventId: string
   }
 
@@ -25596,12 +25619,14 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     goalCount?: IntFieldUpdateOperationsInput | number
+      part?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type RoleSlotUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     goalCount?: IntFieldUpdateOperationsInput | number
+      part?: NullableStringFieldUpdateOperationsInput | string | null
     eventId?: StringFieldUpdateOperationsInput | string
   }
 
@@ -26972,6 +26997,7 @@ export namespace Prisma {
     id?: SortOrder
     role?: SortOrder
     goalCount?: SortOrder
+      part?: SortOrder
     eventId?: SortOrder
   }
 
@@ -26983,6 +27009,7 @@ export namespace Prisma {
     id?: SortOrder
     role?: SortOrder
     goalCount?: SortOrder
+      part?: SortOrder
     eventId?: SortOrder
   }
 
@@ -26990,6 +27017,7 @@ export namespace Prisma {
     id?: SortOrder
     role?: SortOrder
     goalCount?: SortOrder
+      part?: SortOrder
     eventId?: SortOrder
   }
 
@@ -30971,6 +30999,7 @@ export namespace Prisma {
     id?: string
     role: string
     goalCount: number
+      part?: string | null
     registrations?: EventRegistrationCreateNestedManyWithoutRoleSlotInput
   }
 
@@ -30978,6 +31007,7 @@ export namespace Prisma {
     id?: string
     role: string
     goalCount: number
+      part?: string | null
     registrations?: EventRegistrationUncheckedCreateNestedManyWithoutRoleSlotInput
   }
 
@@ -31105,6 +31135,7 @@ export namespace Prisma {
     id?: StringFilter<"RoleSlot"> | string
     role?: StringFilter<"RoleSlot"> | string
     goalCount?: IntFilter<"RoleSlot"> | number
+      part?: StringNullableFilter<"RoleSlot"> | string | null
     eventId?: StringFilter<"RoleSlot"> | string
   }
 
@@ -31293,6 +31324,7 @@ export namespace Prisma {
     id?: string
     role: string
     goalCount: number
+      part?: string | null
     event: EventCreateNestedOneWithoutRoleSlotsInput
   }
 
@@ -31300,6 +31332,7 @@ export namespace Prisma {
     id?: string
     role: string
     goalCount: number
+      part?: string | null
     eventId: string
   }
 
@@ -31419,6 +31452,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     goalCount?: IntFieldUpdateOperationsInput | number
+      part?: NullableStringFieldUpdateOperationsInput | string | null
     event?: EventUpdateOneRequiredWithoutRoleSlotsNestedInput
   }
 
@@ -31426,6 +31460,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     goalCount?: IntFieldUpdateOperationsInput | number
+      part?: NullableStringFieldUpdateOperationsInput | string | null
     eventId?: StringFieldUpdateOperationsInput | string
   }
 
@@ -32665,6 +32700,7 @@ export namespace Prisma {
     id?: string
     role: string
     goalCount: number
+      part?: string | null
   }
 
   export type EventRegistrationCreateManyEventInput = {
@@ -32678,6 +32714,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     goalCount?: IntFieldUpdateOperationsInput | number
+      part?: NullableStringFieldUpdateOperationsInput | string | null
     registrations?: EventRegistrationUpdateManyWithoutRoleSlotNestedInput
   }
 
@@ -32685,6 +32722,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     goalCount?: IntFieldUpdateOperationsInput | number
+      part?: NullableStringFieldUpdateOperationsInput | string | null
     registrations?: EventRegistrationUncheckedUpdateManyWithoutRoleSlotNestedInput
   }
 
@@ -32692,6 +32730,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     goalCount?: IntFieldUpdateOperationsInput | number
+      part?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type EventRegistrationUpdateWithoutEventInput = {

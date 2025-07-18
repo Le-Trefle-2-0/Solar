@@ -244,6 +244,7 @@ exports.Prisma.RoleSlotScalarFieldEnum = {
   id: 'id',
   role: 'role',
   goalCount: 'goalCount',
+    part: 'part',
   eventId: 'eventId'
 };
 
@@ -435,6 +436,7 @@ exports.Prisma.EventOrderByRelevanceFieldEnum = {
 exports.Prisma.RoleSlotOrderByRelevanceFieldEnum = {
   id: 'id',
   role: 'role',
+    part: 'part',
   eventId: 'eventId'
 };
 

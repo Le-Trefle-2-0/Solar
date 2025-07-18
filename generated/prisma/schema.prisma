@@ -195,6 +195,7 @@ model RoleSlot {
   id            String              @id @default(cuid())
   role          String
   goalCount     Int
+  part String?
   event         Event               @relation(fields: [eventId], references: [id])
   eventId       String
   registrations EventRegistration[]
