@@ -1,12 +1,8 @@
 import {auth} from "@/lib/auth";
 import {headers} from "next/headers";
-import {findEvent, registerUserToEvent} from "@/lib/eventManager";
+import {findEvent, registerUserToEvent, unregisterUserToEvent} from "@/lib/eventManager";
 import {NextRequest, NextResponse} from "next/server";
 import {z} from "zod";
-
-const RegisterSchema = z.object({
-    userId: z.string().min(1),
-});
 
 export async function GET(
     request: Request,
@@ -34,40 +30,42 @@ export async function GET(
     return Response.json(event);
 }
 
-export async function POST(req: NextRequest,
-                           {params}: { params: Promise<{ id: string }> }
-) {
+const RegisterSchema = z.object({
+    part: z.enum(['first', 'second']).optional(),
+    userId: z.string().min(1).optional(), // optional, not needed from client
+    type: z.enum(['register', 'unregister']),
+});
+
+export async function POST(req: NextRequest, {params}: { params: Promise<{ id: string }> }) {
     const session = await auth.api.getSession({
-        headers: await headers()
+        headers: await headers(),
     });
+    const body = await req.json();
 
     const {id} = await params;
 
     if (!session) {
-        return new Response('Unauthorized', {
-            status: 401,
-        });
+        return new Response("Unauthorized", {status: 401});
     }
 
-    // const perm = await auth.api.userHasPermission({
-    //     body: {
-    //         userId: session?.user.id,
-    //         permissions: {
-    //             event: ['view']
-    //         }
-    //     }
-    // });
-    //
-    // if (!perm.success) {
-    //     return new Response('Unauthorized', {status: 401,});
-    // }
-
     try {
-        const reg = await registerUserToEvent(id, session?.user.id);
-        const event = await findEvent(reg.eventId || id)
-        return Response.json(event);
+        // For managers, register whole event (no part filtering)
+        // So pass part only if user role is 'volunteer'
+        const verifiedBody = RegisterSchema.parse(body);
+        const userRole = session.user.role;
+
+        const partToRegister = userRole === 'volunteer' ? body.part : undefined;
+        if (verifiedBody.type == "register") {
+            const reg = await registerUserToEvent(id, session.user.id, partToRegister);
+            const event = await findEvent(reg.eventId || id);
+            return Response.json(event);
+        } else {
+            const reg = await unregisterUserToEvent(id, session.user.id, partToRegister);
+            const event = await findEvent(reg.eventId || id);
+            return Response.json(event);
+        }
     } catch (err) {
-        console.error("Event creation failed:", err);
+        console.error("Event registration failed:", err);
         if (err instanceof z.ZodError) {
             return NextResponse.json({success: false, errors: err.flatten()}, {status: 400});
         }
