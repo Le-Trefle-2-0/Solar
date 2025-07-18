@@ -21,7 +21,6 @@ import {toast} from "sonner";
 import {saveMessage} from "@/lib/messageManager";
 import {useSession} from "@/lib/auth-client";
 import {Socket} from "socket.io-client";
-import Peer from "peerjs";
 import {Button, Textarea, useSidebar} from "@/components/ui";
 import {
     AlertDialog,
@@ -44,6 +43,7 @@ import type {Reaction, Ticket} from "@/generated/prisma/client"
 import {useRouter} from "next/navigation";
 import {Message} from "@/components/message";
 import {useSocket} from "@/context/Socket";
+import {usePeer} from "@/context/VoicePeer";
 
 export function Chat(props: { channelID: string, statusID: number }) {
     const {channelID, statusID} = props;
@@ -66,12 +66,14 @@ export function Chat(props: { channelID: string, statusID: number }) {
     const messagesListRef = useRef<HTMLDivElement>(null);
     const myVideoRef = useRef<HTMLVideoElement>(null);
     const callingVideoRef = useRef<HTMLVideoElement>(null);
-    const [peerInstance, setPeerInstance] = useState<Peer | null>(null);
+    // const [peerInstance, setPeerInstance] = useState<Peer | null>(null);
     const [idToCall, setIdToCall] = useState('');
     const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-    const [callColor, setCallColor] = useState<string>("#000");
+    // const [callColor, setCallColor] = useState<string>("#000");
     const [available, setAvailable] = useState<formVolunteer[]>([]);
     const {toggleSidebar} = useSidebar();
+    const myAudioRef = useRef<HTMLAudioElement>(null);
+    const remoteAudioRef = useRef<HTMLAudioElement>(null);
 
     const messageSchema = z
         .string()
@@ -133,45 +135,55 @@ export function Chat(props: { channelID: string, statusID: number }) {
         await socket?.emit('typing', {id: channelID});
     }
 
-    const handleCall = async () => {
+    // const handleCall = async () => {
+    //     if (peerInstance) {
+    //         peerInstance.disconnect();
+    //         setPeerInstance(null);
+    //         setCallColor("#000")
+    //     } else {
+    //         navigator.mediaDevices.getUserMedia({video: false, audio: true})
+    //             .then(stream => {
+    //                 if (myVideoRef.current) {
+    //                     myVideoRef.current.srcObject = stream;
+    //                 }
+    //                 const callID = Math.random().toString(36).substring(2);
+    //                 const peer = new Peer(callID, {
+    //                     host: process.env.NEXT_PUBLIC_HOST,
+    //                     port: 9000,
+    //                     path: '/',
+    //                     secure: true
+    //                 });
+    //                 setPeerInstance(peer);
+    //
+    //                 peer.on('call', call => {
+    //                     call.answer(stream);
+    //
+    //                     setCallColor("#5de03a")
+    //                     call.on('stream', userVideoStream => {
+    //                         if (callingVideoRef.current) {
+    //                             callingVideoRef.current.srcObject = userVideoStream;
+    //                         }
+    //                     });
+    //                 });
+    //
+    //                 setCallColor("#e0c43a")
+    //
+    //                 sendMessage(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/webrtc/${callID}`)
+    //             })
+    //             .catch(error => {
+    //                 console.error("Error accessing media devices:", error);
+    //                 alert("Please allow access to the camera and microphone to use this feature.");
+    //             });
+    //     }
+    // };
+
+    const {peerInstance, callColor, startCall, stopCall} = usePeer();
+
+    const handleCall = () => {
         if (peerInstance) {
-            peerInstance.disconnect();
-            setPeerInstance(null);
-            setCallColor("#000")
+            stopCall();
         } else {
-            navigator.mediaDevices.getUserMedia({video: false, audio: true})
-                .then(stream => {
-                    if (myVideoRef.current) {
-                        myVideoRef.current.srcObject = stream;
-                    }
-                    const callID = Math.random().toString(36).substring(2);
-                    const peer = new Peer(callID, {
-                        host: process.env.NEXT_PUBLIC_HOST,
-                        port: 9000,
-                        path: '/',
-                        secure: true
-                    });
-                    setPeerInstance(peer);
-
-                    peer.on('call', call => {
-                        call.answer(stream);
-
-                        setCallColor("#5de03a")
-                        call.on('stream', userVideoStream => {
-                            if (callingVideoRef.current) {
-                                callingVideoRef.current.srcObject = userVideoStream;
-                            }
-                        });
-                    });
-
-                    setCallColor("#e0c43a")
-
-                    sendMessage(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/webrtc/${callID}`)
-                })
-                .catch(error => {
-                    console.error("Error accessing media devices:", error);
-                    alert("Please allow access to the camera and microphone to use this feature.");
-                });
+            startCall(myAudioRef, remoteAudioRef);
         }
     };
 
@@ -411,7 +423,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
             }),
         }).then(res => res.json()).then(res => {
             if (res.success) {
-                toast(`L'écoute à été attribuée à ${data.volunteer.name}`)
+                toast.success(`L'écoute à été attribuée à ${data.volunteer.name}`)
                 setStatus(2)
             } else {
                 return toast("Erreur lors de l'attribution", {
@@ -473,7 +485,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
     return (
         <div className="flex flex-row items-center justify-center w-full">
                 <div className="flex flex-col relative h-screen p-3 gap-4 w-full" tabIndex={0} ref={rootDivRef}>
-                    <video className='w-0 h-0' playsInline ref={callingVideoRef} autoPlay/>
+                    {/*<video className='w-0 h-0' playsInline ref={callingVideoRef} autoPlay/>*/}
                     <div className="flex flex-col flex-grow overflow-y-auto mt-10">
                         {chat.map(({author, content, timestamp, reactions, id}, key) => {
                             const prevMessage = key > 0 ? chat[key - 1] : null
@@ -613,9 +625,18 @@ export function Chat(props: { channelID: string, statusID: number }) {
                             </AlertDialogContent>
                         </AlertDialog>
 
-                        <Button className={channelID == "1" || status !== 2 ? "hidden" : "flex"} variant='outline'
-                                color={callColor} onClick={handleCall} disabled={status !== 2}>
+                        <Button
+                            className={channelID == "1" || status !== 2 ? "hidden" : "flex"}
+                            variant='outline'
+                            color={callColor}
+                            onClick={handleCall}
+                            disabled={status !== 2}
+                        >
                             <PhoneCall color={callColor}/> Démarrer un vocal
+                            <audio ref={myAudioRef} autoPlay
+                                   muted/>  {/* my own voice (muted so I don't hear myself) */}
+                            <audio ref={remoteAudioRef} autoPlay/>
+                            {/* the other user's audio */}
                         </Button>
 
                         <AlertDialog>

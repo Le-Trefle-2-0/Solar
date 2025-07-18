@@ -5,6 +5,7 @@ import {redirect} from "next/navigation";
 import {auth} from "@/lib/auth";
 import {headers} from "next/headers";
 import {SocketProvider} from "@/context/Socket";
+import {PeerProvider} from "@/context/VoicePeer";
 
 export const metadata: Metadata = {
     title: "Solar - Le Trèfle 2.0",
@@ -12,23 +13,26 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({
-                                       children,
-                                   }: Readonly<{
+                                             children,
+                                         }: Readonly<{
     children: React.ReactNode;
 }>) {
     const session = await auth.api.getSession({
         headers: await headers()
     });
-    if (!session) redirect('/auth/sign-in')
+    if (!session) redirect('/auth/sign-in');
+
     return (
         <SocketProvider>
-            <SidebarProvider>
-                <AppSidebar className="border-r-main border-r"/>
-                <div className="h-full w-full overflow-hidden">
-                    <SidebarTrigger className="fixed z-10 m-3"/>
-                    {children}
-                </div>
-            </SidebarProvider>
+            <PeerProvider>
+                <SidebarProvider>
+                    <AppSidebar className="border-r-main border-r"/>
+                    <div className="h-full w-full overflow-hidden">
+                        <SidebarTrigger className="fixed z-10 m-3"/>
+                        {children}
+                    </div>
+                </SidebarProvider>
+            </PeerProvider>
         </SocketProvider>
     );
 }
