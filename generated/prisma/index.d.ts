@@ -4,11 +4,10 @@
 **/
 
 import * as runtime from './runtime/library.js';
-import $Types = runtime.Types // general types
-import $Public = runtime.Types.Public
-import $Utils = runtime.Types.Utils
-import $Extensions = runtime.Types.Extensions
-import $Result = runtime.Types.Result
+import $Public = runtime.Types.Public;
+import $Utils = runtime.Types.Utils;
+import $Extensions = runtime.Types.Extensions;
+import $Result = runtime.Types.Result;
 
 export type PrismaPromise<T> = $Public.PrismaPromise<T>
 
@@ -441,38 +440,48 @@ export class PrismaClient<
 }
 
 export namespace Prisma {
-    export import DMMF = runtime.DMMF
-
-    export type PrismaPromise<T> = $Public.PrismaPromise<T>
-
+    export import DMMF = runtime.DMMF;
     /**
      * Validator
      */
-    export import validator = runtime.Public.validator
-
+    export import validator = runtime.Public.validator;
     /**
      * Prisma Errors
      */
-    export import PrismaClientKnownRequestError = runtime.PrismaClientKnownRequestError
-    export import PrismaClientUnknownRequestError = runtime.PrismaClientUnknownRequestError
-    export import PrismaClientRustPanicError = runtime.PrismaClientRustPanicError
-    export import PrismaClientInitializationError = runtime.PrismaClientInitializationError
-    export import PrismaClientValidationError = runtime.PrismaClientValidationError
-
+    export import PrismaClientKnownRequestError = runtime.PrismaClientKnownRequestError;
+    export import PrismaClientUnknownRequestError = runtime.PrismaClientUnknownRequestError;
+    export import PrismaClientRustPanicError = runtime.PrismaClientRustPanicError;
+    export import PrismaClientInitializationError = runtime.PrismaClientInitializationError;
+    export import PrismaClientValidationError = runtime.PrismaClientValidationError;
     /**
      * Re-export of sql-template-tag
      */
-    export import sql = runtime.sqltag
-    export import empty = runtime.empty
-    export import join = runtime.join
-    export import raw = runtime.raw
-    export import Sql = runtime.Sql
-
-
+    export import sql = runtime.sqltag;
+    export import empty = runtime.empty;
+    export import join = runtime.join;
+    export import raw = runtime.raw;
+    export import Sql = runtime.Sql;
     /**
      * Decimal.js
      */
-    export import Decimal = runtime.Decimal
+    export import Decimal = runtime.Decimal;
+    /**
+     * Extensions
+     */
+    export import Extension = $Extensions.UserArgs;
+    export import getExtensionContext = runtime.Extensions.getExtensionContext;
+    export import Args = $Public.Args;
+    export import Payload = $Public.Payload;
+    export import Result = $Public.Result;
+    export import Exact = $Public.Exact;
+    export import JsonObject = runtime.JsonObject;
+    export import JsonArray = runtime.JsonArray;
+    export import JsonValue = runtime.JsonValue;
+    export import InputJsonObject = runtime.InputJsonObject;
+    export import InputJsonArray = runtime.InputJsonArray;
+    export import InputJsonValue = runtime.InputJsonValue;
+
+    export type PrismaPromise<T> = $Public.PrismaPromise<T>
 
     export type DecimalJsLike = runtime.DecimalJsLike
 
@@ -484,15 +493,6 @@ export namespace Prisma {
   export type MetricHistogram = runtime.MetricHistogram
   export type MetricHistogramBucket = runtime.MetricHistogramBucket
 
-    /**
-     * Extensions
-     */
-    export import Extension = $Extensions.UserArgs
-    export import getExtensionContext = runtime.Extensions.getExtensionContext
-    export import Args = $Public.Args
-    export import Payload = $Public.Payload
-    export import Result = $Public.Result
-    export import Exact = $Public.Exact
 
     /**
    * Prisma Client JS version: 6.9.0
@@ -504,17 +504,6 @@ export namespace Prisma {
 
   export const prismaVersion: PrismaVersion
 
-    /**
-     * Utility Types
-     */
-
-
-    export import JsonObject = runtime.JsonObject
-    export import JsonArray = runtime.JsonArray
-    export import JsonValue = runtime.JsonValue
-    export import InputJsonObject = runtime.InputJsonObject
-    export import InputJsonArray = runtime.InputJsonArray
-    export import InputJsonValue = runtime.InputJsonValue
 
     /**
    * Types of the values used to represent different kinds of `null` values when working with JSON fields.
