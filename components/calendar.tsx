@@ -31,7 +31,7 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
 
         try {
             const today = new Date();
-            for (let i = 0; i < 1; i++) {
+            for (let i = 0; i < 30; i++) {
                 const date = addDays(today, i);
                 const start = setMinutes(setHours(date, 20), 0);
                 const end = setMinutes(setHours(date, 23), 0);
