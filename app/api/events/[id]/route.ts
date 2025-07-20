@@ -49,8 +49,6 @@ export async function POST(req: NextRequest, {params}: { params: Promise<{ id: s
     }
 
     try {
-        // For managers, register whole event (no part filtering)
-        // So pass part only if user role is 'volunteer'
         const verifiedBody = RegisterSchema.parse(body);
         const userRole = session.user.role;
 
