@@ -13,7 +13,7 @@ model User {
   name          String    @db.Text
   email         String    @unique
   emailVerified Boolean
-  image         String?   @db.Text
+  image String? @db.LongText
   createdAt     DateTime
   updatedAt     DateTime
   accounts      Account[]
@@ -306,4 +306,9 @@ model Passkey {
   aaguid       String?   @db.Text
 
   @@map("passkey")
+}
+
+model Image {
+  id   String @id @default(cuid())
+  link String @db.LongText
 }
