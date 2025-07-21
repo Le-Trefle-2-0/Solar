@@ -1,15 +1,17 @@
 import fs from 'fs';
-import 'dotenv/config'
+import 'dotenv/config';
 import {createServer as createHttpServer} from 'http';
-import {Agent, createServer as createHttpsServer} from 'https';
+import {createServer as createHttpsServer} from 'https';
 import next from 'next';
 import {Server} from 'socket.io';
 import {createRemoteJWKSet, jwtVerify} from 'jose';
 
 const dev = process.env.NODE_ENV !== "production";
-const hostname = process.env.NEXT_PUBLIC_HOST || 'localhost';
-const port = process.env.HTTPS_PORT || 443;
-const httpPort = process.env.HTTP_PORT || 80;
+const hostname = process.env.NEXT_PUBLIC_HOST || '0.0.0.0';
+const port = process.env.PORT || 3000;
+
+// Toggle: use HTTPS internally if INTERNAL_HTTPS="true"
+const useHttps = process.env.INTERNAL_HTTPS === "true";
 
 const app = next({dev, hostname, port});
 const handler = app.getRequestHandler();
@@ -17,33 +19,15 @@ const handler = app.getRequestHandler();
 setInterval(() => {
     const used = process.memoryUsage();
     console.log(`Memory: RSS=${(used.rss / 1024 / 1024).toFixed(1)} MB, HeapUsed=${(used.heapUsed / 1024 / 1024).toFixed(1)} MB, HeapTotal=${(used.heapTotal / 1024 / 1024).toFixed(1)} MB`);
-}, 10000); // every 10s
-
-
-if (process.env.NODE_ENV !== 'production') {
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-    const originalFetch = global.fetch || (await import('node-fetch')).default;
-    const agent = new Agent({rejectUnauthorized: false});
-
-    global.fetch = (url, options = {}) => {
-        return originalFetch(url, {
-            ...options,
-            agent,
-        });
-    };
-}
+}, 10000);
 
 async function validateJWT(token) {
     try {
-        const JWKS = createRemoteJWKSet(
-            new URL(`${process.env.NEXT_PUBLIC_APP_URL}/api/auth/jwks`)
-        );
-
+        const JWKS = createRemoteJWKSet(new URL(`${process.env.NEXT_PUBLIC_APP_URL}/api/auth/jwks`));
         const {payload} = await jwtVerify(token, JWKS, {
             issuer: process.env.NEXT_PUBLIC_APP_URL,
             audience: process.env.NEXT_PUBLIC_APP_URL,
         });
-
         return payload;
     } catch (error) {
         console.error('JWT validation failed:', error);
@@ -58,8 +42,7 @@ async function validateAPIKey(token) {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
         });
-        const valid = await res.json();
-        return valid;
+        return await res.json();
     } catch (error) {
         return false;
     }
@@ -73,45 +56,44 @@ async function getChannels(id) {
             body: JSON.stringify({id}),
         });
         const body = await res.json();
-        if (body.success) return body.accessedChannels
+        if (body.success) return body.accessedChannels;
     } catch (error) {
         return null;
     }
 }
 
 app.prepare().then(() => {
-    const sslOptions = {
-        key: fs.readFileSync(process.env.SSL_KEY_PATH),
-        cert: fs.readFileSync(process.env.SSL_CERT_PATH),
-    };
+    let server;
 
-    const httpsServer = createHttpsServer(sslOptions, handler);
+    if (useHttps) {
+        console.log("🔒 Starting internal HTTPS server...");
+        const sslOptions = {
+            key: fs.readFileSync(process.env.SSL_KEY_PATH),
+            cert: fs.readFileSync(process.env.SSL_CERT_PATH),
+        };
+        server = createHttpsServer(sslOptions, handler);
+    } else {
+        console.log("🌐 Starting HTTP server (expecting external HTTPS termination)...");
+        server = createHttpServer(handler);
+    }
 
-    const httpServer = createHttpServer((req, res) => {
-        const redirectHost = `${hostname}:${port}`;
-        res.writeHead(301, {Location: `https://${redirectHost}${req.url}`});
-        res.end();
-    }).listen(httpPort, () => {
-        console.log(`🌐 HTTP redirect server running on http://${hostname}:${httpPort}`);
+    const io = new Server(server, {
+        cors: {origin: '*'} // adjust if needed
     });
-
-    const io = new Server(httpsServer);
 
     io.use(async (socket, next) => {
         try {
             let validJWT = false;
-            if (socket.handshake.auth.jwt) {
-                validJWT = await validateJWT(socket.handshake.auth.jwt);
-            }
+            if (socket.handshake.auth.jwt) validJWT = await validateJWT(socket.handshake.auth.jwt);
+
             let validToken = false;
-            if (socket.handshake.auth.token) {
-                validToken = await validateAPIKey(socket.handshake.auth.token);
-            }
+            if (socket.handshake.auth.token) validToken = await validateAPIKey(socket.handshake.auth.token);
+
             if (validJWT) socket.user = validJWT;
             if (validToken) socket.user = validToken.user;
-            if (!validJWT && !validToken) {
-                throw new Error("Invalid API key");
-            }
+
+            if (!validJWT && !validToken) throw new Error("Invalid API key");
+
             next();
         } catch (err) {
             next(new Error("Authentication error"));
@@ -120,50 +102,49 @@ app.prepare().then(() => {
 
     io.on("connection", async (socket) => {
         const userID = socket.user.id;
-        const channels = await getChannels(userID)
+        const channels = await getChannels(userID);
+        if (!channels) return;
+
         for (let channel of channels) {
             const id = channel.id;
-            socket.join(id)
+            socket.join(id);
+
             const userObject = {
                 id: socket.user.id,
                 username: socket.user.displayUsername || socket.user.name,
                 image: socket.user.image,
                 role: socket.user.role
             };
+
             socket.to(id).emit("joined", userObject);
 
             const sockets = await io.in(id).fetchSockets();
-
             const users = sockets.map(s => ({
                 id: s.user.id,
                 username: s.user.displayUsername || s.user.name,
                 image: s.user.image,
                 role: s.user.role
             }));
-
             io.in(id).emit("userList", users);
         }
 
         let lastSeen = Date.now();
-
         socket.onAny(() => {
             lastSeen = Date.now();
         });
-
         socket.on("heartbeat", () => {
             lastSeen = Date.now();
         });
 
         const interval = setInterval(() => {
             if (Date.now() - lastSeen > 10000) {
-                for (let id of channels) {
-                    const userObject = {
+                for (let channel of channels) {
+                    socket.to(channel.id).emit("left", {
                         id: socket.user.id,
                         username: socket.user.displayUsername || socket.user.name,
                         image: socket.user.image,
                         role: socket.user.role
-                    };
-                    socket.to(id).emit("left", userObject);
+                    });
                 }
                 socket.disconnect(true);
                 clearInterval(interval);
@@ -171,71 +152,40 @@ app.prepare().then(() => {
         }, 5000);
 
         socket.on("disconnect", async () => {
-            if (!channels) return;
             for (let channel of channels) {
-                const channelID = channel.id;
-                socket.to(channelID).emit("left", socket.user);
-
-                const sockets = await io.in(channelID).fetchSockets();
+                socket.to(channel.id).emit("left", socket.user);
+                const sockets = await io.in(channel.id).fetchSockets();
                 const users = sockets.map(s => ({
                     id: s.user.id,
                     username: s.user.displayUsername || s.user.name,
                     image: s.user.image,
                     role: s.user.role
                 }));
-
-                io.in(channelID).emit("userList", users);
+                io.in(channel.id).emit("userList", users);
             }
             clearInterval(interval);
         });
 
-        socket.on('getOnlineUsers', async (data, callback) => {
+        socket.on('getOnlineUsers', async (data, cb) => {
             const sockets = await io.in(data.channelID).fetchSockets();
-
-            const users = sockets.map(s => ({
+            cb(sockets.map(s => ({
                 id: s.user.id,
                 username: s.user.displayUsername || s.user.name,
                 image: s.user.image,
                 role: s.user.role
-            }));
-
-            callback(users);
+            })));
         });
-
-        socket.on("ping", (callback) => {
-            callback();
-        });
-
-        socket.on("sendMessage", (data) => {
-            socket.broadcast.to(data.channel.id).emit("message", data);
-        });
-
-        socket.on('typing', (data) => {
-            socket.to(data.id).emit("typingIndicator", data);
-        });
-
-        socket.on('update', () => {
-            socket.broadcast.emit('updateRequest')
-        });
-
-        socket.on('reaction', (data) => {
-            console.log(data);
-            socket.broadcast.to(data.channelId).emit('reactionAdd', data.reaction);
-        });
-
-        socket.on('reactionRemove', (data) => {
-            socket.to(data.channelId).emit('reactionRemove', data.reaction);
-        })
+        socket.on("ping", (cb) => cb());
+        socket.on("sendMessage", (data) => socket.broadcast.to(data.channel.id).emit("message", data));
+        socket.on('typing', (data) => socket.to(data.id).emit("typingIndicator", data));
+        socket.on('update', () => socket.broadcast.emit('updateRequest'));
+        socket.on('reaction', (data) => socket.broadcast.to(data.channelId).emit('reactionAdd', data.reaction));
+        socket.on('reactionRemove', (data) => socket.to(data.channelId).emit('reactionRemove', data.reaction));
     });
 
     global.io = io;
 
-    httpsServer
-        .once("error", (err) => {
-            console.error(err);
-            process.exit(1);
-        })
-        .listen(port, () => {
-            console.log(`✅ HTTPS server ready at https://${hostname}:${port}`);
-        });
+    server.listen(port, () => {
+        console.log(`✅ Server ready at ${useHttps ? 'https' : 'http'}://${hostname}:${port}`);
+    });
 });

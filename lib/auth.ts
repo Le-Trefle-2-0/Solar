@@ -2,7 +2,7 @@ import {betterAuth} from "better-auth";
 import {dashboardPlugin} from "better-auth-dashboard";
 import {prismaAdapter} from "better-auth/adapters/prisma";
 import {PrismaClient} from "@/generated/prisma";
-import {resend} from "@/lib/resend";
+import {getResendClient} from "@/lib/resend";
 import {ac, admin, bot, manager, training, volunteer} from "./permissions"
 import {
     admin as adminPlugin,
@@ -10,6 +10,7 @@ import {
     bearer,
     emailOTP,
     jwt,
+    openAPI,
     organization,
     twoFactor,
     username
@@ -24,6 +25,7 @@ export const auth = betterAuth({
     emailAndPassword: {
         enabled: true,
         async sendResetPassword(data, request) {
+            const resend = getResendClient();
             await resend.emails.send({
                 from: "noreply@solar.letrefle.org",
                 to: data.user.email,
@@ -36,6 +38,7 @@ export const auth = betterAuth({
     plugins: [
         emailOTP({
             async sendVerificationOTP({ email, otp, type }) {
+                const resend = getResendClient();
                 await resend.emails.send({
                     from: "noreply@solar.letrefle.org",
                     to: email,
@@ -63,7 +66,8 @@ export const auth = betterAuth({
         jwt(),
         bearer(),
         dashboardPlugin(),
-        passkey()
+        passkey(),
+        openAPI(),
     ],
     account: {
         accountLinking: {
