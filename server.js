@@ -8,7 +8,7 @@ import {createRemoteJWKSet, jwtVerify} from 'jose';
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = process.env.NEXT_PUBLIC_HOST || '0.0.0.0';
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 
 // Toggle: use HTTPS internally if INTERNAL_HTTPS="true"
 const useHttps = process.env.INTERNAL_HTTPS === "true";
