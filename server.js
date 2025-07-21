@@ -11,7 +11,7 @@ const hostname = process.env.NEXT_PUBLIC_HOST || '0.0.0.0';
 const port = process.env.PORT || 8080;
 
 // Toggle: use HTTPS internally if INTERNAL_HTTPS="true"
-const useHttps = process.env.INTERNAL_HTTPS === "true";
+const useHttps = process.env.INTERNAL_HTTPS === "false";
 
 const app = next({dev, hostname, port});
 const handler = app.getRequestHandler();
