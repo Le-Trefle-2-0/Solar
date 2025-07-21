@@ -49,6 +49,7 @@ export interface Tickets {
 export type RoleSlotInput = {
     role: string;
     goalCount: number;
+    part?: string;
 };
 
 export type EventInput = {
@@ -65,7 +66,12 @@ export type EventRoleSlot = {
     role: string;
     goalCount: number;
     registrationsCount: number;
+    part?: 'first' | 'second' | null;
+    registrations: {
+        userId: string;
+    }[];
 };
+
 
 export type EventItem = {
     id: string;

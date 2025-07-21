@@ -39,9 +39,21 @@ export function Providers({children}: { children: ReactNode }) {
             social={{
                 providers: ["discord"]
             }}
+            avatar={{
+                upload: async (image) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(image);
+
+                    await authClient.updateUser({
+                        image: reader.result as string,
+                    });
+
+                    return reader.result as string;
+                }
+            }}
         >
             {children}
-            <Toaster/>
+            <Toaster richColors position="top-center"/>
         </AuthUIProvider>
     )
 }

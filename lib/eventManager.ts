@@ -1,8 +1,11 @@
 import type {EventInput} from "@/lib/interface";
 import prisma from "@/lib/prisma";
+import {createChannel} from "@/lib/channelsManager";
 
 export async function saveEvent(eventData: EventInput) {
     const {title, description, start, end, userId, roleSlots} = eventData;
+
+    const channel = await createChannel(title);
 
     const event = await prisma.event.create({
         data: {
@@ -15,8 +18,10 @@ export async function saveEvent(eventData: EventInput) {
                 create: roleSlots.map((slot) => ({
                     role: slot.role,
                     goalCount: slot.goalCount,
+                    part: slot.part ?? null,
                 })),
             },
+            channelID: channel.id,
         },
         include: {
             roleSlots: true,
@@ -25,6 +30,7 @@ export async function saveEvent(eventData: EventInput) {
 
     return event;
 }
+
 
 export async function getEvents() {
     const events = await prisma.event.findMany({
@@ -57,7 +63,11 @@ export async function findEvent(eventId: string) {
         include: {
             roleSlots: {
                 include: {
-                    registrations: true,
+                    registrations: {
+                        select: {
+                            userId: true
+                        }
+                    },
                 },
             },
         },
@@ -68,64 +78,133 @@ export async function findEvent(eventId: string) {
     }
 
     return {
-        ...event, roleSlots: event.roleSlots.map((slot) => ({
+        ...event,
+        roleSlots: event.roleSlots.map((slot) => ({
             id: slot.id,
             role: slot.role,
+            part: slot.part,
             goalCount: slot.goalCount,
             registrationsCount: slot.registrations.length,
+            registrations: slot.registrations, // include userIds
         }))
     };
 }
 
-export async function registerUserToEvent(eventId: string, userId: string) {
-    // Step 1: Get the user's role
+export async function registerUserToEvent(eventId: string, userId: string, part?: 'first' | 'second') {
     const user = await prisma.user.findUnique({
         where: {id: userId},
         select: {role: true},
     });
 
-    if (!user) {
+    if (!user || !user.role) {
         throw new Error("User not found.");
     }
 
-    // Step 2: Fetch all role slots for this event that match the user's role
+    const roleSlotWhere: any = {
+        eventId,
+        role: user.role,
+    };
+
+    if (user.role === 'volunteer') {
+        if (part) {
+            roleSlotWhere.part = part;
+        } else {
+            throw new Error("Part must be specified for volunteer registrations.");
+        }
+    }
+
     const matchingSlots = await prisma.roleSlot.findMany({
-        where: {
-            eventId,
-            role: user.role as string,
-        },
+        where: roleSlotWhere,
         include: {
-            registrations: true, // Required to access registrations.length
+            registrations: true,
         },
     });
 
     if (!matchingSlots.length) {
-        throw new Error(`No available slots for role "${user.role}" in this event.`);
+        throw new Error(`No available slots for role "${user.role}"${part ? ` and part "${part}"` : ""} in this event.`);
     }
 
-    // Step 3: Check if user is already registered in any matching slot
     const alreadyRegistered = await prisma.eventRegistration.findFirst({
         where: {
             userId,
             roleSlot: {
                 eventId,
-                role: user.role as string,
+                role: user.role,
+                ...(user.role === 'volunteer' && part ? {part} : {}),
             },
         },
     });
 
     if (alreadyRegistered) {
-        throw new Error("User is already registered for this role in this event.");
+        throw new Error("User is already registered for this role and time slot in this event.");
     }
 
-    // Step 4: Register user to the first matching slot (no hard cap)
-    const targetSlot = matchingSlots[0]; // Just use the first available slot
+    const targetSlot = matchingSlots[0];
 
     const registration = await prisma.eventRegistration.create({
         data: {
             userId,
             roleSlotId: targetSlot.id,
             eventId,
+        },
+    });
+
+    return registration;
+}
+
+
+export async function unregisterUserToEvent(eventId: string, userId: string, part?: 'first' | 'second') {
+    const user = await prisma.user.findUnique({
+        where: {id: userId},
+        select: {role: true},
+    });
+
+    if (!user || !user.role) {
+        throw new Error("User not found.");
+    }
+
+    const roleSlotWhere: any = {
+        eventId,
+        role: user.role,
+    };
+
+    if (user.role === 'volunteer') {
+        if (part) {
+            roleSlotWhere.part = part;
+        } else {
+            throw new Error("Part must be specified for volunteer registrations.");
+        }
+    }
+
+    const matchingSlots = await prisma.roleSlot.findMany({
+        where: roleSlotWhere,
+        include: {
+            registrations: true,
+        },
+    });
+
+    if (!matchingSlots.length) {
+        throw new Error(`No available slots for role "${user.role}"${part ? ` and part "${part}"` : ""} in this event.`);
+    }
+
+    const alreadyRegistered = await prisma.eventRegistration.findFirst({
+        where: {
+            userId,
+            roleSlot: {
+                eventId,
+                role: user.role,
+                ...(user.role === 'volunteer' && part ? {part} : {}),
+            },
+        },
+    });
+
+    if (!alreadyRegistered) {
+        throw new Error("User is not already registered for this role and time slot in this event.");
+    }
+
+    const registration = await prisma.eventRegistration.delete({
+        where: {
+            id: alreadyRegistered.id
         },
     });
 

@@ -237,13 +237,15 @@ exports.Prisma.EventScalarFieldEnum = {
   end: 'end',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  userId: 'userId'
+  userId: 'userId',
+  channelID: 'channelID'
 };
 
 exports.Prisma.RoleSlotScalarFieldEnum = {
   id: 'id',
   role: 'role',
   goalCount: 'goalCount',
+  part: 'part',
   eventId: 'eventId'
 };
 
@@ -327,6 +329,11 @@ exports.Prisma.PasskeyScalarFieldEnum = {
   transports: 'transports',
   createdAt: 'createdAt',
   aaguid: 'aaguid'
+};
+
+exports.Prisma.ImageScalarFieldEnum = {
+  id: 'id',
+  link: 'link'
 };
 
 exports.Prisma.SortOrder = {
@@ -429,12 +436,14 @@ exports.Prisma.EventOrderByRelevanceFieldEnum = {
   id: 'id',
   title: 'title',
   description: 'description',
-  userId: 'userId'
+  userId: 'userId',
+  channelID: 'channelID'
 };
 
 exports.Prisma.RoleSlotOrderByRelevanceFieldEnum = {
   id: 'id',
   role: 'role',
+  part: 'part',
   eventId: 'eventId'
 };
 
@@ -496,6 +505,11 @@ exports.Prisma.PasskeyOrderByRelevanceFieldEnum = {
   aaguid: 'aaguid'
 };
 
+exports.Prisma.ImageOrderByRelevanceFieldEnum = {
+  id: 'id',
+  link: 'link'
+};
+
 
 exports.Prisma.ModelName = {
   User: 'User',
@@ -517,7 +531,8 @@ exports.Prisma.ModelName = {
   Apikey: 'Apikey',
   Jwks: 'Jwks',
   RouteProtection: 'RouteProtection',
-  Passkey: 'Passkey'
+  Passkey: 'Passkey',
+  Image: 'Image'
 };
 
 /**

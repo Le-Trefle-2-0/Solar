@@ -21,8 +21,7 @@ import {toast} from "sonner";
 import {saveMessage} from "@/lib/messageManager";
 import {useSession} from "@/lib/auth-client";
 import {Socket} from "socket.io-client";
-import Peer from "peerjs";
-import {Button, Sidebar, SidebarContent, SidebarGroup, SidebarHeader, SidebarProvider, Textarea} from "@/components/ui";
+import {Button, Textarea, useSidebar} from "@/components/ui";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -44,6 +43,7 @@ import type {Reaction, Ticket} from "@/generated/prisma/client"
 import {useRouter} from "next/navigation";
 import {Message} from "@/components/message";
 import {useSocket} from "@/context/Socket";
+import {usePeer} from "@/context/VoicePeer";
 
 export function Chat(props: { channelID: string, statusID: number }) {
     const {channelID, statusID} = props;
@@ -66,11 +66,14 @@ export function Chat(props: { channelID: string, statusID: number }) {
     const messagesListRef = useRef<HTMLDivElement>(null);
     const myVideoRef = useRef<HTMLVideoElement>(null);
     const callingVideoRef = useRef<HTMLVideoElement>(null);
-    const [peerInstance, setPeerInstance] = useState<Peer | null>(null);
+    // const [peerInstance, setPeerInstance] = useState<Peer | null>(null);
     const [idToCall, setIdToCall] = useState('');
     const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-    const [callColor, setCallColor] = useState<string>("#000");
+    // const [callColor, setCallColor] = useState<string>("#000");
     const [available, setAvailable] = useState<formVolunteer[]>([]);
+    const {toggleSidebar} = useSidebar();
+    const myAudioRef = useRef<HTMLAudioElement>(null);
+    const remoteAudioRef = useRef<HTMLAudioElement>(null);
 
     const messageSchema = z
         .string()
@@ -132,45 +135,55 @@ export function Chat(props: { channelID: string, statusID: number }) {
         await socket?.emit('typing', {id: channelID});
     }
 
-    const handleCall = async () => {
+    // const handleCall = async () => {
+    //     if (peerInstance) {
+    //         peerInstance.disconnect();
+    //         setPeerInstance(null);
+    //         setCallColor("#000")
+    //     } else {
+    //         navigator.mediaDevices.getUserMedia({video: false, audio: true})
+    //             .then(stream => {
+    //                 if (myVideoRef.current) {
+    //                     myVideoRef.current.srcObject = stream;
+    //                 }
+    //                 const callID = Math.random().toString(36).substring(2);
+    //                 const peer = new Peer(callID, {
+    //                     host: process.env.NEXT_PUBLIC_HOST,
+    //                     port: 9000,
+    //                     path: '/',
+    //                     secure: true
+    //                 });
+    //                 setPeerInstance(peer);
+    //
+    //                 peer.on('call', call => {
+    //                     call.answer(stream);
+    //
+    //                     setCallColor("#5de03a")
+    //                     call.on('stream', userVideoStream => {
+    //                         if (callingVideoRef.current) {
+    //                             callingVideoRef.current.srcObject = userVideoStream;
+    //                         }
+    //                     });
+    //                 });
+    //
+    //                 setCallColor("#e0c43a")
+    //
+    //                 sendMessage(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/webrtc/${callID}`)
+    //             })
+    //             .catch(error => {
+    //                 console.error("Error accessing media devices:", error);
+    //                 alert("Please allow access to the camera and microphone to use this feature.");
+    //             });
+    //     }
+    // };
+
+    const {peerInstance, callColor, startCall, stopCall} = usePeer();
+
+    const handleCall = () => {
         if (peerInstance) {
-            peerInstance.disconnect();
-            setPeerInstance(null);
-            setCallColor("#000")
+            stopCall();
         } else {
-            navigator.mediaDevices.getUserMedia({video: false, audio: true})
-                .then(stream => {
-                    if (myVideoRef.current) {
-                        myVideoRef.current.srcObject = stream;
-                    }
-                    const callID = Math.random().toString(36).substring(2);
-                    const peer = new Peer(callID, {
-                        host: process.env.NEXT_PUBLIC_HOST,
-                        port: 9000,
-                        path: '/',
-                        secure: true
-                    });
-                    setPeerInstance(peer);
-
-                    peer.on('call', call => {
-                        call.answer(stream);
-
-                        setCallColor("#5de03a")
-                        call.on('stream', userVideoStream => {
-                            if (callingVideoRef.current) {
-                                callingVideoRef.current.srcObject = userVideoStream;
-                            }
-                        });
-                    });
-
-                    setCallColor("#e0c43a")
-
-                    sendMessage(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/webrtc/${callID}`)
-                })
-                .catch(error => {
-                    console.error("Error accessing media devices:", error);
-                    alert("Please allow access to the camera and microphone to use this feature.");
-                });
+            startCall(myAudioRef, remoteAudioRef);
         }
     };
 
@@ -215,8 +228,10 @@ export function Chat(props: { channelID: string, statusID: number }) {
         socket.on('connect', handleConnect);
 
         socket.on("message", (data: Msg) => {
-            setChat((pre) => [...pre, data as MsgWithID])
-            if (timer) clearTimeout(timer)
+            if (data.channel.id === channelID) {
+                setChat((pre) => [...pre, data as MsgWithID])
+                if (timer) clearTimeout(timer)
+            }
         });
 
         socket.on('typingIndicator', () => {
@@ -408,7 +423,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
             }),
         }).then(res => res.json()).then(res => {
             if (res.success) {
-                toast(`L'écoute à été attribuée à ${data.volunteer.name}`)
+                toast.success(`L'écoute à été attribuée à ${data.volunteer.name}`)
                 setStatus(2)
             } else {
                 return toast("Erreur lors de l'attribution", {
@@ -468,10 +483,9 @@ export function Chat(props: { channelID: string, statusID: number }) {
     };
 
     return (
-        <SidebarProvider>
-            <div className="flex flex-row items-center justify-center w-full">
-                <div className="flex flex-col h-screen p-3 gap-4 w-full" tabIndex={0} ref={rootDivRef}>
-                    <video className='w-0 h-0' playsInline ref={callingVideoRef} autoPlay/>
+        <div className="flex flex-row items-center justify-center w-full">
+                <div className="flex flex-col relative h-screen p-3 gap-4 w-full" tabIndex={0} ref={rootDivRef}>
+                    {/*<video className='w-0 h-0' playsInline ref={callingVideoRef} autoPlay/>*/}
                     <div className="flex flex-col flex-grow overflow-y-auto mt-10">
                         {chat.map(({author, content, timestamp, reactions, id}, key) => {
                             const prevMessage = key > 0 ? chat[key - 1] : null
@@ -518,227 +532,231 @@ export function Chat(props: { channelID: string, statusID: number }) {
                         <FontAwesomeIcon icon={faCircle} className="text-gray-400 animate-opacityPulse3"/>
                     </div>
 
-                    {channelID !== "1" ?
-                        <div className="fixed top-6 right-6 flex flex-row gap-2">
-                            <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                    <Button variant="outline" disabled={status == 3 || status == 4}>
-                                        <UserRoundPlus/> Attribuer
-                                    </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>Merci de choisir le bénévole à attribuer</AlertDialogTitle>
-                                    </AlertDialogHeader>
-                                    <Form {...form}>
-                                        <form onSubmit={form.handleSubmit(assign)} className="space-y-6">
-                                            <FormField
-                                                control={form.control}
-                                                name="volunteer"
-                                                render={({field}) => (
-                                                    <FormItem className="flex flex-col">
-                                                        <FormLabel>Bénévole Écoutant</FormLabel>
-                                                        <Popover>
-                                                            <PopoverTrigger asChild>
-                                                                <FormControl>
-                                                                    <Button
-                                                                        variant="outline"
-                                                                        role="combobox"
-                                                                        className={cn(
-                                                                            "w-[350px] justify-between",
-                                                                            !field.value && "text-muted-foreground"
-                                                                        )}
-                                                                    >
-                                                                        {field.value
-                                                                            ? available.find(
-                                                                                (available) => available.value.name === field.value.name
-                                                                            )?.label
-                                                                            : "Sélectionner le bénévole"}
-                                                                        <ChevronsUpDown className="opacity-50"/>
-                                                                    </Button>
-                                                                </FormControl>
-                                                            </PopoverTrigger>
-                                                            <PopoverContent className="w-[350px] p-0">
-                                                                <Command>
-                                                                    <CommandInput
-                                                                        placeholder="Rechercher un bénévole..."
-                                                                        className="h-9"
-                                                                    />
-                                                                    <CommandList>
-                                                                        <CommandEmpty>Aucun bénévole
-                                                                            trouvé</CommandEmpty>
-                                                                        <CommandGroup>
-                                                                            {available.map((available) => (
-                                                                                <CommandItem
-                                                                                    value={available.label}
-                                                                                    key={available.value.id}
-                                                                                    onSelect={() => {
-                                                                                        form.setValue("volunteer", available.value)
-                                                                                    }}
-                                                                                >
-                                                                                    {available.label}
-                                                                                    <Check
-                                                                                        className={cn(
-                                                                                            "ml-auto",
-                                                                                            available.value === field.value
-                                                                                                ? "opacity-100"
-                                                                                                : "opacity-0"
-                                                                                        )}
-                                                                                    />
-                                                                                </CommandItem>
-                                                                            ))}
-                                                                        </CommandGroup>
-                                                                    </CommandList>
-                                                                </Command>
-                                                            </PopoverContent>
-                                                        </Popover>
-                                                        <FormDescription>
-                                                            Le bénévole aura ensuite accès à l'écoute
-                                                        </FormDescription>
-                                                        <FormMessage/>
-                                                    </FormItem>
-                                                )}
-                                            />
+                    <div className="absolute top-6 right-6 flex flex-row gap-2">
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button className={channelID == "1" || status == 3 || status == 4 ? "hidden" : "flex"}
+                                        variant="outline" disabled={status == 3 || status == 4}>
+                                    <UserRoundPlus/> Attribuer
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Merci de choisir le bénévole à attribuer</AlertDialogTitle>
+                                </AlertDialogHeader>
+                                <Form {...form}>
+                                    <form onSubmit={form.handleSubmit(assign)} className="space-y-6">
+                                        <FormField
+                                            control={form.control}
+                                            name="volunteer"
+                                            render={({field}) => (
+                                                <FormItem className="flex flex-col">
+                                                    <FormLabel>Bénévole Écoutant</FormLabel>
+                                                    <Popover>
+                                                        <PopoverTrigger asChild>
+                                                            <FormControl>
+                                                                <Button
+                                                                    variant="outline"
+                                                                    role="combobox"
+                                                                    className={cn(
+                                                                        "w-[350px] justify-between",
+                                                                        !field.value && "text-muted-foreground"
+                                                                    )}
+                                                                >
+                                                                    {field.value
+                                                                        ? available.find(
+                                                                            (available) => available.value.name === field.value.name
+                                                                        )?.label
+                                                                        : "Sélectionner le bénévole"}
+                                                                    <ChevronsUpDown className="opacity-50"/>
+                                                                </Button>
+                                                            </FormControl>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent className="w-[350px] p-0">
+                                                            <Command>
+                                                                <CommandInput
+                                                                    placeholder="Rechercher un bénévole..."
+                                                                    className="h-9"
+                                                                />
+                                                                <CommandList>
+                                                                    <CommandEmpty>Aucun bénévole
+                                                                        trouvé</CommandEmpty>
+                                                                    <CommandGroup>
+                                                                        {available.map((available) => (
+                                                                            <CommandItem
+                                                                                value={available.label}
+                                                                                key={available.value.id}
+                                                                                onSelect={() => {
+                                                                                    form.setValue("volunteer", available.value)
+                                                                                }}
+                                                                            >
+                                                                                {available.label}
+                                                                                <Check
+                                                                                    className={cn(
+                                                                                        "ml-auto",
+                                                                                        available.value === field.value
+                                                                                            ? "opacity-100"
+                                                                                            : "opacity-0"
+                                                                                    )}
+                                                                                />
+                                                                            </CommandItem>
+                                                                        ))}
+                                                                    </CommandGroup>
+                                                                </CommandList>
+                                                            </Command>
+                                                        </PopoverContent>
+                                                    </Popover>
+                                                    <FormDescription>
+                                                        Le bénévole aura ensuite accès à l'écoute
+                                                    </FormDescription>
+                                                    <FormMessage/>
+                                                </FormItem>
+                                            )}
+                                        />
 
-                                            <AlertDialogFooter>
-                                                <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                                <AlertDialogAction asChild>
-                                                    <Button type="submit">Valider</Button>
-                                                </AlertDialogAction>
-                                            </AlertDialogFooter>
-                                        </form>
-                                    </Form>
-                                </AlertDialogContent>
-                            </AlertDialog>
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                            <AlertDialogAction asChild>
+                                                <Button type="submit">Valider</Button>
+                                            </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </form>
+                                </Form>
+                            </AlertDialogContent>
+                        </AlertDialog>
 
-                            <Button variant='outline' color={callColor} onClick={handleCall} disabled={status !== 2}>
-                                <PhoneCall color={callColor}/> Démarrer un vocal
-                            </Button>
+                        <Button
+                            className={channelID == "1" || status !== 2 ? "hidden" : "flex"}
+                            variant='outline'
+                            color={callColor}
+                            onClick={handleCall}
+                            disabled={status !== 2}
+                        >
+                            <PhoneCall color={callColor}/> Démarrer un vocal
+                            <audio ref={myAudioRef} autoPlay
+                                   muted/>  {/* my own voice (muted so I don't hear myself) */}
+                            <audio ref={remoteAudioRef} autoPlay/>
+                            {/* the other user's audio */}
+                        </Button>
 
-                            <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                    <Button variant="destructive" disabled={status == 3 || status == 4}>
-                                        <MessageCircleOff/> Fermer l'écoute
-                                    </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>Attention, êtes vous certain ?</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            La fermeture d'une écoute est irréversible. Pour simplement retourner au
-                                            chat de
-                                            permanence merci d'utiliser l'onglet latéral.
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                        <AlertDialogAction asChild>
-                                            <Button variant="destructive" onClick={() => {
-                                                fetch('/api/tickets/close', {
-                                                    method: 'POST',
-                                                    body: JSON.stringify({
-                                                        channelID: channelID
-                                                    })
-                                                }).then(res => res.json()).then(res => {
-                                                    if (res.success) {
-                                                        setStatus(3)
-                                                    }
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button className={channelID == "1" || status == 3 || status == 4 ? "hidden" : "flex"}
+                                        variant="destructive" disabled={status == 3 || status == 4}>
+                                    <MessageCircleOff/> Fermer l'écoute
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Attention, êtes vous certain ?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        La fermeture d'une écoute est irréversible. Pour simplement retourner au
+                                        chat de
+                                        permanence merci d'utiliser l'onglet latéral.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                    <AlertDialogAction asChild>
+                                        <Button variant="destructive" onClick={() => {
+                                            fetch('/api/tickets/close', {
+                                                method: 'POST',
+                                                body: JSON.stringify({
+                                                    channelID: channelID
                                                 })
-                                            }}>
-                                                Fermer l'écoute
-                                            </Button>
-                                        </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
+                                            }).then(res => res.json()).then(res => {
+                                                if (res.success) {
+                                                    setStatus(3)
+                                                }
+                                            })
+                                        }}>
+                                            Fermer l'écoute
+                                        </Button>
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
 
-                            <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                    <Button variant="outline" disabled={status == 4}>
-                                        <NotebookPen/> Transmission
-                                    </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>Merci de remplir la fiche de transmission</AlertDialogTitle>
-                                    </AlertDialogHeader>
-                                    <Form {...transmissionForm}>
-                                        <form onSubmit={transmissionForm.handleSubmit(transmission)}
-                                              className="space-y-6">
-                                            <FormField
-                                                control={transmissionForm.control}
-                                                name="problematic"
-                                                render={({field}) => (
-                                                    <FormItem className="flex flex-col">
-                                                        <FormLabel>Problématique de l'écoute* :</FormLabel>
-                                                        <FormControl>
-                                                            <Textarea
-                                                                placeholder="Problématique..."
-                                                                className="resize-none"
-                                                                {...field}
-                                                            />
-                                                        </FormControl>
-                                                        <FormMessage/>
-                                                    </FormItem>
-                                                )}
-                                            />
-                                            <FormField
-                                                control={transmissionForm.control}
-                                                name="observations"
-                                                render={({field}) => (
-                                                    <FormItem className="flex flex-col">
-                                                        <FormLabel>Observations générales* :</FormLabel>
-                                                        <FormControl>
-                                                            <Textarea
-                                                                placeholder="Observations..."
-                                                                className="resize-none"
-                                                                {...field}
-                                                            />
-                                                        </FormControl>
-                                                        <FormMessage/>
-                                                    </FormItem>
-                                                )}
-                                            />
-                                            <FormField
-                                                control={transmissionForm.control}
-                                                name="info"
-                                                render={({field}) => (
-                                                    <FormItem className="flex flex-col">
-                                                        <FormLabel>Informations supplémentaires (optionnel)
-                                                            :</FormLabel>
-                                                        <FormControl>
-                                                            <Textarea
-                                                                placeholder="Informations..."
-                                                                className="resize-none"
-                                                                {...field}
-                                                            />
-                                                        </FormControl>
-                                                        <FormMessage/>
-                                                    </FormItem>
-                                                )}
-                                            />
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button className={channelID == "1" || status !== 3 ? "hidden" : "flex"}
+                                        variant="outline" disabled={status !== 3}>
+                                    <NotebookPen/> Transmission
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Merci de remplir la fiche de transmission</AlertDialogTitle>
+                                </AlertDialogHeader>
+                                <Form {...transmissionForm}>
+                                    <form onSubmit={transmissionForm.handleSubmit(transmission)}
+                                          className="space-y-6">
+                                        <FormField
+                                            control={transmissionForm.control}
+                                            name="problematic"
+                                            render={({field}) => (
+                                                <FormItem className="flex flex-col">
+                                                    <FormLabel>Problématique de l'écoute* :</FormLabel>
+                                                    <FormControl>
+                                                        <Textarea
+                                                            placeholder="Problématique..."
+                                                            className="resize-none"
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage/>
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={transmissionForm.control}
+                                            name="observations"
+                                            render={({field}) => (
+                                                <FormItem className="flex flex-col">
+                                                    <FormLabel>Observations générales* :</FormLabel>
+                                                    <FormControl>
+                                                        <Textarea
+                                                            placeholder="Observations..."
+                                                            className="resize-none"
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage/>
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={transmissionForm.control}
+                                            name="info"
+                                            render={({field}) => (
+                                                <FormItem className="flex flex-col">
+                                                    <FormLabel>Informations supplémentaires (optionnel)
+                                                        :</FormLabel>
+                                                    <FormControl>
+                                                        <Textarea
+                                                            placeholder="Informations..."
+                                                            className="resize-none"
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage/>
+                                                </FormItem>
+                                            )}
+                                        />
 
-                                            <AlertDialogFooter>
-                                                <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                                <AlertDialogAction asChild>
-                                                    <Button type="submit">Envoyer</Button>
-                                                </AlertDialogAction>
-                                            </AlertDialogFooter>
-                                        </form>
-                                    </Form>
-                                </AlertDialogContent>
-                            </AlertDialog>
-                        </div> : null
-                    }
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                            <AlertDialogAction asChild>
+                                                <Button type="submit">Envoyer</Button>
+                                            </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </form>
+                                </Form>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    </div>
 
                     <div className="sticky bottom-0">
-                        <div className={gifOpen ? "block absolute right-2 bottom-15" : "hidden"}>
-                            <GifPicker tenorApiKey={process.env.NEXT_PUBLIC_TENOR_KEY as string} onGifClick={(gif) => {
-                                sendMessage(gif.url)
-                                setGifOpen(false);
-                            }}/>
-                        </div>
-
                         <form ref={formRef} onSubmit={(e) => sendForm(e)}
                               className='flex flex-row w-full gap-2 items-center'>
                             <Textarea
@@ -760,9 +778,12 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                 value={currentMsg}
                                 className="w-full flex flex-row outline-main outline-1 p-2 rounded-lg resize-none"
                             />
+
                             <Popover onOpenChange={setEmojiOpen} open={emojiOpen}>
                                 <PopoverTrigger asChild>
-                                    <Laugh className="cursor-pointer" width={42}/>
+                                    <Button variant="ghost" size="icon" disabled={status == 3 || status == 4}>
+                                        <Laugh/>
+                                    </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-fit p-0">
                                     <EmojiPicker
@@ -783,25 +804,37 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                 </PopoverContent>
                             </Popover>
 
-                            <TvMinimalPlay onClick={() => {
-                                if (gifOpen) setGifOpen(false);
-                                else {
-                                    setGifOpen(true);
-                                    if (emojiOpen) setEmojiOpen(false);
-                                }
-                            }} className={gifOpen ? 'cursor-pointer text-main' : 'cursor-pointer'} width={42}/>
-                            <button className='cursor-pointer'><Send width={42}/></button>
+                            <Popover onOpenChange={setGifOpen} open={gifOpen}>
+                                <PopoverTrigger asChild>
+                                    <Button variant="ghost" size="icon" disabled={status == 3 || status == 4}>
+                                        <TvMinimalPlay/>
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-fit p-0">
+                                    <GifPicker tenorApiKey={process.env.NEXT_PUBLIC_TENOR_KEY as string}
+                                               onGifClick={(gif) => {
+                                                   sendMessage(gif.url)
+                                                   setGifOpen(false);
+                                               }}/>
+                                </PopoverContent>
+                            </Popover>
+
+                            <Button variant="ghost" size="icon" disabled={status == 3 || status == 4}>
+                                <Send/>
+                            </Button>
+                            {/*<button className='cursor-pointer'><Send width={42}/></button>*/}
                         </form>
                     </div>
                 </div>
 
-                <Sidebar variant="inset" side="right" className="border-l-main border-l">
-                    <SidebarHeader>
+            <div className="hidden lg:flex flex-col justify-start h-screen w-80 p-6 gap-3 border-l-main border-l">
+                <div>
                         <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">{channelName}</h3>
-                        <small
-                            className="text-sm leading-none font-medium">{onlineUsers.length} utilisateur{onlineUsers.length >= 2 ? "s" : null} connecté{onlineUsers.length >= 2 ? "s" : null}</small>
-                    </SidebarHeader>
-                    <SidebarContent>
+                    <small className="text-sm leading-none font-medium">
+                        {onlineUsers.length} utilisateur{onlineUsers.length >= 2 ? "s" : null} connecté{onlineUsers.length >= 2 ? "s" : null}
+                    </small>
+                </div>
+                <div className="flex flex-col">
                         {Object.entries(
                             onlineUsers.reduce((acc, user) => {
                                 if (!acc[user.role]) acc[user.role] = [];
@@ -813,34 +846,31 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                 Object.keys(roleOrderAndLabels).indexOf(roleA) -
                                 Object.keys(roleOrderAndLabels).indexOf(roleB)
                         ).map(([role, users]) => (
-                            <SidebarGroup key={role}>
-                                <div className="mb-4">
-                                    <h4 className="text-md font-semibold text-gray-700 mb-2 capitalize">
-                                        {roleOrderAndLabels[role] || role}
-                                    </h4>
-                                    <div className="flex flex-col gap-2">
-                                        {users.map(user => (
-                                            <div
-                                                key={user.id}
-                                                className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-                                            >
-                                                <img
-                                                    src={user.image || "/logo.svg"}
-                                                    alt={user.username}
-                                                    className="w-8 h-8 rounded-lg object-cover"
-                                                />
-                                                <span className="text-sm text-gray-900 dark:text-gray-100 truncate">
-                                                {user.username}
-                                              </span>
-                                            </div>
-                                        ))}
-                                    </div>
+                            <div key={role} className="mb-4">
+                                <h4 className="text-md font-semibold text-gray-700 mb-2 capitalize">
+                                    {roleOrderAndLabels[role] || role}
+                                </h4>
+                                <div className="flex flex-col gap-2">
+                                    {users.map(user => (
+                                        <div
+                                            key={user.id}
+                                            className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                                        >
+                                            <img
+                                                src={user.image || "/logo.svg"}
+                                                alt={user.username}
+                                                className="w-8 h-8 rounded-lg object-cover"
+                                            />
+                                            <span className="text-sm text-gray-900 dark:text-gray-100 truncate">
+                                        {user.username}
+                                      </span>
+                                        </div>
+                                    ))}
                                 </div>
-                            </SidebarGroup>
+                            </div>
                         ))}
-                    </SidebarContent>
-                </Sidebar>
+                </div>
             </div>
-        </SidebarProvider>
+        </div>
     );
 }

@@ -14,9 +14,11 @@ const EventSchema = z.object({
         z.object({
             role: z.string().min(1),
             goalCount: z.number().int().nonnegative(),
+            part: z.enum(["first", "second"]).optional()
         })
     ),
 });
+
 
 export async function POST(req: NextRequest) {
     const session = await auth.api.getSession({

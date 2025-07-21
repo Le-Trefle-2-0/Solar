@@ -13,7 +13,7 @@ model User {
   name          String    @db.Text
   email         String    @unique
   emailVerified Boolean
-  image         String?   @db.Text
+  image String? @db.LongText
   createdAt     DateTime
   updatedAt     DateTime
   accounts      Account[]
@@ -152,6 +152,7 @@ model Channel {
 
   Message Message[]
   Ticket  Ticket[]
+  Event Event[]
 
   @@unique([id, name])
 }
@@ -187,6 +188,8 @@ model Event {
   updatedAt     DateTime            @updatedAt
   userId        String
   user          User                @relation(fields: [userId], references: [id])
+  channelID String
+  channel   Channel @relation(fields: [channelID], references: [id])
   roleSlots     RoleSlot[]
   registrations EventRegistration[]
 }
@@ -195,6 +198,7 @@ model RoleSlot {
   id            String              @id @default(cuid())
   role          String
   goalCount     Int
+  part String?
   event         Event               @relation(fields: [eventId], references: [id])
   eventId       String
   registrations EventRegistration[]
@@ -302,4 +306,9 @@ model Passkey {
   aaguid       String?   @db.Text
 
   @@map("passkey")
+}
+
+model Image {
+  id   String @id @default(cuid())
+  link String @db.LongText
 }
