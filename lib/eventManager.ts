@@ -1,11 +1,12 @@
 import type {EventInput} from "@/lib/interface";
 import prisma from "@/lib/prisma";
 import {createChannel} from "@/lib/channelsManager";
+import {format} from "date-fns";
 
 export async function saveEvent(eventData: EventInput) {
     const {title, description, start, end, userId, roleSlots} = eventData;
 
-    const channel = await createChannel(title);
+    const channel = await createChannel(`${title} du ${format(start, "dd/MM/yyyy")}`);
 
     const event = await prisma.event.create({
         data: {
