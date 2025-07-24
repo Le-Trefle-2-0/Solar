@@ -32,6 +32,9 @@ export async function GET(
     const dbChannel = await prisma.channel.findUnique({
         where: {
             id: channel
+        },
+        include: {
+            Ticket: true
         }
     });
 
@@ -43,7 +46,7 @@ export async function GET(
         }
     });
 
-    if (channel !== '1' && ticket[0].assignedUserId !== session?.user.id) {
+    if (dbChannel.Ticket && ticket[0]?.assignedUserId !== session?.user.id) {
         const perm = await auth.api.userHasPermission({
             body: {
                 userId: session?.user.id,
