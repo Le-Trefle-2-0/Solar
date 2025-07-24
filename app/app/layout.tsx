@@ -10,6 +10,10 @@ import {PeerProvider} from "@/context/VoicePeer";
 export const metadata: Metadata = {
     title: "Solar - Le Trèfle 2.0",
     description: "Logiciel d'écoute",
+    icons: {
+        icon: "/favicon.ico",
+        apple: "/logo.svg"
+    }
 };
 
 export default async function RootLayout({
