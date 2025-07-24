@@ -42,7 +42,7 @@ export default async function MainChat() {
     }
 
     return (
-        <div className="flex justify-around align-middle">
+        <div className="flex justify-center items-center w-full h-screen">
             <h1 className="scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance">
                 Aucune permanence en cours ni programmée
             </h1>
