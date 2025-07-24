@@ -114,7 +114,7 @@ export type RouteProtection = $Result.DefaultSelection<Prisma.$RouteProtectionPa
 export type Passkey = $Result.DefaultSelection<Prisma.$PasskeyPayload>
 /**
  * Model Image
- *
+ * 
  */
 export type Image = $Result.DefaultSelection<Prisma.$ImagePayload>
 
@@ -231,7 +231,7 @@ export class PrismaClient<
    *   prisma.user.create({ data: { name: 'Alice' } }),
    * ])
    * ```
-   *
+   * 
    * Read more in our [docs](https://www.prisma.io/docs/concepts/components/prisma-client/transactions).
    */
   $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>
