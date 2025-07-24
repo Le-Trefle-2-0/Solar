@@ -77,12 +77,13 @@ const roles = [
     {label: "Référent Bénévoles Écoutants", value: "manager"},
     {label: "Bénévole en Formation", value: "training"},
     {label: "Bénévole Écoutant", value: "volunteer"},
+    {label: "Bot", value: "bot"},
 ] as const
 const FormSchema = z.object({
     name: z.string(),
     email: z.string(),
     password: z.string(),
-    role: z.enum(["admin", "manager", "training", "volunteer"]),
+    role: z.enum(["admin", "manager", "training", "volunteer", "bot"]),
 });
 
 interface DataTableProps {
