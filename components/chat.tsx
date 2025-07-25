@@ -426,6 +426,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
             if (res.success) {
                 toast.success(`L'écoute à été attribuée à ${data.volunteer.name}`)
                 setStatus(2)
+                socket?.emit('update')
             } else {
                 return toast("Erreur lors de l'attribution", {
                     description: (
@@ -462,6 +463,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                 toast("Transmission envoyée")
                 setTimeout(() => {
                     router.push("/app/chat")
+                    socket?.emit('update')
                 }, 2000)
             } else {
                 return toast("Erreur lors de la transmission", {
