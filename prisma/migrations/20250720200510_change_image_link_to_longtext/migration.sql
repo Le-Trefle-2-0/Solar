@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Image` MODIFY `link` LONGTEXT NOT NULL;
