@@ -7,7 +7,7 @@ async function main() {
         data:
             {
                 id: "1",
-                name: "Permanence"
+                name: "Discussion BE libre"
             }
     });
 
