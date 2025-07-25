@@ -11,16 +11,56 @@ import {
     isSameMonth,
     setHours,
     setMinutes,
+    setSeconds,
     startOfMonth,
     startOfWeek,
     subMonths
 } from 'date-fns';
 import {fr} from 'date-fns/locale/fr';
-import {ChevronLeft, ChevronRight} from 'lucide-react';
+import {CalendarIcon, CalendarPlus, ChevronLeft, ChevronRight} from 'lucide-react';
 import Event from './event';
 import {EventData} from "@/lib/interface";
+import {
+    Button,
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    Input,
+    Popover,
+    PopoverContent,
+    PopoverTrigger
+} from "@/components/ui";
+import {z} from "zod";
+import {useForm} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
+import {cn} from "@/lib/utils";
+import {Calendar} from "@/components/ui/calendar";
+import {toast} from 'sonner';
+import {useRouter} from "next/navigation";
 
+const permSchema = z.object({
+    startDate: z.date(),
+    startTime: z.string(),
+    endDate: z.date(),
+    endTime: z.string(),
+})
 export default function PlanningCalendar({events, userId}: { events: EventData[], userId?: string }) {
+    const createEventForm = useForm<z.infer<typeof permSchema>>({
+        resolver: zodResolver(permSchema),
+        defaultValues: {
+            startDate: new Date(),
+            startTime: "20:00",
+            endDate: new Date(),
+            endTime: "23:00",
+        },
+    });
+
+    const router = useRouter();
     const [currentMonth, setCurrentMonth] = useState(new Date());
 
     async function createTestEvents() {
@@ -130,6 +170,65 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
         );
     };
 
+    async function createEvent(data: z.infer<typeof permSchema>) {
+        console.log(data)
+        try {
+            const [startHour, startMinute] = data.startTime.split(":").map(Number)
+            const start = setSeconds(
+                setMinutes(setHours(new Date(data.startDate), startHour), startMinute),
+                0
+            )
+
+            const [endHour, endMinute] = data.endTime.split(":").map(Number)
+            const end = setSeconds(
+                setMinutes(setHours(new Date(data.endDate), endHour), endMinute),
+                0
+            )
+
+            if (start >= end) {
+                toast("Erreur", {
+                    description: "La date et l'heure de début doivent être avant celles de fin.",
+                })
+                return
+            }
+
+            const payload = {
+                title: "Permanence",
+                description: "Permanence",
+                start,
+                end,
+                userId,
+                roleSlots: [
+                    {role: "manager", goalCount: 1},
+                    {role: "volunteer", goalCount: 3, part: "first"},
+                    {role: "volunteer", goalCount: 3, part: "second"},
+                ],
+            }
+
+            const res = await fetch("/api/events", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(payload),
+            })
+
+            if (!res.ok) {
+                throw new Error("Échec de la création de l'événement")
+            }
+
+            toast.success("Événement créé !")
+
+            router.refresh()
+        } catch (error) {
+            toast.error("Erreur lors de la création", {
+                description: (
+                    <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
+                        <code className="text-white">{JSON.stringify(error)}</code>
+                    </pre>
+                )
+            })
+        }
+    }
+
     return (
         <div className="h-svh flex flex-col pt-16 px-6 pb-6 min-h-0">
             <div className="flex justify-between items-center mb-4 flex-shrink-0">
@@ -144,12 +243,151 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
                         <ChevronRight className="h-5 w-5"/>
                     </button>
                 </div>
-                <button
-                    onClick={createTestEvents}
-                    className="px-3 py-1 text-xs bg-primary text-white rounded hover:bg-primary/90 transition"
-                >
+                <Button onClick={createTestEvents}>
                     Générer les événements de test
-                </button>
+                </Button>
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button variant="outline">
+                            <CalendarPlus/>
+                        </Button>
+                    </DialogTrigger>
+
+                    <DialogContent>
+                        <Form {...createEventForm}>
+                            <form onSubmit={createEventForm.handleSubmit(createEvent)}>
+                                <DialogHeader>
+                                    <DialogTitle>Ajouter une permanence</DialogTitle>
+                                </DialogHeader>
+
+                                <div className="flex gap-4">
+                                    <FormField
+                                        control={createEventForm.control}
+                                        name="startDate"
+                                        render={({field}) => (
+                                            <FormItem className="flex flex-col flex-1">
+                                                <FormLabel>Date de début</FormLabel>
+                                                <Popover>
+                                                    <PopoverTrigger asChild>
+                                                        <FormControl>
+                                                            <Button
+                                                                variant="outline"
+                                                                className={cn(
+                                                                    "pl-3 text-left font-normal",
+                                                                    !field.value && "text-muted-foreground"
+                                                                )}
+                                                            >
+                                                                {field.value ? (
+                                                                    format(field.value, "PPP", {locale: fr})
+                                                                ) : (
+                                                                    <span>Choisir une date</span>
+                                                                )}
+                                                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50"/>
+                                                            </Button>
+                                                        </FormControl>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="w-auto p-0" align="start">
+                                                        <Calendar
+                                                            mode="single"
+                                                            selected={field.value}
+                                                            onSelect={field.onChange}
+                                                            captionLayout="dropdown"
+                                                            locale={fr}
+                                                            weekStartsOn={1}
+                                                            disabled={(date) => date < new Date("1900-01-01")}
+                                                        />
+                                                    </PopoverContent>
+                                                </Popover>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={createEventForm.control}
+                                        name="startTime"
+                                        render={({field}) => (
+                                            <FormItem className="flex flex-col flex-1">
+                                                <FormLabel>Heure de début</FormLabel>
+                                                <FormControl>
+                                                    <Input type="time" step="60" {...field} />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+
+                                <div className="flex gap-4 mt-4">
+                                    <FormField
+                                        control={createEventForm.control}
+                                        name="endDate"
+                                        render={({field}) => (
+                                            <FormItem className="flex flex-col flex-1">
+                                                <FormLabel>Date de fin</FormLabel>
+                                                <Popover>
+                                                    <PopoverTrigger asChild>
+                                                        <FormControl>
+                                                            <Button
+                                                                variant="outline"
+                                                                className={cn(
+                                                                    "pl-3 text-left font-normal",
+                                                                    !field.value && "text-muted-foreground"
+                                                                )}
+                                                            >
+                                                                {field.value ? (
+                                                                    format(field.value, "PPP", {locale: fr})
+                                                                ) : (
+                                                                    <span>Choisir une date</span>
+                                                                )}
+                                                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50"/>
+                                                            </Button>
+                                                        </FormControl>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="w-auto p-0" align="start">
+                                                        <Calendar
+                                                            mode="single"
+                                                            selected={field.value}
+                                                            onSelect={field.onChange}
+                                                            captionLayout="dropdown"
+                                                            locale={fr}
+                                                            weekStartsOn={1}
+                                                            disabled={(date) => date < new Date("1900-01-01")}
+                                                        />
+                                                    </PopoverContent>
+                                                </Popover>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={createEventForm.control}
+                                        name="endTime"
+                                        render={({field}) => (
+                                            <FormItem className="flex flex-col flex-1">
+                                                <FormLabel>Heure de fin</FormLabel>
+                                                <FormControl>
+                                                    <Input type="time" step="60" {...field} />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+
+                                <DialogFooter className="mt-4">
+                                    <DialogClose asChild>
+                                        <Button variant="outline">Annuler</Button>
+                                    </DialogClose>
+                                    <Button type="submit">Sauvegarder</Button>
+                                </DialogFooter>
+                            </form>
+                        </Form>
+                    </DialogContent>
+                </Dialog>
+
+
                 <h2 className="text-xl font-semibold capitalize">
                     {format(currentMonth, 'MMMM yyyy', {locale: fr})}
                 </h2>
