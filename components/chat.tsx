@@ -485,7 +485,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
     return (
         <div className="flex flex-row items-center justify-center w-full">
-                <div className="flex flex-col relative h-screen p-3 gap-4 w-full" tabIndex={0} ref={rootDivRef}>
+            <div className="flex flex-col relative h-svh p-3 gap-4 w-full" tabIndex={0} ref={rootDivRef}>
                     {/*<video className='w-0 h-0' playsInline ref={callingVideoRef} autoPlay/>*/}
                     <div className="flex flex-col flex-grow overflow-y-auto mt-10">
                         {chat.map(({author, content, timestamp, reactions, id}, key) => {
@@ -835,7 +835,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                     </div>
                 </div>
 
-            <div className="hidden lg:flex flex-col justify-start h-screen w-80 p-6 gap-3 border-l-main border-l">
+            <div className="hidden lg:flex flex-col justify-start h-svh w-80 p-6 gap-3 border-l-main border-l">
                 <div>
                         <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">{channelName}</h3>
                     <small className="text-sm leading-none font-medium">
