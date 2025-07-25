@@ -1,5 +1,5 @@
 import {NextRequest, NextResponse} from "next/server";
-import {createTicket} from "@/lib/ticketManager";
+import {createTicket, findTicket} from "@/lib/ticketManager";
 import {auth} from "@/lib/auth";
 import {z} from "zod";
 
@@ -19,6 +19,12 @@ export async function POST(req: NextRequest) {
         });
 
         if (!valid) return new Response('Unauthorized', {status: 401});
+
+        const hasTicket = await findTicket(verifiedBody.discordUserID);
+        if (!hasTicket) return NextResponse.json({
+            success: false,
+            error: "User already has an open ticket"
+        }, {status: 401});
 
         const ticket = await createTicket(verifiedBody.discordUserID);
         return NextResponse.json({success: true, ticket}, {status: 200});
