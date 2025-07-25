@@ -1,7 +1,7 @@
 "use client"
 import * as React from "react"
 import {useEffect, useRef, useState} from "react"
-import {CalendarDays, Ear, House, MessagesSquare, ShieldUser} from "lucide-react"
+import {CalendarDays, Ear, House, MessageSquareMore, MessagesSquare, ShieldUser} from "lucide-react"
 import {NavProjects} from "@/components/nav-projects"
 import {
     Sidebar,
@@ -26,6 +26,11 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
             icon: House,
         },
         {
+            name: "Discussion BE libre",
+            url: "/app/be",
+            icon: MessageSquareMore,
+        },
+        {
             name: "Chat Permanence",
             url: "/app/chat",
             icon: MessagesSquare,
@@ -46,6 +51,11 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
             name: "Accueil",
             url: "/app",
             icon: House,
+        },
+        {
+            name: "Discussion BE libre",
+            url: "/app/be",
+            icon: MessageSquareMore,
         },
         {
             name: "Chat Permanence",

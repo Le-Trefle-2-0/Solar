@@ -316,7 +316,8 @@ export function Chat(props: { channelID: string, statusID: number }) {
                 setChannelName(data.name)
             });
 
-        if (channelID !== "1") {
+        console.log(status)
+        if (status !== 0) {
             fetch(`/api/tickets/findBy/channelID`, {
                 method: "POST",
                 body: JSON.stringify({
@@ -484,7 +485,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
     return (
         <div className="flex flex-row items-center justify-center w-full">
-                <div className="flex flex-col relative h-screen p-3 gap-4 w-full" tabIndex={0} ref={rootDivRef}>
+            <div className="flex flex-col relative h-svh p-3 gap-4 w-full" tabIndex={0} ref={rootDivRef}>
                     {/*<video className='w-0 h-0' playsInline ref={callingVideoRef} autoPlay/>*/}
                     <div className="flex flex-col flex-grow overflow-y-auto mt-10">
                         {chat.map(({author, content, timestamp, reactions, id}, key) => {
@@ -532,229 +533,236 @@ export function Chat(props: { channelID: string, statusID: number }) {
                         <FontAwesomeIcon icon={faCircle} className="text-gray-400 animate-opacityPulse3"/>
                     </div>
 
-                    <div className="absolute top-6 right-6 flex flex-row gap-2">
-                        <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                                <Button className={channelID == "1" || status == 3 || status == 4 ? "hidden" : "flex"}
-                                        variant="outline" disabled={status == 3 || status == 4}>
-                                    <UserRoundPlus/> Attribuer
-                                </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>Merci de choisir le bénévole à attribuer</AlertDialogTitle>
-                                </AlertDialogHeader>
-                                <Form {...form}>
-                                    <form onSubmit={form.handleSubmit(assign)} className="space-y-6">
-                                        <FormField
-                                            control={form.control}
-                                            name="volunteer"
-                                            render={({field}) => (
-                                                <FormItem className="flex flex-col">
-                                                    <FormLabel>Bénévole Écoutant</FormLabel>
-                                                    <Popover>
-                                                        <PopoverTrigger asChild>
-                                                            <FormControl>
-                                                                <Button
-                                                                    variant="outline"
-                                                                    role="combobox"
-                                                                    className={cn(
-                                                                        "w-[350px] justify-between",
-                                                                        !field.value && "text-muted-foreground"
-                                                                    )}
-                                                                >
-                                                                    {field.value
-                                                                        ? available.find(
-                                                                            (available) => available.value.name === field.value.name
-                                                                        )?.label
-                                                                        : "Sélectionner le bénévole"}
-                                                                    <ChevronsUpDown className="opacity-50"/>
-                                                                </Button>
-                                                            </FormControl>
-                                                        </PopoverTrigger>
-                                                        <PopoverContent className="w-[350px] p-0">
-                                                            <Command>
-                                                                <CommandInput
-                                                                    placeholder="Rechercher un bénévole..."
-                                                                    className="h-9"
-                                                                />
-                                                                <CommandList>
-                                                                    <CommandEmpty>Aucun bénévole
-                                                                        trouvé</CommandEmpty>
-                                                                    <CommandGroup>
-                                                                        {available.map((available) => (
-                                                                            <CommandItem
-                                                                                value={available.label}
-                                                                                key={available.value.id}
-                                                                                onSelect={() => {
-                                                                                    form.setValue("volunteer", available.value)
-                                                                                }}
-                                                                            >
-                                                                                {available.label}
-                                                                                <Check
-                                                                                    className={cn(
-                                                                                        "ml-auto",
-                                                                                        available.value === field.value
-                                                                                            ? "opacity-100"
-                                                                                            : "opacity-0"
-                                                                                    )}
-                                                                                />
-                                                                            </CommandItem>
-                                                                        ))}
-                                                                    </CommandGroup>
-                                                                </CommandList>
-                                                            </Command>
-                                                        </PopoverContent>
-                                                    </Popover>
-                                                    <FormDescription>
-                                                        Le bénévole aura ensuite accès à l'écoute
-                                                    </FormDescription>
-                                                    <FormMessage/>
-                                                </FormItem>
-                                            )}
-                                        />
-
-                                        <AlertDialogFooter>
-                                            <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                            <AlertDialogAction asChild>
-                                                <Button type="submit">Valider</Button>
-                                            </AlertDialogAction>
-                                        </AlertDialogFooter>
-                                    </form>
-                                </Form>
-                            </AlertDialogContent>
-                        </AlertDialog>
-
-                        <Button
-                            className={channelID == "1" || status !== 2 ? "hidden" : "flex"}
-                            variant='outline'
-                            color={callColor}
-                            onClick={handleCall}
-                            disabled={status !== 2}
-                        >
-                            <PhoneCall color={callColor}/> Démarrer un vocal
-                            <audio ref={myAudioRef} autoPlay
-                                   muted/>  {/* my own voice (muted so I don't hear myself) */}
-                            <audio ref={remoteAudioRef} autoPlay/>
-                            {/* the other user's audio */}
-                        </Button>
-
-                        <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                                <Button className={channelID == "1" || status == 3 || status == 4 ? "hidden" : "flex"}
-                                        variant="destructive" disabled={status == 3 || status == 4}>
-                                    <MessageCircleOff/> Fermer l'écoute
-                                </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>Attention, êtes vous certain ?</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                        La fermeture d'une écoute est irréversible. Pour simplement retourner au
-                                        chat de
-                                        permanence merci d'utiliser l'onglet latéral.
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                    <AlertDialogAction asChild>
-                                        <Button variant="destructive" onClick={() => {
-                                            fetch('/api/tickets/close', {
-                                                method: 'POST',
-                                                body: JSON.stringify({
-                                                    channelID: channelID
-                                                })
-                                            }).then(res => res.json()).then(res => {
-                                                if (res.success) {
-                                                    setStatus(3)
-                                                }
-                                            })
-                                        }}>
-                                            Fermer l'écoute
+                    {
+                        status === 0 ? null :
+                            <div className="absolute top-6 right-6 flex flex-row gap-2">
+                                <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                        <Button
+                                            className={channelID == "1" || status == 3 || status == 4 ? "hidden" : "flex"}
+                                            variant="outline" disabled={status == 3 || status == 4}>
+                                            <UserRoundPlus/> Attribuer
                                         </Button>
-                                    </AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                            <AlertDialogTitle>Merci de choisir le bénévole à
+                                                attribuer</AlertDialogTitle>
+                                        </AlertDialogHeader>
+                                        <Form {...form}>
+                                            <form onSubmit={form.handleSubmit(assign)} className="space-y-6">
+                                                <FormField
+                                                    control={form.control}
+                                                    name="volunteer"
+                                                    render={({field}) => (
+                                                        <FormItem className="flex flex-col">
+                                                            <FormLabel>Bénévole Écoutant</FormLabel>
+                                                            <Popover>
+                                                                <PopoverTrigger asChild>
+                                                                    <FormControl>
+                                                                        <Button
+                                                                            variant="outline"
+                                                                            role="combobox"
+                                                                            className={cn(
+                                                                                "w-[350px] justify-between",
+                                                                                !field.value && "text-muted-foreground"
+                                                                            )}
+                                                                        >
+                                                                            {field.value
+                                                                                ? available.find(
+                                                                                    (available) => available.value.name === field.value.name
+                                                                                )?.label
+                                                                                : "Sélectionner le bénévole"}
+                                                                            <ChevronsUpDown className="opacity-50"/>
+                                                                        </Button>
+                                                                    </FormControl>
+                                                                </PopoverTrigger>
+                                                                <PopoverContent className="w-[350px] p-0">
+                                                                    <Command>
+                                                                        <CommandInput
+                                                                            placeholder="Rechercher un bénévole..."
+                                                                            className="h-9"
+                                                                        />
+                                                                        <CommandList>
+                                                                            <CommandEmpty>Aucun bénévole
+                                                                                trouvé</CommandEmpty>
+                                                                            <CommandGroup>
+                                                                                {available.map((available) => (
+                                                                                    <CommandItem
+                                                                                        value={available.label}
+                                                                                        key={available.value.id}
+                                                                                        onSelect={() => {
+                                                                                            form.setValue("volunteer", available.value)
+                                                                                        }}
+                                                                                    >
+                                                                                        {available.label}
+                                                                                        <Check
+                                                                                            className={cn(
+                                                                                                "ml-auto",
+                                                                                                available.value === field.value
+                                                                                                    ? "opacity-100"
+                                                                                                    : "opacity-0"
+                                                                                            )}
+                                                                                        />
+                                                                                    </CommandItem>
+                                                                                ))}
+                                                                            </CommandGroup>
+                                                                        </CommandList>
+                                                                    </Command>
+                                                                </PopoverContent>
+                                                            </Popover>
+                                                            <FormDescription>
+                                                                Le bénévole aura ensuite accès à l'écoute
+                                                            </FormDescription>
+                                                            <FormMessage/>
+                                                        </FormItem>
+                                                    )}
+                                                />
 
-                        <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                                <Button className={channelID == "1" || status !== 3 ? "hidden" : "flex"}
-                                        variant="outline" disabled={status !== 3}>
-                                    <NotebookPen/> Transmission
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                                    <AlertDialogAction asChild>
+                                                        <Button type="submit">Valider</Button>
+                                                    </AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </form>
+                                        </Form>
+                                    </AlertDialogContent>
+                                </AlertDialog>
+
+                                <Button
+                                    className={channelID == "1" || status !== 2 ? "hidden" : "flex"}
+                                    variant='outline'
+                                    color={callColor}
+                                    onClick={handleCall}
+                                    disabled={status !== 2}
+                                >
+                                    <PhoneCall color={callColor}/> Démarrer un vocal
+                                    <audio ref={myAudioRef} autoPlay
+                                           muted/>  {/* my own voice (muted so I don't hear myself) */}
+                                    <audio ref={remoteAudioRef} autoPlay/>
+                                    {/* the other user's audio */}
                                 </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>Merci de remplir la fiche de transmission</AlertDialogTitle>
-                                </AlertDialogHeader>
-                                <Form {...transmissionForm}>
-                                    <form onSubmit={transmissionForm.handleSubmit(transmission)}
-                                          className="space-y-6">
-                                        <FormField
-                                            control={transmissionForm.control}
-                                            name="problematic"
-                                            render={({field}) => (
-                                                <FormItem className="flex flex-col">
-                                                    <FormLabel>Problématique de l'écoute* :</FormLabel>
-                                                    <FormControl>
-                                                        <Textarea
-                                                            placeholder="Problématique..."
-                                                            className="resize-none"
-                                                            {...field}
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage/>
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={transmissionForm.control}
-                                            name="observations"
-                                            render={({field}) => (
-                                                <FormItem className="flex flex-col">
-                                                    <FormLabel>Observations générales* :</FormLabel>
-                                                    <FormControl>
-                                                        <Textarea
-                                                            placeholder="Observations..."
-                                                            className="resize-none"
-                                                            {...field}
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage/>
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={transmissionForm.control}
-                                            name="info"
-                                            render={({field}) => (
-                                                <FormItem className="flex flex-col">
-                                                    <FormLabel>Informations supplémentaires (optionnel)
-                                                        :</FormLabel>
-                                                    <FormControl>
-                                                        <Textarea
-                                                            placeholder="Informations..."
-                                                            className="resize-none"
-                                                            {...field}
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage/>
-                                                </FormItem>
-                                            )}
-                                        />
 
+                                <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                        <Button
+                                            className={channelID == "1" || status == 3 || status == 4 ? "hidden" : "flex"}
+                                            variant="destructive" disabled={status == 3 || status == 4}>
+                                            <MessageCircleOff/> Fermer l'écoute
+                                        </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                            <AlertDialogTitle>Attention, êtes vous certain ?</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                                La fermeture d'une écoute est irréversible. Pour simplement retourner au
+                                                chat de
+                                                permanence merci d'utiliser l'onglet latéral.
+                                            </AlertDialogDescription>
+                                        </AlertDialogHeader>
                                         <AlertDialogFooter>
                                             <AlertDialogCancel>Annuler</AlertDialogCancel>
                                             <AlertDialogAction asChild>
-                                                <Button type="submit">Envoyer</Button>
+                                                <Button variant="destructive" onClick={() => {
+                                                    fetch('/api/tickets/close', {
+                                                        method: 'POST',
+                                                        body: JSON.stringify({
+                                                            channelID: channelID
+                                                        })
+                                                    }).then(res => res.json()).then(res => {
+                                                        if (res.success) {
+                                                            setStatus(3)
+                                                        }
+                                                    })
+                                                }}>
+                                                    Fermer l'écoute
+                                                </Button>
                                             </AlertDialogAction>
                                         </AlertDialogFooter>
-                                    </form>
-                                </Form>
-                            </AlertDialogContent>
-                        </AlertDialog>
-                    </div>
+                                    </AlertDialogContent>
+                                </AlertDialog>
+
+                                <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                        <Button className={channelID == "1" || status !== 3 ? "hidden" : "flex"}
+                                                variant="outline" disabled={status !== 3}>
+                                            <NotebookPen/> Transmission
+                                        </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                            <AlertDialogTitle>Merci de remplir la fiche de
+                                                transmission</AlertDialogTitle>
+                                        </AlertDialogHeader>
+                                        <Form {...transmissionForm}>
+                                            <form onSubmit={transmissionForm.handleSubmit(transmission)}
+                                                  className="space-y-6">
+                                                <FormField
+                                                    control={transmissionForm.control}
+                                                    name="problematic"
+                                                    render={({field}) => (
+                                                        <FormItem className="flex flex-col">
+                                                            <FormLabel>Problématique de l'écoute* :</FormLabel>
+                                                            <FormControl>
+                                                                <Textarea
+                                                                    placeholder="Problématique..."
+                                                                    className="resize-none"
+                                                                    {...field}
+                                                                />
+                                                            </FormControl>
+                                                            <FormMessage/>
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={transmissionForm.control}
+                                                    name="observations"
+                                                    render={({field}) => (
+                                                        <FormItem className="flex flex-col">
+                                                            <FormLabel>Observations générales* :</FormLabel>
+                                                            <FormControl>
+                                                                <Textarea
+                                                                    placeholder="Observations..."
+                                                                    className="resize-none"
+                                                                    {...field}
+                                                                />
+                                                            </FormControl>
+                                                            <FormMessage/>
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={transmissionForm.control}
+                                                    name="info"
+                                                    render={({field}) => (
+                                                        <FormItem className="flex flex-col">
+                                                            <FormLabel>Informations supplémentaires (optionnel)
+                                                                :</FormLabel>
+                                                            <FormControl>
+                                                                <Textarea
+                                                                    placeholder="Informations..."
+                                                                    className="resize-none"
+                                                                    {...field}
+                                                                />
+                                                            </FormControl>
+                                                            <FormMessage/>
+                                                        </FormItem>
+                                                    )}
+                                                />
+
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                                    <AlertDialogAction asChild>
+                                                        <Button type="submit">Envoyer</Button>
+                                                    </AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </form>
+                                        </Form>
+                                    </AlertDialogContent>
+                                </AlertDialog>
+                            </div>
+                    }
 
                     <div className="sticky bottom-0">
                         <form ref={formRef} onSubmit={(e) => sendForm(e)}
@@ -827,7 +835,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                     </div>
                 </div>
 
-            <div className="hidden lg:flex flex-col justify-start h-screen w-80 p-6 gap-3 border-l-main border-l">
+            <div className="hidden lg:flex flex-col justify-start h-svh w-80 p-6 gap-3 border-l-main border-l">
                 <div>
                         <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">{channelName}</h3>
                     <small className="text-sm leading-none font-medium">

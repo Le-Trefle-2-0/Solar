@@ -7,7 +7,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <div className='flex justify-around items-center h-screen'>
+        <div className='flex justify-around items-center h-svh'>
             <Image src={logo} alt='logo' height={450}
                    className="hidden md:inline absolute bottom-1 left-1 opacity-25 z-0"/>
                     {children}

@@ -131,7 +131,7 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
     };
 
     return (
-        <div className="h-screen flex flex-col pt-16 px-6 pb-6 min-h-0">
+        <div className="h-svh flex flex-col pt-16 px-6 pb-6 min-h-0">
             <div className="flex justify-between items-center mb-4 flex-shrink-0">
                 <div className="flex items-center gap-2">
                     <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>

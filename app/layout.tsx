@@ -21,8 +21,12 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-    title: "Better Auth Next.js Starter",
-    description: "Better Auth Next.js Starter with Postgres, Drizzle, shadcn/ui and Tanstack Query"
+    title: "Solar - Logiciel d'écoutes",
+    description: "Application de prise en charge d'écoutes anonymes pour Le Trèfle 2.0",
+    icons: {
+        icon: "/favicon.ico",
+        apple: "/logo.svg"
+    }
 }
 
 export const viewport: Viewport = {

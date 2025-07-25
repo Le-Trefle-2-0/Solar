@@ -11,6 +11,11 @@
 @source "../.flowbite-react/class-list.json";
 @source "../node_modules/@daveyplate/better-auth-ui";
 
+html, body {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
 :root {
   --main: #8cc088;
   --accent: oklch(0.97 0 0);
