@@ -37,3 +37,11 @@ export async function createTicket(id: string) {
         }
     });
 }
+
+export async function findTicket(discordUserID: string) {
+    return await prisma.ticket.findFirst({
+        where: {
+            discordUserID
+        }
+    });
+}
