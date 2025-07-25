@@ -178,7 +178,7 @@ app.prepare().then(() => {
         socket.on("ping", (cb) => cb());
         socket.on("sendMessage", (data) => socket.broadcast.to(data.channel.id).emit("message", data));
         socket.on('typing', (data) => socket.to(data.id).emit("typingIndicator", data));
-        socket.on('update', () => socket.broadcast.emit('updateRequest'));
+        socket.on('update', () => io.emit('updateRequest'));
         socket.on('reaction', (data) => socket.broadcast.to(data.channelId).emit('reactionAdd', data.reaction));
         socket.on('reactionRemove', (data) => socket.to(data.channelId).emit('reactionRemove', data.reaction));
     });
