@@ -160,6 +160,7 @@ model Channel {
 model Message {
   id        Int      @id @default(autoincrement())
   createdAt DateTime
+  discordID String?
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   channelId String

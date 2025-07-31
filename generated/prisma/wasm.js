@@ -217,6 +217,7 @@ exports.Prisma.ChannelScalarFieldEnum = {
 exports.Prisma.MessageScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
+  discordID: 'discordID',
   userId: 'userId',
   channelId: 'channelId',
   content: 'content'
@@ -422,6 +423,7 @@ exports.Prisma.ChannelOrderByRelevanceFieldEnum = {
 };
 
 exports.Prisma.MessageOrderByRelevanceFieldEnum = {
+  discordID: 'discordID',
   userId: 'userId',
   channelId: 'channelId'
 };

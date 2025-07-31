@@ -160,10 +160,11 @@ model Channel {
 model Message {
   id        Int      @id @default(autoincrement())
   createdAt DateTime
+  discordID String?
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   channelId String
-  channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
   content   Bytes
 
   Reaction Reaction[]
