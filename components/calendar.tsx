@@ -136,7 +136,7 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
             >
               {format(cloneDay, 'd')}
             </span>
-                        <div className="flex-1 text-[10px] text-gray-500 space-y-1 overflow-hidden">
+                        <div className="flex flex-col w-full text-[10px] text-gray-500 space-y-1 overflow-hidden">
                             {dayEvents.length > 0 ? (
                                 dayEvents.map(event => (
                                     <Event key={event.id} event={event}/>
@@ -246,151 +246,155 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
                 <Button onClick={createTestEvents}>
                     Générer les événements de test
                 </Button>
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button variant="outline">
-                            <CalendarPlus/>
-                        </Button>
-                    </DialogTrigger>
-
-                    <DialogContent>
-                        <Form {...createEventForm}>
-                            <form onSubmit={createEventForm.handleSubmit(createEvent)}>
-                                <DialogHeader>
-                                    <DialogTitle>Ajouter une permanence</DialogTitle>
-                                </DialogHeader>
-
-                                <div className="flex gap-4">
-                                    <FormField
-                                        control={createEventForm.control}
-                                        name="startDate"
-                                        render={({field}) => (
-                                            <FormItem className="flex flex-col flex-1">
-                                                <FormLabel>Date de début</FormLabel>
-                                                <Popover>
-                                                    <PopoverTrigger asChild>
-                                                        <FormControl>
-                                                            <Button
-                                                                variant="outline"
-                                                                className={cn(
-                                                                    "pl-3 text-left font-normal",
-                                                                    !field.value && "text-muted-foreground"
-                                                                )}
-                                                            >
-                                                                {field.value ? (
-                                                                    format(field.value, "PPP", {locale: fr})
-                                                                ) : (
-                                                                    <span>Choisir une date</span>
-                                                                )}
-                                                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50"/>
-                                                            </Button>
-                                                        </FormControl>
-                                                    </PopoverTrigger>
-                                                    <PopoverContent className="w-auto p-0" align="start">
-                                                        <Calendar
-                                                            mode="single"
-                                                            selected={field.value}
-                                                            onSelect={field.onChange}
-                                                            captionLayout="dropdown"
-                                                            locale={fr}
-                                                            weekStartsOn={1}
-                                                            disabled={(date) => date < new Date("1900-01-01")}
-                                                        />
-                                                    </PopoverContent>
-                                                </Popover>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    <FormField
-                                        control={createEventForm.control}
-                                        name="startTime"
-                                        render={({field}) => (
-                                            <FormItem className="flex flex-col flex-1">
-                                                <FormLabel>Heure de début</FormLabel>
-                                                <FormControl>
-                                                    <Input type="time" step="60" {...field} />
-                                                </FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
-
-                                <div className="flex gap-4 mt-4">
-                                    <FormField
-                                        control={createEventForm.control}
-                                        name="endDate"
-                                        render={({field}) => (
-                                            <FormItem className="flex flex-col flex-1">
-                                                <FormLabel>Date de fin</FormLabel>
-                                                <Popover>
-                                                    <PopoverTrigger asChild>
-                                                        <FormControl>
-                                                            <Button
-                                                                variant="outline"
-                                                                className={cn(
-                                                                    "pl-3 text-left font-normal",
-                                                                    !field.value && "text-muted-foreground"
-                                                                )}
-                                                            >
-                                                                {field.value ? (
-                                                                    format(field.value, "PPP", {locale: fr})
-                                                                ) : (
-                                                                    <span>Choisir une date</span>
-                                                                )}
-                                                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50"/>
-                                                            </Button>
-                                                        </FormControl>
-                                                    </PopoverTrigger>
-                                                    <PopoverContent className="w-auto p-0" align="start">
-                                                        <Calendar
-                                                            mode="single"
-                                                            selected={field.value}
-                                                            onSelect={field.onChange}
-                                                            captionLayout="dropdown"
-                                                            locale={fr}
-                                                            weekStartsOn={1}
-                                                            disabled={(date) => date < new Date("1900-01-01")}
-                                                        />
-                                                    </PopoverContent>
-                                                </Popover>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    <FormField
-                                        control={createEventForm.control}
-                                        name="endTime"
-                                        render={({field}) => (
-                                            <FormItem className="flex flex-col flex-1">
-                                                <FormLabel>Heure de fin</FormLabel>
-                                                <FormControl>
-                                                    <Input type="time" step="60" {...field} />
-                                                </FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
-
-                                <DialogFooter className="mt-4">
-                                    <DialogClose asChild>
-                                        <Button variant="outline">Annuler</Button>
-                                    </DialogClose>
-                                    <Button type="submit">Sauvegarder</Button>
-                                </DialogFooter>
-                            </form>
-                        </Form>
-                    </DialogContent>
-                </Dialog>
 
 
-                <h2 className="text-xl font-semibold capitalize">
-                    {format(currentMonth, 'MMMM yyyy', {locale: fr})}
-                </h2>
+                <div className="flex gap-3 justify-end">
+                    <h2 className="text-xl font-semibold capitalize">
+                        {format(currentMonth, 'MMMM yyyy', {locale: fr})}
+                    </h2>
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button variant="outline">
+                                <CalendarPlus/>
+                            </Button>
+                        </DialogTrigger>
+
+                        <DialogContent>
+                            <Form {...createEventForm}>
+                                <form onSubmit={createEventForm.handleSubmit(createEvent)}>
+                                    <DialogHeader>
+                                        <DialogTitle>Ajouter une permanence</DialogTitle>
+                                    </DialogHeader>
+
+                                    <div className="flex gap-4">
+                                        <FormField
+                                            control={createEventForm.control}
+                                            name="startDate"
+                                            render={({field}) => (
+                                                <FormItem className="flex flex-col flex-1">
+                                                    <FormLabel>Date de début</FormLabel>
+                                                    <Popover>
+                                                        <PopoverTrigger asChild>
+                                                            <FormControl>
+                                                                <Button
+                                                                    variant="outline"
+                                                                    className={cn(
+                                                                        "pl-3 text-left font-normal",
+                                                                        !field.value && "text-muted-foreground"
+                                                                    )}
+                                                                >
+                                                                    {field.value ? (
+                                                                        format(field.value, "PPP", {locale: fr})
+                                                                    ) : (
+                                                                        <span>Choisir une date</span>
+                                                                    )}
+                                                                    <CalendarIcon
+                                                                        className="ml-auto h-4 w-4 opacity-50"/>
+                                                                </Button>
+                                                            </FormControl>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent className="w-auto p-0" align="start">
+                                                            <Calendar
+                                                                mode="single"
+                                                                selected={field.value}
+                                                                onSelect={field.onChange}
+                                                                captionLayout="dropdown"
+                                                                locale={fr}
+                                                                weekStartsOn={1}
+                                                                disabled={(date) => date < new Date("1900-01-01")}
+                                                            />
+                                                        </PopoverContent>
+                                                    </Popover>
+                                                    <FormMessage/>
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={createEventForm.control}
+                                            name="startTime"
+                                            render={({field}) => (
+                                                <FormItem className="flex flex-col flex-1">
+                                                    <FormLabel>Heure de début</FormLabel>
+                                                    <FormControl>
+                                                        <Input type="time" step="60" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage/>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+
+                                    <div className="flex gap-4 mt-4">
+                                        <FormField
+                                            control={createEventForm.control}
+                                            name="endDate"
+                                            render={({field}) => (
+                                                <FormItem className="flex flex-col flex-1">
+                                                    <FormLabel>Date de fin</FormLabel>
+                                                    <Popover>
+                                                        <PopoverTrigger asChild>
+                                                            <FormControl>
+                                                                <Button
+                                                                    variant="outline"
+                                                                    className={cn(
+                                                                        "pl-3 text-left font-normal",
+                                                                        !field.value && "text-muted-foreground"
+                                                                    )}
+                                                                >
+                                                                    {field.value ? (
+                                                                        format(field.value, "PPP", {locale: fr})
+                                                                    ) : (
+                                                                        <span>Choisir une date</span>
+                                                                    )}
+                                                                    <CalendarIcon
+                                                                        className="ml-auto h-4 w-4 opacity-50"/>
+                                                                </Button>
+                                                            </FormControl>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent className="w-auto p-0" align="start">
+                                                            <Calendar
+                                                                mode="single"
+                                                                selected={field.value}
+                                                                onSelect={field.onChange}
+                                                                captionLayout="dropdown"
+                                                                locale={fr}
+                                                                weekStartsOn={1}
+                                                                disabled={(date) => date < new Date("1900-01-01")}
+                                                            />
+                                                        </PopoverContent>
+                                                    </Popover>
+                                                    <FormMessage/>
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={createEventForm.control}
+                                            name="endTime"
+                                            render={({field}) => (
+                                                <FormItem className="flex flex-col flex-1">
+                                                    <FormLabel>Heure de fin</FormLabel>
+                                                    <FormControl>
+                                                        <Input type="time" step="60" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage/>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+
+                                    <DialogFooter className="mt-4">
+                                        <DialogClose asChild>
+                                            <Button variant="outline">Annuler</Button>
+                                        </DialogClose>
+                                        <Button type="submit">Sauvegarder</Button>
+                                    </DialogFooter>
+                                </form>
+                            </Form>
+                        </DialogContent>
+                    </Dialog>
+                </div>
             </div>
             <div className="grid grid-cols-7 gap-2 text-center text-xs font-medium text-gray-700 mb-2 flex-shrink-0">
                 {daysOfWeek.map(day => (
