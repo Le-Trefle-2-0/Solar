@@ -1,4 +1,4 @@
-import type {Reaction} from "@/generated/prisma/client"
+import type {Reaction, User} from "@/generated/prisma/client"
 
 export interface Msg {
     author: {
@@ -97,3 +97,14 @@ export type EventModalProps = {
     event: EventData | null;
     onUpdate?: (updated: EventData) => void;
 };
+
+export type vigi = {
+    date: Date;
+    motive: string;
+}
+
+export type ticketInfo = {
+    vigis: vigi[];
+    ineligible: User[];
+    voiceIneligible: User[];
+}
