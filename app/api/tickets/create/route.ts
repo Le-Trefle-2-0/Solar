@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
         if (!valid) return new Response('Unauthorized', {status: 401});
 
         const hasTicket = await findTicket(verifiedBody.discordUserID);
-        if (!hasTicket) return NextResponse.json({
+        if (hasTicket) return NextResponse.json({
             success: false,
             error: "User already has an open ticket"
         }, {status: 401});
