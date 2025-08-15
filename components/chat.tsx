@@ -6,22 +6,29 @@ import {EmojiPicker, EmojiPickerContent, EmojiPickerFooter, EmojiPickerSearch,} 
 import {
     Check,
     ChevronsUpDown,
+    CircleAlert,
+    Copy,
+    IdCardLanyard,
+    Info,
     Laugh,
     MessageCircleOff,
+    MicOff,
     NotebookPen,
     PhoneCall,
+    ScanFace,
     Send,
     TvMinimalPlay,
-    UserRoundPlus
+    UserRoundPlus,
+    UserRoundX
 } from "lucide-react";
 import React, {FormEvent, useEffect, useRef, useState} from "react";
-import {formVolunteer, Msg, MsgWithID} from "@/lib/interface";
+import {formVolunteer, Msg, MsgWithID, ticketInfo} from "@/lib/interface";
 import {z, ZodError} from "zod";
 import {toast} from "sonner";
 import {saveMessage} from "@/lib/messageManager";
 import {useSession} from "@/lib/auth-client";
 import {Socket} from "socket.io-client";
-import {Button, Textarea, useSidebar} from "@/components/ui";
+import {Button, Dialog, DialogContent, DialogHeader, DialogTrigger, Textarea, useSidebar} from "@/components/ui";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -52,6 +59,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
     const {socket, setChannelID} = useSocket();
     const router = useRouter();
     const [emojiOpen, setEmojiOpen] = useState(false);
+    const [ticketInfo, setTicketInfo] = useState<ticketInfo>();
     const [gifOpen, setGifOpen] = useState(false);
     const [showTyping, setShowTyping] = useState(false);
     const [ticket, setTicket] = useState<Ticket>();
@@ -95,6 +103,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
             channel: {
                 id: channelID,
             },
+            discordID: null,
             reactions: [],
             content,
         };
@@ -134,48 +143,6 @@ export function Chat(props: { channelID: string, statusID: number }) {
     const sendTyping = async () => {
         await socket?.emit('typing', {id: channelID});
     }
-
-    // const handleCall = async () => {
-    //     if (peerInstance) {
-    //         peerInstance.disconnect();
-    //         setPeerInstance(null);
-    //         setCallColor("#000")
-    //     } else {
-    //         navigator.mediaDevices.getUserMedia({video: false, audio: true})
-    //             .then(stream => {
-    //                 if (myVideoRef.current) {
-    //                     myVideoRef.current.srcObject = stream;
-    //                 }
-    //                 const callID = Math.random().toString(36).substring(2);
-    //                 const peer = new Peer(callID, {
-    //                     host: process.env.NEXT_PUBLIC_HOST,
-    //                     port: 9000,
-    //                     path: '/',
-    //                     secure: true
-    //                 });
-    //                 setPeerInstance(peer);
-    //
-    //                 peer.on('call', call => {
-    //                     call.answer(stream);
-    //
-    //                     setCallColor("#5de03a")
-    //                     call.on('stream', userVideoStream => {
-    //                         if (callingVideoRef.current) {
-    //                             callingVideoRef.current.srcObject = userVideoStream;
-    //                         }
-    //                     });
-    //                 });
-    //
-    //                 setCallColor("#e0c43a")
-    //
-    //                 sendMessage(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/webrtc/${callID}`)
-    //             })
-    //             .catch(error => {
-    //                 console.error("Error accessing media devices:", error);
-    //                 alert("Please allow access to the camera and microphone to use this feature.");
-    //             });
-    //     }
-    // };
 
     const {peerInstance, callColor, startCall, stopCall} = usePeer();
 
@@ -763,6 +730,63 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                         </Form>
                                     </AlertDialogContent>
                                 </AlertDialog>
+
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button variant="outline">
+                                            <Info/>
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="w-[1000px]">
+                                        <DialogHeader>
+                                            {/*<DialogTitle>Informations de l'écoute</DialogTitle>*/}
+                                            {/*<DialogDescription>*/}
+                                            <h4 className="scroll-m-20 text-xl font-semibold tracking-tight flex flex-row gap-3">
+                                                <CircleAlert/> Vigilances
+                                            </h4>
+                                            <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
+                                                {
+                                                    ticketInfo?.vigis.length && ticketInfo.vigis.length > 0 ?
+                                                        ticketInfo?.vigis.map((item, index) => (
+                                                            <li key={index}>{item.date.toLocaleDateString()} - {item.motive}</li>
+                                                        )) : <li>Aucune vigilance en cours</li>
+                                                }
+                                            </ul>
+
+                                            <h4 className="scroll-m-20 text-xl font-semibold tracking-tight flex flex-row gap-3">
+                                                <UserRoundX/> Bénévoles Inéligibles
+                                            </h4>
+                                            <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
+                                                <li>Anthony J</li>
+                                                <li>Julie R</li>
+                                                <li>Paul PR</li>
+                                            </ul>
+
+                                            <h4 className="scroll-m-20 text-xl font-semibold tracking-tight flex flex-row gap-3">
+                                                <MicOff/> Bénévoles Inéligibles Vocal
+                                            </h4>
+                                            <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
+                                                <li>Anthony J</li>
+                                                <li>Julie R</li>
+                                                <li>Paul PR</li>
+                                            </ul>
+
+                                            <h4 className="scroll-m-20 text-xl font-semibold tracking-tight flex flex-row gap-3">
+                                                <IdCardLanyard/> Identifiant
+                                            </h4>
+                                            <p className="leading-7 [&:not(:first-child)]:mt-6">
+                                                Numéro d'anonymat : 277dd0... <Button variant="secondary">
+                                                <Copy/> Copier</Button>
+                                            </p>
+                                            <p className="leading-7 [&:not(:first-child)]:mt-6">
+                                                Identifiant Discord : <Button variant="secondary">
+                                                <ScanFace/> Révéler</Button>
+                                            </p>
+
+                                            {/*</DialogDescription>*/}
+                                        </DialogHeader>
+                                    </DialogContent>
+                                </Dialog>
                             </div>
                     }
 
