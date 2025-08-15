@@ -9,6 +9,7 @@ export const saveMessage = async (msg: Msg) => {
                 userId: msg.author.id,
                 channelId: msg.channel.id,
                 content: Buffer.from(msg.content, "utf8"),
+                discordID: msg.discordID,
             }
         });
 
@@ -49,6 +50,7 @@ export const getMessages = async (channelId: string) => {
             channel: {
                 id: '1',
             },
+            discordID: msg.discordID,
             reactions: reactions,
         });
     }

@@ -12,6 +12,7 @@ export interface Msg {
     channel: {
         id: string;
     },
+    discordID: string | null;
     reactions: Reaction[] | null;
 }
 
