@@ -165,6 +165,9 @@ app.prepare().then(() => {
             }
             clearInterval(interval);
         });
+        socket.on('listen', async (data) => {
+            socket.join(data.id);
+        })
 
         socket.on('getOnlineUsers', async (data, cb) => {
             const sockets = await io.in(data.channelID).fetchSockets();
