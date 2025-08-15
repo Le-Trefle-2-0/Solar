@@ -85,6 +85,7 @@ export async function POST(req: NextRequest) {
             id: z.string(),
         }),
         token: z.string(),
+        discordID: z.string(),
         reactions: z.array(z.any()).optional(),
     })
     try {
