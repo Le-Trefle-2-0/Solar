@@ -19,6 +19,25 @@ async function main() {
             {name: "commented", label: "Terminée"},
         ]
     })
+
+    await prisma.theme.createMany({
+        data: [
+            {name: "Harcèlement"},
+            {name: "Trouble du comportement alimentaire"},
+            {name: "Orientation de genre/sexe et discrimination liée à l'identité de genre/sexuelle"},
+            {name: "Violences sexistes/sexuelles/abus (passées ou présentes"},
+            {name: "Relation sociales (famille, amis, camarades, etc.)"},
+            {name: "Dépression"},
+            {name: "Stress - Anxiété - Angoisse - Phobies"},
+            {name: "Trouble psy (Paranoïa, Bipolaire, TDI, ..."},
+            {name: "Addictions (sexe, drogues, alcool, argent, jeux, ..."},
+            {name: "Solitude / Isolement social / Discrimination"},
+            {name: "Deuil"},
+            {name: "Idées suicidaires - Crises suicidaires"},
+            {name: "Question liées à la sexualité / relations amoureuses"},
+            {name: "Maltraitance physique ou psychique (passées ou présentes"},
+        ]
+    })
 }
 
 main()

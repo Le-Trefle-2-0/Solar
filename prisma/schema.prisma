@@ -56,7 +56,7 @@ model Session {
   userAgent String?  @db.Text
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  themes Theme[]
   impersonatedBy String? @db.Text
 
   activeOrganizationId String? @db.Text
@@ -311,4 +311,11 @@ model Passkey {
 model Image {
   id   String @id @default(cuid())
   link String @db.LongText
+}
+
+model Theme {
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(255)
+
+  Session Session[]
 }
