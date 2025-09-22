@@ -1,5 +1,5 @@
 "use client";
-import type {Reaction} from "@/generated/prisma";
+import type {Reaction} from "@/generated/prisma/client";
 import React, {useEffect, useState} from "react";
 import {
     Badge,
@@ -43,6 +43,7 @@ export function Message(props: {
     channelId: string,
     onReply?: (payload: { id: number; authorName: string; content: string; timestamp: number }) => void,
     replyTargetId?: number,
+    replyOf?: { id: number; authorName: string; content: string; image?: string | null } | undefined,
 }) {
     const {
         prevDate,
@@ -61,6 +62,7 @@ export function Message(props: {
         channelId,
         onReply,
         replyTargetId,
+        replyOf,
     } = props;
     const {socket} = useSocket();
 
@@ -199,6 +201,7 @@ export function Message(props: {
             <ContextMenu>
                 <ContextMenuTrigger>
                     <div
+                        id={`message-${id}`}
                         className={`relative group w-full flex flex-row gap-2 ${isLastInBlock ? 'mb-6' : 'mb-1'} hover:bg-gray-100 rounded-lg px-2 ${replyTargetId === id ? 'border-2 border-blue-400 bg-blue-50' : ''}`}>
                         <div
                             className="absolute -top-4 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -269,6 +272,27 @@ export function Message(props: {
                             )}
                         </div>
                         <div>
+                            {replyOf && (
+                                <div
+                                    className="mb-1 text-xs text-gray-600 hover:text-blue-700 cursor-pointer flex items-center gap-2 border-l-2 border-gray-300 pl-2 max-w-[70vw]"
+                                    onClick={() => {
+                                        const el = document.getElementById(`message-${replyOf.id}`);
+                                        el?.scrollIntoView({behavior: 'smooth', block: 'center'});
+                                    }}
+                                    title={`Aller au message #${replyOf.id}`}
+                                >
+                                    <Image
+                                        src={replyOf.image || '/logo.svg'}
+                                        alt="Avatar"
+                                        width={16}
+                                        height={16}
+                                        className="rounded-md flex-shrink-0"
+                                    />
+                                    <span className="font-medium text-gray-700">{replyOf.authorName}</span>
+                                    <span
+                                        className="truncate">{replyOf.content.length > 60 ? `${replyOf.content.slice(0, 60)}…` : replyOf.content}</span>
+                                </div>
+                            )}
                             {showAuthorInfo && (
                                 <div className="flex flex-row items-center gap-4 mb-1">
                             <span

@@ -113,6 +113,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
             discordID: null,
             reactions: [],
             content,
+            replyID: replyTo?.id ?? null,
         };
 
         try {
@@ -121,6 +122,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
             const msgWithID: MsgWithID = {
                 ...msg,
                 id: savedMessage.id,
+                replyID: msg.replyID ?? null,
             };
 
             socket?.emit("sendMessage", msgWithID);
@@ -472,7 +474,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
             <div className="flex flex-col relative h-svh p-3 gap-4 w-full" tabIndex={0} ref={rootDivRef}>
                     {/*<video className='w-0 h-0' playsInline ref={callingVideoRef} autoPlay/>*/}
                     <div className="flex flex-col flex-grow overflow-y-auto mt-10">
-                        {chat.map(({author, content, timestamp, reactions, id}, key) => {
+                        {chat.map(({author, content, timestamp, reactions, id, replyID}, key) => {
                             const prevMessage = key > 0 ? chat[key - 1] : null
                             const nextMessage = key < chat.length - 1 ? chat[key + 1] : null
                             const currentDate = new Date(timestamp).getTime()
@@ -487,6 +489,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                             const isWithin10MinOfNext = nextDate !== null && Math.abs(nextDate - currentDate) / 60000 < 10
                             const isLastInBlock = !isSameAuthorAsNext || !isWithin10MinOfNext
 
+                            const ref = replyID ? chat.find(m => m.id === replyID) : undefined;
                             return (
                                 <Message
                                     prevDate={prevDate as number}
@@ -510,6 +513,12 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                         setTimeout(() => textRef.current?.focus(), 0);
                                     }}
                                     replyTargetId={replyTo?.id}
+                                    replyOf={ref ? {
+                                        id: ref.id,
+                                        authorName: ref.author.name,
+                                        content: ref.content,
+                                        image: ref.author.image
+                                    } : undefined}
                                 />
                             );
                         })}
