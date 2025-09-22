@@ -9,7 +9,8 @@ export const saveMessage = async (msg: Msg) => {
                 userId: msg.author.id,
                 channelId: msg.channel.id,
                 content: Buffer.from(msg.content, "utf8"),
-                discordID: msg.discordID,
+                discordID: msg.discordID ?? undefined,
+                replyID: msg.replyID ?? undefined,
             }
         });
 
@@ -52,6 +53,7 @@ export const getMessages = async (channelId: string) => {
             },
             discordID: msg.discordID,
             reactions: reactions,
+            replyID: msg.replyID ?? null,
         });
     }
     return messages;
