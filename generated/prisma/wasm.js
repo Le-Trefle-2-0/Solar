@@ -220,7 +220,8 @@ exports.Prisma.MessageScalarFieldEnum = {
   discordID: 'discordID',
   userId: 'userId',
   channelId: 'channelId',
-  content: 'content'
+    content: 'content',
+    replyID: 'replyID'
 };
 
 exports.Prisma.ReactionScalarFieldEnum = {

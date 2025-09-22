@@ -46,7 +46,7 @@ export async function GET(
         }
     });
 
-    if (dbChannel.Ticket && ticket[0]?.assignedUserId !== session?.user.id) {
+    if (dbChannel.Ticket && ticket[0]?.assignedUserId !== session?.user.id && dbChannel.id !== "1") {
         const perm = await auth.api.userHasPermission({
             body: {
                 userId: session?.user.id,
@@ -87,6 +87,7 @@ export async function POST(req: NextRequest) {
         token: z.string(),
         discordID: z.string(),
         reactions: z.array(z.any()).optional(),
+        replyID: z.number().optional().nullable(),
     })
     try {
         let verifiedBody = messageSchema.parse(body);

@@ -166,6 +166,7 @@ model Message {
   channelId String
   channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
   content   Bytes
+  replyID Int?
 
   Reaction Reaction[]
 }
