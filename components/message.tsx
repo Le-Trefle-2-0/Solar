@@ -41,6 +41,8 @@ export function Message(props: {
     userID: string,
     id: number,
     channelId: string,
+    onReply?: (payload: { id: number; authorName: string; content: string; timestamp: number }) => void,
+    replyTargetId?: number,
 }) {
     const {
         prevDate,
@@ -56,7 +58,9 @@ export function Message(props: {
         content,
         userID,
         id,
-        channelId
+        channelId,
+        onReply,
+        replyTargetId,
     } = props;
     const {socket} = useSocket();
 
@@ -195,7 +199,7 @@ export function Message(props: {
             <ContextMenu>
                 <ContextMenuTrigger>
                     <div
-                        className={`relative group w-full flex flex-row gap-2 ${isLastInBlock ? 'mb-6' : 'mb-1'} hover:bg-gray-100 rounded-lg px-2`}>
+                        className={`relative group w-full flex flex-row gap-2 ${isLastInBlock ? 'mb-6' : 'mb-1'} hover:bg-gray-100 rounded-lg px-2 ${replyTargetId === id ? 'border-2 border-blue-400 bg-blue-50' : ''}`}>
                         <div
                             className="absolute -top-4 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                             <Popover onOpenChange={setIsOpen} open={isOpen}>
@@ -226,7 +230,12 @@ export function Message(props: {
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent>
-                                    <DropdownMenuItem onClick={() => toast("Fonctionnalité encore non disponible")}>
+                                    <DropdownMenuItem onClick={() => onReply ? onReply({
+                                        id,
+                                        authorName,
+                                        content,
+                                        timestamp
+                                    }) : toast("Fonctionnalité encore non disponible")}>
                                         <Reply/> Répondre
                                     </DropdownMenuItem>
                                     {
@@ -361,7 +370,12 @@ export function Message(props: {
                     </div>
                 </ContextMenuTrigger>
                 <ContextMenuContent>
-                    <ContextMenuItem onClick={() => toast("Fonctionnalité encore non disponible")}>
+                    <ContextMenuItem onClick={() => onReply ? onReply({
+                        id,
+                        authorName,
+                        content,
+                        timestamp
+                    }) : toast("Fonctionnalité encore non disponible")}>
                         <Reply/> Répondre
                     </ContextMenuItem>
                     {

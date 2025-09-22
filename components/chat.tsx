@@ -19,7 +19,8 @@ import {
     Send,
     TvMinimalPlay,
     UserRoundPlus,
-    UserRoundX
+    UserRoundX,
+    X
 } from "lucide-react";
 import React, {FormEvent, useEffect, useRef, useState} from "react";
 import {formVolunteer, Msg, MsgWithID, ticketInfo} from "@/lib/interface";
@@ -65,6 +66,12 @@ export function Chat(props: { channelID: string, statusID: number }) {
     const [ticket, setTicket] = useState<Ticket>();
     const [currentMsg, setCurrentMsg] = useState("");
     const [channelName, setChannelName] = useState("le chat");
+    const [replyTo, setReplyTo] = useState<{
+        id: number;
+        authorName: string;
+        content: string;
+        timestamp: number
+    } | null>(null);
     const [chat, setChat] = useState<MsgWithID[]>([])
     const formRef = useRef<HTMLFormElement>(null);
     const textRef = useRef<HTMLTextAreaElement>(null);
@@ -135,8 +142,10 @@ export function Chat(props: { channelID: string, statusID: number }) {
             }
         }
         if (currentMsg !== "") {
+            // Optionally include reply metadata in future API
             sendMessage(currentMsg);
             setCurrentMsg("");
+            setReplyTo(null);
         }
     }
 
@@ -317,6 +326,12 @@ export function Chat(props: { channelID: string, statusID: number }) {
         }
     }, []);
 
+    // Always scroll to bottom when chat list changes (initial load and new messages)
+    useEffect(() => {
+        // use smooth on subsequent updates; browsers will auto-select behavior on first paint
+        messagesListRef.current?.scrollIntoView({behavior: 'smooth', block: 'end'});
+    }, [chat]);
+
     const nonChar = [
         // Navigation
         "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight",
@@ -489,6 +504,12 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                     userID={session?.user.id as string}
                                     id={id as number}
                                     channelId={channelID}
+                                    onReply={({id, authorName, content, timestamp}) => {
+                                        setReplyTo({id, authorName, content, timestamp});
+                                        // Focus input for quick replying
+                                        setTimeout(() => textRef.current?.focus(), 0);
+                                    }}
+                                    replyTargetId={replyTo?.id}
                                 />
                             );
                         })}
@@ -791,6 +812,19 @@ export function Chat(props: { channelID: string, statusID: number }) {
                     }
 
                     <div className="sticky bottom-0">
+                        {replyTo && (
+                            <div
+                                className="flex items-start justify-between gap-2 mb-2 p-2 rounded-md border border-blue-300 bg-blue-50 text-blue-900">
+                                <div className="flex flex-col text-sm">
+                                    <span className="font-medium">Répondre à {replyTo.authorName}</span>
+                                    <span className="truncate max-w-[70vw] text-blue-800">{replyTo.content}</span>
+                                </div>
+                                <Button variant="ghost" size="icon" onClick={() => setReplyTo(null)}
+                                        aria-label="Annuler la réponse">
+                                    <X/>
+                                </Button>
+                            </div>
+                        )}
                         <form ref={formRef} onSubmit={(e) => sendForm(e)}
                               className='flex flex-row w-full gap-2 items-center'>
                             <Textarea
