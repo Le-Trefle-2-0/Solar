@@ -14,6 +14,7 @@ export interface Msg {
     },
     discordID: string | null;
     reactions: Reaction[] | null;
+    replyID?: number | null;
 }
 
 export interface MsgWithID extends Msg {
