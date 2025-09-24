@@ -83,7 +83,7 @@ const FormSchema = z.object({
     name: z.string(),
     email: z.string(),
     password: z.string(),
-    role: z.enum(["admin", "manager", "training", "volunteer", "bot"]),
+    roles: z.array(z.enum(["admin", "manager", "training", "volunteer", "bot"])).min(1),
 });
 
 interface DataTableProps {
@@ -198,24 +198,26 @@ export function UsersTable({data}: DataTableProps) {
                     {label: "Bénévole Écoutant", value: "volunteer"},
                 ] as const
                 const FormSchema = z.object({
-                    role: z.enum(["admin", "manager", "training", "volunteer"]),
+                    roles: z.array(z.enum(["admin", "manager", "training", "volunteer"]))
                 });
 
                 async function onSubmit(formData: z.infer<typeof FormSchema>) {
-                    const user = await authClient.admin.setRole({
-                        userId: account.id,
-                        role: formData.role,
+                    const res = await fetch(`/api/admin/users/${account.id}/role`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({roles: formData.roles}),
                     });
-
-                    if (user.error) return toast("Erreur lors de la création", {
-                        description: (
-                            <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
-                              <code className="text-white">{JSON.stringify(user.error)}</code>
-                            </pre>
-                        )
-                    })
-
-                    const userData = user.data.user;
+                    if (!res.ok) {
+                        const err = await res.json().catch(() => ({}));
+                        return toast("Erreur lors de la modification", {
+                            description: (
+                                <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
+                                  <code className="text-white">{JSON.stringify(err)}</code>
+                                </pre>
+                            )
+                        });
+                    }
+                    const {user: userData} = await res.json();
                     setUsers((prev) =>
                         prev.map((u) =>
                             u.id === userData.id
@@ -228,14 +230,14 @@ export function UsersTable({data}: DataTableProps) {
                     );
 
                     setDialogOpen(false);
-                    toast("Rôle modifié")
+                    toast("Rôles modifiés")
                     form.reset();
                 }
 
                 const form = useForm<z.infer<typeof FormSchema>>({
                     resolver: zodResolver(FormSchema),
                     defaultValues: {
-                        role: account.role as ("admin" | "manager" | "training" | "volunteer"),
+                        roles: (account.role || '').split(',').map(r => r.trim()).filter(Boolean) as ("admin" | "manager" | "training" | "volunteer")[],
                     },
                 });
 
@@ -305,10 +307,10 @@ export function UsersTable({data}: DataTableProps) {
                                         <div className="grid gap-3">
                                             <FormField
                                                 control={form.control}
-                                                name="role"
+                                                name="roles"
                                                 render={({field}) => (
                                                     <FormItem className="flex flex-col">
-                                                        <FormLabel>Rôle</FormLabel>
+                                                        <FormLabel>Rôles</FormLabel>
                                                         <Popover>
                                                             <PopoverTrigger asChild>
                                                                 <FormControl>
@@ -317,12 +319,15 @@ export function UsersTable({data}: DataTableProps) {
                                                                         role="combobox"
                                                                         className={cn(
                                                                             "w-full justify-between",
-                                                                            !field.value && "text-muted-foreground"
+                                                                            (!field.value || field.value.length === 0) && "text-muted-foreground"
                                                                         )}
                                                                     >
-                                                                        {field.value
-                                                                            ? roles.find((role) => role.value === field.value)?.label
-                                                                            : "Sélectionner un rôle"}
+                                                                        {field.value && field.value.length > 0
+                                                                            ? roles
+                                                                                .filter((r) => (field.value as string[]).includes(r.value))
+                                                                                .map((r) => r.label)
+                                                                                .join(', ')
+                                                                            : "Sélectionner un ou plusieurs rôles"}
                                                                         <ChevronsUpDown className="opacity-50"/>
                                                                     </Button>
                                                                 </FormControl>
@@ -331,23 +336,32 @@ export function UsersTable({data}: DataTableProps) {
                                                                 <Command>
                                                                     <CommandList>
                                                                         <CommandGroup>
-                                                                            {roles.map((role) => (
-                                                                                <CommandItem
-                                                                                    value={role.label}
-                                                                                    key={role.value}
-                                                                                    onSelect={() => {
-                                                                                        form.setValue("role", role.value);
-                                                                                    }}
-                                                                                >
-                                                                                    {role.label}
-                                                                                    <Check
-                                                                                        className={cn(
-                                                                                            "ml-auto",
-                                                                                            role.value === field.value ? "opacity-100" : "opacity-0"
-                                                                                        )}
-                                                                                    />
-                                                                                </CommandItem>
-                                                                            ))}
+                                                                            {roles.map((role) => {
+                                                                                const selected = ((field.value as string[]) || []).includes(role.value)
+                                                                                return (
+                                                                                    <CommandItem
+                                                                                        value={role.label}
+                                                                                        key={role.value}
+                                                                                        onSelect={() => {
+                                                                                            const current = new Set((field.value as string[]) || [])
+                                                                                            if (current.has(role.value)) {
+                                                                                                current.delete(role.value)
+                                                                                            } else {
+                                                                                                current.add(role.value)
+                                                                                            }
+                                                                                            form.setValue("roles", Array.from(current) as any, {shouldDirty: true})
+                                                                                        }}
+                                                                                    >
+                                                                                        {role.label}
+                                                                                        <Check
+                                                                                            className={cn(
+                                                                                                "ml-auto",
+                                                                                                selected ? "opacity-100" : "opacity-0"
+                                                                                            )}
+                                                                                        />
+                                                                                    </CommandItem>
+                                                                                )
+                                                                            })}
                                                                         </CommandGroup>
                                                                     </CommandList>
                                                                 </Command>
@@ -399,16 +413,18 @@ export function UsersTable({data}: DataTableProps) {
             name: "",
             email: "",
             password: "",
-            role: "volunteer",
+            roles: ["volunteer"],
         },
     });
 
     async function onSubmit(formData: z.infer<typeof FormSchema>) {
+        const pickedRoles = formData.roles && formData.roles.length > 0 ? formData.roles : ["volunteer"];
+        const primaryRole = pickedRoles[0];
         const user = await authClient.admin.createUser({
             email: formData.email,
             name: formData.name,
             password: formData.password,
-            role: formData.role,
+            role: primaryRole as "admin" | "manager" | "training" | "volunteer" | "bot" | ("admin" | "manager" | "training" | "volunteer" | "bot")[] | undefined,
         });
 
         if (user.error) return toast("Erreur lors de la création", {
@@ -420,13 +436,28 @@ export function UsersTable({data}: DataTableProps) {
         })
 
         const userData = user.data.user;
+
+        try {
+            const res = await fetch(`/api/admin/users/${userData.id}/role`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({roles: pickedRoles}),
+            });
+            if (res.ok) {
+                const {user: updated} = await res.json();
+                userData.role = updated.role;
+            }
+        } catch (e) {
+            console.error(e);
+        }
+
         setUsers((prev) => [
             ...prev,
             {
                 id: userData.id,
                 name: userData.name,
                 email: userData.email,
-                role: userData.role as string,
+                role: (userData.role as string),
                 lastTicketTimestamp: 0,
             },
         ]);
@@ -536,10 +567,10 @@ export function UsersTable({data}: DataTableProps) {
                                     <div className="grid gap-3">
                                         <FormField
                                             control={form.control}
-                                            name="role"
+                                            name="roles"
                                             render={({field}) => (
                                                 <FormItem className="flex flex-col">
-                                                    <FormLabel>Rôle</FormLabel>
+                                                    <FormLabel>Rôles</FormLabel>
                                                     <Popover>
                                                         <PopoverTrigger asChild>
                                                             <FormControl>
@@ -548,12 +579,15 @@ export function UsersTable({data}: DataTableProps) {
                                                                     role="combobox"
                                                                     className={cn(
                                                                         "w-full justify-between",
-                                                                        !field.value && "text-muted-foreground"
+                                                                        (!field.value || (field.value as string[]).length === 0) && "text-muted-foreground"
                                                                     )}
                                                                 >
-                                                                    {field.value
-                                                                        ? roles.find((role) => role.value === field.value)?.label
-                                                                        : "Sélectionner un rôle"}
+                                                                    {field.value && (field.value as string[]).length > 0
+                                                                        ? roles
+                                                                            .filter((r) => ((field.value as string[]) || []).includes(r.value))
+                                                                            .map((r) => r.label)
+                                                                            .join(', ')
+                                                                        : "Sélectionner un ou plusieurs rôles"}
                                                                     <ChevronsUpDown className="opacity-50"/>
                                                                 </Button>
                                                             </FormControl>
@@ -562,23 +596,32 @@ export function UsersTable({data}: DataTableProps) {
                                                             <Command>
                                                                 <CommandList>
                                                                     <CommandGroup>
-                                                                        {roles.map((role) => (
-                                                                            <CommandItem
-                                                                                value={role.label}
-                                                                                key={role.value}
-                                                                                onSelect={() => {
-                                                                                    form.setValue("role", role.value);
-                                                                                }}
-                                                                            >
-                                                                                {role.label}
-                                                                                <Check
-                                                                                    className={cn(
-                                                                                        "ml-auto",
-                                                                                        role.value === field.value ? "opacity-100" : "opacity-0"
-                                                                                    )}
-                                                                                />
-                                                                            </CommandItem>
-                                                                        ))}
+                                                                        {roles.map((role) => {
+                                                                            const selected = ((field.value as string[]) || []).includes(role.value)
+                                                                            return (
+                                                                                <CommandItem
+                                                                                    value={role.label}
+                                                                                    key={role.value}
+                                                                                    onSelect={() => {
+                                                                                        const current = new Set((field.value as string[]) || [])
+                                                                                        if (current.has(role.value)) {
+                                                                                            current.delete(role.value)
+                                                                                        } else {
+                                                                                            current.add(role.value)
+                                                                                        }
+                                                                                        form.setValue("roles", Array.from(current) as any, {shouldDirty: true})
+                                                                                    }}
+                                                                                >
+                                                                                    {role.label}
+                                                                                    <Check
+                                                                                        className={cn(
+                                                                                            "ml-auto",
+                                                                                            selected ? "opacity-100" : "opacity-0"
+                                                                                        )}
+                                                                                    />
+                                                                                </CommandItem>
+                                                                            )
+                                                                        })}
                                                                     </CommandGroup>
                                                                 </CommandList>
                                                             </Command>
