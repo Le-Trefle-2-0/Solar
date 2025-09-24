@@ -19,7 +19,7 @@ import {
     PopoverTrigger
 } from "@/components/ui";
 import {EmojiPicker, EmojiPickerContent, EmojiPickerFooter, EmojiPickerSearch} from "@/components/ui/emoji-picker";
-import {Bot, Ellipsis, IdCardLanyard, Reply, SmilePlus, Trash2} from "lucide-react";
+import {Bot, Ellipsis, IdCardLanyard, Pencil, Reply, SmilePlus, Trash2} from "lucide-react";
 import Image from "next/image";
 import {toast} from "sonner";
 import {useSocket} from "@/context/Socket";
@@ -50,6 +50,7 @@ export function Message(props: {
     onReply?: (payload: { id: number; authorName: string; content: string; timestamp: number }) => void,
     replyTargetId?: number,
     replyOf?: { id: number; authorName: string; content: string; image?: string | null } | undefined,
+    edited?: boolean,
 }) {
     const {
         prevDate,
@@ -70,6 +71,7 @@ export function Message(props: {
         replyTargetId,
         replyOf,
         canManageMessages,
+        edited: wasEdited,
     } = props;
     const {socket} = useSocket();
 
@@ -148,6 +150,8 @@ export function Message(props: {
 
     const [isOpen, setIsOpen] = useState(false);
     const [confirmOpen, setConfirmOpen] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editContent, setEditContent] = useState(content);
 
     const handleDelete = async () => {
         try {
@@ -179,6 +183,25 @@ export function Message(props: {
             socket?.emit("reaction", {channelId, reaction: res.reaction});
             setReactionList((reactions) => [...reactions, res.reaction]);
         });
+    }
+
+    const handleSaveEdit = async () => {
+        try {
+            const res = await fetch(`/api/message/${id}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({content: editContent})
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                toast.success('Message modifié');
+                setIsEditing(false);
+            } else {
+                toast.error(data?.error || 'Modification impossible');
+            }
+        } catch (e) {
+            toast.error('Erreur lors de la modification');
+        }
     }
 
     const removeReaction = (reactionID: string, reaction: string) => {
@@ -264,13 +287,23 @@ export function Message(props: {
                                     }) : toast("Fonctionnalité encore non disponible")}>
                                         <Reply/> Répondre
                                     </DropdownMenuItem>
-                                    {(isAuthor || canManageMessages) ? (
-                                            <DropdownMenuItem className="text-red-500"
-                                                              onClick={() => setConfirmOpen(true)}>
-                                                <Trash2/> Supprimer
+                                    {
+                                        isAuthor ?
+
+                                            <DropdownMenuItem onClick={() => {
+                                                setIsEditing(true);
+                                                setEditContent(content);
+                                            }}>
+                                                <Pencil/> Modifier
                                             </DropdownMenuItem>
-                                    ) : null
+                                            : null
                                     }
+                                    {(isAuthor || canManageMessages) ? (
+                                        <DropdownMenuItem className="text-red-500"
+                                                          onClick={() => setConfirmOpen(true)}>
+                                            <Trash2/> Supprimer
+                                        </DropdownMenuItem>
+                                    ) : null}
                                     <DropdownMenuSeparator/>
                                     <DropdownMenuItem
                                         onClick={() => navigator.clipboard.writeText(id.toString())}>
@@ -338,60 +371,91 @@ export function Message(props: {
                                     <span className="font-light text-sm text-gray-900">{formattedDate}</span>
                                 </div>
                             )}
-                            <h3 className="text-lg text-gray-900 whitespace-pre-wrap break-words max-w-full">
-                                {mediaTenorGifRegex.test(content) || resolvedTenorGif ? (
-                                    <Image
-                                        src={resolvedTenorGif || content}
-                                        alt="gif"
-                                        height={256}
-                                        width={256}
-                                        unoptimized
-                                        className="rounded-xl p-2"
+                            {isEditing ? (
+                                <div className="flex flex-col gap-2">
+                                    <textarea
+                                        value={editContent}
+                                        onChange={(e) => setEditContent(e.target.value)}
+                                        rows={3}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Escape') {
+                                                e.preventDefault();
+                                                setIsEditing(false);
+                                                setEditContent(content);
+                                            } else if (e.key === 'Enter' && !e.shiftKey) {
+                                                e.preventDefault();
+                                                handleSaveEdit();
+                                            }
+                                        }}
+                                        className="w-full p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
                                     />
-                                ) : (
-                                    content.split(/(https?:\/\/[^\s]+)/g).map((part, i) => {
-                                        if (/https?:\/\/[^\s]+/.test(part)) {
-                                            return (
-                                                <a
-                                                    key={`link-${i}`}
-                                                    href={part}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-blue-600 underline"
-                                                >
-                                                    {part}
-                                                </a>
-                                            );
-                                        } else {
-                                            const markdownRegex = /(\*\*([^*]+)\*\*|\*([^*]+)\*|__(.+?)__)/g;
-                                            const elements = [];
-                                            let lastIndex = 0;
-                                            let match;
-                                            while ((match = markdownRegex.exec(part)) !== null) {
-                                                if (match.index > lastIndex) {
-                                                    elements.push(part.slice(lastIndex, match.index));
+                                    <div className="flex gap-2">
+                                        <Button size="sm" variant="outline" onClick={() => {
+                                            setIsEditing(false);
+                                            setEditContent(content);
+                                        }}>
+                                            Annuler
+                                        </Button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <h3 className="text-lg text-gray-900 whitespace-pre-wrap break-words max-w-full">
+                                    {mediaTenorGifRegex.test(content) || resolvedTenorGif ? (
+                                        <Image
+                                            src={resolvedTenorGif || content}
+                                            alt="gif"
+                                            height={256}
+                                            width={256}
+                                            unoptimized
+                                            className="rounded-xl p-2"
+                                        />
+                                    ) : (
+                                        content.split(/(https?:\/\/[^\s]+)/g).map((part, i) => {
+                                            if (/https?:\/\/[^\s]+/.test(part)) {
+                                                return (
+                                                    <a
+                                                        key={`link-${i}`}
+                                                        href={part}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-blue-600 underline"
+                                                    >
+                                                        {part}
+                                                    </a>
+                                                );
+                                            } else {
+                                                const markdownRegex = /(\*\*([^*]+)\*\*|\*([^*]+)\*|__(.+?)__)/g;
+                                                const elements: any[] = [];
+                                                let lastIndex = 0;
+                                                let match;
+                                                while ((match = markdownRegex.exec(part)) !== null) {
+                                                    if (match.index > lastIndex) {
+                                                        elements.push(part.slice(lastIndex, match.index));
+                                                    }
+                                                    const [fullMatch, , boldText, italicText, underlineText] = match;
+                                                    if (boldText) {
+                                                        elements.push(<strong
+                                                            key={`bold-${i}-${match.index}`}>{boldText}</strong>);
+                                                    } else if (italicText) {
+                                                        elements.push(<em
+                                                            key={`italic-${i}-${match.index}`}>{italicText}</em>);
+                                                    } else if (underlineText) {
+                                                        elements.push(<u
+                                                            key={`underline-${i}-${match.index}`}>{underlineText}</u>);
+                                                    }
+                                                    lastIndex = match.index + fullMatch.length;
                                                 }
-                                                const [fullMatch, , boldText, italicText, underlineText] = match;
-                                                if (boldText) {
-                                                    elements.push(<strong
-                                                        key={`bold-${i}-${match.index}`}>{boldText}</strong>);
-                                                } else if (italicText) {
-                                                    elements.push(<em
-                                                        key={`italic-${i}-${match.index}`}>{italicText}</em>);
-                                                } else if (underlineText) {
-                                                    elements.push(<u
-                                                        key={`underline-${i}-${match.index}`}>{underlineText}</u>);
+                                                if (lastIndex < part.length) {
+                                                    elements.push(part.slice(lastIndex));
                                                 }
-                                                lastIndex = match.index + fullMatch.length;
+                                                return <React.Fragment key={i}>{elements}</React.Fragment>;
                                             }
-                                            if (lastIndex < part.length) {
-                                                elements.push(part.slice(lastIndex));
-                                            }
-                                            return <React.Fragment key={i}>{elements}</React.Fragment>;
-                                        }
-                                    })
-                                )}
-                            </h3>
+                                        })
+                                    )}
+                                    {wasEdited ? (
+                                        <span className="ml-2 text-xs text-gray-500 italic">Modifié</span>) : null}
+                                </h3>
+                            )}
 
                             {Object.entries(reactionMap ?? {}).length > 0 && (
                                 <div className="flex flex-row gap-2 mt-2">
@@ -425,13 +489,23 @@ export function Message(props: {
                     }) : toast("Fonctionnalité encore non disponible")}>
                         <Reply/> Répondre
                     </ContextMenuItem>
-                    {(isAuthor || canManageMessages) ? (
-                            <ContextMenuItem className="text-red-500"
-                                             onClick={() => setConfirmOpen(true)}>
-                                <Trash2/> Supprimer
-                            </ContextMenuItem>
-                    ) : null
+                    {
+                        isAuthor ?
+
+                            <DropdownMenuItem onClick={() => {
+                                setIsEditing(true);
+                                setEditContent(content);
+                            }}>
+                                <Pencil/> Modifier
+                            </DropdownMenuItem>
+                            : null
                     }
+                    {(isAuthor || canManageMessages) ? (
+                        <DropdownMenuItem className="text-red-500"
+                                          onClick={() => setConfirmOpen(true)}>
+                            <Trash2/> Supprimer
+                        </DropdownMenuItem>
+                    ) : null}
                     <ContextMenuSeparator/>
                     <ContextMenuItem onClick={() => navigator.clipboard.writeText(id.toString())}>
                         <IdCardLanyard/> Copier l'identifiant
