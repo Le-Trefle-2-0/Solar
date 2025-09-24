@@ -28,7 +28,6 @@ export default function EventModal({isOpen, onClose, event, onUpdate}: EventModa
         return () => document.removeEventListener('keydown', handleKeyDown);
     }, [isOpen, onClose]);
 
-    // Close on click outside
     const handleClickOutside = (e: MouseEvent) => {
         if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
             onClose();
