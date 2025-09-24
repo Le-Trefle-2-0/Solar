@@ -4,6 +4,11 @@ import React, {useEffect, useState} from "react";
 import {
     Badge,
     Button,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
@@ -41,6 +46,7 @@ export function Message(props: {
     userID: string,
     id: number,
     channelId: string,
+    canManageMessages?: boolean,
     onReply?: (payload: { id: number; authorName: string; content: string; timestamp: number }) => void,
     replyTargetId?: number,
     replyOf?: { id: number; authorName: string; content: string; image?: string | null } | undefined,
@@ -63,6 +69,7 @@ export function Message(props: {
         onReply,
         replyTargetId,
         replyOf,
+        canManageMessages,
     } = props;
     const {socket} = useSocket();
 
@@ -140,6 +147,22 @@ export function Message(props: {
     }, [reactionList]);
 
     const [isOpen, setIsOpen] = useState(false);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+
+    const handleDelete = async () => {
+        try {
+            const res = await fetch(`/api/message/${id}`, {method: 'DELETE'});
+            const data = await res.json();
+            if (res.ok && data.success) {
+                toast.success('Message supprimé');
+                // server will broadcast messageDelete; local removal happens via socket listener in Chat
+            } else {
+                toast.error(data?.error || "Suppression impossible");
+            }
+        } catch (e) {
+            toast.error("Erreur lors de la suppression");
+        }
+    }
 
     const sendReaction = (emoji: string) => {
         fetch('/api/reaction', {
@@ -241,12 +264,12 @@ export function Message(props: {
                                     }) : toast("Fonctionnalité encore non disponible")}>
                                         <Reply/> Répondre
                                     </DropdownMenuItem>
-                                    {
-                                        isAuthor ?
+                                    {(isAuthor || canManageMessages) ? (
                                             <DropdownMenuItem className="text-red-500"
-                                                              onClick={() => toast("Fonctionnalité encore non disponible")}>
+                                                              onClick={() => setConfirmOpen(true)}>
                                                 <Trash2/> Supprimer
-                                            </DropdownMenuItem> : null
+                                            </DropdownMenuItem>
+                                    ) : null
                                     }
                                     <DropdownMenuSeparator/>
                                     <DropdownMenuItem
@@ -402,12 +425,12 @@ export function Message(props: {
                     }) : toast("Fonctionnalité encore non disponible")}>
                         <Reply/> Répondre
                     </ContextMenuItem>
-                    {
-                        isAuthor ?
+                    {(isAuthor || canManageMessages) ? (
                             <ContextMenuItem className="text-red-500"
-                                             onClick={() => toast("Fonctionnalité encore non disponible")}>
+                                             onClick={() => setConfirmOpen(true)}>
                                 <Trash2/> Supprimer
-                            </ContextMenuItem> : null
+                            </ContextMenuItem>
+                    ) : null
                     }
                     <ContextMenuSeparator/>
                     <ContextMenuItem onClick={() => navigator.clipboard.writeText(id.toString())}>
@@ -415,6 +438,31 @@ export function Message(props: {
                     </ContextMenuItem>
                 </ContextMenuContent>
             </ContextMenu>
+
+            <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Supprimer ce message ?</DialogTitle>
+                        <DialogDescription>
+                            Cette action est irréversible. Le message sera définitivement supprimé.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="flex justify-end gap-2">
+                        <Button variant="outline" onClick={() => setConfirmOpen(false)}>
+                            Annuler
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            onClick={() => {
+                                setConfirmOpen(false);
+                                handleDelete();
+                            }}
+                        >
+                            Supprimer
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </React.Fragment>
     )
 }

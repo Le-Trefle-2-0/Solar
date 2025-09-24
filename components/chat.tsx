@@ -90,6 +90,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
     // const [callColor, setCallColor] = useState<string>("#000");
     const [available, setAvailable] = useState<formVolunteer[]>([]);
     const {toggleSidebar} = useSidebar();
+    const [canManageMessages, setCanManageMessages] = useState(false);
     const myAudioRef = useRef<HTMLAudioElement>(null);
     const remoteAudioRef = useRef<HTMLAudioElement>(null);
 
@@ -262,28 +263,21 @@ export function Chat(props: { channelID: string, statusID: number }) {
             setChat(prev =>
                 prev.map(message => {
                     if (message.id === data.messageID) {
-                        // Avoid adding duplicate reactions from same user and emoji
                         const existingReactions = message.reactions ?? [];
-                        const alreadyExists = existingReactions.some(
-                            r => r.userID === data.userID && r.emoji === data.emoji
-                        );
-
-                        if (alreadyExists) {
-                            // Optionally, replace the old reaction with the new data
-                            const updatedReactions = existingReactions.map(r =>
-                                r.userID === data.userID && r.emoji === data.emoji ? data : r
-                            );
-                            return {
-                                ...message,
-                                reactions: updatedReactions
-                            };
+                        // If same reaction id already exists, replace it
+                        const existsById = existingReactions.some(r => r.id === data.id);
+                        if (existsById) {
+                            const updated = existingReactions.map(r => r.id === data.id ? data : r);
+                            return {...message, reactions: updated};
                         }
-
-                        // Add new reaction if no duplicate found
-                        return {
-                            ...message,
-                            reactions: [...existingReactions, data]
-                        };
+                        // Otherwise, if same user and emoji exists, replace it
+                        const existsByUserEmoji = existingReactions.some(r => r.userID === data.userID && r.emoji === data.emoji);
+                        if (existsByUserEmoji) {
+                            const updated = existingReactions.map(r => (r.userID === data.userID && r.emoji === data.emoji) ? data : r);
+                            return {...message, reactions: updated};
+                        }
+                        // Else append
+                        return {...message, reactions: [...existingReactions, data]};
                     }
                     return message;
                 })
@@ -311,11 +305,16 @@ export function Chat(props: { channelID: string, statusID: number }) {
             );
         });
 
+        socket.on('messageDelete', (data: { messageID: number }) => {
+            setChat(prev => prev.filter(m => m.id !== data.messageID));
+        });
+
         return () => {
             socket.off('userList');
             socket.off('reactionAdd');
             socket.off('reactionRemove');
             socket.off('typingIndicator');
+            socket.off('messageDelete');
         };
     }, [socket]);
 
@@ -364,6 +363,14 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
         return () => {
         }
+    }, []);
+
+    useEffect(() => {
+        // Check if user has manage messages permission
+        fetch('/api/permissions/messages/manage')
+            .then(r => r.ok ? r.json() : Promise.resolve({canManage: false}))
+            .then(d => setCanManageMessages(!!d.canManage))
+            .catch(() => setCanManageMessages(false));
     }, []);
 
     // Always scroll to bottom when chat list changes (initial load and new messages)
@@ -545,6 +552,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                 userID={session?.user.id as string}
                                 id={id as number}
                                 channelId={channelID}
+                                canManageMessages={canManageMessages}
                                 onReply={({id, authorName, content, timestamp}) => {
                                     setReplyTo({id, authorName, content, timestamp});
                                     // Focus input for quick replying
