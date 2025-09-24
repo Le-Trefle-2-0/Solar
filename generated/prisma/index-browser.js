@@ -221,7 +221,8 @@ exports.Prisma.MessageScalarFieldEnum = {
   userId: 'userId',
   channelId: 'channelId',
     content: 'content',
-    replyID: 'replyID'
+    replyID: 'replyID',
+    edited: 'edited'
 };
 
 exports.Prisma.ReactionScalarFieldEnum = {

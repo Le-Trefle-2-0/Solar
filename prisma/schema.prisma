@@ -167,6 +167,7 @@ model Message {
   channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
   content   Bytes
   replyID Int?
+  edited Boolean @default(false)
 
   Reaction Reaction[]
 }
