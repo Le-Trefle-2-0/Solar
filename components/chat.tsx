@@ -284,6 +284,14 @@ export function Chat(props: { channelID: string, statusID: number }) {
             );
         });
 
+        socket.on('messageEdit', (data: { messageID: number; content: string; edited?: boolean }) => {
+            setChat(prev => prev.map(m => m.id === data.messageID ? {
+                ...m,
+                content: data.content,
+                edited: data.edited ?? true
+            } : m));
+        });
+
         socket.on('reactionRemove', (data) => {
             console.log("REACTION REMOVE", data);
             const {messageID, id: reactionId} = data;
@@ -315,6 +323,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
             socket.off('reactionRemove');
             socket.off('typingIndicator');
             socket.off('messageDelete');
+            socket.off('messageEdit');
         };
     }, [socket]);
 
@@ -519,7 +528,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
             <div className="flex flex-col relative h-svh p-3 gap-4 w-full" tabIndex={0} ref={rootDivRef}>
                 {/*<video className='w-0 h-0' playsInline ref={callingVideoRef} autoPlay/>*/}
                 <div className="flex flex-col flex-grow overflow-y-auto mt-10">
-                    {chat.map(({author, content, timestamp, reactions, id, replyID}, key) => {
+                    {chat.map(({author, content, timestamp, reactions, id, replyID, edited}, key) => {
                         const prevMessage = key > 0 ? chat[key - 1] : null
                         const nextMessage = key < chat.length - 1 ? chat[key + 1] : null
                         const currentDate = new Date(timestamp).getTime()
@@ -553,6 +562,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                 id={id as number}
                                 channelId={channelID}
                                 canManageMessages={canManageMessages}
+                                edited={edited}
                                 onReply={({id, authorName, content, timestamp}) => {
                                     setReplyTo({id, authorName, content, timestamp});
                                     // Focus input for quick replying
