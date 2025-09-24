@@ -63,6 +63,9 @@ export function Chat(props: { channelID: string, statusID: number }) {
     const [ticketInfo, setTicketInfo] = useState<ticketInfo>();
     const [gifOpen, setGifOpen] = useState(false);
     const [showTyping, setShowTyping] = useState(false);
+    const [typingUsers, setTypingUsers] = useState<{ id: string; name: string; image: string | null }[]>([]);
+    const typingTimeoutsRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
+    const lastTypingSentRef = useRef<number>(0);
     const [ticket, setTicket] = useState<Ticket>();
     const [currentMsg, setCurrentMsg] = useState("");
     const [channelName, setChannelName] = useState("le chat");
@@ -152,7 +155,17 @@ export function Chat(props: { channelID: string, statusID: number }) {
     }
 
     const sendTyping = async () => {
-        await socket?.emit('typing', {id: channelID});
+        const now = Date.now();
+        if (now - (lastTypingSentRef.current || 0) < 1500) return; // throttle to 1.5s
+        lastTypingSentRef.current = now;
+        await socket?.emit('typing', {
+            id: channelID,
+            user: {
+                id: session?.user.id,
+                name: (session?.user.displayUsername as string) || (session?.user.name as string),
+                image: session?.user.image as string | null,
+            }
+        });
     }
 
     const {peerInstance, callColor, startCall, stopCall} = usePeer();
@@ -212,12 +225,36 @@ export function Chat(props: { channelID: string, statusID: number }) {
             }
         });
 
-        socket.on('typingIndicator', () => {
-            setShowTyping(true);
-            if (timer) clearTimeout(timer);
-            timer = setTimeout(() => {
-                setShowTyping(false);
-            }, 5000)
+        socket.on('typingIndicator', (data: any) => {
+            if (data && data.user && data.id === channelID) {
+                const u = data.user as { id: string; name: string; image: string | null };
+                setTypingUsers(prev => {
+                    const exists = prev.some(p => p.id === u.id);
+                    const next = exists ? prev.map(p => p.id === u.id ? u : p) : [...prev, u];
+                    return next;
+                });
+                setShowTyping(true);
+                // manage per-user timeout
+                const timeouts = typingTimeoutsRef.current;
+                if (timeouts.has(u.id)) clearTimeout(timeouts.get(u.id)!);
+                const t = setTimeout(() => {
+                    setTypingUsers(prev => {
+                        const next = prev.filter(p => p.id !== u.id);
+                        if (next.length === 0) setShowTyping(false);
+                        return next;
+                    });
+                    const timeouts2 = typingTimeoutsRef.current;
+                    timeouts2.delete(u.id);
+                }, 5000);
+                timeouts.set(u.id, t);
+            } else {
+                // fallback: no payload, just show indicator briefly
+                setShowTyping(true);
+                if (timer) clearTimeout(timer);
+                timer = setTimeout(() => {
+                    setShowTyping(false);
+                }, 3000);
+            }
         });
 
         socket.on('reactionAdd', (data) => {
@@ -278,6 +315,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
             socket.off('userList');
             socket.off('reactionAdd');
             socket.off('reactionRemove');
+            socket.off('typingIndicator');
         };
     }, [socket]);
 
@@ -472,480 +510,503 @@ export function Chat(props: { channelID: string, statusID: number }) {
     return (
         <div className="flex flex-row items-center justify-center w-full">
             <div className="flex flex-col relative h-svh p-3 gap-4 w-full" tabIndex={0} ref={rootDivRef}>
-                    {/*<video className='w-0 h-0' playsInline ref={callingVideoRef} autoPlay/>*/}
-                    <div className="flex flex-col flex-grow overflow-y-auto mt-10">
-                        {chat.map(({author, content, timestamp, reactions, id, replyID}, key) => {
-                            const prevMessage = key > 0 ? chat[key - 1] : null
-                            const nextMessage = key < chat.length - 1 ? chat[key + 1] : null
-                            const currentDate = new Date(timestamp).getTime()
-                            const prevDate = prevMessage ? new Date(prevMessage.timestamp).getTime() : null
-                            const nextDate = nextMessage ? new Date(nextMessage.timestamp).getTime() : null
+                {/*<video className='w-0 h-0' playsInline ref={callingVideoRef} autoPlay/>*/}
+                <div className="flex flex-col flex-grow overflow-y-auto mt-10">
+                    {chat.map(({author, content, timestamp, reactions, id, replyID}, key) => {
+                        const prevMessage = key > 0 ? chat[key - 1] : null
+                        const nextMessage = key < chat.length - 1 ? chat[key + 1] : null
+                        const currentDate = new Date(timestamp).getTime()
+                        const prevDate = prevMessage ? new Date(prevMessage.timestamp).getTime() : null
+                        const nextDate = nextMessage ? new Date(nextMessage.timestamp).getTime() : null
 
-                            const isSameAuthorAsPrev = prevMessage && prevMessage.author.id === author.id
-                            const isWithin10MinOfPrev = prevDate !== null && Math.abs(currentDate - prevDate) / 60000 < 10
-                            const showAuthorInfo = !isSameAuthorAsPrev || !isWithin10MinOfPrev
+                        const isSameAuthorAsPrev = prevMessage && prevMessage.author.id === author.id
+                        const isWithin10MinOfPrev = prevDate !== null && Math.abs(currentDate - prevDate) / 60000 < 10
+                        const showAuthorInfo = !isSameAuthorAsPrev || !isWithin10MinOfPrev
 
-                            const isSameAuthorAsNext = nextMessage && nextMessage.author.id === author.id
-                            const isWithin10MinOfNext = nextDate !== null && Math.abs(nextDate - currentDate) / 60000 < 10
-                            const isLastInBlock = !isSameAuthorAsNext || !isWithin10MinOfNext
+                        const isSameAuthorAsNext = nextMessage && nextMessage.author.id === author.id
+                        const isWithin10MinOfNext = nextDate !== null && Math.abs(nextDate - currentDate) / 60000 < 10
+                        const isLastInBlock = !isSameAuthorAsNext || !isWithin10MinOfNext
 
-                            const ref = replyID ? chat.find(m => m.id === replyID) : undefined;
-                            return (
-                                <Message
-                                    prevDate={prevDate as number}
-                                    currentDate={currentDate}
-                                    timestamp={timestamp}
-                                    reactions={reactions as Reaction[]}
-                                    key={id}  // better: use unique id instead of array index
-                                    isLastInBlock={isLastInBlock}
-                                    showAuthorInfo={showAuthorInfo}
-                                    isAuthor={author.id === session?.user.id}
-                                    profilePicture={author.image}
-                                    authorRole={author.role}
-                                    authorName={author.name}
-                                    content={content}
-                                    userID={session?.user.id as string}
-                                    id={id as number}
-                                    channelId={channelID}
-                                    onReply={({id, authorName, content, timestamp}) => {
-                                        setReplyTo({id, authorName, content, timestamp});
-                                        // Focus input for quick replying
-                                        setTimeout(() => textRef.current?.focus(), 0);
-                                    }}
-                                    replyTargetId={replyTo?.id}
-                                    replyOf={ref ? {
-                                        id: ref.id,
-                                        authorName: ref.author.name,
-                                        content: ref.content,
-                                        image: ref.author.image
-                                    } : undefined}
-                                />
-                            );
-                        })}
-                        <div ref={messagesListRef} className="h-px"/>
-                    </div>
-
-
-                    <div className={showTyping ? 'flex flex-row gap-1 relative left-2 bottom-3' : 'hidden'}>
-                        <FontAwesomeIcon icon={faCircle} className="text-gray-400 animate-opacityPulse1"/>
-                        <FontAwesomeIcon icon={faCircle} className="text-gray-400 animate-opacityPulse2"/>
-                        <FontAwesomeIcon icon={faCircle} className="text-gray-400 animate-opacityPulse3"/>
-                    </div>
-
-                    {
-                        status === 0 ? null :
-                            <div className="absolute top-6 right-6 flex flex-row gap-2">
-                                <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                        <Button
-                                            className={channelID == "1" || status == 3 || status == 4 ? "hidden" : "flex"}
-                                            variant="outline" disabled={status == 3 || status == 4}>
-                                            <UserRoundPlus/> Attribuer
-                                        </Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                        <AlertDialogHeader>
-                                            <AlertDialogTitle>Merci de choisir le bénévole à
-                                                attribuer</AlertDialogTitle>
-                                        </AlertDialogHeader>
-                                        <Form {...form}>
-                                            <form onSubmit={form.handleSubmit(assign)} className="space-y-6">
-                                                <FormField
-                                                    control={form.control}
-                                                    name="volunteer"
-                                                    render={({field}) => (
-                                                        <FormItem className="flex flex-col">
-                                                            <FormLabel>Bénévole Écoutant</FormLabel>
-                                                            <Popover>
-                                                                <PopoverTrigger asChild>
-                                                                    <FormControl>
-                                                                        <Button
-                                                                            variant="outline"
-                                                                            role="combobox"
-                                                                            className={cn(
-                                                                                "w-[350px] justify-between",
-                                                                                !field.value && "text-muted-foreground"
-                                                                            )}
-                                                                        >
-                                                                            {field.value
-                                                                                ? available.find(
-                                                                                    (available) => available.value.name === field.value.name
-                                                                                )?.label
-                                                                                : "Sélectionner le bénévole"}
-                                                                            <ChevronsUpDown className="opacity-50"/>
-                                                                        </Button>
-                                                                    </FormControl>
-                                                                </PopoverTrigger>
-                                                                <PopoverContent className="w-[350px] p-0">
-                                                                    <Command>
-                                                                        <CommandInput
-                                                                            placeholder="Rechercher un bénévole..."
-                                                                            className="h-9"
-                                                                        />
-                                                                        <CommandList>
-                                                                            <CommandEmpty>Aucun bénévole
-                                                                                trouvé</CommandEmpty>
-                                                                            <CommandGroup>
-                                                                                {available.map((available) => (
-                                                                                    <CommandItem
-                                                                                        value={available.label}
-                                                                                        key={available.value.id}
-                                                                                        onSelect={() => {
-                                                                                            form.setValue("volunteer", available.value)
-                                                                                        }}
-                                                                                    >
-                                                                                        {available.label}
-                                                                                        <Check
-                                                                                            className={cn(
-                                                                                                "ml-auto",
-                                                                                                available.value === field.value
-                                                                                                    ? "opacity-100"
-                                                                                                    : "opacity-0"
-                                                                                            )}
-                                                                                        />
-                                                                                    </CommandItem>
-                                                                                ))}
-                                                                            </CommandGroup>
-                                                                        </CommandList>
-                                                                    </Command>
-                                                                </PopoverContent>
-                                                            </Popover>
-                                                            <FormDescription>
-                                                                Le bénévole aura ensuite accès à l'écoute
-                                                            </FormDescription>
-                                                            <FormMessage/>
-                                                        </FormItem>
-                                                    )}
-                                                />
-
-                                                <AlertDialogFooter>
-                                                    <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                                    <AlertDialogAction asChild>
-                                                        <Button type="submit">Valider</Button>
-                                                    </AlertDialogAction>
-                                                </AlertDialogFooter>
-                                            </form>
-                                        </Form>
-                                    </AlertDialogContent>
-                                </AlertDialog>
-
-                                <Button
-                                    className={channelID == "1" || status !== 2 ? "hidden" : "flex"}
-                                    variant='outline'
-                                    color={callColor}
-                                    onClick={handleCall}
-                                    disabled={status !== 2}
-                                >
-                                    <PhoneCall color={callColor}/> Démarrer un vocal
-                                    <audio ref={myAudioRef} autoPlay
-                                           muted/>  {/* my own voice (muted so I don't hear myself) */}
-                                    <audio ref={remoteAudioRef} autoPlay/>
-                                    {/* the other user's audio */}
-                                </Button>
-
-                                <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                        <Button
-                                            className={channelID == "1" || status == 3 || status == 4 ? "hidden" : "flex"}
-                                            variant="destructive" disabled={status == 3 || status == 4}>
-                                            <MessageCircleOff/> Fermer l'écoute
-                                        </Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                        <AlertDialogHeader>
-                                            <AlertDialogTitle>Attention, êtes vous certain ?</AlertDialogTitle>
-                                            <AlertDialogDescription>
-                                                La fermeture d'une écoute est irréversible. Pour simplement retourner au
-                                                chat de
-                                                permanence merci d'utiliser l'onglet latéral.
-                                            </AlertDialogDescription>
-                                        </AlertDialogHeader>
-                                        <AlertDialogFooter>
-                                            <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                            <AlertDialogAction asChild>
-                                                <Button variant="destructive" onClick={() => {
-                                                    fetch('/api/tickets/close', {
-                                                        method: 'POST',
-                                                        body: JSON.stringify({
-                                                            channelID: channelID
-                                                        })
-                                                    }).then(res => res.json()).then(res => {
-                                                        if (res.success) {
-                                                            setStatus(3)
-                                                        }
-                                                    })
-                                                }}>
-                                                    Fermer l'écoute
-                                                </Button>
-                                            </AlertDialogAction>
-                                        </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                </AlertDialog>
-
-                                <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                        <Button className={channelID == "1" || status !== 3 ? "hidden" : "flex"}
-                                                variant="outline" disabled={status !== 3}>
-                                            <NotebookPen/> Transmission
-                                        </Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                        <AlertDialogHeader>
-                                            <AlertDialogTitle>Merci de remplir la fiche de
-                                                transmission</AlertDialogTitle>
-                                        </AlertDialogHeader>
-                                        <Form {...transmissionForm}>
-                                            <form onSubmit={transmissionForm.handleSubmit(transmission)}
-                                                  className="space-y-6">
-                                                <FormField
-                                                    control={transmissionForm.control}
-                                                    name="problematic"
-                                                    render={({field}) => (
-                                                        <FormItem className="flex flex-col">
-                                                            <FormLabel>Problématique de l'écoute* :</FormLabel>
-                                                            <FormControl>
-                                                                <Textarea
-                                                                    placeholder="Problématique..."
-                                                                    className="resize-none"
-                                                                    {...field}
-                                                                />
-                                                            </FormControl>
-                                                            <FormMessage/>
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                                <FormField
-                                                    control={transmissionForm.control}
-                                                    name="observations"
-                                                    render={({field}) => (
-                                                        <FormItem className="flex flex-col">
-                                                            <FormLabel>Observations générales* :</FormLabel>
-                                                            <FormControl>
-                                                                <Textarea
-                                                                    placeholder="Observations..."
-                                                                    className="resize-none"
-                                                                    {...field}
-                                                                />
-                                                            </FormControl>
-                                                            <FormMessage/>
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                                <FormField
-                                                    control={transmissionForm.control}
-                                                    name="info"
-                                                    render={({field}) => (
-                                                        <FormItem className="flex flex-col">
-                                                            <FormLabel>Informations supplémentaires (optionnel)
-                                                                :</FormLabel>
-                                                            <FormControl>
-                                                                <Textarea
-                                                                    placeholder="Informations..."
-                                                                    className="resize-none"
-                                                                    {...field}
-                                                                />
-                                                            </FormControl>
-                                                            <FormMessage/>
-                                                        </FormItem>
-                                                    )}
-                                                />
-
-                                                <AlertDialogFooter>
-                                                    <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                                    <AlertDialogAction asChild>
-                                                        <Button type="submit">Envoyer</Button>
-                                                    </AlertDialogAction>
-                                                </AlertDialogFooter>
-                                            </form>
-                                        </Form>
-                                    </AlertDialogContent>
-                                </AlertDialog>
-
-                                <Dialog>
-                                    <DialogTrigger asChild>
-                                        <Button variant="outline">
-                                            <Info/>
-                                        </Button>
-                                    </DialogTrigger>
-                                    <DialogContent className="w-[1000px]">
-                                        <DialogHeader>
-                                            {/*<DialogTitle>Informations de l'écoute</DialogTitle>*/}
-                                            {/*<DialogDescription>*/}
-                                            <h4 className="scroll-m-20 text-xl font-semibold tracking-tight flex flex-row gap-3">
-                                                <CircleAlert/> Vigilances
-                                            </h4>
-                                            <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
-                                                {
-                                                    ticketInfo?.vigis.length && ticketInfo.vigis.length > 0 ?
-                                                        ticketInfo?.vigis.map((item, index) => (
-                                                            <li key={index}>{item.date.toLocaleDateString()} - {item.motive}</li>
-                                                        )) : <li>Aucune vigilance en cours</li>
-                                                }
-                                            </ul>
-
-                                            <h4 className="scroll-m-20 text-xl font-semibold tracking-tight flex flex-row gap-3">
-                                                <UserRoundX/> Bénévoles Inéligibles
-                                            </h4>
-                                            <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
-                                                <li>Anthony J</li>
-                                                <li>Julie R</li>
-                                                <li>Paul PR</li>
-                                            </ul>
-
-                                            <h4 className="scroll-m-20 text-xl font-semibold tracking-tight flex flex-row gap-3">
-                                                <MicOff/> Bénévoles Inéligibles Vocal
-                                            </h4>
-                                            <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
-                                                <li>Anthony J</li>
-                                                <li>Julie R</li>
-                                                <li>Paul PR</li>
-                                            </ul>
-
-                                            <h4 className="scroll-m-20 text-xl font-semibold tracking-tight flex flex-row gap-3">
-                                                <IdCardLanyard/> Identifiant
-                                            </h4>
-                                            <p className="leading-7 [&:not(:first-child)]:mt-6">
-                                                Numéro d'anonymat : 277dd0... <Button variant="secondary">
-                                                <Copy/> Copier</Button>
-                                            </p>
-                                            <p className="leading-7 [&:not(:first-child)]:mt-6">
-                                                Identifiant Discord : <Button variant="secondary">
-                                                <ScanFace/> Révéler</Button>
-                                            </p>
-
-                                            {/*</DialogDescription>*/}
-                                        </DialogHeader>
-                                    </DialogContent>
-                                </Dialog>
-                            </div>
-                    }
-
-                    <div className="sticky bottom-0">
-                        {replyTo && (
-                            <div
-                                className="flex items-start justify-between gap-2 mb-2 p-2 rounded-md border border-blue-300 bg-blue-50 text-blue-900">
-                                <div className="flex flex-col text-sm">
-                                    <span className="font-medium">Répondre à {replyTo.authorName}</span>
-                                    <span className="truncate max-w-[70vw] text-blue-800">{replyTo.content}</span>
-                                </div>
-                                <Button variant="ghost" size="icon" onClick={() => setReplyTo(null)}
-                                        aria-label="Annuler la réponse">
-                                    <X/>
-                                </Button>
-                            </div>
-                        )}
-                        <form ref={formRef} onSubmit={(e) => sendForm(e)}
-                              className='flex flex-row w-full gap-2 items-center'>
-                            <Textarea
-                                placeholder={`Envoyer un message dans ${channelName}`}
-                                onChange={(e) => {
-                                    setCurrentMsg(e.target.value)
-                                    sendTyping()
+                        const ref = replyID ? chat.find(m => m.id === replyID) : undefined;
+                        return (
+                            <Message
+                                prevDate={prevDate as number}
+                                currentDate={currentDate}
+                                timestamp={timestamp}
+                                reactions={reactions as Reaction[]}
+                                key={id}  // better: use unique id instead of array index
+                                isLastInBlock={isLastInBlock}
+                                showAuthorInfo={showAuthorInfo}
+                                isAuthor={author.id === session?.user.id}
+                                profilePicture={author.image}
+                                authorRole={author.role}
+                                authorName={author.name}
+                                content={content}
+                                userID={session?.user.id as string}
+                                id={id as number}
+                                channelId={channelID}
+                                onReply={({id, authorName, content, timestamp}) => {
+                                    setReplyTo({id, authorName, content, timestamp});
+                                    // Focus input for quick replying
+                                    setTimeout(() => textRef.current?.focus(), 0);
                                 }}
-                                disabled={status == 3 || status == 4}
-                                ref={textRef}
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter" && !e.shiftKey) {
-                                        e.preventDefault();
-                                        formRef.current?.requestSubmit();
-                                    }
-                                }}
-                                spellCheck="true"
-                                data-ms-editor="true"
-                                value={currentMsg}
-                                className="w-full flex flex-row outline-main outline-1 p-2 rounded-lg resize-none"
+                                replyTargetId={replyTo?.id}
+                                replyOf={ref ? {
+                                    id: ref.id,
+                                    authorName: ref.author.name,
+                                    content: ref.content,
+                                    image: ref.author.image
+                                } : undefined}
                             />
-
-                            <Popover onOpenChange={setEmojiOpen} open={emojiOpen}>
-                                <PopoverTrigger asChild>
-                                    <Button variant="ghost" size="icon" disabled={status == 3 || status == 4}>
-                                        <Laugh/>
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-fit p-0">
-                                    <EmojiPicker
-                                        className="h-[342px]"
-                                        onEmojiSelect={({emoji}) => {
-                                            if (currentMsg.length > 0) setCurrentMsg(currentMsg + ' ' + emoji);
-                                            else setCurrentMsg(emoji);
-                                            setEmojiOpen(false);
-                                            textRef.current?.focus();
-                                            console.log(emoji);
-                                        }}
-                                        locale="fr"
-                                    >
-                                        <EmojiPickerSearch/>
-                                        <EmojiPickerContent/>
-                                        <EmojiPickerFooter/>
-                                    </EmojiPicker>
-                                </PopoverContent>
-                            </Popover>
-
-                            <Popover onOpenChange={setGifOpen} open={gifOpen}>
-                                <PopoverTrigger asChild>
-                                    <Button variant="ghost" size="icon" disabled={status == 3 || status == 4}>
-                                        <TvMinimalPlay/>
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-fit p-0">
-                                    <GifPicker tenorApiKey={process.env.NEXT_PUBLIC_TENOR_KEY as string}
-                                               onGifClick={(gif) => {
-                                                   sendMessage(gif.url)
-                                                   setGifOpen(false);
-                                               }}/>
-                                </PopoverContent>
-                            </Popover>
-
-                            <Button variant="ghost" size="icon" disabled={status == 3 || status == 4}>
-                                <Send/>
-                            </Button>
-                            {/*<button className='cursor-pointer'><Send width={42}/></button>*/}
-                        </form>
-                    </div>
+                        );
+                    })}
+                    <div ref={messagesListRef} className="h-px"/>
                 </div>
+
+
+                {
+                    status === 0 ? null :
+                        <div className="absolute top-6 right-6 flex flex-row gap-2">
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button
+                                        className={channelID == "1" || status == 3 || status == 4 ? "hidden" : "flex"}
+                                        variant="outline" disabled={status == 3 || status == 4}>
+                                        <UserRoundPlus/> Attribuer
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Merci de choisir le bénévole à
+                                            attribuer</AlertDialogTitle>
+                                    </AlertDialogHeader>
+                                    <Form {...form}>
+                                        <form onSubmit={form.handleSubmit(assign)} className="space-y-6">
+                                            <FormField
+                                                control={form.control}
+                                                name="volunteer"
+                                                render={({field}) => (
+                                                    <FormItem className="flex flex-col">
+                                                        <FormLabel>Bénévole Écoutant</FormLabel>
+                                                        <Popover>
+                                                            <PopoverTrigger asChild>
+                                                                <FormControl>
+                                                                    <Button
+                                                                        variant="outline"
+                                                                        role="combobox"
+                                                                        className={cn(
+                                                                            "w-[350px] justify-between",
+                                                                            !field.value && "text-muted-foreground"
+                                                                        )}
+                                                                    >
+                                                                        {field.value
+                                                                            ? available.find(
+                                                                                (available) => available.value.name === field.value.name
+                                                                            )?.label
+                                                                            : "Sélectionner le bénévole"}
+                                                                        <ChevronsUpDown className="opacity-50"/>
+                                                                    </Button>
+                                                                </FormControl>
+                                                            </PopoverTrigger>
+                                                            <PopoverContent className="w-[350px] p-0">
+                                                                <Command>
+                                                                    <CommandInput
+                                                                        placeholder="Rechercher un bénévole..."
+                                                                        className="h-9"
+                                                                    />
+                                                                    <CommandList>
+                                                                        <CommandEmpty>Aucun bénévole
+                                                                            trouvé</CommandEmpty>
+                                                                        <CommandGroup>
+                                                                            {available.map((available) => (
+                                                                                <CommandItem
+                                                                                    value={available.label}
+                                                                                    key={available.value.id}
+                                                                                    onSelect={() => {
+                                                                                        form.setValue("volunteer", available.value)
+                                                                                    }}
+                                                                                >
+                                                                                    {available.label}
+                                                                                    <Check
+                                                                                        className={cn(
+                                                                                            "ml-auto",
+                                                                                            available.value === field.value
+                                                                                                ? "opacity-100"
+                                                                                                : "opacity-0"
+                                                                                        )}
+                                                                                    />
+                                                                                </CommandItem>
+                                                                            ))}
+                                                                        </CommandGroup>
+                                                                    </CommandList>
+                                                                </Command>
+                                                            </PopoverContent>
+                                                        </Popover>
+                                                        <FormDescription>
+                                                            Le bénévole aura ensuite accès à l'écoute
+                                                        </FormDescription>
+                                                        <FormMessage/>
+                                                    </FormItem>
+                                                )}
+                                            />
+
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                                <AlertDialogAction asChild>
+                                                    <Button type="submit">Valider</Button>
+                                                </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </form>
+                                    </Form>
+                                </AlertDialogContent>
+                            </AlertDialog>
+
+                            <Button
+                                className={channelID == "1" || status !== 2 ? "hidden" : "flex"}
+                                variant='outline'
+                                color={callColor}
+                                onClick={handleCall}
+                                disabled={status !== 2}
+                            >
+                                <PhoneCall color={callColor}/> Démarrer un vocal
+                                <audio ref={myAudioRef} autoPlay
+                                       muted/>  {/* my own voice (muted so I don't hear myself) */}
+                                <audio ref={remoteAudioRef} autoPlay/>
+                                {/* the other user's audio */}
+                            </Button>
+
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button
+                                        className={channelID == "1" || status == 3 || status == 4 ? "hidden" : "flex"}
+                                        variant="destructive" disabled={status == 3 || status == 4}>
+                                        <MessageCircleOff/> Fermer l'écoute
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Attention, êtes vous certain ?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            La fermeture d'une écoute est irréversible. Pour simplement retourner au
+                                            chat de
+                                            permanence merci d'utiliser l'onglet latéral.
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                        <AlertDialogAction asChild>
+                                            <Button variant="destructive" onClick={() => {
+                                                fetch('/api/tickets/close', {
+                                                    method: 'POST',
+                                                    body: JSON.stringify({
+                                                        channelID: channelID
+                                                    })
+                                                }).then(res => res.json()).then(res => {
+                                                    if (res.success) {
+                                                        setStatus(3)
+                                                    }
+                                                })
+                                            }}>
+                                                Fermer l'écoute
+                                            </Button>
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button className={channelID == "1" || status !== 3 ? "hidden" : "flex"}
+                                            variant="outline" disabled={status !== 3}>
+                                        <NotebookPen/> Transmission
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Merci de remplir la fiche de
+                                            transmission</AlertDialogTitle>
+                                    </AlertDialogHeader>
+                                    <Form {...transmissionForm}>
+                                        <form onSubmit={transmissionForm.handleSubmit(transmission)}
+                                              className="space-y-6">
+                                            <FormField
+                                                control={transmissionForm.control}
+                                                name="problematic"
+                                                render={({field}) => (
+                                                    <FormItem className="flex flex-col">
+                                                        <FormLabel>Problématique de l'écoute* :</FormLabel>
+                                                        <FormControl>
+                                                            <Textarea
+                                                                placeholder="Problématique..."
+                                                                className="resize-none"
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage/>
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={transmissionForm.control}
+                                                name="observations"
+                                                render={({field}) => (
+                                                    <FormItem className="flex flex-col">
+                                                        <FormLabel>Observations générales* :</FormLabel>
+                                                        <FormControl>
+                                                            <Textarea
+                                                                placeholder="Observations..."
+                                                                className="resize-none"
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage/>
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={transmissionForm.control}
+                                                name="info"
+                                                render={({field}) => (
+                                                    <FormItem className="flex flex-col">
+                                                        <FormLabel>Informations supplémentaires (optionnel)
+                                                            :</FormLabel>
+                                                        <FormControl>
+                                                            <Textarea
+                                                                placeholder="Informations..."
+                                                                className="resize-none"
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage/>
+                                                    </FormItem>
+                                                )}
+                                            />
+
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                                <AlertDialogAction asChild>
+                                                    <Button type="submit">Envoyer</Button>
+                                                </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </form>
+                                    </Form>
+                                </AlertDialogContent>
+                            </AlertDialog>
+
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <Button variant="outline">
+                                        <Info/>
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent className="w-[1000px]">
+                                    <DialogHeader>
+                                        {/*<DialogTitle>Informations de l'écoute</DialogTitle>*/}
+                                        {/*<DialogDescription>*/}
+                                        <h4 className="scroll-m-20 text-xl font-semibold tracking-tight flex flex-row gap-3">
+                                            <CircleAlert/> Vigilances
+                                        </h4>
+                                        <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
+                                            {
+                                                ticketInfo?.vigis.length && ticketInfo.vigis.length > 0 ?
+                                                    ticketInfo?.vigis.map((item, index) => (
+                                                        <li key={index}>{item.date.toLocaleDateString()} - {item.motive}</li>
+                                                    )) : <li>Aucune vigilance en cours</li>
+                                            }
+                                        </ul>
+
+                                        <h4 className="scroll-m-20 text-xl font-semibold tracking-tight flex flex-row gap-3">
+                                            <UserRoundX/> Bénévoles Inéligibles
+                                        </h4>
+                                        <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
+                                            <li>Anthony J</li>
+                                            <li>Julie R</li>
+                                            <li>Paul PR</li>
+                                        </ul>
+
+                                        <h4 className="scroll-m-20 text-xl font-semibold tracking-tight flex flex-row gap-3">
+                                            <MicOff/> Bénévoles Inéligibles Vocal
+                                        </h4>
+                                        <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
+                                            <li>Anthony J</li>
+                                            <li>Julie R</li>
+                                            <li>Paul PR</li>
+                                        </ul>
+
+                                        <h4 className="scroll-m-20 text-xl font-semibold tracking-tight flex flex-row gap-3">
+                                            <IdCardLanyard/> Identifiant
+                                        </h4>
+                                        <p className="leading-7 [&:not(:first-child)]:mt-6">
+                                            Numéro d'anonymat : 277dd0... <Button variant="secondary">
+                                            <Copy/> Copier</Button>
+                                        </p>
+                                        <p className="leading-7 [&:not(:first-child)]:mt-6">
+                                            Identifiant Discord : <Button variant="secondary">
+                                            <ScanFace/> Révéler</Button>
+                                        </p>
+
+                                        {/*</DialogDescription>*/}
+                                    </DialogHeader>
+                                </DialogContent>
+                            </Dialog>
+                        </div>
+                }
+
+                <div className="sticky bottom-0">
+                    {replyTo && (
+                        <div
+                            className="flex items-start justify-between gap-2 mb-2 p-2 rounded-md border border-blue-300 bg-blue-50 text-blue-900">
+                            <div className="flex flex-col text-sm">
+                                <span className="font-medium">Répondre à {replyTo.authorName}</span>
+                                <span className="truncate max-w-[70vw] text-blue-800">{replyTo.content}</span>
+                            </div>
+                            <Button variant="ghost" size="icon" onClick={() => setReplyTo(null)}
+                                    aria-label="Annuler la réponse">
+                                <X/>
+                            </Button>
+                        </div>
+                    )}
+
+                    {(typingUsers.length > 0) && (
+                        <div
+                            className="mb-2 px-3 py-1 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full shadow-sm border border-gray-200 dark:border-gray-700 flex items-center gap-2 text-xs text-gray-700 dark:text-gray-200">
+                            <div className="flex -space-x-2">
+                                {typingUsers.slice(0, 3).map(u => (
+                                    <img key={u.id} src={u.image || '/logo.svg'} alt={u.name}
+                                         className="w-5 h-5 rounded-full border border-white dark:border-gray-800 object-cover"/>
+                                ))}
+                            </div>
+                            <span className="whitespace-nowrap">
+                                    {(() => {
+                                        const names = typingUsers.map(u => u.name).filter(Boolean);
+                                        if (names.length === 1) return `${names[0]} est entrain d\'écrire...`;
+                                        if (names.length === 2) return `${names[0]} et ${names[1]} sont entrain d\'écrire...`;
+                                        return `${names[0]}, ${names[1]} et ${names.length - 2} autres sont entrain d\'écrire...`;
+                                    })()}
+                                </span>
+                            <div className="flex items-center gap-1 ml-1">
+                                <FontAwesomeIcon icon={faCircle}
+                                                 className="text-gray-400 animate-opacityPulse1 w-2 h-2"/>
+                                <FontAwesomeIcon icon={faCircle}
+                                                 className="text-gray-400 animate-opacityPulse2 w-2 h-2"/>
+                                <FontAwesomeIcon icon={faCircle}
+                                                 className="text-gray-400 animate-opacityPulse3 w-2 h-2"/>
+                            </div>
+                        </div>
+                    )}
+
+                    <form ref={formRef} onSubmit={(e) => sendForm(e)}
+                          className='flex flex-row w-full gap-2 items-center'>
+                        <Textarea
+                            placeholder={`Envoyer un message dans ${channelName}`}
+                            onChange={(e) => {
+                                setCurrentMsg(e.target.value)
+                                sendTyping()
+                            }}
+                            disabled={status == 3 || status == 4}
+                            ref={textRef}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" && !e.shiftKey) {
+                                    e.preventDefault();
+                                    formRef.current?.requestSubmit();
+                                }
+                            }}
+                            spellCheck="true"
+                            data-ms-editor="true"
+                            value={currentMsg}
+                            className="w-full flex flex-row outline-main outline-1 p-2 rounded-lg resize-none"
+                        />
+
+                        <Popover onOpenChange={setEmojiOpen} open={emojiOpen}>
+                            <PopoverTrigger asChild>
+                                <Button variant="ghost" size="icon" disabled={status == 3 || status == 4}>
+                                    <Laugh/>
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-fit p-0">
+                                <EmojiPicker
+                                    className="h-[342px]"
+                                    onEmojiSelect={({emoji}) => {
+                                        if (currentMsg.length > 0) setCurrentMsg(currentMsg + ' ' + emoji);
+                                        else setCurrentMsg(emoji);
+                                        setEmojiOpen(false);
+                                        textRef.current?.focus();
+                                        console.log(emoji);
+                                    }}
+                                    locale="fr"
+                                >
+                                    <EmojiPickerSearch/>
+                                    <EmojiPickerContent/>
+                                    <EmojiPickerFooter/>
+                                </EmojiPicker>
+                            </PopoverContent>
+                        </Popover>
+
+                        <Popover onOpenChange={setGifOpen} open={gifOpen}>
+                            <PopoverTrigger asChild>
+                                <Button variant="ghost" size="icon" disabled={status == 3 || status == 4}>
+                                    <TvMinimalPlay/>
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-fit p-0">
+                                <GifPicker tenorApiKey={process.env.NEXT_PUBLIC_TENOR_KEY as string}
+                                           onGifClick={(gif) => {
+                                               sendMessage(gif.url)
+                                               setGifOpen(false);
+                                           }}/>
+                            </PopoverContent>
+                        </Popover>
+
+                        <Button variant="ghost" size="icon" disabled={status == 3 || status == 4}>
+                            <Send/>
+                        </Button>
+                        {/*<button className='cursor-pointer'><Send width={42}/></button>*/}
+                    </form>
+                </div>
+            </div>
 
             <div className="hidden lg:flex flex-col justify-start h-svh w-80 p-6 gap-3 border-l-main border-l">
                 <div>
-                        <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">{channelName}</h3>
+                    <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">{channelName}</h3>
                     <small className="text-sm leading-none font-medium">
                         {onlineUsers.length} utilisateur{onlineUsers.length >= 2 ? "s" : null} connecté{onlineUsers.length >= 2 ? "s" : null}
                     </small>
                 </div>
                 <div className="flex flex-col">
-                        {Object.entries(
-                            onlineUsers.reduce((acc, user) => {
-                                if (!acc[user.role]) acc[user.role] = [];
-                                acc[user.role].push(user);
-                                return acc;
-                            }, {} as Record<string, typeof onlineUsers>)
-                        ).sort(
-                            ([roleA], [roleB]) =>
-                                Object.keys(roleOrderAndLabels).indexOf(roleA) -
-                                Object.keys(roleOrderAndLabels).indexOf(roleB)
-                        ).map(([role, users]) => (
-                            <div key={role} className="mb-4">
-                                <h4 className="text-md font-semibold text-gray-700 mb-2 capitalize">
-                                    {roleOrderAndLabels[role] || role}
-                                </h4>
-                                <div className="flex flex-col gap-2">
-                                    {users.map(user => (
-                                        <div
-                                            key={user.id}
-                                            className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-                                        >
-                                            <img
-                                                src={user.image || "/logo.svg"}
-                                                alt={user.username}
-                                                className="w-8 h-8 rounded-lg object-cover"
-                                            />
-                                            <span className="text-sm text-gray-900 dark:text-gray-100 truncate">
+                    {Object.entries(
+                        onlineUsers.reduce((acc, user) => {
+                            if (!acc[user.role]) acc[user.role] = [];
+                            acc[user.role].push(user);
+                            return acc;
+                        }, {} as Record<string, typeof onlineUsers>)
+                    ).sort(
+                        ([roleA], [roleB]) =>
+                            Object.keys(roleOrderAndLabels).indexOf(roleA) -
+                            Object.keys(roleOrderAndLabels).indexOf(roleB)
+                    ).map(([role, users]) => (
+                        <div key={role} className="mb-4">
+                            <h4 className="text-md font-semibold text-gray-700 mb-2 capitalize">
+                                {roleOrderAndLabels[role] || role}
+                            </h4>
+                            <div className="flex flex-col gap-2">
+                                {users.map(user => (
+                                    <div
+                                        key={user.id}
+                                        className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                                    >
+                                        <img
+                                            src={user.image || "/logo.svg"}
+                                            alt={user.username}
+                                            className="w-8 h-8 rounded-lg object-cover"
+                                        />
+                                        <span className="text-sm text-gray-900 dark:text-gray-100 truncate">
                                         {user.username}
                                       </span>
-                                        </div>
-                                    ))}
-                                </div>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>
