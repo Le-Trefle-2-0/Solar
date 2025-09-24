@@ -15,6 +15,7 @@ export interface Msg {
     discordID: string | null;
     reactions: Reaction[] | null;
     replyID?: number | null;
+    edited?: boolean;
 }
 
 export interface MsgWithID extends Msg {

@@ -54,6 +54,7 @@ export const getMessages = async (channelId: string) => {
             discordID: msg.discordID,
             reactions: reactions,
             replyID: msg.replyID ?? null,
+            edited: msg.edited,
         });
     }
     return messages;
