@@ -9,7 +9,6 @@ import {fr} from 'date-fns/locale/fr';
 import type {EventData} from "@/lib/interface";
 import {useSession} from "@/lib/auth-client";
 import {toast} from "sonner";
-import {CalendarMinus, CalendarPlus} from "lucide-react";
 
 interface EventProps {
     event: EventData;
@@ -33,7 +32,7 @@ export default function Event({event}: EventProps) {
             });
     }, [event.id]);
 
-    async function handleRegister(part?: 'first' | 'second') {
+    async function handleRegister(part?: 'first' | 'second', roleSlotId?: string) {
         if (!session?.user?.id) {
             toast.error("Cette action requiert d'être connecté");
             return;
@@ -41,7 +40,10 @@ export default function Event({event}: EventProps) {
 
         try {
             setLoading(true);
-            const body = part ? JSON.stringify({part, type: "register"}) : JSON.stringify({type: "register"});
+            const payload: any = {type: "register"};
+            if (part) payload.part = part;
+            if (roleSlotId) payload.roleSlotId = roleSlotId;
+            const body = JSON.stringify(payload);
 
             const res = await fetch(`/api/events/${event.id}`, {
                 method: 'POST',
@@ -64,7 +66,7 @@ export default function Event({event}: EventProps) {
         }
     }
 
-    async function handleUnregister(part?: 'first' | 'second') {
+    async function handleUnregister(part?: 'first' | 'second', roleSlotId?: string) {
         if (!session?.user?.id) {
             toast.error("Cette action requiert d'être connecté");
             return;
@@ -72,7 +74,10 @@ export default function Event({event}: EventProps) {
 
         try {
             setLoading(true);
-            const body = part ? JSON.stringify({part, type: "unregister"}) : JSON.stringify({type: "unregister"});
+            const payload: any = {type: "unregister"};
+            if (part) payload.part = part;
+            if (roleSlotId) payload.roleSlotId = roleSlotId;
+            const body = JSON.stringify(payload);
 
             const res = await fetch(`/api/events/${event.id}`, {
                 method: 'POST',
@@ -95,17 +100,11 @@ export default function Event({event}: EventProps) {
         }
     }
 
-    const userRole = session?.user?.role ?? '';
     const userId = session?.user?.id;
-
-    const userRegisteredParts = eventDetails?.roleSlots
-        .filter(slot => slot.registrations.some(r => r.userId === userId))
-        .map(slot => slot.part) ?? [];
-
-    const isRegisteredForPart = (part: 'first' | 'second') =>
-        userRegisteredParts.includes(part);
-
-    const isRegisteredForWhole = userRegisteredParts.length && userRegisteredParts.every(p => !p);
+    const userRoles: string[] = (session?.user?.role || '')
+        .split(',')
+        .map((r: string) => r.trim())
+        .filter(Boolean);
 
     let badgeColor = 'bg-gray-300 text-gray-800';
 
@@ -152,12 +151,34 @@ export default function Event({event}: EventProps) {
 
                             const displayRole = roleDisplayNames[slot.role] ?? slot.role;
 
+                            const isRegistered = slot.registrations.some(r => r.userId === userId);
+                            const isEligible = userRoles.includes(slot.role);
+                            const isFull = registeredCount >= slot.goalCount;
+                            const labelPart = slot.part ? (slot.part === 'first' ? '1 : 20h00-21h30' : '2 : 21h30-23h00') : '';
+                            const partValue = slot.part ? (slot.part as 'first' | 'second') : undefined;
                             return (
-                                <div key={slot.id} className="text-xs flex justify-between">
-                                  <span>
-                                    {displayRole} {slot.part ? `(partie ${slot.part === 'first' ? '1 : 20h00-21h30' : '2 : 21h30-23h00'})` : ''}
-                                  </span>
+                                <div key={slot.id} className="text-xs flex flex-col gap-1">
+                                    <div className="flex justify-between items-center">
+                                    <span>
+                                      {displayRole} {slot.part ? `(partie ${labelPart})` : ''}
+                                    </span>
                                     <span>{registeredCount} / {slot.goalCount} inscrits</span>
+                                    </div>
+                                    <div className="flex justify-end">
+                                        <Button
+                                            size="sm"
+                                            variant={isRegistered ? 'destructive' : 'default'}
+                                            disabled={loading || (!isRegistered && (isFull || !isEligible))}
+                                            onClick={() => isRegistered
+                                                ? handleUnregister(partValue, slot.id)
+                                                : handleRegister(partValue, slot.id).then(() => {
+                                                }).catch(() => {
+                                                })
+                                            }
+                                        >
+                                            {isRegistered ? 'Se désinscrire' : isEligible ? (isFull ? 'Complet' : "S'inscrire") : 'Non admissible'}
+                                        </Button>
+                                    </div>
                                 </div>
                             );
                         })}
@@ -165,47 +186,6 @@ export default function Event({event}: EventProps) {
                 )}
 
 
-                {userRole === 'volunteer' ? (
-                    <div className="flex flex-col gap-2">
-                        {['first', 'second'].map(part => {
-                            const registered = isRegisteredForPart(part as 'first' | 'second');
-                            return (
-                                <Button
-                                    key={part}
-                                    onClick={() =>
-                                        registered
-                                            ? handleUnregister(part as 'first' | 'second')
-                                            : handleRegister(part as 'first' | 'second')
-                                    }
-                                    disabled={loading}
-                                    className="w-full"
-                                >
-                                    {
-                                        registered ? <CalendarPlus/> : <CalendarMinus/>
-                                    }
-                                    {loading && selectedPart === `part${part === 'first' ? '1' : '2'}`}
-                                    {registered
-                                        ? `Désinscription pour partie ${part === 'first' ? '1' : '2'} (${part === 'first' ? '20h00-21h30' : '21h30-23h00'})`
-                                        : `S'inscrire pour partie ${part === 'first' ? '1' : '2'} (${part === 'first' ? '20h00-21h30' : '21h30-23h00'})`}
-                                </Button>
-                            );
-                        })}
-                    </div>
-                ) : (
-                    <Button
-                        onClick={() =>
-                            isRegisteredForWhole ? handleUnregister() : handleRegister()
-                        }
-                        disabled={loading}
-                        className="w-full"
-                    >
-
-                        {
-                            isRegisteredForWhole ? <CalendarMinus/> : <CalendarPlus/>
-                        }
-                        {loading ? "Chargement..." : isRegisteredForWhole ? "Désinscription" : "S'inscrire"}
-                    </Button>
-                )}
             </DialogContent>
         </Dialog>
     );
