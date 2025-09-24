@@ -32,7 +32,12 @@ import {
     Input,
     Popover,
     PopoverContent,
-    PopoverTrigger
+    PopoverTrigger,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
 } from "@/components/ui";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
@@ -50,6 +55,12 @@ const permSchema = z.object({
     endTime: z.string(),
 })
 export default function PlanningCalendar({events, userId}: { events: EventData[], userId?: string }) {
+    type RoleSlotForm = { role: 'manager' | 'volunteer'; goalCount: number; part?: 'first' | 'second' };
+    const DEFAULT_SLOTS: RoleSlotForm[] = [
+        {role: 'manager', goalCount: 1},
+        {role: 'volunteer', goalCount: 1, part: 'first'},
+        {role: 'volunteer', goalCount: 3, part: 'second'},
+    ];
     const createEventForm = useForm<z.infer<typeof permSchema>>({
         resolver: zodResolver(permSchema),
         defaultValues: {
@@ -61,6 +72,7 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
     });
 
     const router = useRouter();
+    const [roleSlots, setRoleSlots] = useState<RoleSlotForm[]>([...DEFAULT_SLOTS]);
     const [currentMonth, setCurrentMonth] = useState(new Date());
 
     async function createTestEvents() {
@@ -107,7 +119,6 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
     const startDate = startOfWeek(monthStart, {weekStartsOn: 1});
     const endDate = endOfWeek(monthEnd, {weekStartsOn: 1});
 
-    // Calculate how many weeks (rows) are shown in the calendar grid
     const weeksCount = differenceInCalendarWeeks(endDate, startDate, {weekStartsOn: 1}) + 1;
 
     const renderCells = () => {
@@ -192,17 +203,20 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
                 return
             }
 
+            const sanitizedSlots = roleSlots
+                .map(s => ({
+                    role: s.role,
+                    goalCount: Math.max(1, Number(s.goalCount) || 1),
+                    part: s.role === 'volunteer' ? s.part : undefined,
+                }));
+
             const payload = {
                 title: "Permanence",
                 description: "Permanence",
                 start,
                 end,
                 userId,
-                roleSlots: [
-                    {role: "manager", goalCount: 1},
-                    {role: "volunteer", goalCount: 3, part: "first"},
-                    {role: "volunteer", goalCount: 3, part: "second"},
-                ],
+                roleSlots: sanitizedSlots,
             }
 
             const res = await fetch("/api/events", {
@@ -254,12 +268,14 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
                     </h2>
                     <Dialog>
                         <DialogTrigger asChild>
-                            <Button variant="outline">
+                            <Button variant="outline" onClick={() => setRoleSlots([...DEFAULT_SLOTS])}
+                                    aria-label="Ajouter une permanence">
                                 <CalendarPlus/>
                             </Button>
                         </DialogTrigger>
 
-                        <DialogContent>
+                        <DialogContent
+                            className="max-w-[95vw] sm:max-w-xl md:max-w-2xl lg:max-w-3xl max-h-[85vh] overflow-y-auto focus:outline-none">
                             <Form {...createEventForm}>
                                 <form onSubmit={createEventForm.handleSubmit(createEvent)}>
                                     <DialogHeader>
@@ -382,6 +398,102 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
                                                 </FormItem>
                                             )}
                                         />
+                                    </div>
+
+                                    <div className="mt-4 border-t pt-4">
+                                        <h3 className="text-sm font-semibold mb-2">Gestion des créneaux par rôle</h3>
+                                        <div className="space-y-3">
+                                            {roleSlots.map((slot, idx) => (
+                                                <div key={idx} className="flex items-end gap-3">
+                                                    <div className="flex-1">
+                                                        <FormLabel>Rôle</FormLabel>
+                                                        <Select
+                                                            value={slot.role}
+                                                            onValueChange={(val) => {
+                                                                const roleVal = val as 'manager' | 'volunteer'
+                                                                setRoleSlots(prev => prev.map((s, i) => i === idx ? {
+                                                                    role: roleVal,
+                                                                    goalCount: s.goalCount,
+                                                                    part: roleVal === 'volunteer' ? (s.part ?? 'first') : undefined
+                                                                } : s));
+                                                            }}
+                                                        >
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="Choisir un rôle"/>
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="manager">Référent
+                                                                    (manager)</SelectItem>
+                                                                <SelectItem value="volunteer">Bénévole
+                                                                    (volunteer)</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                    {slot.role === 'volunteer' && (
+                                                        <div className="flex-1">
+                                                            <FormLabel>Partie</FormLabel>
+                                                            <Select
+                                                                value={(slot.part || 'first')}
+                                                                onValueChange={(val) => {
+                                                                    const partVal = val as 'first' | 'second'
+                                                                    setRoleSlots(prev => prev.map((s, i) => i === idx ? {
+                                                                        ...s,
+                                                                        part: partVal
+                                                                    } : s));
+                                                                }}
+                                                            >
+                                                                <SelectTrigger>
+                                                                    <SelectValue placeholder="Choisir une partie"/>
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value="first">Partie 1
+                                                                        (20h00-21h30)</SelectItem>
+                                                                    <SelectItem value="second">Partie 2
+                                                                        (21h30-23h00)</SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </div>
+                                                    )}
+                                                    <div className="w-32">
+                                                        <FormLabel>Places</FormLabel>
+                                                        <Input
+                                                            type="number"
+                                                            min={1}
+                                                            value={slot.goalCount}
+                                                            onChange={(e) => {
+                                                                const val = Math.max(1, Number(e.target.value) || 1);
+                                                                setRoleSlots(prev => prev.map((s, i) => i === idx ? {
+                                                                    ...s,
+                                                                    goalCount: val
+                                                                } : s));
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            onClick={() => setRoleSlots(prev => prev.filter((_, i) => i !== idx))}
+                                                        >
+                                                            Supprimer
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <div className="mt-3">
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                onClick={() => setRoleSlots(prev => ([...prev, {
+                                                    role: 'volunteer',
+                                                    goalCount: 1,
+                                                    part: 'first'
+                                                }]))}
+                                            >
+                                                Ajouter un créneau
+                                            </Button>
+                                        </div>
                                     </div>
 
                                     <DialogFooter className="mt-4">

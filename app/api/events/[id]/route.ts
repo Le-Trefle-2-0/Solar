@@ -32,7 +32,8 @@ export async function GET(
 
 const RegisterSchema = z.object({
     part: z.enum(['first', 'second']).optional(),
-    userId: z.string().min(1).optional(), // optional, not needed from client
+    roleSlotId: z.string().min(1).optional(),
+    userId: z.string().min(1).optional(),
     type: z.enum(['register', 'unregister']),
 });
 
@@ -52,13 +53,14 @@ export async function POST(req: NextRequest, {params}: { params: Promise<{ id: s
         const verifiedBody = RegisterSchema.parse(body);
         const userRole = session.user.role;
 
-        const partToRegister = userRole === 'volunteer' ? body.part : undefined;
+        const partToRegister = userRole?.includes('volunteer') ? verifiedBody.part : undefined;
+        const roleSlotId = verifiedBody.roleSlotId;
         if (verifiedBody.type == "register") {
-            const reg = await registerUserToEvent(id, session.user.id, partToRegister);
+            const reg = await registerUserToEvent(id, session.user.id, partToRegister, roleSlotId);
             const event = await findEvent(reg.eventId || id);
             return Response.json(event);
         } else {
-            const reg = await unregisterUserToEvent(id, session.user.id, partToRegister);
+            const reg = await unregisterUserToEvent(id, session.user.id, partToRegister, roleSlotId);
             const event = await findEvent(reg.eventId || id);
             return Response.json(event);
         }
