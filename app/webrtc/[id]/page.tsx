@@ -31,7 +31,7 @@ const PeerPage = () => {
 
     const handleCall = () => {
         if (localStream) {
-            const call = peerInstance?.call(id as string, localStream);
+            const call = peerInstance?.call(id as string, localStream, {metadata: {displayName: 'Utilisateur Anonyme'}});
             if (call) {
                 call.on('stream', userVideoStream => {
                     setStatus("connecté")
@@ -46,7 +46,7 @@ const PeerPage = () => {
     };
 
     useEffect(() => {
-        setMyUniqueId(generateRandomString());
+        setMyUniqueId('anon-' + generateRandomString());
     }, []);
 
     useEffect(() => {
