@@ -272,6 +272,14 @@ export function Message(props: {
                                     </EmojiPicker>
                                 </PopoverContent>
                             </Popover>
+                            <Button variant="outline" onClick={() => onReply ? onReply({
+                                id,
+                                authorName,
+                                content,
+                                timestamp
+                            }) : toast("Fonctionnalité encore non disponible")}>
+                                <Reply/>
+                            </Button>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="outline">
@@ -492,19 +500,19 @@ export function Message(props: {
                     {
                         isAuthor ?
 
-                            <DropdownMenuItem onClick={() => {
+                            <ContextMenuItem onClick={() => {
                                 setIsEditing(true);
                                 setEditContent(content);
                             }}>
                                 <Pencil/> Modifier
-                            </DropdownMenuItem>
+                            </ContextMenuItem>
                             : null
                     }
                     {(isAuthor || canManageMessages) ? (
-                        <DropdownMenuItem className="text-red-500"
+                        <ContextMenuItem className="text-red-500"
                                           onClick={() => setConfirmOpen(true)}>
                             <Trash2/> Supprimer
-                        </DropdownMenuItem>
+                        </ContextMenuItem>
                     ) : null}
                     <ContextMenuSeparator/>
                     <ContextMenuItem onClick={() => navigator.clipboard.writeText(id.toString())}>
