@@ -9,6 +9,12 @@ export async function initSocket(jwt: string): Promise<Socket | null> {
         auth: {jwt},
         transports: ["websocket"],
         withCredentials: true,
+        reconnection: true,
+        reconnectionAttempts: Infinity,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+        timeout: 20000,
+        forceNew: false,
         rejectUnauthorized: process.env.NODE_ENV === "production"
     });
 

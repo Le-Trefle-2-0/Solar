@@ -78,7 +78,10 @@ app.prepare().then(() => {
     }
 
     const io = new Server(server, {
-        cors: {origin: '*'} // adjust if needed
+        cors: {origin: '*'},
+        transports: ['websocket'],
+        pingInterval: 10000,
+        pingTimeout: 20000
     });
 
     io.use(async (socket, next) => {
@@ -116,7 +119,7 @@ app.prepare().then(() => {
                 role: socket.user.role
             };
 
-            socket.to(id).emit("joined", userObject);
+            socket.to(id).emit("joined", {channelId: id, user: userObject});
 
             const sockets = await io.in(id).fetchSockets();
             const users = sockets.map(s => ({
@@ -140,10 +143,13 @@ app.prepare().then(() => {
             if (Date.now() - lastSeen > 10000) {
                 for (let channel of channels) {
                     socket.to(channel.id).emit("left", {
-                        id: socket.user.id,
-                        username: socket.user.displayUsername || socket.user.name,
-                        image: socket.user.image,
-                        role: socket.user.role
+                        channelId: channel.id,
+                        user: {
+                            id: socket.user.id,
+                            username: socket.user.displayUsername || socket.user.name,
+                            image: socket.user.image,
+                            role: socket.user.role
+                        }
                     });
                 }
                 socket.disconnect(true);
@@ -153,7 +159,15 @@ app.prepare().then(() => {
 
         socket.on("disconnect", async () => {
             for (let channel of channels) {
-                socket.to(channel.id).emit("left", socket.user);
+                socket.to(channel.id).emit("left", {
+                    channelId: channel.id,
+                    user: {
+                        id: socket.user.id,
+                        username: socket.user.displayUsername || socket.user.name,
+                        image: socket.user.image,
+                        role: socket.user.role
+                    }
+                });
                 const sockets = await io.in(channel.id).fetchSockets();
                 const users = sockets.map(s => ({
                     id: s.user.id,
