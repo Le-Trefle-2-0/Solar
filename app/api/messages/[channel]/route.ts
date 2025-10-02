@@ -61,12 +61,13 @@ export async function GET(
         }
     }
 
-    const messages = await getMessages(channel);
-    // const messages = await prisma.message.findMany({
-    //     where: {
-    //         channelId: channel
-    //     }
-    // })
+    const url = new URL(request.url);
+    const limitStr = url.searchParams.get('limit');
+    const beforeStr = url.searchParams.get('before');
+    const limit = limitStr ? parseInt(limitStr, 10) : undefined;
+    const before = beforeStr ? parseInt(beforeStr, 10) : undefined;
+
+    const messages = await getMessages(channel, {limit, before});
     return Response.json(messages);
 }
 

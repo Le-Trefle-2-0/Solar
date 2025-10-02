@@ -29,7 +29,16 @@ import {toast} from "sonner";
 import {saveMessage} from "@/lib/messageManager";
 import {useSession} from "@/lib/auth-client";
 import {Socket} from "socket.io-client";
-import {Button, Dialog, DialogContent, DialogHeader, DialogTrigger, Textarea, useSidebar} from "@/components/ui";
+import {
+    Button,
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTrigger,
+    Skeleton,
+    Textarea,
+    useSidebar
+} from "@/components/ui";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -76,6 +85,12 @@ export function Chat(props: { channelID: string, statusID: number }) {
         timestamp: number
     } | null>(null);
     const [chat, setChat] = useState<MsgWithID[]>([])
+    const [loadingMessages, setLoadingMessages] = useState(true)
+    const [skeletonItems, setSkeletonItems] = useState<{ nameW: number; line1W: number; line2W: number }[]>([])
+    const INITIAL_LIMIT = 60
+    const [hasMore, setHasMore] = useState(true)
+    const [loadingOlder, setLoadingOlder] = useState(false)
+    const messagesContainerRef = useRef<HTMLDivElement>(null)
     const formRef = useRef<HTMLFormElement>(null);
     const textRef = useRef<HTMLTextAreaElement>(null);
     const rootDivRef = useRef<HTMLDivElement>(null);
@@ -91,6 +106,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
     const [canManageMessages, setCanManageMessages] = useState(false);
     const myAudioRef = useRef<HTMLAudioElement>(null);
     const remoteAudioRef = useRef<HTMLAudioElement>(null);
+    const initialAutoScrollPending = useRef(false);
 
     const messageSchema = z
         .string()
@@ -379,19 +395,37 @@ export function Chat(props: { channelID: string, statusID: number }) {
     }, [socket, channelID, session?.user]);
 
     useEffect(() => {
-        fetch(`/api/messages/${channelID}`)
+        let cancelled = false;
+        setLoadingMessages(true);
+        setHasMore(true);
+        setLoadingOlder(false);
+        initialAutoScrollPending.current = true;
+        fetch(`/api/messages/${channelID}?limit=${INITIAL_LIMIT}`)
             .then(res => res.json())
             .then(data => {
+                if (cancelled) return;
                 setChat(data)
-                messagesListRef.current?.scrollIntoView()
+                setHasMore(Array.isArray(data) && data.length >= INITIAL_LIMIT);
+            })
+            .catch(() => {
+                if (cancelled) return;
+                setChat([])
+                setHasMore(false);
+            })
+            .finally(() => {
+                if (cancelled) return;
+                setLoadingMessages(false);
             });
+
         fetch(`/api/channel/${channelID}`)
             .then(res => res.json())
             .then(data => {
+                if (cancelled) return;
                 setChannelName(data.name)
+            })
+            .catch(() => {
             });
 
-        console.log(status)
         if (status !== 0) {
             fetch(`/api/tickets/findBy/channelID`, {
                 method: "POST",
@@ -399,16 +433,19 @@ export function Chat(props: { channelID: string, statusID: number }) {
                     channelID: channelID,
                 }),
             }).then(res => res.json()).then(data => {
+                if (cancelled) return;
                 try {
                     setTicket(data.ticket);
                 } catch (e) {
                     console.log(e);
                 }
+            }).catch(() => {
             });
         }
         fetch(`/api/events/getAvailable`)
             .then(res => res.json())
             .then(data => {
+                if (cancelled) return;
                 setAvailable([
                     ...data.map((user: { name: any; id: any; }) => ({
                         label: user.name,
@@ -418,13 +455,14 @@ export function Chat(props: { channelID: string, statusID: number }) {
                         }
                     }))
                 ]);
-            })
+            }).catch(() => {
+        });
 
         return () => {
+            cancelled = true;
         }
-    }, []);
+    }, [channelID, status]);
 
-    // Ensure we explicitly join the active channel room so presence snapshots include self
     useEffect(() => {
         try {
             setChannelID(channelID);
@@ -440,8 +478,104 @@ export function Chat(props: { channelID: string, statusID: number }) {
     }, []);
 
     useEffect(() => {
-        messagesListRef.current?.scrollIntoView({behavior: 'smooth', block: 'end'});
-    }, [chat]);
+        const el = messagesContainerRef.current;
+        if (!el) return;
+        if (loadingOlder) return;
+
+        if (initialAutoScrollPending.current) {
+            setTimeout(() => {
+                const anchor = messagesListRef.current;
+                if (anchor) {
+                    anchor.scrollIntoView({behavior: 'auto', block: 'end'});
+                } else if (messagesContainerRef.current) {
+                    messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+                }
+                initialAutoScrollPending.current = false;
+            }, 0);
+            return;
+        }
+
+        const threshold = 100;
+        const distanceFromBottom = el.scrollHeight - (el.scrollTop + el.clientHeight);
+        const nearBottom = distanceFromBottom <= threshold;
+        if (nearBottom) {
+            messagesListRef.current?.scrollIntoView({behavior: 'smooth', block: 'end'});
+        }
+    }, [chat, loadingOlder]);
+
+    const loadOlder = async () => {
+        if (initialAutoScrollPending.current) return;
+        if (loadingOlder || !hasMore || loadingMessages) return;
+        const container = messagesContainerRef.current;
+        const oldest = chat[0]?.timestamp;
+        if (!container || !oldest) return;
+        setLoadingOlder(true);
+        const prevHeight = container.scrollHeight;
+        try {
+            const res = await fetch(`/api/messages/${channelID}?limit=${INITIAL_LIMIT}&before=${oldest}`);
+            const data: MsgWithID[] = await res.json();
+            if (Array.isArray(data) && data.length > 0) {
+                setChat(prev => {
+                    const existingIds = new Set(prev.map(m => m.id));
+                    const deduped = data.filter(m => !existingIds.has(m.id));
+                    return [...deduped, ...prev];
+                });
+                setTimeout(() => {
+                    if (!messagesContainerRef.current) return;
+                    const newHeight = messagesContainerRef.current.scrollHeight;
+                    messagesContainerRef.current.scrollTop = newHeight - prevHeight + messagesContainerRef.current.scrollTop;
+                }, 0);
+                if (data.length < INITIAL_LIMIT) setHasMore(false);
+            } else {
+                setHasMore(false);
+            }
+        } catch (e) {
+            // ignore
+        } finally {
+            setLoadingOlder(false);
+        }
+    };
+
+    useEffect(() => {
+        const el = messagesContainerRef.current;
+        if (!el) return;
+        let ticking = false;
+        const onScroll = () => {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(() => {
+                ticking = false;
+                if (initialAutoScrollPending.current) return;
+                if (el.scrollTop < 150) {
+                    loadOlder();
+                }
+            });
+        };
+        el.addEventListener('scroll', onScroll);
+        return () => {
+            el.removeEventListener('scroll', onScroll);
+        };
+    }, [messagesContainerRef.current, hasMore, loadingOlder, loadingMessages, chat, channelID]);
+
+    useEffect(() => {
+        function generateSkeletons() {
+            const approxItemHeight = 72;
+            const viewportH = typeof window !== 'undefined' ? window.innerHeight : 800;
+            const count = Math.max(6, Math.ceil(viewportH / approxItemHeight));
+            const items = Array.from({length: count}).map(() => ({
+                nameW: 20 + Math.random() * 30,
+                line1W: 50 + Math.random() * 40,
+                line2W: 30 + Math.random() * 60,
+            }));
+            setSkeletonItems(items);
+        }
+
+        if (loadingMessages) {
+            generateSkeletons();
+            window.addEventListener('resize', generateSkeletons);
+            return () => window.removeEventListener('resize', generateSkeletons);
+        }
+    }, [loadingMessages]);
 
     const nonChar = [
         "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight",
@@ -571,56 +705,78 @@ export function Chat(props: { channelID: string, statusID: number }) {
         <div className="flex flex-row items-center justify-center w-full">
             <div className="flex flex-col relative h-svh p-3 gap-4 w-full" tabIndex={0} ref={rootDivRef}>
                 {/*<video className='w-0 h-0' playsInline ref={callingVideoRef} autoPlay/>*/}
-                <div className="flex flex-col flex-grow overflow-y-auto mt-10">
-                    {chat.map(({author, content, timestamp, reactions, id, replyID, edited}, key) => {
-                        const prevMessage = key > 0 ? chat[key - 1] : null
-                        const nextMessage = key < chat.length - 1 ? chat[key + 1] : null
-                        const currentDate = new Date(timestamp).getTime()
-                        const prevDate = prevMessage ? new Date(prevMessage.timestamp).getTime() : null
-                        const nextDate = nextMessage ? new Date(nextMessage.timestamp).getTime() : null
+                <div className="flex flex-col flex-grow overflow-y-auto mt-10" ref={messagesContainerRef}>
+                    {loadingMessages ? (
+                        <div className="flex flex-col gap-4 px-2 py-2">
+                            {skeletonItems.map((item, i) => (
+                                <div key={i} className="flex items-start gap-3">
+                                    <Skeleton className="h-9 w-9 rounded-lg shrink-0"/>
+                                    <div className="flex-1 space-y-2 py-1">
+                                        <Skeleton className="h-4 max-w-[220px]" style={{width: `${item.nameW}%`}}/>
+                                        <Skeleton className="h-4" style={{width: `${item.line1W}%`}}/>
+                                        <Skeleton className="h-4" style={{width: `${item.line2W}%`}}/>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <>
+                            {loadingOlder && (
+                                <div className="flex justify-center py-2">
+                                    <Skeleton className="h-4 w-1/3"/>
+                                </div>
+                            )}
+                            {chat.map(({author, content, timestamp, reactions, id, replyID, edited}, key) => {
+                                const prevMessage = key > 0 ? chat[key - 1] : null
+                                const nextMessage = key < chat.length - 1 ? chat[key + 1] : null
+                                const currentDate = new Date(timestamp).getTime()
+                                const prevDate = prevMessage ? new Date(prevMessage.timestamp).getTime() : null
+                                const nextDate = nextMessage ? new Date(nextMessage.timestamp).getTime() : null
 
-                        const isSameAuthorAsPrev = prevMessage && prevMessage.author.id === author.id
-                        const isWithin10MinOfPrev = prevDate !== null && Math.abs(currentDate - prevDate) / 60000 < 10
-                        const showAuthorInfo = !isSameAuthorAsPrev || !isWithin10MinOfPrev
+                                const isSameAuthorAsPrev = prevMessage && prevMessage.author.id === author.id
+                                const isWithin10MinOfPrev = prevDate !== null && Math.abs(currentDate - prevDate) / 60000 < 10
+                                const showAuthorInfo = !isSameAuthorAsPrev || !isWithin10MinOfPrev
 
-                        const isSameAuthorAsNext = nextMessage && nextMessage.author.id === author.id
-                        const isWithin10MinOfNext = nextDate !== null && Math.abs(nextDate - currentDate) / 60000 < 10
-                        const isLastInBlock = !isSameAuthorAsNext || !isWithin10MinOfNext
+                                const isSameAuthorAsNext = nextMessage && nextMessage.author.id === author.id
+                                const isWithin10MinOfNext = nextDate !== null && Math.abs(nextDate - currentDate) / 60000 < 10
+                                const isLastInBlock = !isSameAuthorAsNext || !isWithin10MinOfNext
 
-                        const ref = replyID ? chat.find(m => m.id === replyID) : undefined;
-                        return (
-                            <Message
-                                prevDate={prevDate as number}
-                                currentDate={currentDate}
-                                timestamp={timestamp}
-                                reactions={reactions as Reaction[]}
-                                key={id}
-                                isLastInBlock={isLastInBlock}
-                                showAuthorInfo={showAuthorInfo}
-                                isAuthor={author.id === session?.user.id}
-                                profilePicture={author.image}
-                                authorRole={author.role}
-                                authorName={author.name}
-                                content={content}
-                                userID={session?.user.id as string}
-                                id={id as number}
-                                channelId={channelID}
-                                canManageMessages={canManageMessages}
-                                edited={edited}
-                                onReply={({id, authorName, content, timestamp}) => {
-                                    setReplyTo({id, authorName, content, timestamp});
-                                    setTimeout(() => textRef.current?.focus(), 0);
-                                }}
-                                replyTargetId={replyTo?.id}
-                                replyOf={ref ? {
-                                    id: ref.id,
-                                    authorName: ref.author.name,
-                                    content: ref.content,
-                                    image: ref.author.image
-                                } : undefined}
-                            />
-                        );
-                    })}
+                                const ref = replyID ? chat.find(m => m.id === replyID) : undefined;
+                                return (
+                                    <Message
+                                        prevDate={prevDate as number}
+                                        currentDate={currentDate}
+                                        timestamp={timestamp}
+                                        reactions={reactions as Reaction[]}
+                                        key={id}
+                                        isLastInBlock={isLastInBlock}
+                                        showAuthorInfo={showAuthorInfo}
+                                        isAuthor={author.id === session?.user.id}
+                                        profilePicture={author.image}
+                                        authorRole={author.role}
+                                        authorName={author.name}
+                                        content={content}
+                                        userID={session?.user.id as string}
+                                        id={id as number}
+                                        channelId={channelID}
+                                        canManageMessages={canManageMessages}
+                                        edited={edited}
+                                        onReply={({id, authorName, content, timestamp}) => {
+                                            setReplyTo({id, authorName, content, timestamp});
+                                            setTimeout(() => textRef.current?.focus(), 0);
+                                        }}
+                                        replyTargetId={replyTo?.id}
+                                        replyOf={ref ? {
+                                            id: ref.id,
+                                            authorName: ref.author.name,
+                                            content: ref.content,
+                                            image: ref.author.image
+                                        } : undefined}
+                                    />
+                                );
+                            })}
+                        </>
+                    )}
                     <div ref={messagesListRef} className="h-px"/>
                 </div>
 
