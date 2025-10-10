@@ -236,6 +236,7 @@ model Ticket {
   problematic  String?
   observations String?
   info         String?
+  voice Boolean @default(false)
 }
 
 model TicketStatus {
