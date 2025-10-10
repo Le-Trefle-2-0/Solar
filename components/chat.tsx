@@ -22,7 +22,7 @@ import {
     UserRoundX,
     X
 } from "lucide-react";
-import React, {FormEvent, useEffect, useRef, useState} from "react";
+import React, {FormEvent, useEffect, useLayoutEffect, useRef, useState} from "react";
 import {formVolunteer, Msg, MsgWithID, ticketInfo} from "@/lib/interface";
 import {z, ZodError} from "zod";
 import {toast} from "sonner";
@@ -57,6 +57,7 @@ import {cn} from "@/lib/utils"
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,} from "@/components/ui/command"
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form"
 import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover"
+import {ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger} from "@/components/ui/context-menu"
 import type {Reaction, Ticket} from "@/generated/prisma/client"
 import {useRouter} from "next/navigation";
 import {Message} from "@/components/message";
@@ -109,9 +110,193 @@ export function Chat(props: { channelID: string, statusID: number }) {
     const {toggleSidebar} = useSidebar();
     const [canManageMessages, setCanManageMessages] = useState(false);
     const myAudioRef = useRef<HTMLAudioElement>(null);
+
+    // LanguageTool (French) spellcheck state for chat input
+    const [ltMatches, setLtMatches] = useState<{
+        offset: number;
+        length: number;
+        message: string;
+        replacements?: string[]
+    }[]>([]);
+    const [highlightHtml, setHighlightHtml] = useState<string>("");
+    const ltAbortRef = useRef<AbortController | null>(null);
+    const overlayRef = useRef<HTMLDivElement>(null);
+    const inputWrapperRef = useRef<HTMLDivElement>(null);
+    const [ctxData, setCtxData] = useState<{ offset: number; length: number; suggestions: string[] }>({
+        offset: 0,
+        length: 0,
+        suggestions: []
+    });
     const remoteAudioRef = useRef<HTMLAudioElement>(null);
     const initialAutoScrollPending = useRef(false);
     const isAtBottomRef = useRef(true);
+
+    // Escape HTML to safely build overlay content
+    const escapeHtml = (s: string) => s
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+
+    // Build highlighted HTML using LanguageTool matches (underline errors)
+    const buildHighlightHtml = (text: string, matches: { offset: number; length: number; message: string }[]) => {
+        if (!text) return "";
+        const safe = escapeHtml(text);
+        if (!matches || matches.length === 0) return safe;
+        // Map through original indices; since we escaped, indices still align as we only replaced single chars
+        let result = "";
+        let cursor = 0;
+        // Merge overlapping matches and sort
+        const sorted = [...matches]
+            .filter(m => m.length > 0)
+            .sort((a, b) => a.offset - b.offset);
+        const merged: { offset: number; length: number; message: string }[] = [];
+        for (const m of sorted) {
+            if (merged.length === 0) {
+                merged.push({...m});
+                continue;
+            }
+            const last = merged[merged.length - 1];
+            const lastEnd = last.offset + last.length;
+            if (m.offset <= lastEnd) {
+                // overlap, extend
+                const newEnd = Math.max(lastEnd, m.offset + m.length);
+                merged[merged.length - 1] = {offset: last.offset, length: newEnd - last.offset, message: last.message};
+            } else {
+                merged.push({...m});
+            }
+        }
+        for (const m of merged) {
+            const start = m.offset;
+            const end = m.offset + m.length;
+            if (start > safe.length) break;
+            if (cursor < start) result += safe.slice(cursor, start);
+            const frag = safe.slice(start, Math.min(end, safe.length));
+            result += `<span class="lt-err" data-offset="${start}" data-length="${m.length}" title="${escapeHtml(m.message)}">${frag}</span>`;
+            cursor = end;
+        }
+        if (cursor < safe.length) result += safe.slice(cursor);
+        return result;
+    };
+
+    // Throttled + debounced scheduling for LanguageTool checks
+    const [ltQuery, setLtQuery] = useState<string>("");
+    const lastCheckAtRef = useRef<number>(0);
+    const lastCheckedTextRef = useRef<string>("");
+    useEffect(() => {
+        // Clear on empty or very short inputs
+        if (!currentMsg || currentMsg.trim().length < 4) {
+            setLtMatches([]);
+            setHighlightHtml("");
+            setLtQuery("");
+            return;
+        }
+        const now = Date.now();
+        const minInterval = 1200; // throttle: at most ~1.2s
+        const idleDelay = 800; // debounce after pause
+        const prev = lastCheckedTextRef.current;
+        const delta = Math.abs(currentMsg.length - prev.length);
+        const significantChange = delta >= 5 || /[\s\.,;:!?]$/.test(currentMsg);
+
+        // Immediate check if throttled interval passed and change significant
+        if (now - lastCheckAtRef.current > minInterval && significantChange) {
+            lastCheckAtRef.current = now;
+            lastCheckedTextRef.current = currentMsg;
+            setLtQuery(currentMsg);
+            return;
+        }
+        // Debounced check after user pauses typing
+        const t = setTimeout(() => {
+            lastCheckAtRef.current = Date.now();
+            lastCheckedTextRef.current = currentMsg;
+            setLtQuery(currentMsg);
+        }, idleDelay);
+        return () => clearTimeout(t);
+    }, [currentMsg]);
+
+    // LanguageTool API call driven by ltQuery (not every keystroke)
+    useEffect(() => {
+        if (!ltQuery) return;
+        (async () => {
+            try {
+                if (ltAbortRef.current) ltAbortRef.current.abort();
+                const controller = new AbortController();
+                ltAbortRef.current = controller;
+                const params = new URLSearchParams();
+                params.set("language", "fr");
+                params.set("text", ltQuery);
+                const res = await fetch("https://api.languagetool.org/v2/check", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/x-www-form-urlencoded"},
+                    body: params.toString(),
+                    signal: controller.signal,
+                });
+                if (!res.ok) throw new Error("LanguageTool API error");
+                const data = await res.json();
+                const matches = (data.matches || []).map((m: any) => ({
+                    offset: m.offset as number,
+                    length: m.length as number,
+                    message: typeof m.message === "string" ? m.message : "Erreur détectée",
+                    replacements: Array.isArray(m.replacements) ? m.replacements.map((r: any) => r.value).filter(Boolean) : [],
+                }));
+                // Avoid applying stale results to newer text
+                if (ltQuery === currentMsg) {
+                    setLtMatches(matches);
+                }
+            } catch (e) {
+                if ((e as any)?.name === "AbortError") return;
+                setLtMatches([]);
+            }
+        })();
+    }, [ltQuery, currentMsg]);
+
+    // Rebuild highlight HTML when text or matches change
+    useEffect(() => {
+        setHighlightHtml(buildHighlightHtml(currentMsg, ltMatches));
+    }, [currentMsg, ltMatches]);
+
+    // Mirror textarea's computed styles into the overlay to ensure exact underline placement
+    useLayoutEffect(() => {
+        const ta = textRef.current;
+        const ov = overlayRef.current;
+        if (!ta || !ov) return;
+
+        const sync = () => {
+            const cs = window.getComputedStyle(ta);
+            const props = [
+                "fontFamily",
+                "fontSize",
+                "fontWeight",
+                "fontStyle",
+                "letterSpacing",
+                "textTransform",
+                "textIndent",
+                "wordSpacing",
+                "lineHeight",
+                "paddingTop",
+                "paddingRight",
+                "paddingBottom",
+                "paddingLeft",
+                "boxSizing",
+                "tabSize",
+            ] as const;
+            props.forEach((p) => {
+                // @ts-ignore - dynamic style copy
+                ov.style[p] = (cs as any)[p] || "";
+            });
+            // Ensure wrapping behavior matches textarea
+            ov.style.whiteSpace = "pre-wrap";
+        };
+
+        sync();
+        const ro = new ResizeObserver(() => sync());
+        ro.observe(ta);
+        window.addEventListener("resize", sync);
+        return () => {
+            ro.disconnect();
+            window.removeEventListener("resize", sync);
+        };
+    }, []);
+
 
     const messageSchema = z
         .string()
@@ -1150,25 +1335,111 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
                     <form ref={formRef} onSubmit={(e) => sendForm(e)}
                           className='flex flex-row w-full gap-2 items-center'>
-                        <Textarea
-                            placeholder={`Envoyer un message dans ${channelName}`}
-                            onChange={(e) => {
-                                setCurrentMsg(e.target.value)
-                                sendTyping()
-                            }}
-                            disabled={status == 3 || status == 4}
-                            ref={textRef}
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter" && !e.shiftKey) {
+                        <ContextMenu>
+                            <ContextMenuTrigger asChild>
+                                <div
+                                    className="relative w-full"
+                                    ref={inputWrapperRef}
+                                    onContextMenuCapture={(e) => {
+                                        const target = e.target as HTMLElement | null;
+                                        if (target && target.classList && target.classList.contains('lt-err')) {
+                                            // allow Radix to open; data will be set by overlay handler
+                                        } else {
+                                            // prevent opening when right-clicking outside errors
+                                            e.preventDefault();
+                                        }
+                                    }}
+                                >
+                                    {/* Overlay showing highlights */}
+                                    <div
+                                        ref={overlayRef}
+                                        className="absolute inset-0 pointer-events-none whitespace-pre-wrap rounded-lg lt-overlay"
+                                        onContextMenu={(e) => {
+                                            const target = e.target as HTMLElement | null;
+                                            if (target && target.classList && target.classList.contains('lt-err')) {
+                                                const off = Number(target.getAttribute('data-offset') || '0');
+                                                const len = Number(target.getAttribute('data-length') || '0');
+                                                const match = ltMatches.find(m => m.offset === off && m.length === len);
+                                                setCtxData({
+                                                    offset: off,
+                                                    length: len,
+                                                    suggestions: match?.replacements?.slice(0, 6) || []
+                                                });
+                                            }
+                                        }}
+                                        dangerouslySetInnerHTML={{__html: highlightHtml || ''}}
+                                    />
+                                    {/* Actual textarea capturing input */}
+                                    <Textarea
+                                        placeholder={`Envoyer un message dans ${channelName}`}
+                                        onChange={(e) => {
+                                            setCurrentMsg(e.target.value)
+                                            sendTyping()
+                                        }}
+                                        disabled={status == 3 || status == 4}
+                                        ref={textRef}
+                                        onScroll={(e) => {
+                                            if (overlayRef.current) {
+                                                overlayRef.current.scrollTop = (e.target as HTMLTextAreaElement).scrollTop;
+                                                overlayRef.current.scrollLeft = (e.target as HTMLTextAreaElement).scrollLeft;
+                                            }
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter" && !e.shiftKey) {
                                     e.preventDefault();
                                     formRef.current?.requestSubmit();
+                                            }
+                                        }}
+                                        spellCheck={false}
+                                        lang="fr"
+                                        data-ms-editor="false"
+                                        value={currentMsg}
+                                        className={cn(
+                                            "w-full flex flex-row outline-main outline-1 p-2 rounded-lg resize-none"
+                                        )}
+                                    />
+                                    {/* Inline styles for LanguageTool highlighting */}
+                                    <style jsx global>{`
+                                .lt-overlay {
+                                  color: transparent; /* hide overlay text while keeping underline color */
+                                  overflow: hidden; /* will follow textarea scroll via JS */
                                 }
-                            }}
-                            spellCheck="true"
-                            data-ms-editor="true"
-                            value={currentMsg}
-                            className="w-full flex flex-row outline-main outline-1 p-2 rounded-lg resize-none"
-                        />
+                                .lt-err {
+                                  text-decoration-line: underline;
+                                  text-decoration-style: wavy;
+                                  text-decoration-color: #ef4444; /* red-500 */
+                                  text-underline-offset: 2px;
+                                  pointer-events: auto; /* allow right-click on errors */
+                                  cursor: context-menu;
+                                }
+                              `}</style>
+                                </div>
+                            </ContextMenuTrigger>
+                            <ContextMenuContent className="min-w-[180px] max-w-[260px]">
+                                {ctxData.suggestions && ctxData.suggestions.length > 0 ? (
+                                    ctxData.suggestions.map((s, i) => (
+                                        <ContextMenuItem
+                                            key={i}
+                                            onSelect={() => {
+                                                const before = currentMsg.slice(0, ctxData.offset);
+                                                const after = currentMsg.slice(ctxData.offset + ctxData.length);
+                                                const newText = before + s + after;
+                                                setCurrentMsg(newText);
+                                                setTimeout(() => {
+                                                    const pos = before.length + s.length;
+                                                    textRef.current?.focus();
+                                                    textRef.current?.setSelectionRange(pos, pos);
+                                                }, 0);
+                                            }}
+                                        >
+                                            {s}
+                                        </ContextMenuItem>
+                                    ))
+                                ) : (
+                                    <ContextMenuItem disabled>Aucune suggestion</ContextMenuItem>
+                                )}
+                            </ContextMenuContent>
+                        </ContextMenu>
 
                         <Popover onOpenChange={setEmojiOpen} open={emojiOpen}>
                             <PopoverTrigger asChild>
