@@ -34,6 +34,7 @@ import {
     Dialog,
     DialogContent,
     DialogHeader,
+    DialogTitle,
     DialogTrigger,
     Skeleton,
     Textarea,
@@ -61,6 +62,7 @@ import {useRouter} from "next/navigation";
 import {Message} from "@/components/message";
 import {useSocket} from "@/context/Socket";
 import {usePeer} from "@/context/VoicePeer";
+import {VisuallyHidden} from "@radix-ui/react-visually-hidden";
 
 export function Chat(props: { channelID: string, statusID: number }) {
     const {channelID, statusID} = props;
@@ -102,11 +104,14 @@ export function Chat(props: { channelID: string, statusID: number }) {
     const [idToCall, setIdToCall] = useState('');
     const [localStream, setLocalStream] = useState<MediaStream | null>(null);
     const [available, setAvailable] = useState<formVolunteer[]>([]);
+    const [ineligibleText, setIneligibleText] = useState<string[]>([]);
+    const [ineligibleVoice, setIneligibleVoice] = useState<string[]>([]);
     const {toggleSidebar} = useSidebar();
     const [canManageMessages, setCanManageMessages] = useState(false);
     const myAudioRef = useRef<HTMLAudioElement>(null);
     const remoteAudioRef = useRef<HTMLAudioElement>(null);
     const initialAutoScrollPending = useRef(false);
+    const isAtBottomRef = useRef(true);
 
     const messageSchema = z
         .string()
@@ -442,7 +447,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
             }).catch(() => {
             });
         }
-        fetch(`/api/events/getAvailable`)
+        fetch(`/api/events/getAvailable?channelID=${channelID}`)
             .then(res => res.json())
             .then(data => {
                 if (cancelled) return;
@@ -457,6 +462,22 @@ export function Chat(props: { channelID: string, statusID: number }) {
                 ]);
             }).catch(() => {
         });
+
+        // Fetch ineligible lists (text and voice) for the dialog
+        fetch(`/api/events/getAvailable?channelID=${channelID}&lists=ineligible`)
+            .then(res => res.json())
+            .then(data => {
+                if (cancelled) return;
+                const textNames = Array.isArray(data?.ineligibleText) ? data.ineligibleText.map((u: any) => u.name).filter(Boolean) : [];
+                const voiceNames = Array.isArray(data?.ineligibleVoice) ? data.ineligibleVoice.map((u: any) => u.name).filter(Boolean) : [];
+                setIneligibleText(textNames);
+                setIneligibleVoice(voiceNames);
+            })
+            .catch(() => {
+                if (cancelled) return;
+                setIneligibleText([]);
+                setIneligibleVoice([]);
+            });
 
         return () => {
             cancelled = true;
@@ -491,14 +512,13 @@ export function Chat(props: { channelID: string, statusID: number }) {
                     messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
                 }
                 initialAutoScrollPending.current = false;
+                // after initial scroll, we are at bottom
+                isAtBottomRef.current = true;
             }, 0);
             return;
         }
 
-        const threshold = 100;
-        const distanceFromBottom = el.scrollHeight - (el.scrollTop + el.clientHeight);
-        const nearBottom = distanceFromBottom <= threshold;
-        if (nearBottom) {
+        if (isAtBottomRef.current) {
             messagesListRef.current?.scrollIntoView({behavior: 'smooth', block: 'end'});
         }
     }, [chat, loadingOlder]);
@@ -546,11 +566,17 @@ export function Chat(props: { channelID: string, statusID: number }) {
             requestAnimationFrame(() => {
                 ticking = false;
                 if (initialAutoScrollPending.current) return;
+                // update bottom state
+                const distanceFromBottom = el.scrollHeight - (el.scrollTop + el.clientHeight);
+                isAtBottomRef.current = distanceFromBottom <= 2;
                 if (el.scrollTop < 150) {
                     loadOlder();
                 }
             });
         };
+        // initialize at-bottom state when attaching
+        const initDistance = el.scrollHeight - (el.scrollTop + el.clientHeight);
+        isAtBottomRef.current = initDistance <= 2;
         el.addEventListener('scroll', onScroll);
         return () => {
             el.removeEventListener('scroll', onScroll);
@@ -1018,7 +1044,9 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                 </DialogTrigger>
                                 <DialogContent className="w-[1000px]">
                                     <DialogHeader>
-                                        {/*<DialogTitle>Informations de l'écoute</DialogTitle>*/}
+                                        <VisuallyHidden>
+                                            <DialogTitle>Informations de l'écoute</DialogTitle>
+                                        </VisuallyHidden>
                                         {/*<DialogDescription>*/}
                                         <h4 className="scroll-m-20 text-xl font-semibold tracking-tight flex flex-row gap-3">
                                             <CircleAlert/> Vigilances
@@ -1036,18 +1064,26 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                             <UserRoundX/> Bénévoles Inéligibles
                                         </h4>
                                         <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
-                                            <li>Anthony J</li>
-                                            <li>Julie R</li>
-                                            <li>Paul PR</li>
+                                            {ineligibleText.length > 0 ? (
+                                                ineligibleText.map((name, index) => (
+                                                    <li key={index}>{name}</li>
+                                                ))
+                                            ) : (
+                                                <li>Aucun bénévole inéligible</li>
+                                            )}
                                         </ul>
 
                                         <h4 className="scroll-m-20 text-xl font-semibold tracking-tight flex flex-row gap-3">
                                             <MicOff/> Bénévoles Inéligibles Vocal
                                         </h4>
                                         <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
-                                            <li>Anthony J</li>
-                                            <li>Julie R</li>
-                                            <li>Paul PR</li>
+                                            {ineligibleVoice.length > 0 ? (
+                                                ineligibleVoice.map((name, index) => (
+                                                    <li key={index}>{name}</li>
+                                                ))
+                                            ) : (
+                                                <li>Aucun bénévole inéligible</li>
+                                            )}
                                         </ul>
 
                                         <h4 className="scroll-m-20 text-xl font-semibold tracking-tight flex flex-row gap-3">
