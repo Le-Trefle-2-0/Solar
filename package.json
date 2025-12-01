@@ -46,7 +46,7 @@
     "@radix-ui/react-tabs": "^1.1.12",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@tanstack/react-table": "^8.21.3",
-    "better-auth": "^1.3.27",
+    "better-auth": "^1.4.4",
     "better-auth-dashboard": "^0.0.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
