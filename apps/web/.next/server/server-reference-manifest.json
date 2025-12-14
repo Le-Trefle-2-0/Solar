@@ -1,0 +1,32 @@
+{
+  "node": {
+    "7f07dce565bafa6e5a86932ddd649f0e2e1baa0701": {
+      "workers": {
+        "app/app/be/page": {
+          "moduleId": "(action-browser)/../../node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5Cadmin%5C%5CWebstormProjects%5C%5CSolar%5C%5Capps%5C%5Cweb%5C%5Clib%5C%5CmessageManager.ts%22%2C%5B%7B%22id%22%3A%227f07dce565bafa6e5a86932ddd649f0e2e1baa0701%22%2C%22exportedName%22%3A%22getMessages%22%2C%22filename%22%3A%22..%2FC%3A%5C%5CUsers%5C%5Cadmin%5C%5CWebstormProjects%5C%5CSolar%5C%5Capps%5C%5Cweb%5C%5Clib%5C%5CmessageManager.ts%22%7D%2C%7B%22id%22%3A%227f7d0776c6245283a36bf77b9ca83493ae2c2ed96e%22%2C%22exportedName%22%3A%22saveMessage%22%2C%22filename%22%3A%22..%2FC%3A%5C%5CUsers%5C%5Cadmin%5C%5CWebstormProjects%5C%5CSolar%5C%5Capps%5C%5Cweb%5C%5Clib%5C%5CmessageManager.ts%22%7D%5D%5D%5D&__client_imported__=true!",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/app/be/page": "action-browser"
+      },
+      "filename": "../C:\\Users\\admin\\WebstormProjects\\Solar\\apps\\web\\lib\\messageManager.ts",
+      "exportedName": "getMessages"
+    },
+    "7f7d0776c6245283a36bf77b9ca83493ae2c2ed96e": {
+      "workers": {
+        "app/app/be/page": {
+          "moduleId": "(action-browser)/../../node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5Cadmin%5C%5CWebstormProjects%5C%5CSolar%5C%5Capps%5C%5Cweb%5C%5Clib%5C%5CmessageManager.ts%22%2C%5B%7B%22id%22%3A%227f07dce565bafa6e5a86932ddd649f0e2e1baa0701%22%2C%22exportedName%22%3A%22getMessages%22%2C%22filename%22%3A%22..%2FC%3A%5C%5CUsers%5C%5Cadmin%5C%5CWebstormProjects%5C%5CSolar%5C%5Capps%5C%5Cweb%5C%5Clib%5C%5CmessageManager.ts%22%7D%2C%7B%22id%22%3A%227f7d0776c6245283a36bf77b9ca83493ae2c2ed96e%22%2C%22exportedName%22%3A%22saveMessage%22%2C%22filename%22%3A%22..%2FC%3A%5C%5CUsers%5C%5Cadmin%5C%5CWebstormProjects%5C%5CSolar%5C%5Capps%5C%5Cweb%5C%5Clib%5C%5CmessageManager.ts%22%7D%5D%5D%5D&__client_imported__=true!",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/app/be/page": "action-browser"
+      },
+      "filename": "../C:\\Users\\admin\\WebstormProjects\\Solar\\apps\\web\\lib\\messageManager.ts",
+      "exportedName": "saveMessage"
+    }
+  },
+  "edge": {},
+  "encryptionKey": "pD6TqpcLpQjV0rNi7Fx1AsGRyW7VXmE+2UHk2bDN8R8="
+}

@@ -1,0 +1,103 @@
+version: '3.9'
+
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: solar
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-ppassword" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  api:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm ci && npm run dev:api"
+    ports:
+      - "4000:4000"
+    environment:
+      API_HOST: 0.0.0.0
+      API_PORT: 4000
+      NEXT_PUBLIC_APP_URL: http://web:3000
+      DATABASE_URL: mysql://root:password@mysql:3306/solar
+    volumes:
+      - ./:/app
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  ws:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm ci && npm run dev:ws"
+    ports:
+      - "5000:5000"
+    environment:
+      WS_HOST: 0.0.0.0
+      WS_PORT: 5000
+      NEXT_PUBLIC_APP_URL: http://web:3000
+      REDIS_URL: redis://redis:6379
+      API_BASE_URL: http://api:4000
+    volumes:
+      - ./:/app
+    depends_on:
+      - redis
+      - api
+
+  voice:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm ci && npm run dev:voice"
+    ports:
+      - "6000:6000"
+      # Mediasoup UDP/TCP ports (adjust as needed)
+      - "40000-40050:40000-40050/udp"
+      - "40000-40050:40000-40050/tcp"
+    environment:
+      VOICE_HOST: 0.0.0.0
+      VOICE_PORT: 6000
+      NEXT_PUBLIC_APP_URL: http://web:3000
+      MEDIASOUP_MIN_PORT: 40000
+      MEDIASOUP_MAX_PORT: 40050
+      MEDIASOUP_ANNOUNCED_IP: 127.0.0.1
+    volumes:
+      - ./:/app
+    depends_on:
+      - api
+
+  web:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm ci && npm run dev:web"
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      NEXT_PUBLIC_APP_URL: http://web:3000
+      NEXT_PUBLIC_API_URL: http://api:4000
+      NEXT_PUBLIC_WS_URL: ws://localhost:5000
+      DATABASE_URL: mysql://root:password@mysql:3306/solar
+    volumes:
+      - ./:/app
+    depends_on:
+      mysql:
+        condition: service_healthy
+      api:
+        condition: service_started
+      ws:
+        condition: service_started
+
+volumes:
+  db_data:

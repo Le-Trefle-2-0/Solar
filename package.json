@@ -1,14 +1,35 @@
 {
-  "name": "my-app",
+  "name": "solar-monorepo",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "node server.js NODE_ENV=dev",
-    "build": "next build",
+    "dev": "npm run dev -w apps/web",
+    "build": "npm run build -w apps/web",
     "db": "prisma migrate reset -y",
-    "start": "NODE_ENV=production node --max-old-space-size=4096 server.js ",
-    "lint": "next lint",
-    "postinstall": "flowbite-react patch"
+    "start": "npm run start -w apps/web",
+    "lint": "npm run lint -w apps/web",
+    "postinstall": "flowbite-react patch && prisma generate --schema=prisma/schema.prisma",
+    "generate": "prisma generate --schema=prisma/schema.prisma",
+    "dev:api": "npm run dev -w apps/api",
+    "dev:ws": "npm run dev -w apps/ws",
+    "dev:voice": "npm run dev -w apps/voice",
+    "dev:all": "concurrently -k -p \"[{name}]\" -c blue,magenta,green,yellow \"npm:dev:api\" \"npm:dev:ws\" \"npm:dev:voice\" \"npm:dev:web\"",
+    "build:api": "npm run build -w apps/api",
+    "build:ws": "npm run build -w apps/ws",
+    "build:voice": "npm run build -w apps/voice",
+    "start:api": "npm run start -w apps/api",
+    "start:ws": "npm run start -w apps/ws",
+    "start:voice": "npm run start -w apps/voice",
+    "start:all": "concurrently -k -p \"[{name}]\" -c blue,magenta,green,yellow \"npm:start:api\" \"npm:start:ws\" \"npm:start:voice\" \"npm:start:web\"",
+    "dev:web": "npm run dev -w apps/web",
+    "build:web": "npm run build -w apps/web",
+    "start:web": "npm run start -w apps/web",
+    "compose:up": "docker compose up",
+    "compose:down": "docker compose down -v"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
@@ -46,7 +67,7 @@
     "@radix-ui/react-tabs": "^1.1.12",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@tanstack/react-table": "^8.21.3",
-    "better-auth": "^1.2.12",
+    "better-auth": "^1.4.6",
     "better-auth-dashboard": "^0.0.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -92,6 +113,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/react-twemoji": "^0.4.3",
+    "concurrently": "^9.0.1",
     "prisma": "^6.9.0",
     "tailwindcss": "^4.1.10",
     "tw-animate-css": "^1.3.4",
