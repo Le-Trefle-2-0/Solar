@@ -11,6 +11,7 @@ interface SocketContextProps {
     socket: Socket | null;
     currentChannelID: string | null;
     setChannelID: (id: string) => void;
+    connected: boolean;
 }
 
 const SocketContext = createContext<SocketContextProps>({
@@ -18,6 +19,7 @@ const SocketContext = createContext<SocketContextProps>({
     currentChannelID: null,
     setChannelID: () => {
     },
+    connected: false,
 });
 
 export const useSocket = () => useContext(SocketContext);
@@ -27,7 +29,12 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({childre
     const router = useRouter();
     const [socket, setSocket] = useState<Socket | null>(null);
     const [currentChannelID, setCurrentChannelID] = useState<string | null>(null);
+    const [connected, setConnected] = useState(false);
+    const [connecting, setConnecting] = useState(true);
+    const [showOverlay, setShowOverlay] = useState(false);
+    const [trouble, setTrouble] = useState(false);
     const currentPathRef = useRef<string>(pathname); // add ref
+    const overlayTimerRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         currentPathRef.current = pathname;
@@ -41,16 +48,63 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({childre
                 if (!res.ok || !ct.includes('application/json')) {
                     // eslint-disable-next-line no-console
                     console.warn('[ws] token endpoint returned non-JSON or non-OK', res.status);
+                    setConnecting(false);
                     return;
                 }
                 const data = await res.json();
                 if (!data?.token) {
                     // eslint-disable-next-line no-console
                     console.warn('[ws] no JWT token found from /api/auth/token');
+                    setConnecting(false);
                     return;
                 }
                 const s = await initSocket(data.token);
                 setSocket(s);
+                setConnecting(true);
+
+                // Always show overlay while establishing (or re-establishing) the first connection
+                setShowOverlay(true);
+                if (!overlayTimerRef.current) overlayTimerRef.current = setTimeout(() => setTrouble(true), 5000);
+
+                s?.on('connect', () => {
+                    setConnected(true);
+                    setConnecting(false);
+                    setShowOverlay(false);
+                    setTrouble(false);
+                    if (overlayTimerRef.current) {
+                        clearTimeout(overlayTimerRef.current);
+                        overlayTimerRef.current = null;
+                    }
+                });
+
+                s?.on('connect_error', () => {
+                    setConnected(false);
+                    setConnecting(false);
+                    // keep overlay visible; trouble will show after timeout
+                    setShowOverlay(true);
+                    if (!overlayTimerRef.current) overlayTimerRef.current = setTimeout(() => setTrouble(true), 5000);
+                });
+
+                s?.on('disconnect', () => {
+                    setConnected(false);
+                    setShowOverlay(true);
+                    if (!overlayTimerRef.current) overlayTimerRef.current = setTimeout(() => setTrouble(true), 5000);
+                });
+
+                s?.io.on('reconnect_attempt', () => {
+                    setShowOverlay(true);
+                    if (!overlayTimerRef.current) overlayTimerRef.current = setTimeout(() => setTrouble(true), 5000);
+                });
+
+                s?.io.on('reconnect', () => {
+                    setConnected(true);
+                    setShowOverlay(false);
+                    setTrouble(false);
+                    if (overlayTimerRef.current) {
+                        clearTimeout(overlayTimerRef.current);
+                        overlayTimerRef.current = null;
+                    }
+                });
 
                 s?.on('message', async (data) => {
                     const currentPath = currentPathRef.current; // read latest value
@@ -96,11 +150,21 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({childre
 
                 return () => {
                     s?.off('message');
+                    s?.off('connect');
+                    s?.off('connect_error');
+                    s?.off('disconnect');
+                    s?.io.off('reconnect_attempt');
+                    s?.io.off('reconnect');
                     clearInterval(interval);
+                    if (overlayTimerRef.current) {
+                        clearTimeout(overlayTimerRef.current);
+                        overlayTimerRef.current = null;
+                    }
                 };
             } catch (e) {
                 // eslint-disable-next-line no-console
                 console.error('[ws] failed to init socket', e);
+                setConnecting(false);
             }
         };
         init();
@@ -120,7 +184,22 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({childre
     }, [currentChannelID, socket]);
 
     return (
-        <SocketContext.Provider value={{socket, currentChannelID, setChannelID: setCurrentChannelID}}>
+        <SocketContext.Provider value={{socket, currentChannelID, setChannelID: setCurrentChannelID, connected}}>
+            {showOverlay && (
+                <div
+                    className="fixed inset-0 z-[1000] flex items-center justify-center bg-background/90 backdrop-blur-sm">
+                    <div className="flex flex-col items-center gap-4">
+                        <img src="/logo.svg" alt="Solar" className="h-16 w-16 animate-pulse-scale"/>
+                        <p className="text-sm text-muted-foreground text-center px-4">
+                            {trouble ? 'Nous rencontrons des difficultés de connexion. Nouvelle tentative…' : ''}
+                        </p>
+                    </div>
+                    <style>{`
+                        .animate-pulse-scale { animation: pulseScale 1.2s ease-in-out infinite alternate; }
+                        @keyframes pulseScale { from { transform: scale(1); } to { transform: scale(1.15); } }
+                    `}</style>
+                </div>
+            )}
             {children}
         </SocketContext.Provider>
     );

@@ -90,6 +90,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
     } | null>(null);
     const [chat, setChat] = useState<MsgWithID[]>([])
     const [loadingMessages, setLoadingMessages] = useState(true)
+    const [retryMs, setRetryMs] = useState(1000)
     const [skeletonItems, setSkeletonItems] = useState<{ nameW: number; line1W: number; line2W: number }[]>([])
     const INITIAL_LIMIT = 60
     const [hasMore, setHasMore] = useState(true)
@@ -587,82 +588,81 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
     useEffect(() => {
         let cancelled = false;
-        setLoadingMessages(true);
-        setHasMore(true);
-        setLoadingOlder(false);
-        initialAutoScrollPending.current = true;
-        apiFetch(`/v1/messages/${channelID}?limit=${INITIAL_LIMIT}`)
-            .then(data => {
+        let timer: NodeJS.Timeout | null = null;
+
+        const load = async () => {
+            if (cancelled) return;
+            setLoadingMessages(true);
+            setHasMore(true);
+            setLoadingOlder(false);
+            initialAutoScrollPending.current = true;
+            try {
+                const data: MsgWithID[] = await apiFetch(`/v1/messages/${channelID}?limit=${INITIAL_LIMIT}`);
                 if (cancelled) return;
-                setChat(data)
+                setChat(data);
                 setHasMore(Array.isArray(data) && data.length >= INITIAL_LIMIT);
-            })
-            .catch(() => {
-                if (cancelled) return;
-                setChat([])
-                setHasMore(false);
-            })
-            .finally(() => {
-                if (cancelled) return;
                 setLoadingMessages(false);
-            });
+                setRetryMs(1000);
 
-        apiFetch(`/v1/channel/${channelID}`)
-            .then(data => {
-                if (cancelled) return;
-                setChannelName(data.name)
-            })
-            .catch(() => {
-            });
+                // Fetch supplemental data after messages succeed (best-effort)
+                apiFetch(`/v1/channel/${channelID}`)
+                    .then((d) => {
+                        if (!cancelled) setChannelName(d.name);
+                    })
+                    .catch(() => {
+                    });
 
-        if (status !== 0) {
-            apiFetch(`/v1/tickets/findBy/channelID`, {
-                method: "POST",
-                body: JSON.stringify({
-                    channelID: channelID,
-                }),
-            }).then(data => {
-                if (cancelled) return;
-                try {
-                    setTicket(data.ticket);
-                } catch (e) {
-                    console.log(e);
+                if (status !== 0) {
+                    apiFetch(`/v1/tickets/findBy/channelID`, {
+                        method: "POST",
+                        body: JSON.stringify({channelID}),
+                    }).then((d) => {
+                        if (!cancelled) setTicket(d.ticket);
+                    }).catch(() => {
+                    });
                 }
-            }).catch(() => {
-            });
-        }
-        apiFetch(`/v1/events/getAvailable?channelID=${channelID}`)
-            .then(data => {
-                if (cancelled) return;
-                setAvailable([
-                    ...data.map((user: { name: any; id: any; }) => ({
-                        label: user.name,
-                        value: {
-                            id: user.id,
-                            name: user.name,
-                        }
-                    }))
-                ]);
-            }).catch(() => {
-        });
 
-        // Fetch ineligible lists (text and voice) for the dialog
-        apiFetch(`/v1/events/getAvailable?channelID=${channelID}&lists=ineligible`)
-            .then(data => {
+                apiFetch(`/v1/events/getAvailable?channelID=${channelID}`)
+                    .then((d) => {
+                        if (cancelled) return;
+                        setAvailable([
+                            ...d.map((user: { name: any; id: any; }) => ({
+                                label: user.name,
+                                value: {id: user.id, name: user.name},
+                            }))
+                        ]);
+                    }).catch(() => {
+                });
+
+                apiFetch(`/v1/events/getAvailable?channelID=${channelID}&lists=ineligible`)
+                    .then((d) => {
+                        if (cancelled) return;
+                        const textNames = Array.isArray(d?.ineligibleText) ? d.ineligibleText.map((u: any) => u.name).filter(Boolean) : [];
+                        const voiceNames = Array.isArray(d?.ineligibleVoice) ? d.ineligibleVoice.map((u: any) => u.name).filter(Boolean) : [];
+                        setIneligibleText(textNames);
+                        setIneligibleVoice(voiceNames);
+                    })
+                    .catch(() => {
+                        if (cancelled) return;
+                        setIneligibleText([]);
+                        setIneligibleVoice([]);
+                    });
+            } catch (e) {
                 if (cancelled) return;
-                const textNames = Array.isArray(data?.ineligibleText) ? data.ineligibleText.map((u: any) => u.name).filter(Boolean) : [];
-                const voiceNames = Array.isArray(data?.ineligibleVoice) ? data.ineligibleVoice.map((u: any) => u.name).filter(Boolean) : [];
-                setIneligibleText(textNames);
-                setIneligibleVoice(voiceNames);
-            })
-            .catch(() => {
-                if (cancelled) return;
-                setIneligibleText([]);
-                setIneligibleVoice([]);
-            });
+                // Keep skeleton visible and retry with exponential backoff
+                const next = Math.min(retryMs * 2, 10000);
+                timer = setTimeout(() => {
+                    if (!cancelled) load();
+                }, retryMs);
+                setRetryMs(next);
+            }
+        };
+
+        load();
 
         return () => {
             cancelled = true;
+            if (timer) clearTimeout(timer);
         }
     }, [channelID, status]);
 

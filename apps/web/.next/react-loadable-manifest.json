@@ -1,8 +1,4 @@
 {
-  "..\\..\\node_modules\\@react-email\\render\\dist\\browser\\index.mjs -> react-dom/server": {
-    "id": "..\\..\\node_modules\\@react-email\\render\\dist\\browser\\index.mjs -> react-dom/server",
-    "files": []
-  },
   "..\\..\\node_modules\\next\\dist\\client\\dev\\hot-reloader\\app\\use-websocket.js -> @vercel/turbopack-ecmascript-runtime/browser/dev/hmr-client/hmr-client.ts": {
     "id": "..\\..\\node_modules\\next\\dist\\client\\dev\\hot-reloader\\app\\use-websocket.js -> @vercel/turbopack-ecmascript-runtime/browser/dev/hmr-client/hmr-client.ts",
     "files": [
