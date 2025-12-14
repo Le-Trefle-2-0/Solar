@@ -42,3 +42,8 @@ next-env.d.ts
 
 /app/generated/prisma
 /apps/web/.next/
+/apps/storage/node_modules/
+/apps/web/.next/
+/apps/ws/node_modules/
+/apps/peer/node_modules/
+/apps/web/.next/
