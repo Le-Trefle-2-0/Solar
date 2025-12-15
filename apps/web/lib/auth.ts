@@ -1,9 +1,10 @@
 import {betterAuth} from "better-auth";
-import {dashboardPlugin} from "better-auth-dashboard";
 import {prismaAdapter} from "better-auth/adapters/prisma";
 import {PrismaClient} from "@prisma/client";
 import {getResendClient} from "@/lib/resend";
 import {ac, admin, bot, manager, training, volunteer} from "./permissions";
+// Namespace import to access optional plugins that may not exist in older versions
+import * as betterPlugins from "better-auth/plugins";
 import {
     admin as adminPlugin,
     apiKey,
@@ -15,8 +16,6 @@ import {
     twoFactor,
     username,
 } from "better-auth/plugins";
-// Namespace import to access optional plugins that may not exist in older versions
-import * as betterPlugins from "better-auth/plugins";
 
 const prisma = new PrismaClient;
 
@@ -57,7 +56,6 @@ const pluginList: any[] = [
     }),
     jwt(),
     bearer(),
-    dashboardPlugin(),
 ];
 
 // Insert passkey plugin before openAPI if it exists and is a function
