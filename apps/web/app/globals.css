@@ -141,6 +141,28 @@ html, body {
     }
 }
 
+@keyframes marquee {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+.animate-marquee {
+    animation: marquee 60s linear infinite;
+    will-change: transform;
+}
+
+.hover-pause:hover {
+    animation-play-state: paused;
+}
+
+.mask-marquee {
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
 @keyframes opacityPulse1 {
     0%, 100% {
         opacity: 0.25;

@@ -1,6 +1,7 @@
 import {Button} from "@/components/ui/button";
-import {ChevronDown} from "lucide-react";
+import {ChevronDown, ExternalLink} from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export function Hero() {
     return (
@@ -18,8 +19,11 @@ export function Hero() {
                     soirs de 20h à 23h.
                 </p>
                 <div className="mt-8 flex flex-col sm:flex-row gap-4">
-                    <Button size="lg">
-                        Nous rejoindre sur Discord
+                    <Button size="lg" asChild>
+                        <Link href="https://discord.gg/letrefle" target="_blank" rel="noopener noreferrer">
+                            Nous rejoindre sur Discord
+                            <ExternalLink className="ml-2 h-5 w-5"/>
+                        </Link>
                     </Button>
                     <Button variant="outline" size="lg">
                         En savoir plus
