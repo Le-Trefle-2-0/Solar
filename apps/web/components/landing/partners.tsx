@@ -16,7 +16,8 @@ export function Partners() {
     const partnerSet = Array(8).fill(partners).flat();
 
     return (
-        <section className="relative py-12 bg-gradient-to-b from-background to-muted/30 w-full overflow-hidden">
+        <section id="about"
+                 className="relative py-12 bg-gradient-to-b from-background to-muted/30 w-full overflow-hidden">
             <div
                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 opacity-5 dark:opacity-10 blur-[100px]">
                 <div className="w-[800px] h-[300px] bg-primary rounded-full"/>

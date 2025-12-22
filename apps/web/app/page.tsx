@@ -4,7 +4,9 @@ import {PublicHeader} from "@/components/landing/header";
 import {Hero} from "@/components/landing/hero";
 import {Partners} from "@/components/landing/partners";
 import {DiscordSection} from "@/components/landing/discord";
+import {OrganizationTree} from "@/components/landing/organization";
 import {PublicFooter} from "@/components/landing/footer";
+import {ScrollReveal} from "@/components/landing/scroll-reveal";
 
 export default async function Home() {
     const session = await auth.api.getSession({
@@ -16,10 +18,19 @@ export default async function Home() {
             <PublicHeader session={session}/>
             <main className="flex-1">
                 <Hero/>
-                <Partners/>
-                <DiscordSection/>
+                <ScrollReveal>
+                    <Partners/>
+                </ScrollReveal>
+                <ScrollReveal>
+                    <DiscordSection/>
+                </ScrollReveal>
+                <ScrollReveal>
+                    <OrganizationTree/>
+                </ScrollReveal>
             </main>
-            <PublicFooter/>
+            <ScrollReveal animation="fade-in">
+                <PublicFooter/>
+            </ScrollReveal>
         </div>
     );
 }

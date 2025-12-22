@@ -2,6 +2,7 @@ import {Button} from "@/components/ui/button";
 import {Card, CardContent} from "@/components/ui/card";
 import {Check, ExternalLink, MessageCircle} from "lucide-react";
 import Link from "next/link";
+import {ScrollReveal} from "./scroll-reveal";
 
 export function DiscordSection() {
     return (
@@ -18,7 +19,7 @@ export function DiscordSection() {
 
             <div className="px-4 md:px-8 w-full relative z-10">
                 <div className="grid gap-12 lg:grid-cols-2 items-center">
-                    <div className="flex flex-col gap-6 order-1 lg:order-2">
+                    <ScrollReveal animation="slide-right" className="flex flex-col gap-6 order-1 lg:order-2">
                         <div
                             className="inline-flex items-center rounded-lg bg-[#5865F2]/10 px-3 py-1 text-sm font-medium text-[#5865F2]">
                             <MessageCircle className="mr-2 h-4 w-4"/>
@@ -64,19 +65,21 @@ export function DiscordSection() {
                                 </Link>
                             </Button>
                         </div>
-                    </div>
-                    <Card className="p-0 overflow-hidden border-none shadow-2xl bg-[#313338] order-2 lg:order-1">
-                        <CardContent className="p-0">
-                            <iframe
-                                src="https://discord.com/widget?id=718246706319458365&theme=dark"
-                                width="100%"
-                                height="500"
-                                allowtransparency="true"
-                                frameBorder="0"
-                                sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
-                            />
-                        </CardContent>
-                    </Card>
+                    </ScrollReveal>
+                    <ScrollReveal animation="slide-left" className="order-2 lg:order-1">
+                        <Card className="p-0 overflow-hidden border-none shadow-2xl bg-[#313338]">
+                            <CardContent className="p-0">
+                                <iframe
+                                    src="https://discord.com/widget?id=718246706319458365&theme=dark"
+                                    width="100%"
+                                    height="500"
+                                    allowtransparency="true"
+                                    frameBorder="0"
+                                    sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
+                                />
+                            </CardContent>
+                        </Card>
+                    </ScrollReveal>
                 </div>
             </div>
         </section>
