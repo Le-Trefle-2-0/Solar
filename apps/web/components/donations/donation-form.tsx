@@ -9,6 +9,7 @@ import {Tabs, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {initiateDonation} from "@/app/actions/donations";
 import {toast} from "sonner";
 import {cn} from "@/lib/utils";
+import {Info} from "lucide-react";
 
 const PRESET_AMOUNTS = [5, 10, 20, 50];
 
@@ -115,6 +116,15 @@ export function DonationForm() {
                         "Avec 20€, vous financez la formation d'un nouveau bénévole écoutant."
                     </div>
                 )}
+
+                <div className="flex items-start gap-3 p-4 bg-muted/50 rounded-xl border text-sm text-muted-foreground">
+                    <Info className="h-5 w-5 shrink-0 text-primary mt-0.5"/>
+                    <p>
+                        Au moment du paiement, la plateforme HelloAsso propose par défaut une <strong>contribution
+                        volontaire</strong> optionnelle.
+                        Celle-ci est entièrement modifiable ou annulable avant de valider votre don.
+                    </p>
+                </div>
             </CardContent>
             <CardFooter>
                 <Button
