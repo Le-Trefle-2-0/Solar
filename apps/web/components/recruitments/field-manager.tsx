@@ -6,13 +6,7 @@ import {Label} from "@/components/ui/label";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Checkbox} from "@/components/ui/checkbox";
 import {ChevronDown, ChevronUp, Plus, Trash2} from "lucide-react";
-
-export interface RecruitmentField {
-    name: string;
-    label: string;
-    type: string;
-    required: boolean;
-}
+import {RecruitmentField} from "@/lib/recruitments";
 
 interface FieldManagerProps {
     fields: RecruitmentField[];

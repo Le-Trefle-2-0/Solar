@@ -6,21 +6,7 @@ import {auth} from "@/lib/auth";
 import {headers} from "next/headers";
 import {revalidatePath} from "next/cache";
 
-const fieldSchema = z.object({
-    name: z.string().min(1),
-    label: z.string().min(1),
-    type: z.string(), // "text" | "email" | "textarea" | "number"
-    required: z.boolean(),
-});
-
-const recruitmentSchema = z.object({
-    title: z.string().min(1, "Le titre est obligatoire"),
-    description: z.string().min(1, "La description est obligatoire"),
-    icon: z.string().optional().nullable(),
-    contactEmail: z.string().email("Email de contact invalide").optional().nullable().or(z.literal("")),
-    fields: z.array(fieldSchema),
-    enabled: z.boolean().default(true),
-});
+import {recruitmentSchema} from "@/lib/recruitments";
 
 export async function getRecruitments() {
     return prisma.recruitment.findMany({

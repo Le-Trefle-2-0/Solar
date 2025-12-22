@@ -16,12 +16,12 @@ import {Textarea} from "@/components/ui/textarea";
 import {Button} from "@/components/ui/button";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {z} from "zod";
 import {createRecruitment, updateRecruitment} from "@/app/actions/recruitments";
+import {RecruitmentField, recruitmentSchema, RecruitmentValues} from "@/lib/recruitments";
 import {toast} from "sonner";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import ReactMarkdown from "react-markdown";
-import {FieldManager, RecruitmentField} from "./field-manager";
+import {FieldManager} from "./field-manager";
 import {Checkbox} from "@/components/ui/checkbox";
 
 const DEFAULT_FIELDS: RecruitmentField[] = [
@@ -31,15 +31,7 @@ const DEFAULT_FIELDS: RecruitmentField[] = [
     {name: "message", label: "Message", type: "textarea", required: true},
 ];
 
-const recruitmentSchema = z.object({
-    title: z.string().min(1, "Le titre est obligatoire"),
-    description: z.string().min(1, "La description est obligatoire"),
-    icon: z.string().optional().nullable(),
-    contactEmail: z.string().email("Email de contact invalide").optional().nullable().or(z.literal("")),
-    enabled: z.boolean().default(true),
-});
-
-type RecruitmentFormValues = z.infer<typeof recruitmentSchema>;
+type RecruitmentFormValues = RecruitmentValues;
 
 interface RecruitmentDialogProps {
     open: boolean;
@@ -50,7 +42,6 @@ interface RecruitmentDialogProps {
 
 export function RecruitmentDialog({open, onOpenChange, recruitment, onSave}: RecruitmentDialogProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [fields, setFields] = useState<RecruitmentField[]>(DEFAULT_FIELDS);
 
     const form = useForm<RecruitmentFormValues>({
         resolver: zodResolver(recruitmentSchema),
@@ -60,6 +51,7 @@ export function RecruitmentDialog({open, onOpenChange, recruitment, onSave}: Rec
             icon: "Users",
             contactEmail: "",
             enabled: true,
+            fields: DEFAULT_FIELDS,
         },
     });
 
@@ -69,10 +61,10 @@ export function RecruitmentDialog({open, onOpenChange, recruitment, onSave}: Rec
                 title: recruitment.title,
                 description: recruitment.description,
                 icon: recruitment.icon,
-                contactEmail: (recruitment as any).contactEmail || "",
+                contactEmail: recruitment.contactEmail || "",
                 enabled: recruitment.enabled,
+                fields: (recruitment.fields as unknown as RecruitmentField[]) || DEFAULT_FIELDS,
             });
-            setFields(recruitment.fields as any || DEFAULT_FIELDS);
         } else {
             form.reset({
                 title: "",
@@ -80,29 +72,24 @@ export function RecruitmentDialog({open, onOpenChange, recruitment, onSave}: Rec
                 icon: "Users",
                 contactEmail: "",
                 enabled: true,
+                fields: DEFAULT_FIELDS,
             });
-            setFields(DEFAULT_FIELDS);
         }
     }, [recruitment, form, open]);
 
     async function onSubmit(values: RecruitmentFormValues) {
         setIsSubmitting(true);
         try {
-            const data = {
-                ...values,
-                fields,
-            };
-
             let result;
             if (recruitment) {
-                result = await updateRecruitment(recruitment.id, data);
+                result = await updateRecruitment(recruitment.id, values);
                 toast.success("Recrutement mis à jour");
             } else {
-                result = await createRecruitment(data);
+                result = await createRecruitment(values);
                 toast.success("Recrutement publié");
             }
 
-            onSave(result as any);
+            onSave(result as Recruitment);
             onOpenChange(false);
         } catch (error) {
             console.error(error);
@@ -227,7 +214,10 @@ export function RecruitmentDialog({open, onOpenChange, recruitment, onSave}: Rec
                             </Tabs>
                         </div>
 
-                        <FieldManager fields={fields} onChange={setFields}/>
+                        <FieldManager
+                            fields={form.watch("fields") || []}
+                            onChange={(val) => form.setValue("fields", val, {shouldDirty: true, shouldValidate: true})}
+                        />
 
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

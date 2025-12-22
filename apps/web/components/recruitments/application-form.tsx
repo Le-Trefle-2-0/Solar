@@ -10,7 +10,7 @@ import {Textarea} from "@/components/ui/textarea";
 import {Button} from "@/components/ui/button";
 import {toast} from "sonner";
 import {applyToRecruitment} from "@/app/actions/recruitments";
-import {RecruitmentField} from "./field-manager";
+import {RecruitmentField} from "@/lib/recruitments";
 
 interface ApplicationFormProps {
     recruitmentId: string;
