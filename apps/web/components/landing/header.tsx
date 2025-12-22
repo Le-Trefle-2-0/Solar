@@ -28,18 +28,18 @@ export function PublicHeader({session}: { session: any }) {
                     >
                         Contact
                     </button>
-                    {session ? (
-                        <Button asChild variant="outline">
-                            <Link href="/app">Ouvrir l'application</Link>
-                        </Button>
-                    ) : (
-                        <Button asChild variant="outline">
-                            <Link href="/login">Connexion</Link>
-                        </Button>
-                    )}
                     <Button asChild variant="default">
                         <Link href="/don">Faire un don</Link>
                     </Button>
+                    {session ? (
+                        <Button asChild variant="outline">
+                            <Link href="/app">Ouvrir Solar</Link>
+                        </Button>
+                    ) : (
+                        <Button asChild variant="outline">
+                            <Link href="/login">Connexion Bénévole</Link>
+                        </Button>
+                    )}
                 </nav>
             </div>
             <ContactDialog open={contactOpen} onOpenChange={setContactOpen}/>
