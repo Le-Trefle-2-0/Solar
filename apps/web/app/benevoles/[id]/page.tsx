@@ -46,7 +46,7 @@ export default async function RecruitmentDetailPage({params}: { params: Promise<
                                         <Icon className="h-10 w-10"/>
                                     </div>
                                     <div className="space-y-2">
-                                        <Badge variant={recruitment.enabled ? "default" : "secondary"} className="mb-2">
+                                        <Badge variant={recruitment.enabled ? "default" : "outline"} className="mb-2">
                                             {recruitment.enabled ? "Recrutement ouvert" : "Recrutement clos"}
                                         </Badge>
                                         <h1 className="text-3xl font-bold tracking-tight md:text-5xl">

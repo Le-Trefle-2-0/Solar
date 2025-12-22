@@ -13,7 +13,7 @@ export function DiscordSection() {
                 <div className="w-[400px] h-[400px] bg-[#5865F2] rounded-full"/>
             </div>
             <div className="absolute bottom-1/4 -right-24 -z-10 opacity-5 dark:opacity-10 blur-[100px]">
-                <div className="w-[400px] h-[400px] bg-secondary rounded-full"/>
+                <div className="w-[400px] h-[400px] bg-primary rounded-full"/>
             </div>
 
             <div className="px-4 md:px-8 w-full relative z-10">
