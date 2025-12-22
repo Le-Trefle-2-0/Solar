@@ -4,7 +4,18 @@ import withFlowbiteReact from "flowbite-react/plugin/nextjs";
 const nextConfig: NextConfig = {
     /* config options here */
     images: {
-        remotePatterns: [new URL("https://media.tenor.com/**"), new URL("https://cdn.discordapp.com/**")]
+        remotePatterns: [
+            {
+                protocol: "https",
+                hostname: "media.tenor.com",
+                pathname: "/**",
+            },
+            {
+                protocol: "https",
+                hostname: "cdn.discordapp.com",
+                pathname: "/**",
+            },
+        ],
     },
     devIndicators: false,
     async rewrites() {

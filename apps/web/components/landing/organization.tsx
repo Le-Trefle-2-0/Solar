@@ -1,27 +1,58 @@
 "use client";
 
 import {Card, CardContent} from "@/components/ui/card";
-import {Shield, Star, Users} from "lucide-react";
+import {Shield, Users} from "lucide-react";
 import {cn} from "@/lib/utils";
 import {ScrollReveal} from "./scroll-reveal";
+import Image from "next/image";
 
 interface Person {
     name: string;
     role: string;
     icon: any;
+    image?: string; // optional photo URL
 }
 
 const board: Person[] = [
-    {name: "Nom Prénom", role: "Président", icon: Shield},
-    {name: "Nom Prénom", role: "Vice-Président", icon: Star},
-    {name: "Nom Prénom", role: "Trésorier", icon: Shield},
-    {name: "Nom Prénom", role: "Secrétaire", icon: Shield},
+    {
+        name: "Anthony J.",
+        role: "Président",
+        icon: Shield,
+        image: "https://cdn.discordapp.com/avatars/512409112231936021/19636aa5f20d108c2161fa7c58d94591.jpeg?size=1024"
+    },
+    {
+        name: "Paul PERON REDON",
+        role: "Administrateur",
+        icon: Shield,
+        image: "https://cdn.discordapp.com/avatars/369564132770578432/d9059864986d2b943ab7d1e61c35b74e.jpeg?size=1024"
+    },
+    {
+        name: "Océane DUPONT",
+        role: "Trésorière",
+        icon: Shield,
+        image: "https://cdn.discordapp.com/avatars/372806343108591617/518b38f6cb377b207d54b0de30a6220d.jpeg?size=1024"
+    },
 ];
 
 const managers: Person[] = [
-    {name: "Nom Prénom", role: "Responsable BE", icon: Users},
-    {name: "Nom Prénom", role: "Responsable Technique", icon: Users},
-    {name: "Nom Prénom", role: "Responsable Communication", icon: Users},
+    {
+        name: "Julie ROMANET",
+        role: "Responsable Pôle Écoute",
+        icon: Users,
+        image: "https://cdn.discordapp.com/avatars/869076177686523954/b6549e8d4c6a96e7423f731dc5563d7b.jpeg?size=1024"
+    },
+    {
+        name: "Romain D.",
+        role: "Responsable Pôle Écoute",
+        icon: Users,
+        image: "https://cdn.discordapp.com/avatars/911352415268257823/608f160b1e5e70944079cb9ec75b41ae.jpeg?size=1024"
+    },
+    {
+        name: "Louise BURTÉ",
+        role: "Coordinatrice des Équipes",
+        icon: Users,
+        image: "https://cdn.discordapp.com/avatars/967058591494316033/fab79946a1d207f42fb220f9ed3d6e76.jpeg?size=1024"
+    },
 ];
 
 export function OrganizationTree() {
@@ -53,12 +84,13 @@ export function OrganizationTree() {
                         <ScrollReveal animation="fade-in"
                                       className="flex items-center gap-4 justify-center bg-background/80 backdrop-blur-sm w-fit mx-auto px-4 py-1 rounded-full border border-primary/20">
                             <Shield className="h-5 w-5 text-primary"/>
-                            <h3 className="text-xl font-bold uppercase tracking-widest text-primary">Le Bureau</h3>
+                            <h3 className="text-xl font-bold uppercase tracking-widest text-primary">Le Conseil
+                                d'Administration</h3>
                         </ScrollReveal>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
                             {board.map((person, i) => (
                                 <ScrollReveal key={i} delay={i * 100} animation="slide-up">
-                                    <PersonCard person={person} isLeader={i === 0}/>
+                                    <PersonCard person={person}/>
                                 </ScrollReveal>
                             ))}
                         </div>
@@ -86,25 +118,32 @@ export function OrganizationTree() {
     );
 }
 
-function PersonCard({person, isLeader}: { person: Person; isLeader?: boolean }) {
+function PersonCard({person}: { person: Person }) {
     const Icon = person.icon;
     return (
         <Card className={cn(
             "group hover:border-primary/50 transition-all duration-300 bg-card/50 backdrop-blur-sm shadow-md border border-transparent",
-            isLeader && "lg:scale-105 border-primary/20 bg-primary/5"
+            // Removed leader-specific highlight
         )}>
             <CardContent className="pt-8 flex flex-col items-center text-center">
                 <div className="relative">
                     <div
-                        className="w-24 h-24 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mb-6 group-hover:rotate-6 transition-transform duration-500 shadow-inner">
-                        <Icon className="h-10 w-10 text-primary"/>
+                        className="w-24 h-24 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mb-6 group-hover:rotate-6 transition-transform duration-500 shadow-inner overflow-hidden">
+                        {person.image ? (
+                            <div className="relative w-full h-full">
+                                <Image
+                                    src={person.image}
+                                    alt={`${person.name} – ${person.role}`}
+                                    fill
+                                    sizes="96px"
+                                    className="object-cover"
+                                    priority={false}
+                                />
+                            </div>
+                        ) : (
+                            <Icon className="h-10 w-10 text-primary"/>
+                        )}
                     </div>
-                    {isLeader && (
-                        <div
-                            className="absolute -top-2 -right-2 bg-primary text-primary-foreground p-1.5 rounded-lg shadow-lg">
-                            <Star className="h-4 w-4 fill-current"/>
-                        </div>
-                    )}
                 </div>
                 <h4 className="font-bold text-xl tracking-tight">{person.name}</h4>
                 <p className="text-sm font-medium text-primary/70 uppercase tracking-wider mt-1">{person.role}</p>

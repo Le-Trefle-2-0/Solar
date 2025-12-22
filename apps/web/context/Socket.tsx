@@ -80,15 +80,19 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({childre
                 s?.on('connect_error', () => {
                     setConnected(false);
                     setConnecting(false);
-                    // keep overlay visible; trouble will show after timeout
+                    // show overlay briefly, then auto-hide so UI is usable
                     setShowOverlay(true);
                     if (!overlayTimerRef.current) overlayTimerRef.current = setTimeout(() => setTrouble(true), 5000);
+                    // Auto-hide the blocking overlay after 8s even if still failing
+                    setTimeout(() => setShowOverlay(false), 8000);
                 });
 
                 s?.on('disconnect', () => {
                     setConnected(false);
                     setShowOverlay(true);
                     if (!overlayTimerRef.current) overlayTimerRef.current = setTimeout(() => setTrouble(true), 5000);
+                    // Auto-hide after a while to prevent indefinite blocking
+                    setTimeout(() => setShowOverlay(false), 8000);
                 });
 
                 s?.io.on('reconnect_attempt', () => {

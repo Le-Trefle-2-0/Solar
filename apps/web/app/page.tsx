@@ -7,6 +7,7 @@ import {DiscordSection} from "@/components/landing/discord";
 import {OrganizationTree} from "@/components/landing/organization";
 import {PublicFooter} from "@/components/landing/footer";
 import {ScrollReveal} from "@/components/landing/scroll-reveal";
+import ChatWidget from "@/components/chat-widget";
 
 export default async function Home() {
     const session = await auth.api.getSession({
@@ -31,6 +32,8 @@ export default async function Home() {
             <ScrollReveal animation="fade-in">
                 <PublicFooter/>
             </ScrollReveal>
+            {/* Floating public chat widget */}
+            <ChatWidget/>
         </div>
     );
 }

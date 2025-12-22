@@ -25,9 +25,15 @@ export async function initSocket(jwt: string): Promise<Socket | null> {
 
     // eslint-disable-next-line no-console
     console.log('[ws] connecting to', base);
+    const transportsEnv = (process.env.NEXT_PUBLIC_WS_TRANSPORTS || 'websocket')
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean);
+    const rejectUnauth = (process.env.NEXT_PUBLIC_WS_REJECT_UNAUTHORIZED || '').toLowerCase();
+    const rejectUnauthorized = rejectUnauth ? rejectUnauth === 'true' : process.env.NODE_ENV === 'production';
     socket = io(base, {
         auth: {jwt},
-        // Let socket.io decide transports (websocket + fallback) to improve connectivity
+        transports: transportsEnv as any, // default to websocket only for stability
         withCredentials: true,
         reconnection: true,
         reconnectionAttempts: Infinity,
@@ -35,7 +41,7 @@ export async function initSocket(jwt: string): Promise<Socket | null> {
         reconnectionDelayMax: 5000,
         timeout: 20000,
         forceNew: false,
-        rejectUnauthorized: process.env.NODE_ENV === "production"
+        rejectUnauthorized,
     });
 
     // Debug listeners to help diagnose connection issues

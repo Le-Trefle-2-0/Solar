@@ -1,9 +1,10 @@
 import 'dotenv/config';
-import {createServer} from 'http';
+import {createServer, IncomingMessage, ServerResponse} from 'http';
 import {Server} from 'socket.io';
 import Redis from 'ioredis';
 import {createAdapter} from '@socket.io/redis-adapter';
 import {createRemoteJWKSet, jwtVerify} from 'jose';
+import {createHmac} from 'crypto';
 
 const PORT = Number(process.env.WS_PORT || 5000);
 const HOST = process.env.WS_HOST || '0.0.0.0';
@@ -36,15 +37,29 @@ async function validateJWT(token: string) {
         });
         return payload;
     } catch (e) {
+        // Optionally relax JWT checks in environments where APP_URL mismatches
+        if ((process.env.WS_RELAX_JWT || '').toLowerCase() === 'true') {
+            try {
+                const {payload} = await jwtVerify(token, JWKS);
+                return payload;
+            } catch {
+                return null;
+            }
+        }
         return null;
     }
 }
 
 io.use(async (socket, next) => {
-    const {jwt: token, token: apiToken} = socket.handshake.auth as Record<string, string>;
+    const auth: any = socket.handshake.auth || {};
+    const {jwt: token, token: apiToken, guest} = auth as Record<string, any>;
     let ok = false;
+    let isGuest = false;
+
+    // 1) Full JWT (internal volunteers)
     if (token) ok = !!(await validateJWT(token));
-    // Optionally validate API key via API service if provided
+
+    // 2) API key (bots/integrations)
     if (!ok && apiToken && process.env.API_BASE_URL) {
         try {
             const res = await fetch(`${process.env.API_BASE_URL}/v1/keys/check`, {
@@ -56,6 +71,29 @@ io.use(async (socket, next) => {
         } catch {
         }
     }
+
+    // 3) Guest access for public widget, restricted to a single room
+    if (!ok && guest && typeof guest === 'object') {
+        const secret = process.env.WS_GUEST_SECRET || '';
+        const uid = String(guest.uid || '');
+        const channelId = String(guest.channelId || '');
+        const exp = Number(guest.exp || 0);
+        const sig = String(guest.sig || '');
+        const now = Date.now();
+        if (secret && uid && channelId && exp > now && sig) {
+            const base = `${channelId}.${uid}.${exp}`;
+            const h = createHmac('sha256', secret).update(base).digest('hex');
+            if (h === sig) {
+                ok = true;
+                isGuest = true;
+                (socket.data as any).guest = true;
+                (socket.data as any).allowedRoom = channelId;
+                (socket.data as any).guestUid = uid;
+                (socket.data as any).guestExp = exp;
+            }
+        }
+    }
+
     if (!ok) {
         console.warn('[ws] auth failed for', socket.id, 'origin=', socket.handshake.headers.origin);
         return next(new Error('Authentication error'));
@@ -71,6 +109,14 @@ io.on('connection', (socket) => {
     socket.on('listen', (data: { id: string }, cb?: (ok: boolean) => void) => {
         const room = data?.id;
         if (!room) return cb && cb(false);
+        // Guests may only join their allowed room
+        if ((socket.data as any)?.guest) {
+            const allowed = (socket.data as any).allowedRoom;
+            if (room !== allowed) {
+                console.warn('[ws] guest attempted to join unauthorized room', socket.id, room, 'allowed=', allowed);
+                return cb && cb(false);
+            }
+        }
         socket.join(room);
         const size = io.sockets.adapter.rooms.get(room)?.size || 0;
         console.log(`[ws] ${socket.id} joined room ${room} (size=${size})`);
@@ -88,6 +134,14 @@ io.on('connection', (socket) => {
     socket.on('sendMessage', (data: any, cb?: (ok: boolean) => void) => {
         const room = data?.channel?.id;
         if (!room) return cb && cb(false);
+        // Guests may only send to their allowed room
+        if ((socket.data as any)?.guest) {
+            const allowed = (socket.data as any).allowedRoom;
+            if (room !== allowed) {
+                console.warn('[ws] guest attempted to send to unauthorized room', socket.id, room, 'allowed=', allowed);
+                return cb && cb(false);
+            }
+        }
         // emit to everyone else in the room
         socket.to(room).emit('message', data);
         cb && cb(true);
@@ -109,6 +163,63 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', (reason) => {
         console.log(`[ws] disconnected ${socket.id} (${reason})`);
+    });
+});
+
+// Lightweight HTTP endpoint to broadcast messages to a room (for server-to-server use)
+httpServer.on('request', async (req: IncomingMessage, res: ServerResponse) => {
+    // Only handle POST /broadcast
+    if (!req.url) return;
+    // Use a proper base for URL parsing
+    const url = new URL(req.url, `http://${req.headers.host}`);
+    if (req.method !== 'POST' || url.pathname !== '/broadcast') return;
+
+    // Auth via shared secret header
+    const expected = process.env.WS_BROADCAST_SECRET;
+    const provided = (req.headers['x-ws-secret'] as string) || '';
+    if (!expected || provided !== expected) {
+        res.statusCode = 401;
+        res.end('unauthorized');
+        return;
+    }
+
+    // Read body
+    let body = '';
+    req.on('data', (chunk) => {
+        body += chunk;
+    });
+    req.on('end', () => {
+        try {
+            const payload = JSON.parse(body || '{}');
+            const room: string = payload.room || payload.channelId || payload.channel || '';
+            const data: any = payload.data;
+            const event: string = payload.event || 'message';
+            if (!room || typeof data === 'undefined') {
+                // Allow global broadcast for custom events without room
+                if (typeof data !== 'undefined' && event) {
+                    io.emit(event, data);
+                    res.statusCode = 200;
+                    res.setHeader('content-type', 'application/json');
+                    res.end(JSON.stringify({success: true}));
+                    return;
+                } else {
+                    res.statusCode = 400;
+                    res.end('invalid payload');
+                    return;
+                }
+            }
+            // Emit to the specific room for listeners already joined
+            io.to(room).emit(event, data);
+            // Additionally emit globally so authenticated volunteers not yet joined
+            // to the room still get the notification/toast in the internal app
+            io.emit(event, data);
+            res.statusCode = 200;
+            res.setHeader('content-type', 'application/json');
+            res.end(JSON.stringify({success: true}));
+        } catch (e) {
+            res.statusCode = 400;
+            res.end('bad json');
+        }
     });
 });
 

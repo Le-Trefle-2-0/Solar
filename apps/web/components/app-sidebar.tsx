@@ -27,10 +27,13 @@ import {
 import Image from "next/image";
 import {apiFetch} from "@/lib/api";
 import logo from "@/public/logo.svg";
-import {UserButton} from "@daveyplate/better-auth-ui";
+import dynamic from "next/dynamic";
 import {Socket} from "socket.io-client";
 import {useSocket} from "@/context/Socket";
 import {usePeer} from "@/context/VoicePeer";
+// Disable SSR for UserButton to avoid hydration mismatches originating from
+// client-only behavior (Radix IDs, image load state, timers, etc.).
+const UserButton = dynamic(() => import("@daveyplate/better-auth-ui").then(m => m.UserButton), {ssr: false});
 
 export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
     const {peerInstance, isMuted, toggleMute, stopCall, connectedUsers, netQuality, rttMs, lossPct} = usePeer();
