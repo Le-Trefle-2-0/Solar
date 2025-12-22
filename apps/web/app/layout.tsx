@@ -34,8 +34,8 @@ export const viewport: Viewport = {
     viewportFit: "cover",
     width: "device-width",
     themeColor: [
-        {media: "(prefers-color-scheme: light)", color: "oklch(1 0 0)"},
-        {media: "(prefers-color-scheme: dark)", color: "oklch(0.145 0 0)"}
+        {media: "(prefers-color-scheme: light)", color: "#f6f6f6"},
+        {media: "(prefers-color-scheme: dark)", color: "#202020"}
     ]
 }
 
@@ -46,7 +46,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" suppressHydrationWarning>
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
         <Providers>
             <div className="flex min-h-svh flex-col">
                 {children}
