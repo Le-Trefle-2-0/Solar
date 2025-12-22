@@ -11,7 +11,8 @@ import {
     MicOff,
     PhoneOff,
     ShieldUser,
-    Signal
+    Signal,
+    Users
 } from "lucide-react"
 import {NavProjects} from "@/components/nav-projects"
 import {
@@ -55,6 +56,11 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
             icon: CalendarDays,
         },
         {
+            name: "Recrutement",
+            url: "/app/recruitments",
+            icon: Users,
+        },
+        {
             name: "Administration",
             url: "/app/admin",
             icon: ShieldUser
@@ -80,6 +86,11 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
             name: "Planning",
             url: "/app/planning",
             icon: CalendarDays,
+        },
+        {
+            name: "Recrutement",
+            url: "/app/recruitments",
+            icon: Users,
         },
         {
             name: "Administration",

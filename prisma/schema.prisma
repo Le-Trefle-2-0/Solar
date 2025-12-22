@@ -312,6 +312,18 @@ model Passkey {
   @@map("passkey")
 }
 
+model Recruitment {
+  id           String   @id @default(cuid())
+  title        String
+  description  String   @db.LongText
+  icon         String?
+  contactEmail String?
+  fields       Json
+  enabled      Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
 model Image {
   id   String @id @default(cuid())
   link String @db.LongText

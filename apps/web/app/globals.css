@@ -182,3 +182,61 @@ html, body {
     animation-delay: 0.4s;
 }
 
+@layer utilities {
+    .prose h1 {
+        @apply text-3xl font-bold mb-4 mt-6 first:mt-0;
+    }
+
+    .prose h2 {
+        @apply text-2xl font-bold mb-3 mt-5 first:mt-0;
+    }
+
+    .prose h3 {
+        @apply text-xl font-bold mb-2 mt-4 first:mt-0;
+    }
+
+    .prose p {
+        @apply mb-4 leading-relaxed last:mb-0;
+    }
+
+    .prose ul {
+        @apply list-disc pl-6 mb-4 last:mb-0;
+    }
+
+    .prose ol {
+        @apply list-decimal pl-6 mb-4 last:mb-0;
+    }
+
+    .prose li {
+        @apply mb-1;
+    }
+
+    .prose strong {
+        @apply font-bold;
+    }
+
+    .prose em {
+        @apply italic;
+    }
+
+    .prose-snippet * {
+        @apply inline !mb-0 !mt-0 !p-0 !leading-normal;
+    }
+
+    .prose-snippet p {
+        @apply inline;
+    }
+
+    .prose-snippet ul, .prose-snippet ol {
+        @apply inline;
+    }
+
+    .prose-snippet li {
+        @apply inline mr-2 after:content-[','] last:after:content-none;
+    }
+
+    .prose-snippet h1, .prose-snippet h2, .prose-snippet h3 {
+        @apply font-bold;
+    }
+}
+

@@ -14,7 +14,7 @@ import {
     openAPI,
     organization,
     twoFactor,
-    username,
+    username
 } from "better-auth/plugins";
 
 const prisma = new PrismaClient;
@@ -30,12 +30,15 @@ const pluginList: any[] = [
     emailOTP({
         async sendVerificationOTP({email, otp, type}) {
             const resend = getResendClient();
-            await resend.emails.send({
+            const {error} = await resend.emails.send({
                 from: "noreply@solar.letrefle.org",
                 to: email,
                 subject: "OTP connection",
                 html: otp
             });
+            if (error) {
+                console.error("Resend error sending OTP:", error);
+            }
         }
     }),
     adminPlugin({
@@ -91,12 +94,15 @@ export const auth = betterAuth({
         enabled: true,
         async sendResetPassword(data, request) {
             const resend = getResendClient();
-            await resend.emails.send({
+            const {error} = await resend.emails.send({
                 from: "noreply@solar.letrefle.org",
                 to: data.user.email,
                 subject: "Réinitialisation de mot de passe",
                 html: data.url
             });
+            if (error) {
+                console.error("Resend error sending reset password email:", error);
+            }
         },
         autoSignIn: true,
     },
