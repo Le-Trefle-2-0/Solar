@@ -134,7 +134,7 @@ export const auth = betterAuth({
     },
     hooks: {
         before: async (context) => {
-            if (context.path.includes("sign-up")) {
+            if (context?.request?.url.includes("sign-up")) {
                 const userCount = await prisma.user.count();
                 if (userCount > 0) {
                     throw new Error("Registration is closed. Please contact an administrator.");
