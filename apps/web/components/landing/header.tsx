@@ -31,7 +31,7 @@ export function PublicHeader({session}: { session: any }) {
                 </Button>
             ) : (
                 <Button asChild variant="outline" className="w-full lg:w-auto">
-                    <Link href="/login">Connexion Bénévole</Link>
+                    <Link href="/auth/sign-in">Connexion Bénévole</Link>
                 </Button>
             )}
         </div>

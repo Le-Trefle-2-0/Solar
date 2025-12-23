@@ -32,10 +32,11 @@
     "build:web": "npm run build -w apps/web",
     "start:web": "npm run start -w apps/web",
     "compose:up": "docker compose up",
-    "compose:down": "docker compose down -v"
+    "compose:down": "docker compose down -v",
+    "setup:admin": "ts-node -P scripts/tsconfig.json scripts/setup-admin.ts"
   },
   "prisma": {
-    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+    "seed": "ts-node -P scripts/tsconfig.json prisma/seed.ts"
   },
   "dependencies": {
     "@capacitor/cli": "^7.4.2",
