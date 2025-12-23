@@ -34,7 +34,7 @@ export function Providers({children}: { children: ReactNode }) {
             }}
             twoFactor={["totp"]}
             localization={locale}
-            signUp={true}
+            signUp={false}
             social={{
                 providers: ["discord"]
             }}
