@@ -41,6 +41,20 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({childre
     }, [pathname]);
 
     useEffect(() => {
+        if ('serviceWorker' in navigator) {
+            const register = () => {
+                navigator.serviceWorker.register('/sw.js').catch(err => console.error('SW registration failed:', err));
+            };
+            if (document.readyState === 'complete') {
+                register();
+            } else {
+                window.addEventListener('load', register);
+                return () => window.removeEventListener('load', register);
+            }
+        }
+    }, []);
+
+    useEffect(() => {
         const init = async () => {
             try {
                 const res = await fetch("/api/auth/token", {cache: 'no-store'});
