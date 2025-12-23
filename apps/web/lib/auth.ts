@@ -2,6 +2,7 @@ import {betterAuth} from "better-auth";
 import {prismaAdapter} from "better-auth/adapters/prisma";
 import {PrismaClient} from "@prisma/client";
 import {getResendClient} from "@/lib/resend";
+import {renderEmailTemplate} from "@/lib/email-template";
 import {ac, admin, bot, manager, training, volunteer} from "./permissions";
 // Namespace import to access optional plugins that may not exist in older versions
 import * as betterPlugins from "better-auth/plugins";
@@ -30,11 +31,23 @@ const pluginList: any[] = [
     emailOTP({
         async sendVerificationOTP({email, otp, type}) {
             const resend = getResendClient();
+            const {html} = renderEmailTemplate({
+                title: "Code de vérification",
+                content: `
+                    <p>Bonjour,</p>
+                    <p>Voici votre code de vérification pour vous connecter à Solar :</p>
+                    <div style="font-size: 32px; font-weight: 700; letter-spacing: 5px; text-align: center; margin: 30px 0; padding: 20px; background-color: #f9f9f9; border-radius: 8px; color: #8cc088; border: 1px dashed #8cc088;">
+                        ${otp}
+                    </div>
+                    <p>Ce code expirera dans 10 minutes.</p>
+                    <p>Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet e-mail.</p>
+                `,
+            });
             const {error} = await resend.emails.send({
                 from: "noreply@solar.letrefle.org",
                 to: email,
-                subject: "OTP connection",
-                html: otp
+                subject: "Solar - Votre code de vérification",
+                html,
             });
             if (error) {
                 console.error("Resend error sending OTP:", error);
@@ -94,11 +107,24 @@ export const auth = betterAuth({
         enabled: true,
         async sendResetPassword(data, request) {
             const resend = getResendClient();
+            const {html} = renderEmailTemplate({
+                title: "Réinitialisation de mot de passe",
+                content: `
+                    <p>Bonjour ${data.user.name || ""},</p>
+                    <p>Vous avez demandé la réinitialisation de votre mot de passe pour votre compte Solar.</p>
+                    <p>Cliquez sur le bouton ci-dessous pour choisir un nouveau mot de passe :</p>
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="${data.url}" class="button">Réinitialiser mon mot de passe</a>
+                    </div>
+                    <p>Ce lien expirera bientôt.</p>
+                    <p>Si vous n'avez pas demandé cette réinitialisation, vous pouvez ignorer cet e-mail en toute sécurité.</p>
+                `,
+            });
             const {error} = await resend.emails.send({
                 from: "noreply@solar.letrefle.org",
                 to: data.user.email,
-                subject: "Réinitialisation de mot de passe",
-                html: data.url
+                subject: "Solar - Réinitialisation de mot de passe",
+                html,
             });
             if (error) {
                 console.error("Resend error sending reset password email:", error);

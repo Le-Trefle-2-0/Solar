@@ -30,6 +30,7 @@ export function PublicFooter() {
                     <div className="flex flex-col gap-4 lg:items-end">
                         <nav className="flex flex-col gap-2 text-sm">
                             <Link href="/faq" className="hover:underline">F.A.Q.</Link>
+                            <Link href="/confidentialite" className="hover:underline">Confidentialité</Link>
                             <Link href="/legal" className="hover:underline">Mentions Légales</Link>
                             <Link href="/don" className="text-primary font-semibold hover:underline">Faire un don</Link>
                         </nav>

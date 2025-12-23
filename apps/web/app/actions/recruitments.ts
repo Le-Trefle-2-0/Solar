@@ -7,6 +7,7 @@ import {headers} from "next/headers";
 import {revalidatePath} from "next/cache";
 
 import {recruitmentSchema} from "@/lib/recruitments";
+import {renderEmailTemplate} from "@/lib/email-template";
 
 export async function getRecruitments() {
     return prisma.recruitment.findMany({
@@ -47,19 +48,23 @@ export async function applyToRecruitment(recruitmentId: string, data: Record<str
         })
         .join("");
 
+    const {html} = renderEmailTemplate({
+        title: `Nouvelle candidature : ${recruitment.title}`,
+        content: `
+            <div style="margin-bottom: 20px;">
+                ${fieldsHtml}
+            </div>
+        `,
+        footer: `Candidature envoyée le ${new Date().toLocaleString()}`
+    });
+
     try {
         const {error} = await resend.emails.send({
             from: "noreply@solar.letrefle.org",
             to: recruitment.contactEmail || "contact@letrefle.org",
             replyTo: applicantEmail,
             subject: `[Recrutement] ${recruitment.title} - ${applicantName}`,
-            html: `
-                <h2>Nouvelle candidature pour : ${recruitment.title}</h2>
-                <hr />
-                ${fieldsHtml}
-                <hr />
-                <p>Candidature envoyée le ${new Date().toLocaleString()}</p>
-            `,
+            html,
         });
 
         if (error) {
