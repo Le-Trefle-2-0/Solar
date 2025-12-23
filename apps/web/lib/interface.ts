@@ -44,6 +44,8 @@ export interface Tickets {
     status: string;
     createdAt: Date;
     channelID: string;
+    source?: string;
+    metadata?: any;
     problematic: string | null;
     observations: string | null;
     info: string | null;

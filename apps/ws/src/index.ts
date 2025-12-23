@@ -57,7 +57,13 @@ io.use(async (socket, next) => {
     let isGuest = false;
 
     // 1) Full JWT (internal volunteers)
-    if (token) ok = !!(await validateJWT(token));
+    if (token) {
+        const payload = await validateJWT(token);
+        if (payload) {
+            ok = true;
+            (socket.data as any).isVolunteer = true;
+        }
+    }
 
     // 2) API key (bots/integrations)
     if (!ok && apiToken && process.env.API_BASE_URL) {
@@ -74,13 +80,13 @@ io.use(async (socket, next) => {
 
     // 3) Guest access for public widget, restricted to a single room
     if (!ok && guest && typeof guest === 'object') {
-        const secret = process.env.WS_GUEST_SECRET || '';
+        const secret = process.env.WS_GUEST_SECRET || 'fallback_secret_for_dev_only';
         const uid = String(guest.uid || '');
         const channelId = String(guest.channelId || '');
         const exp = Number(guest.exp || 0);
         const sig = String(guest.sig || '');
         const now = Date.now();
-        if (secret && uid && channelId && exp > now && sig) {
+        if (uid && channelId && exp > now && sig) {
             const base = `${channelId}.${uid}.${exp}`;
             const h = createHmac('sha256', secret).update(base).digest('hex');
             if (h === sig) {
@@ -103,6 +109,10 @@ io.use(async (socket, next) => {
 
 io.on('connection', (socket) => {
     console.log(`[ws] connected ${socket.id} from ${socket.handshake.address}`);
+
+    if ((socket.data as any).isVolunteer) {
+        socket.join('volunteers');
+    }
 
     socket.on('ping', (cb?: () => void) => cb && cb());
 
@@ -142,8 +152,9 @@ io.on('connection', (socket) => {
                 return cb && cb(false);
             }
         }
-        // emit to everyone else in the room
-        socket.to(room).emit('message', data);
+        // emit to everyone else in the room + all volunteers (for toasts)
+        // This avoids sending back to the sender
+        socket.to(room).to('volunteers').emit('message', data);
         cb && cb(true);
     });
 
@@ -175,9 +186,9 @@ httpServer.on('request', async (req: IncomingMessage, res: ServerResponse) => {
     if (req.method !== 'POST' || url.pathname !== '/broadcast') return;
 
     // Auth via shared secret header
-    const expected = process.env.WS_BROADCAST_SECRET;
+    const expected = process.env.WS_BROADCAST_SECRET || 'fallback_broadcast_secret_for_dev_only';
     const provided = (req.headers['x-ws-secret'] as string) || '';
-    if (!expected || provided !== expected) {
+    if (provided !== expected) {
         res.statusCode = 401;
         res.end('unauthorized');
         return;
@@ -195,9 +206,9 @@ httpServer.on('request', async (req: IncomingMessage, res: ServerResponse) => {
             const data: any = payload.data;
             const event: string = payload.event || 'message';
             if (!room || typeof data === 'undefined') {
-                // Allow global broadcast for custom events without room
+                // Broadcast to volunteers by default for non-room events
                 if (typeof data !== 'undefined' && event) {
-                    io.emit(event, data);
+                    io.to('volunteers').emit(event, data);
                     res.statusCode = 200;
                     res.setHeader('content-type', 'application/json');
                     res.end(JSON.stringify({success: true}));
@@ -208,11 +219,9 @@ httpServer.on('request', async (req: IncomingMessage, res: ServerResponse) => {
                     return;
                 }
             }
-            // Emit to the specific room for listeners already joined
-            io.to(room).emit(event, data);
-            // Additionally emit globally so authenticated volunteers not yet joined
-            // to the room still get the notification/toast in the internal app
-            io.emit(event, data);
+            // Emit to the specific room AND to all volunteers
+            // Use additive rooms to reach both audiences in one go, deduplicated by Socket.IO
+            io.to(room).to('volunteers').emit(event, data);
             res.statusCode = 200;
             res.setHeader('content-type', 'application/json');
             res.end(JSON.stringify({success: true}));

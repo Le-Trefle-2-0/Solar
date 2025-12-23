@@ -31,7 +31,7 @@ const PeerPage = () => {
 
     const handleCall = () => {
         if (localStream) {
-            const call = peerInstance?.call(id as string, localStream, {metadata: {displayName: 'Utilisateur Anonyme'}});
+            const call = peerInstance?.call(id as string, localStream, {metadata: {displayName: 'utilisateur'}});
             if (call) {
                 call.on('stream', userVideoStream => {
                     setStatus("connecté")

@@ -9,6 +9,46 @@ function roleHasTicketsReadAll(role?: string | null): boolean {
     return !!role && allowed.has(role);
 }
 
+async function broadcastStatusUpdate(channelId: string, statusId: number, statusName: string) {
+    try {
+        let base = process.env.WS_INTERNAL_URL || process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:5000';
+        if (base.startsWith('ws://')) base = 'http://' + base.slice('ws://'.length);
+        if (base.startsWith('wss://')) base = 'https://' + base.slice('wss://'.length);
+        const secret = process.env.WS_BROADCAST_SECRET || 'fallback_broadcast_secret_for_dev_only';
+
+        // 1. Notify current room of the status change
+        await fetch(`${base}/broadcast`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-ws-secret': secret,
+            },
+            body: JSON.stringify({
+                room: channelId,
+                event: 'ticketStatusUpdate',
+                data: {channelId, statusId, statusName}
+            }),
+        }).catch(() => {
+        });
+
+        // 2. Trigger global sidebar refresh
+        await fetch(`${base}/broadcast`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-ws-secret': secret,
+            },
+            body: JSON.stringify({
+                event: 'updateRequest',
+                data: {channelId}
+            }),
+        }).catch(() => {
+        });
+    } catch (err) {
+        console.warn('[api] Failed to broadcast status update:', err);
+    }
+}
+
 export async function registerTicketsRoutes(app: FastifyInstance) {
     // GET /v1/tickets – list tickets depending on auth
     app.get('/v1/tickets', async (req, reply) => {
@@ -73,6 +113,7 @@ export async function registerTicketsRoutes(app: FastifyInstance) {
                     statusLabel: status.label,
                 },
             });
+            await broadcastStatusUpdate(ticket.channelId as string, status.id, status.name);
             return reply.send({success: true, update});
         } catch (err) {
             if (err instanceof z.ZodError) return reply.status(400).send({success: false, errors: err.flatten()});
@@ -98,6 +139,7 @@ export async function registerTicketsRoutes(app: FastifyInstance) {
                     discordUserID: createHash('sha256').update(ticket.discordUserID).digest('hex'),
                 },
             });
+            await broadcastStatusUpdate(channelID, status.id, status.name);
             return reply.send({success: true, update});
         } catch (e) {
             if (e instanceof z.ZodError) return reply.status(400).send({success: false, error: e.flatten()});
@@ -130,6 +172,7 @@ export async function registerTicketsRoutes(app: FastifyInstance) {
                     statusLabel: status.label,
                 },
             });
+            await broadcastStatusUpdate(channelID, status.id, status.name);
             return reply.send({success: true, update});
         } catch (e) {
             if (e instanceof z.ZodError) return reply.status(400).send({success: false, error: e.flatten()});
@@ -139,9 +182,14 @@ export async function registerTicketsRoutes(app: FastifyInstance) {
 
     // POST /v1/tickets/create
     app.post('/v1/tickets/create', async (req, reply) => {
-        const bodySchema = z.object({discordUserID: z.string(), token: z.string()});
+        const bodySchema = z.object({
+            discordUserID: z.string(),
+            token: z.string(),
+            source: z.string().optional(),
+            metadata: z.any().optional(),
+        });
         try {
-            const {discordUserID, token} = bodySchema.parse((req.body ?? {}) as any);
+            const {discordUserID, token, source, metadata} = bodySchema.parse((req.body ?? {}) as any);
             // Validate API key
             const key = await prisma.apikey.findFirst({where: {key: token}});
             if (!key || key.enabled === false || (key.expiresAt && key.expiresAt <= new Date())) {
@@ -156,6 +204,8 @@ export async function registerTicketsRoutes(app: FastifyInstance) {
             const ticket = await prisma.ticket.create({
                 data: {
                     discordUserID,
+                    source: source || 'discord',
+                    metadata: metadata || {},
                     createdAt: new Date(),
                     updatedAt: new Date(),
                     statusName: status.name,
@@ -163,10 +213,10 @@ export async function registerTicketsRoutes(app: FastifyInstance) {
                 },
             });
 
-            // Compute channel name: Ecoute-00001 style
+            // Compute channel name: Ticket-00001 style
             let channelName = String(ticket.id);
             while (channelName.length < 5) channelName = '0' + channelName;
-            channelName = 'Ecoute-' + channelName;
+            channelName = 'Ticket-' + channelName;
 
             const channel = await prisma.channel.create({data: {name: channelName}});
 

@@ -335,7 +335,11 @@ export function Chat(props: { channelID: string, statusID: number }) {
             };
 
             socket?.emit("sendMessage", msgWithID);
-            setChat((pre) => [...pre, msgWithID]);
+            isAtBottomRef.current = true;
+            setChat((pre) => {
+                if (savedMessage.id && pre.some(m => m.id === savedMessage.id)) return pre;
+                return [...pre, msgWithID];
+            });
         } catch (error) {
             console.error("Error saving message:", error);
         }
@@ -466,24 +470,19 @@ export function Chat(props: { channelID: string, statusID: number }) {
                 setOnlineUsers(prev => prev.filter(u => u.id !== payload.user.id));
             }
         };
-        socket.on('joined', handleJoined);
-        socket.on('left', handleLeft);
 
-        socket.on('connect', handleConnect);
-        socket.on('reconnect', handleConnect as any);
-        socket.on('reconnect_attempt', requestSnapshot as any);
-
-        // periodic reconciliation in case any event was missed
-        pollId = setInterval(requestSnapshot, 10000);
-
-        socket.on("message", (data: Msg) => {
+        const onMessage = (data: Msg) => {
             if (data.channel.id === channelID) {
-                setChat((pre) => [...pre, data as MsgWithID])
+                setChat((pre) => {
+                    const exists = (data as MsgWithID).id && pre.some(m => m.id === (data as MsgWithID).id);
+                    if (exists) return pre;
+                    return [...pre, data as MsgWithID];
+                })
                 if (timer) clearTimeout(timer)
             }
-        });
+        };
 
-        socket.on('typingIndicator', (data: any) => {
+        const onTyping = (data: any) => {
             if (data && data.user && data.id === channelID) {
                 const u = data.user as { id: string; name: string; image: string | null };
                 setTypingUsers(prev => {
@@ -511,9 +510,9 @@ export function Chat(props: { channelID: string, statusID: number }) {
                     setShowTyping(false);
                 }, 3000);
             }
-        });
+        };
 
-        socket.on('reactionAdd', (data) => {
+        const onReactionAdd = (data: any) => {
             console.log("REACTION ADD", data);
             setChat(prev =>
                 prev.map(message => {
@@ -534,17 +533,25 @@ export function Chat(props: { channelID: string, statusID: number }) {
                     return message;
                 })
             );
-        });
+        };
 
-        socket.on('messageEdit', (data: { messageID: number; content: string; edited?: boolean }) => {
+        const onMessageEdit = (data: { messageID: number; content: string; edited?: boolean }) => {
             setChat(prev => prev.map(m => m.id === data.messageID ? {
                 ...m,
                 content: data.content,
                 edited: data.edited ?? true
             } : m));
-        });
+        };
 
-        socket.on('reactionRemove', (data) => {
+        const onStatusUpdate = (data: { channelId: string; statusId: number; statusName: string }) => {
+            if (data.channelId === channelID) {
+                setStatus(data.statusId);
+                // Also update local ticket object if present
+                setTicket(prev => prev ? {...prev, statusName: data.statusName} : prev);
+            }
+        };
+
+        const onReactionRemove = (data: any) => {
             console.log("REACTION REMOVE", data);
             const {messageID, id: reactionId} = data;
 
@@ -563,11 +570,29 @@ export function Chat(props: { channelID: string, statusID: number }) {
                     return message;
                 })
             );
-        });
+        };
 
-        socket.on('messageDelete', (data: { messageID: number }) => {
+        const onMessageDelete = (data: { messageID: number }) => {
             setChat(prev => prev.filter(m => m.id !== data.messageID));
-        });
+        };
+
+        socket.on('joined', handleJoined);
+        socket.on('left', handleLeft);
+
+        socket.on('connect', handleConnect);
+        socket.on('reconnect', handleConnect as any);
+        socket.on('reconnect_attempt', requestSnapshot as any);
+
+        // periodic reconciliation in case any event was missed
+        pollId = setInterval(requestSnapshot, 10000);
+
+        socket.on("message", onMessage);
+        socket.on('typingIndicator', onTyping);
+        socket.on('reactionAdd', onReactionAdd);
+        socket.on('messageEdit', onMessageEdit);
+        socket.on('ticketStatusUpdate', onStatusUpdate);
+        socket.on('reactionRemove', onReactionRemove);
+        socket.on('messageDelete', onMessageDelete);
 
         return () => {
             socket.off('userList', handleUserList);
@@ -577,12 +602,13 @@ export function Chat(props: { channelID: string, statusID: number }) {
             socket.off('reconnect', handleConnect as any);
             socket.off('reconnect_attempt', requestSnapshot as any);
             if (pollId) clearInterval(pollId);
-            socket.off('message');
-            socket.off('reactionAdd');
-            socket.off('reactionRemove');
-            socket.off('typingIndicator');
-            socket.off('messageDelete');
-            socket.off('messageEdit');
+            socket.off('message', onMessage);
+            socket.off('reactionAdd', onReactionAdd);
+            socket.off('reactionRemove', onReactionRemove);
+            socket.off('typingIndicator', onTyping);
+            socket.off('messageDelete', onMessageDelete);
+            socket.off('messageEdit', onMessageEdit);
+            socket.off('ticketStatusUpdate', onStatusUpdate);
         };
     }, [socket, channelID, session?.user]);
 
@@ -748,7 +774,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                 if (initialAutoScrollPending.current) return;
                 // update bottom state
                 const distanceFromBottom = el.scrollHeight - (el.scrollTop + el.clientHeight);
-                isAtBottomRef.current = distanceFromBottom <= 2;
+                isAtBottomRef.current = distanceFromBottom <= 50;
                 if (el.scrollTop < 150) {
                     loadOlder();
                 }
@@ -756,7 +782,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
         };
         // initialize at-bottom state when attaching
         const initDistance = el.scrollHeight - (el.scrollTop + el.clientHeight);
-        isAtBottomRef.current = initDistance <= 2;
+        isAtBottomRef.current = initDistance <= 50;
         el.addEventListener('scroll', onScroll);
         return () => {
             el.removeEventListener('scroll', onScroll);

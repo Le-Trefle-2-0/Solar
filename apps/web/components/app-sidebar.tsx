@@ -104,21 +104,29 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
     const socketRef = useRef<Socket | null>(null);
     const {socket} = useSocket();
 
-    socket?.on('updateRequest', () => {
-        updateTickets();
-    })
+    useEffect(() => {
+        if (!socket) return;
+        const onUpdateRequest = () => updateTickets();
+        socket.on('updateRequest', onUpdateRequest);
+        return () => {
+            socket.off('updateRequest', onUpdateRequest);
+        };
+    }, [socket]);
 
     const updateTickets = () => {
         apiFetch(`/v1/tickets`)
             .then((res) => {
                 if (res.success) {
                     const ticketList = res.tickets;
-                    console.log(ticketList);
-                    const items = ticketList.map((ticket: { channelName: string; channelId: string }) => ({
-                        name: ticket.channelName,
-                        url: '/app/ticket/' + ticket.channelId,
-                        icon: Ear
-                    }));
+                    const items = ticketList.map((ticket: any) => {
+                        let idStr = String(ticket.id).padStart(5, '0');
+                        let displayName = `Ticket-${idStr}`;
+                        return {
+                            name: displayName,
+                            url: '/app/ticket/' + ticket.channelId,
+                            icon: Ear
+                        };
+                    });
                     setData(data => [...baseData, ...items]);
                 }
             })

@@ -223,6 +223,8 @@ model EventRegistration {
 model Ticket {
   id           Int          @id @default(autoincrement())
   discordUserID  String
+  source   String @default("discord")
+  metadata Json?
   channelId    String?      @unique
   channelName  String?
   channel      Channel?     @relation(fields: [channelId, channelName], references: [id, name], onDelete: Cascade)

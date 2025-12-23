@@ -274,7 +274,7 @@ export const PeerProvider: React.FC<{ children: React.ReactNode }> = ({children}
     const connectedUsers = useMemo(() => {
         return connectedPeerIds
             .filter(id => id && id !== myPeerId)
-            .map(id => peerNames[id] || (id.startsWith('anon-') ? 'Utilisateur Anonyme' : id));
+            .map(id => peerNames[id] || (id.startsWith('anon-') ? 'utilisateur' : id));
     }, [connectedPeerIds, myPeerId, peerNames]);
 
     return (

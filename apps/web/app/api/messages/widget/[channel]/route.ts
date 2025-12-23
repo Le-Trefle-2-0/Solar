@@ -2,20 +2,26 @@ import {NextRequest, NextResponse} from "next/server";
 import prisma from "@/lib/prisma";
 import {saveMessage} from "@/lib/messageManager";
 
-async function getOrCreateWidgetUser() {
-    const email = 'widget-visitor@solar.local';
-    let user = await prisma.user.findUnique({where: {email}});
+async function getOrCreateWidgetUser(id: string, name: string) {
+    let user = await prisma.user.findUnique({where: {id}});
     if (!user) {
         const now = new Date();
         user = await prisma.user.create({
             data: {
-                id: `widget_${crypto.randomUUID()}`,
-                name: 'Visiteur',
-                email,
+                id,
+                name: name,
+                email: `${id}@solar.local`,
                 emailVerified: false,
                 createdAt: now,
                 updatedAt: now,
+                role: 'visitor'
             },
+        });
+    } else if (user.name !== name) {
+        // Update name if it changed
+        user = await prisma.user.update({
+            where: {id},
+            data: {name}
         });
     }
     return user;
@@ -33,7 +39,16 @@ export async function POST(
         if (!content || !channel) {
             return NextResponse.json({success: false, message: 'Invalid payload'}, {status: 400});
         }
-        const user = await getOrCreateWidgetUser();
+
+        // Get visitor info from cookies and ticket
+        const cookies = req.headers.get('cookie') || '';
+        const uidMatch = cookies.match(/widget_uid=([^;]+)/);
+        const uid = uidMatch ? decodeURIComponent(uidMatch[1]) : `guest_${crypto.randomUUID()}`;
+
+        const ticket = await prisma.ticket.findUnique({where: {channelId: channel}});
+        const visitorName = (ticket?.metadata as any)?.visitorName || 'utilisateur';
+
+        const user = await getOrCreateWidgetUser(uid, visitorName);
         const msg = {
             author: {
                 id: user.id,
@@ -58,7 +73,7 @@ export async function POST(
             // Normalize ws(s) scheme to http(s) for fetch
             if (base.startsWith('ws://')) base = 'http://' + base.slice('ws://'.length);
             if (base.startsWith('wss://')) base = 'https://' + base.slice('wss://'.length);
-            const secret = process.env.WS_BROADCAST_SECRET || '';
+            const secret = process.env.WS_BROADCAST_SECRET || 'fallback_broadcast_secret_for_dev_only';
             const payload = {
                 room: channel,
                 data: {
