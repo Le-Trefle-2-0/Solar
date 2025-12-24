@@ -72,6 +72,7 @@ import {cn} from "@/lib/utils";
 import {authClient} from "@/lib/auth-client";
 import {useRouter} from "next/navigation";
 import {apiFetch} from "@/lib/api";
+import {inviteUserAction} from "@/app/actions/users";
 
 const roles = [
     {label: "Responsable de pôle/Admin", value: "admin"},
@@ -83,7 +84,6 @@ const roles = [
 const FormSchema = z.object({
     name: z.string(),
     email: z.string(),
-    password: z.string(),
     roles: z.array(z.enum(["admin", "manager", "training", "volunteer", "bot"])).min(1),
 });
 
@@ -94,6 +94,7 @@ interface DataTableProps {
 export function UsersTable({data}: DataTableProps) {
     const [users, setUsers] = useState<DisplayAccount[]>(data);
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [isInviting, setIsInviting] = useState(false);
     const router = useRouter();
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -411,58 +412,49 @@ export function UsersTable({data}: DataTableProps) {
         defaultValues: {
             name: "",
             email: "",
-            password: "",
             roles: ["volunteer"],
         },
     });
 
     async function onSubmit(formData: z.infer<typeof FormSchema>) {
-        const pickedRoles = formData.roles && formData.roles.length > 0 ? formData.roles : ["volunteer"];
-        const primaryRole = pickedRoles[0];
-        const user = await authClient.admin.createUser({
-            email: formData.email,
-            name: formData.name,
-            password: formData.password,
-            role: primaryRole as "admin" | "manager" | "training" | "volunteer" | "bot" | ("admin" | "manager" | "training" | "volunteer" | "bot")[] | undefined,
-        });
-
-        if (user.error) return toast("Erreur lors de la création", {
-            description: (
-                <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
-          <code className="text-white">{JSON.stringify(user.error)}</code>
-        </pre>
-            )
-        })
-
-        const userData = user.data.user;
+        if (isInviting) return;
+        setIsInviting(true);
 
         try {
-            const res = await fetch(`/api/admin/users/${userData.id}/role`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({roles: pickedRoles}),
-            });
-            if (res.ok) {
-                const {user: updated} = await res.json();
-                userData.role = updated.role;
+            const result = await inviteUserAction(formData);
+
+            if (result.error) {
+                toast.error("Erreur lors de l'invitation", {
+                    description: result.error
+                });
+                return;
             }
+
+            const userData = result.user!;
+
+            toast.success("Invitation envoyée", {
+                description: `Un email a été envoyé à ${formData.email} pour configurer son mot de passe.`
+            });
+
+            setUsers((prev) => [
+                ...prev,
+                {
+                    id: userData.id,
+                    name: userData.name,
+                    email: userData.email,
+                    role: (userData.role as string),
+                    lastTicketTimestamp: 0,
+                },
+            ]);
+
+            setDialogOpen(false);
+            form.reset();
         } catch (e) {
             console.error(e);
+            toast.error("Une erreur inattendue est survenue");
+        } finally {
+            setIsInviting(false);
         }
-
-        setUsers((prev) => [
-            ...prev,
-            {
-                id: userData.id,
-                name: userData.name,
-                email: userData.email,
-                role: (userData.role as string),
-                lastTicketTimestamp: 0,
-            },
-        ]);
-
-        setDialogOpen(false);
-        form.reset();
     }
 
     return (
@@ -505,15 +497,16 @@ export function UsersTable({data}: DataTableProps) {
                     </DropdownMenu>
                     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                         <DialogTrigger asChild>
-                            <Button variant="outline" size="icon">
+                            <Button variant="outline" size="icon" title="Inviter un utilisateur">
                                 <UserPlus/>
                             </Button>
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-[425px]">
                             <DialogHeader>
-                                <DialogTitle>Ajouter un utilisateur</DialogTitle>
+                                <DialogTitle>Inviter un utilisateur</DialogTitle>
                                 <DialogDescription>
-                                    Merci d'indiquer les informations nécessaires pour la création du compte
+                                    L'utilisateur recevra un email pour configurer son mot de passe et accéder à la
+                                    plateforme.
                                 </DialogDescription>
                             </DialogHeader>
                             <Form {...form}>
@@ -542,21 +535,6 @@ export function UsersTable({data}: DataTableProps) {
                                                     <FormLabel>Email</FormLabel>
                                                     <FormControl>
                                                         <Input placeholder="Email" {...field} type="email"/>
-                                                    </FormControl>
-                                                    <FormMessage/>
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </div>
-                                    <div className="grid gap-3">
-                                        <FormField
-                                            control={form.control}
-                                            name="password"
-                                            render={({field}) => (
-                                                <FormItem>
-                                                    <FormLabel>Mot de passe</FormLabel>
-                                                    <FormControl>
-                                                        <Input placeholder="Mot de passe" {...field} type="password"/>
                                                     </FormControl>
                                                     <FormMessage/>
                                                 </FormItem>
@@ -635,7 +613,9 @@ export function UsersTable({data}: DataTableProps) {
                                         <DialogClose asChild>
                                             <Button variant="outline">Annuler</Button>
                                         </DialogClose>
-                                        <Button type="submit" className="cursor-pointer">Ajouter</Button>
+                                        <Button type="submit" className="cursor-pointer" disabled={isInviting}>
+                                            {isInviting ? "Invitation en cours..." : "Inviter"}
+                                        </Button>
                                     </DialogFooter>
                                 </form>
                             </Form>

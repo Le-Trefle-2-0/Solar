@@ -94,8 +94,7 @@ npm run compose:up
 ## 🔒 Authentification et Accès
 
 L'accès à la partie connectée de l'application se fait uniquement sur invitation. Une fois le premier administrateur
-créé via l'outil de configuration, celui-ci peut gérer les membres et les invitations depuis l'interface d'
-administration.
+créé via l'outil de configuration, celui-ci peut gérer les membres et les invitations depuis l'onglet "Utilisateurs".
 
 ---
 

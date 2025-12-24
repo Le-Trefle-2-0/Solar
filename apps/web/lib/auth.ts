@@ -1,6 +1,6 @@
 import {betterAuth} from "better-auth";
 import {prismaAdapter} from "better-auth/adapters/prisma";
-import {PrismaClient} from "@prisma/client";
+import prisma from "@/lib/prisma";
 import {getResendClient} from "@/lib/resend";
 import {renderEmailTemplate} from "@/lib/email-template";
 import {ac, admin, bot, manager, training, volunteer} from "./permissions";
@@ -18,15 +18,6 @@ import {
     username
 } from "better-auth/plugins";
 
-const prisma = new PrismaClient;
-
-// Development-friendly base URL and trusted origins
-const IS_DEV = process.env.NODE_ENV !== "production";
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-const DEFAULT_DEV_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"];
-const TRUSTED_ORIGINS = Array.from(new Set(IS_DEV ? [APP_URL, ...DEFAULT_DEV_ORIGINS] : [APP_URL]));
-
-// Build plugin list and include passkey only if available in the installed better-auth version
 const pluginList: any[] = [
     emailOTP({
         async sendVerificationOTP({email, otp, type}) {
@@ -44,7 +35,7 @@ const pluginList: any[] = [
                 `,
             });
             const {error} = await resend.emails.send({
-                from: "noreply@solar.letrefle.org",
+                from: "Solar <noreply@solar.letrefle.org>",
                 to: email,
                 subject: "Solar - Votre code de vérification",
                 html,
@@ -92,6 +83,12 @@ if (typeof (betterPlugins as any).passkey === 'function') {
 // Always add OpenAPI at the end
 pluginList.push(openAPI());
 
+// Development-friendly base URL and trusted origins
+const IS_DEV = process.env.NODE_ENV !== "production";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+const DEFAULT_DEV_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"];
+const TRUSTED_ORIGINS = Array.from(new Set(IS_DEV ? [APP_URL, ...DEFAULT_DEV_ORIGINS] : [APP_URL]));
+
 export const auth = betterAuth({
     // Allow non-secure http origin in development and make origins explicit
     baseURL: APP_URL,
@@ -106,28 +103,33 @@ export const auth = betterAuth({
     emailAndPassword: {
         enabled: true,
         async sendResetPassword(data, request) {
+            console.log(`[auth] sendResetPassword triggered for ${data.user.email}`);
+            console.log(`[auth] Reset URL: ${data.url}`);
             const resend = getResendClient();
             const {html} = renderEmailTemplate({
-                title: "Réinitialisation de mot de passe",
+                title: "Invitation à rejoindre Solar",
                 content: `
                     <p>Bonjour ${data.user.name || ""},</p>
-                    <p>Vous avez demandé la réinitialisation de votre mot de passe pour votre compte Solar.</p>
-                    <p>Cliquez sur le bouton ci-dessous pour choisir un nouveau mot de passe :</p>
+                    <p>Vous avez été invité par un administrateur à rejoindre la plateforme Solar.</p>
+                    <p>Cliquez sur le bouton ci-dessous pour définir votre mot de passe et finaliser votre inscription :</p>
                     <div style="text-align: center; margin: 30px 0;">
-                        <a href="${data.url}" class="button">Réinitialiser mon mot de passe</a>
+                        <a href="${data.url}" class="button" style="color: white !important;">Définir mon mot de passe</a>
                     </div>
                     <p>Ce lien expirera bientôt.</p>
-                    <p>Si vous n'avez pas demandé cette réinitialisation, vous pouvez ignorer cet e-mail en toute sécurité.</p>
+                    <p>Si vous n'êtes pas à l'origine de cette invitation, vous pouvez ignorer cet e-mail.</p>
                 `,
             });
+            console.log(`[auth] Sending invitation email via Resend to ${data.user.email}`);
             const {error} = await resend.emails.send({
-                from: "noreply@solar.letrefle.org",
+                from: "Solar <noreply@solar.letrefle.org>",
                 to: data.user.email,
-                subject: "Solar - Réinitialisation de mot de passe",
+                subject: "Solar - Invitation",
                 html,
             });
             if (error) {
-                console.error("Resend error sending reset password email:", error);
+                console.error("[auth] Resend error sending reset password email:", error);
+            } else {
+                console.log(`[auth] Invitation email successfully sent to ${data.user.email}`);
             }
         },
         autoSignIn: true,

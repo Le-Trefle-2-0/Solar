@@ -64,7 +64,7 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
             icon: Users,
         },
         {
-            name: "Administration",
+            name: "Utilisateurs",
             url: "/app/admin",
             icon: ShieldUser
         },
@@ -96,7 +96,7 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
             icon: Users,
         },
         {
-            name: "Administration",
+            name: "Utilisateurs",
             url: "/app/admin",
             icon: ShieldUser
         },
