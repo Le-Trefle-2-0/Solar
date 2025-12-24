@@ -1,12 +1,19 @@
+export function getWebBase() {
+    if (typeof window !== 'undefined') {
+        return window.location.origin;
+    }
+    return (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/$/, '');
+}
+
 export function getApiBase() {
     if (typeof window !== 'undefined') {
-        const url = process.env.NEXT_PUBLIC_API_URL || window.location.origin.replace(':3000', ':4000');
+        const url = (process.env.NEXT_PUBLIC_API_URL || window.location.origin.replace(':3000', ':4000')).replace(/\/$/, '');
         if (!process.env.NEXT_PUBLIC_API_URL) {
             console.warn(`NEXT_PUBLIC_API_URL is not set, falling back to ${url}`);
         }
         return url;
     }
-    return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+    return (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000').replace(/\/$/, '');
 }
 
 let cachedJwt: string | null = null;
@@ -14,8 +21,15 @@ let cachedJwt: string | null = null;
 export async function getJwt(): Promise<string | null> {
     if (cachedJwt) return cachedJwt;
     try {
+        const base = getWebBase();
         // We still obtain the JWT from Better Auth in the web app
-        const res = await fetch('/api/auth/token', {cache: 'no-store'});
+        const res = await fetch(`${base}/api/auth/token`, {
+            cache: 'no-store',
+            credentials: 'include',
+            headers: typeof window === 'undefined' ? {
+                'Cookie': (await import('next/headers')).cookies().toString()
+            } : {}
+        });
         if (!res.ok) return null;
         const ct = res.headers.get('content-type') || '';
         if (!ct.includes('application/json')) return null;

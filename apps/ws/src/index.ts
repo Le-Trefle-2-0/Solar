@@ -9,7 +9,7 @@ import {createHmac} from 'crypto';
 const PORT = Number(process.env.WS_PORT || 5000);
 const HOST = process.env.WS_HOST || '0.0.0.0';
 // Better Auth JWKS lives on the web app; default to local dev origin
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/$/, '');
 if (!process.env.NEXT_PUBLIC_APP_URL) {
     console.warn('NEXT_PUBLIC_APP_URL is not set, falling back to http://localhost:3000');
 }
@@ -39,7 +39,8 @@ async function validateJWT(token: string) {
             audience: APP_URL,
         });
         return payload;
-    } catch (e) {
+    } catch (e: any) {
+        console.warn('[ws] JWT verification failed:', e.message);
         // Optionally relax JWT checks in environments where APP_URL mismatches
         if ((process.env.WS_RELAX_JWT || '').toLowerCase() === 'true') {
             try {

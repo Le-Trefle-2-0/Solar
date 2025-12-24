@@ -60,6 +60,8 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({childre
                 const token = await getJwt();
                 if (!token) {
                     console.warn('[ws] no JWT token found');
+                    // Retry in 2 seconds if no token (maybe session is still loading)
+                    setTimeout(init, 2000);
                     setConnecting(false);
                     return;
                 }

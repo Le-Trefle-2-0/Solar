@@ -40,7 +40,7 @@ export async function initSocket(jwt: string): Promise<Socket | null> {
 
     // eslint-disable-next-line no-console
     console.log('[ws] connecting to', base);
-    const transportsEnv = (process.env.NEXT_PUBLIC_WS_TRANSPORTS || 'websocket')
+    const transportsEnv = (process.env.NEXT_PUBLIC_WS_TRANSPORTS || 'polling,websocket')
         .split(',')
         .map(s => s.trim())
         .filter(Boolean);

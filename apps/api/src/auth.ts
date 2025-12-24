@@ -1,8 +1,8 @@
 import {createRemoteJWKSet, JWTPayload, jwtVerify} from 'jose';
-import {APP_URL} from './env.js';
+import {APP_URL, INTERNAL_AUTH_URL} from './env.js';
 import {prisma} from './prisma.js';
 
-const JWKS = createRemoteJWKSet(new URL(`${APP_URL}/api/auth/jwks`));
+const JWKS = createRemoteJWKSet(new URL(`${INTERNAL_AUTH_URL}/api/auth/jwks`));
 
 export async function verifyAuthorizationHeader(authHeader?: string): Promise<JWTPayload | null> {
     if (!authHeader) return null;
@@ -13,7 +13,8 @@ export async function verifyAuthorizationHeader(authHeader?: string): Promise<JW
             audience: APP_URL,
         });
         return payload;
-    } catch {
+    } catch (e: any) {
+        console.warn('[auth] JWT verification failed:', e.message);
         return null;
     }
 }

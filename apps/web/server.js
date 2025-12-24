@@ -23,7 +23,8 @@ setInterval(() => {
 
 async function validateJWT(token) {
     try {
-        const JWKS = createRemoteJWKSet(new URL(`${process.env.NEXT_PUBLIC_APP_URL}/api/auth/jwks`));
+        const authUrl = process.env.INTERNAL_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL;
+        const JWKS = createRemoteJWKSet(new URL(`${authUrl}/api/auth/jwks`));
         const {payload} = await jwtVerify(token, JWKS, {
             issuer: process.env.NEXT_PUBLIC_APP_URL,
             audience: process.env.NEXT_PUBLIC_APP_URL,
@@ -37,7 +38,8 @@ async function validateJWT(token) {
 
 async function validateAPIKey(token) {
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/check-key`, {
+        const authUrl = process.env.INTERNAL_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL;
+        const res = await fetch(`${authUrl}/api/check-key`, {
             body: JSON.stringify({key: token}),
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -50,7 +52,8 @@ async function validateAPIKey(token) {
 
 async function getChannels(id) {
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/channels`, {
+        const authUrl = process.env.INTERNAL_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL;
+        const res = await fetch(`${authUrl}/api/channels`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({id}),

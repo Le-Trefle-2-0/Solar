@@ -10,10 +10,10 @@ import {
 import {ac, admin, bot, manager, training, volunteer} from "@/lib/permissions";
 
 
-import {getApiBase} from "@/lib/api";
+import {getWebBase} from "@/lib/api";
 
 export const authClient = createAuthClient({
-    baseURL: getApiBase(),
+    baseURL: getWebBase(),
     plugins: [
         emailOTPClient(),
         adminClient({
