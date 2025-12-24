@@ -42,8 +42,42 @@ model User {
   passkeys Passkey[]
   Reaction Reaction[]
 
+  // Document validation fields
+  documentsStatus      String?   @default("missing") // "missing", "submitted", "validated", "rejected"
+  documentsSentAt      DateTime?
+  documentsValidatedAt DateTime?
+  documentsRenewalAt   DateTime?
+  documentsText        String?   @db.Text
+
+  firstName         String?   @db.Text
+  lastName          String?   @db.Text
+  birthDate         DateTime?
+  addressStreet     String?   @db.Text
+  addressNumber     String?   @db.Text
+  addressPostalCode String?   @db.Text
+  addressCity       String?   @db.Text
+
+  idCardFileId       String?
+  idCardStatus       String? @default("missing") // "missing", "submitted", "validated", "rejected"
+  idCardRejectReason String? @db.Text
+
+  casierFileId       String?
+  casierStatus       String? @default("missing") // "missing", "submitted", "validated", "rejected"
+  casierRejectReason String? @db.Text
+
   @@unique([username])
   @@map("user")
+}
+
+model File {
+  id        String   @id @default(uuid())
+  filename  String   @db.Text
+  content   Bytes    @db.LongBlob
+  mime      String   @db.Text
+  size      Int
+  createdAt DateTime @default(now())
+
+  @@map("file")
 }
 
 model Session {

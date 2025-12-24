@@ -37,6 +37,24 @@ export interface DisplayAccount {
     role: string;
     username?: string;
     lastTicketTimestamp: number;
+    documentsStatus?: string | null;
+    documentsSentAt?: Date | null;
+    documentsValidatedAt?: Date | null;
+    documentsRenewalAt?: Date | null;
+    documentsText?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    birthDate?: Date | null;
+    addressStreet?: string | null;
+    addressNumber?: string | null;
+    addressPostalCode?: string | null;
+    addressCity?: string | null;
+    idCardFileId?: string | null;
+    idCardStatus?: string | null;
+    idCardRejectReason?: string | null;
+    casierFileId?: string | null;
+    casierStatus?: string | null;
+    casierRejectReason?: string | null;
 }
 
 export interface Tickets {

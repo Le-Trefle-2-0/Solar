@@ -97,6 +97,85 @@ export const auth = betterAuth({
         // Disable secure cookies on http during development so OAuth works on localhost
         useSecureCookies: !IS_DEV,
     },
+    user: {
+        additionalFields: {
+            documentsStatus: {
+                type: "string",
+                required: false,
+                defaultValue: "missing",
+            },
+            documentsSentAt: {
+                type: "datetime",
+                required: false,
+            },
+            documentsValidatedAt: {
+                type: "datetime",
+                required: false,
+            },
+            documentsRenewalAt: {
+                type: "datetime",
+                required: false,
+            },
+            documentsText: {
+                type: "string",
+                required: false,
+            },
+            firstName: {
+                type: "string",
+                required: false,
+            },
+            lastName: {
+                type: "string",
+                required: false,
+            },
+            birthDate: {
+                type: "datetime",
+                required: false,
+            },
+            addressStreet: {
+                type: "string",
+                required: false,
+            },
+            addressNumber: {
+                type: "string",
+                required: false,
+            },
+            addressPostalCode: {
+                type: "string",
+                required: false,
+            },
+            addressCity: {
+                type: "string",
+                required: false,
+            },
+            idCardFileId: {
+                type: "string",
+                required: false,
+            },
+            idCardStatus: {
+                type: "string",
+                required: false,
+                defaultValue: "missing",
+            },
+            idCardRejectReason: {
+                type: "string",
+                required: false,
+            },
+            casierFileId: {
+                type: "string",
+                required: false,
+            },
+            casierStatus: {
+                type: "string",
+                required: false,
+                defaultValue: "missing",
+            },
+            casierRejectReason: {
+                type: "string",
+                required: false,
+            },
+        }
+    },
     database: prismaAdapter(prisma, {
         provider: "mysql", // or "mysql", "postgresql", ...etc
     }),

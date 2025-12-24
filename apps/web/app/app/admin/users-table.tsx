@@ -19,6 +19,11 @@ import {
     Check,
     ChevronDown,
     ChevronsUpDown,
+    ExternalLink,
+    FileCheck,
+    FileClock,
+    FileText,
+    FileX,
     IdCardLanyard,
     Info,
     MoreHorizontal,
@@ -28,6 +33,7 @@ import {
 } from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Checkbox} from "@/components/ui/checkbox";
+import {Badge} from "@/components/ui/badge";
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
@@ -42,6 +48,7 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/
 import {DisplayAccount} from "@/lib/interface";
 import {
     AlertDialog,
+    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
@@ -72,7 +79,17 @@ import {cn} from "@/lib/utils";
 import {authClient} from "@/lib/auth-client";
 import {useRouter} from "next/navigation";
 import {apiFetch} from "@/lib/api";
-import {inviteUserAction} from "@/app/actions/users";
+import {
+    inviteUserAction,
+    rejectDocumentAction,
+    requestAllRenewalAction,
+    requestRenewalAction,
+    validateDocumentsAction
+} from "@/app/actions/users";
+import {format} from "date-fns";
+import {fr} from "date-fns/locale";
+import {Textarea} from "@/components/ui/textarea";
+import {Label} from "@/components/ui/label";
 
 const roles = [
     {label: "Responsable de pôle/Admin", value: "admin"},
@@ -94,6 +111,7 @@ interface DataTableProps {
 export function UsersTable({data}: DataTableProps) {
     const [users, setUsers] = useState<DisplayAccount[]>(data);
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [allRenewalAlertOpen, setAllRenewalAlertOpen] = useState(false);
     const [isInviting, setIsInviting] = useState(false);
     const router = useRouter();
     const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -186,12 +204,51 @@ export function UsersTable({data}: DataTableProps) {
             },
         },
         {
+            accessorKey: "documentsStatus",
+            header: "Documents",
+            cell: ({row}) => {
+                const status = row.getValue("documentsStatus") as string;
+                const user = row.original;
+
+                if (status === 'validated') {
+                    return (
+                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 gap-1">
+                            <FileCheck size={14}/> Validé
+                        </Badge>
+                    );
+                }
+                if (status === 'submitted') {
+                    return (
+                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 gap-1">
+                            <FileClock size={14}/> Envoyé
+                        </Badge>
+                    );
+                }
+                if (status === 'rejected') {
+                    return (
+                        <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 gap-1">
+                            <FileX size={14}/> Refusé
+                        </Badge>
+                    );
+                }
+                return (
+                    <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200 gap-1">
+                        <FileX size={14}/> Manquant
+                    </Badge>
+                );
+            },
+        },
+        {
             id: "actions",
             enableHiding: false,
             cell: ({row}) => {
                 const account = row.original;
                 const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
                 const [editDialogOpen, setEditDialogOpen] = useState(false);
+                const [viewDocOpen, setViewDocOpen] = useState(false);
+                const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+                const [rejectType, setRejectType] = useState<'idCard' | 'casier' | null>(null);
+                const [rejectReasonText, setRejectReasonText] = useState("");
 
                 const roles = [
                     {label: "Responsable de pôle/Admin", value: "admin"},
@@ -253,6 +310,22 @@ export function UsersTable({data}: DataTableProps) {
                             <DropdownMenuContent align="end">
                                 <DropdownMenuItem onClick={() => router.push(`/app/admin/user/${account.id}`)}>
                                     <Info/> Voir le profil
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator/>
+                                <DropdownMenuItem onClick={() => setViewDocOpen(true)}>
+                                    <FileText/> Documents administratifs
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => {
+                                    toast.promise(requestRenewalAction(account.id), {
+                                        loading: 'Demande de renouvellement...',
+                                        success: () => {
+                                            router.refresh();
+                                            return 'Renouvellement demandé';
+                                        },
+                                        error: 'Erreur lors de la demande'
+                                    });
+                                }}>
+                                    <FileClock/> Demander renouvellement
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator/>
                                 <DropdownMenuItem
@@ -382,6 +455,250 @@ export function UsersTable({data}: DataTableProps) {
                                 </Form>
                             </DialogContent>
                         </Dialog>
+
+                        <Dialog open={viewDocOpen} onOpenChange={setViewDocOpen}>
+                            <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+                                <DialogHeader>
+                                    <DialogTitle>Dossier de {account.name}</DialogTitle>
+                                    <DialogDescription>
+                                        Statut global : {
+                                        account.documentsStatus === 'validated' ? 'Validé' :
+                                            account.documentsStatus === 'submitted' ? 'En attente' :
+                                                account.documentsStatus === 'rejected' ? 'Refusé' : 'Manquant'
+                                    }
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <div className="space-y-6 py-4">
+                                    {/* Personal Info */}
+                                    <div className="grid grid-cols-2 gap-x-8 gap-y-4 text-sm border-b pb-4">
+                                        <div>
+                                            <Label className="text-xs text-muted-foreground">Prénom</Label>
+                                            <p className="font-medium">{account.firstName || '-'}</p>
+                                        </div>
+                                        <div>
+                                            <Label className="text-xs text-muted-foreground">Nom</Label>
+                                            <p className="font-medium">{account.lastName || '-'}</p>
+                                        </div>
+                                        <div>
+                                            <Label className="text-xs text-muted-foreground">Date de naissance</Label>
+                                            <p className="font-medium">{account.birthDate ? format(new Date(account.birthDate), "PPP", {locale: fr}) : '-'}</p>
+                                        </div>
+                                        <div>
+                                            <Label className="text-xs text-muted-foreground">Adresse</Label>
+                                            <p className="font-medium">
+                                                {account.addressNumber} {account.addressStreet}<br/>
+                                                {account.addressPostalCode} {account.addressCity}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Documents */}
+                                    <div className="space-y-4">
+                                        {/* ID Card */}
+                                        <div
+                                            className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 bg-background rounded border">
+                                                    <IdCardLanyard size={20} className="text-blue-600"/>
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-medium">Pièce d'identité</p>
+                                                    <div className="flex items-center gap-2">
+                                                        <Badge variant="outline" className={cn(
+                                                            "text-[10px] h-4 px-1",
+                                                            account.idCardStatus === 'validated' ? "bg-green-50 text-green-700 border-green-200" :
+                                                                account.idCardStatus === 'submitted' ? "bg-blue-50 text-blue-700 border-blue-200" :
+                                                                    "bg-red-50 text-red-700 border-red-200"
+                                                        )}>
+                                                            {account.idCardStatus === 'validated' ? 'Validé' : account.idCardStatus === 'submitted' ? 'Soumis' : 'Manquant'}
+                                                        </Badge>
+                                                        {account.idCardFileId && (
+                                                            <a
+                                                                href={`${process.env.NEXT_PUBLIC_STORAGE_URL || 'http://localhost:7000'}/v1/files/${account.idCardFileId}`}
+                                                                target="_blank"
+                                                                className="text-xs text-blue-600 hover:underline flex items-center gap-1"
+                                                            >
+                                                                Voir <ExternalLink size={10}/>
+                                                            </a>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {account.idCardStatus === 'submitted' && (
+                                                <div className="flex gap-2">
+                                                    <Button size="sm" variant="outline"
+                                                            className="h-8 text-red-600 border-red-200 hover:bg-red-50"
+                                                            onClick={() => {
+                                                                setRejectType('idCard');
+                                                                setRejectReasonText("");
+                                                                setRejectDialogOpen(true);
+                                                            }}>Refuser</Button>
+                                                    <Button size="sm" className="h-8 bg-green-600 hover:bg-green-700"
+                                                            onClick={async () => {
+                                                                await validateDocumentsAction(account.id, 'idCard');
+                                                                setUsers(prev => {
+                                                                    return prev.map(u => {
+                                                                        if (u.id === account.id) {
+                                                                            const newIdCardStatus = 'validated';
+                                                                            const newCasierStatus = u.casierStatus;
+                                                                            const allValidated = newIdCardStatus === 'validated' && newCasierStatus === 'validated';
+                                                                            return {
+                                                                                ...u,
+                                                                                idCardStatus: newIdCardStatus,
+                                                                                idCardRejectReason: null,
+                                                                                documentsStatus: allValidated ? 'validated' : u.documentsStatus,
+                                                                                documentsValidatedAt: allValidated ? new Date() : u.documentsValidatedAt
+                                                                            };
+                                                                        }
+                                                                        return u;
+                                                                    });
+                                                                });
+                                                                router.refresh();
+                                                            }}>Valider</Button>
+                                                </div>
+                                            )}
+                                        </div>
+                                        {account.idCardRejectReason && (
+                                            <p className="text-xs text-red-600 px-3">Raison du refus
+                                                : {account.idCardRejectReason}</p>
+                                        )}
+
+                                        {/* Casier */}
+                                        <div
+                                            className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 bg-background rounded border">
+                                                    <FileText size={20} className="text-purple-600"/>
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-medium">Casier judiciaire</p>
+                                                    <div className="flex items-center gap-2">
+                                                        <Badge variant="outline" className={cn(
+                                                            "text-[10px] h-4 px-1",
+                                                            account.casierStatus === 'validated' ? "bg-green-50 text-green-700 border-green-200" :
+                                                                account.casierStatus === 'submitted' ? "bg-blue-50 text-blue-700 border-blue-200" :
+                                                                    "bg-red-50 text-red-700 border-red-200"
+                                                        )}>
+                                                            {account.casierStatus === 'validated' ? 'Validé' : account.casierStatus === 'submitted' ? 'Soumis' : 'Manquant'}
+                                                        </Badge>
+                                                        {account.casierFileId && (
+                                                            <a
+                                                                href={`${process.env.NEXT_PUBLIC_STORAGE_URL || 'http://localhost:7000'}/v1/files/${account.casierFileId}`}
+                                                                target="_blank"
+                                                                className="text-xs text-blue-600 hover:underline flex items-center gap-1"
+                                                            >
+                                                                Voir <ExternalLink size={10}/>
+                                                            </a>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {account.casierStatus === 'submitted' && (
+                                                <div className="flex gap-2">
+                                                    <Button size="sm" variant="outline"
+                                                            className="h-8 text-red-600 border-red-200 hover:bg-red-50"
+                                                            onClick={() => {
+                                                                setRejectType('casier');
+                                                                setRejectReasonText("");
+                                                                setRejectDialogOpen(true);
+                                                            }}>Refuser</Button>
+                                                    <Button size="sm" className="h-8 bg-green-600 hover:bg-green-700"
+                                                            onClick={async () => {
+                                                                await validateDocumentsAction(account.id, 'casier');
+                                                                setUsers(prev => {
+                                                                    return prev.map(u => {
+                                                                        if (u.id === account.id) {
+                                                                            const newCasierStatus = 'validated';
+                                                                            const newIdCardStatus = u.idCardStatus;
+                                                                            const allValidated = newIdCardStatus === 'validated' && newCasierStatus === 'validated';
+                                                                            return {
+                                                                                ...u,
+                                                                                casierStatus: newCasierStatus,
+                                                                                casierRejectReason: null,
+                                                                                documentsStatus: allValidated ? 'validated' : u.documentsStatus,
+                                                                                documentsValidatedAt: allValidated ? new Date() : u.documentsValidatedAt
+                                                                            };
+                                                                        }
+                                                                        return u;
+                                                                    });
+                                                                });
+                                                                router.refresh();
+                                                            }}>Valider</Button>
+                                                </div>
+                                            )}
+                                        </div>
+                                        {account.casierRejectReason && (
+                                            <p className="text-xs text-red-600 px-3">Raison du refus
+                                                : {account.casierRejectReason}</p>
+                                        )}
+                                    </div>
+
+                                    <div
+                                        className="grid grid-cols-2 gap-4 text-[10px] text-muted-foreground border-t pt-4">
+                                        <div>
+                                            <p>Envoyé le
+                                                : {account.documentsSentAt ? format(new Date(account.documentsSentAt), "PPp", {locale: fr}) : "Jamais"}</p>
+                                        </div>
+                                        <div>
+                                            <p>Dernière validation
+                                                : {account.documentsValidatedAt ? format(new Date(account.documentsValidatedAt), "PPp", {locale: fr}) : "Jamais"}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <DialogFooter>
+                                    <DialogClose asChild>
+                                        <Button variant="outline">Fermer</Button>
+                                    </DialogClose>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
+
+                        <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
+                            <DialogContent className="sm:max-w-[425px]">
+                                <DialogHeader>
+                                    <DialogTitle>Refuser le document</DialogTitle>
+                                    <DialogDescription>
+                                        Veuillez indiquer la raison du refus
+                                        pour {rejectType === 'idCard' ? "la pièce d'identité" : "le casier judiciaire"}.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <div className="py-4">
+                                    <Label htmlFor="reject-reason" className="text-xs mb-2 block">Raison du
+                                        refus</Label>
+                                    <Textarea
+                                        id="reject-reason"
+                                        placeholder="Ex: Document expiré, illisible..."
+                                        value={rejectReasonText}
+                                        onChange={(e) => setRejectReasonText(e.target.value)}
+                                        rows={3}
+                                    />
+                                </div>
+                                <DialogFooter>
+                                    <Button variant="outline"
+                                            onClick={() => setRejectDialogOpen(false)}>Annuler</Button>
+                                    <Button
+                                        variant="destructive"
+                                        disabled={!rejectReasonText.trim()}
+                                        onClick={async () => {
+                                            if (rejectType) {
+                                                await rejectDocumentAction(account.id, rejectType, rejectReasonText);
+                                                setUsers(prev => prev.map(u => u.id === account.id ? {
+                                                    ...u,
+                                                    [rejectType === 'idCard' ? 'idCardStatus' : 'casierStatus']: 'rejected',
+                                                    [rejectType === 'idCard' ? 'idCardRejectReason' : 'casierRejectReason']: rejectReasonText,
+                                                    documentsStatus: 'rejected'
+                                                } : u));
+                                                setRejectDialogOpen(false);
+                                                router.refresh();
+                                                toast.success("Document refusé");
+                                            }
+                                        }}
+                                    >
+                                        Refuser
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
                     </>
                 );
             },
@@ -495,6 +812,46 @@ export function UsersTable({data}: DataTableProps) {
                                 })}
                         </DropdownMenuContent>
                     </DropdownMenu>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-9 gap-1 text-amber-600 border-amber-200 hover:bg-amber-50"
+                        onClick={() => setAllRenewalAlertOpen(true)}
+                    >
+                        <FileClock size={16}/> Renouvellement général
+                    </Button>
+
+                    <AlertDialog open={allRenewalAlertOpen} onOpenChange={setAllRenewalAlertOpen}>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Demander le renouvellement général ?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Êtes-vous sûr de vouloir demander le renouvellement des documents pour TOUS les
+                                    utilisateurs (hors administrateurs) ?
+                                    Cette action obligera chaque bénévole à soumettre de nouveaux documents à leur
+                                    prochaine connexion (après le délai de grâce de 2 semaines).
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                <AlertDialogAction
+                                    className="bg-amber-600 hover:bg-amber-700"
+                                    onClick={async () => {
+                                        toast.promise(requestAllRenewalAction(), {
+                                            loading: 'Demande de renouvellement général...',
+                                            success: () => {
+                                                router.refresh();
+                                                return 'Renouvellement demandé pour tous';
+                                            },
+                                            error: 'Erreur lors de la demande'
+                                        });
+                                    }}
+                                >
+                                    Confirmer
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
                     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                         <DialogTrigger asChild>
                             <Button variant="outline" size="icon" title="Inviter un utilisateur">
