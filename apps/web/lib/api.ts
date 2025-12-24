@@ -38,7 +38,10 @@ export async function apiFetch(path: string, init: RequestInit = {}) {
     }
     const data = await res.json();
     if (!res.ok) {
-        const msg = (data && (data.error || data.message)) || `HTTP ${res.status}`;
+        let msg = (data && (data.error || data.message)) || `HTTP ${res.status}`;
+        if (typeof msg === 'object') {
+            msg = JSON.stringify(msg);
+        }
         throw new Error(msg);
     }
     return data;

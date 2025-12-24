@@ -2,6 +2,9 @@ import {UsersTable} from "./users-table"
 import {DisplayAccount} from "@/lib/interface";
 import prisma from "@/lib/prisma";
 import {subDays} from "date-fns";
+import {auth} from "@/lib/auth";
+import {headers} from "next/headers";
+import {redirect} from "next/navigation";
 
 async function getData(): Promise<DisplayAccount[]> {
     // Fetch data from your API here.
@@ -77,6 +80,17 @@ async function getData(): Promise<DisplayAccount[]> {
 }
 
 export default async function Admin() {
+    const session = await auth.api.getSession({
+        headers: await headers()
+    });
+
+    if (!session) redirect('/auth/sign-in');
+
+    const userRoles = ((session.user as any).role || "").split(",").map((r: string) => r.trim());
+    if (!userRoles.includes("admin")) {
+        redirect("/app");
+    }
+
     const data = await getData()
 
     return (

@@ -20,3 +20,4 @@ export * from "./separator";
 export * from "./alert-dialog";
 export * from "./textarea";
 export * from "./sonner";
+export * from "./alert";

@@ -226,7 +226,7 @@ export function Message(props: {
     }
 
     return (
-        <React.Fragment>
+        <div className="contents">
             {showDateSeparator && (
                 <div className="flex items-center my-4">
                     <div className="flex-grow border-t border-gray-300"></div>
@@ -542,6 +542,6 @@ export function Message(props: {
                     </div>
                 </DialogContent>
             </Dialog>
-        </React.Fragment>
+        </div>
     )
 }

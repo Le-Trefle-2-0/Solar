@@ -13,7 +13,7 @@ export const recruitmentSchema = z.object({
     icon: z.string().optional().nullable(),
     contactEmail: z.string().email("Email de contact invalide").optional().nullable().or(z.literal("")),
     fields: z.array(fieldSchema),
-    enabled: z.boolean().default(true),
+    enabled: z.boolean(),
 });
 
 export type RecruitmentField = z.infer<typeof fieldSchema>;

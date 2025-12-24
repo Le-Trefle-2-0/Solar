@@ -105,15 +105,15 @@ export const auth = betterAuth({
                 defaultValue: "missing",
             },
             documentsSentAt: {
-                type: "datetime",
+                type: "date",
                 required: false,
             },
             documentsValidatedAt: {
-                type: "datetime",
+                type: "date",
                 required: false,
             },
             documentsRenewalAt: {
-                type: "datetime",
+                type: "date",
                 required: false,
             },
             documentsText: {
@@ -129,7 +129,7 @@ export const auth = betterAuth({
                 required: false,
             },
             birthDate: {
-                type: "datetime",
+                type: "date",
                 required: false,
             },
             addressStreet: {

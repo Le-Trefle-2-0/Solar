@@ -2,7 +2,7 @@
 
 import React, {createContext, useContext, useEffect, useRef, useState} from "react";
 import {initSocket, joinChannel, leaveChannel} from "@/lib/socket";
-import {apiFetch} from "@/lib/api";
+import {apiFetch, getJwt} from "@/lib/api";
 import {Socket} from "socket.io-client";
 import {usePathname, useRouter} from "next/navigation";
 import {toast} from "sonner";
@@ -57,20 +57,13 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({childre
     useEffect(() => {
         const init = async () => {
             try {
-                const res = await fetch("/api/auth/token", {cache: 'no-store'});
-                const ct = res.headers.get('content-type') || '';
-                if (!res.ok || !ct.includes('application/json')) {
-                    console.warn('[ws] token endpoint returned non-JSON or non-OK', res.status);
+                const token = await getJwt();
+                if (!token) {
+                    console.warn('[ws] no JWT token found');
                     setConnecting(false);
                     return;
                 }
-                const data = await res.json();
-                if (!data?.token) {
-                    console.warn('[ws] no JWT token found from /api/auth/token');
-                    setConnecting(false);
-                    return;
-                }
-                const s = await initSocket(data.token);
+                const s = await initSocket(token);
                 setSocket(s);
                 setConnecting(true);
             } catch (e) {

@@ -17,7 +17,7 @@ export async function inviteUserAction(formData: z.infer<typeof inviteSchema>) {
         headers: await headers(),
     });
 
-    if (!session || session.user.role !== "admin") {
+    if (!session || (session.user as any).role !== "admin") {
         return {error: "Unauthorized"};
     }
 
@@ -92,13 +92,13 @@ export async function inviteUserAction(formData: z.infer<typeof inviteSchema>) {
 }
 
 export async function submitDocumentsAction(data: {
-    firstName: string;
-    lastName: string;
-    birthDate: string;
-    addressStreet: string;
-    addressNumber: string;
-    addressPostalCode: string;
-    addressCity: string;
+    firstName?: string;
+    lastName?: string;
+    birthDate?: string;
+    addressStreet?: string;
+    addressNumber?: string;
+    addressPostalCode?: string;
+    addressCity?: string;
     idCardFileId?: string;
     casierFileId?: string;
 }) {
@@ -151,7 +151,7 @@ export async function validateDocumentsAction(userId: string, type: 'idCard' | '
         headers: await headers(),
     });
 
-    if (!session || session.user.role !== "admin") {
+    if (!session || (session.user as any).role !== "admin") {
         return {error: "Unauthorized"};
     }
 
@@ -194,7 +194,7 @@ export async function rejectDocumentAction(userId: string, type: 'idCard' | 'cas
         headers: await headers(),
     });
 
-    if (!session || session.user.role !== "admin") {
+    if (!session || (session.user as any).role !== "admin") {
         return {error: "Unauthorized"};
     }
 
@@ -226,7 +226,7 @@ export async function requestRenewalAction(userId: string) {
         headers: await headers(),
     });
 
-    if (!session || session.user.role !== "admin") {
+    if (!session || (session.user as any).role !== "admin") {
         return {error: "Unauthorized"};
     }
 
@@ -256,7 +256,7 @@ export async function requestAllRenewalAction() {
         headers: await headers(),
     });
 
-    if (!session || session.user.role !== "admin") {
+    if (!session || (session.user as any).role !== "admin") {
         return {error: "Unauthorized"};
     }
 

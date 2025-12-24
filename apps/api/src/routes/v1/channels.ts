@@ -1,10 +1,13 @@
 import type {FastifyInstance} from 'fastify';
 import {z} from 'zod';
 import {prisma} from '../../prisma.js';
+import {authenticate} from '../../auth.js';
 
 function roleHasTicketsReadAll(role?: string | null): boolean {
+    if (!role) return false;
     const allowed = new Set(['admin', 'manager', 'training', 'bot']);
-    return !!role && allowed.has(role);
+    const roles = role.split(',').map(r => r.trim().toLowerCase());
+    return roles.some(r => allowed.has(r));
 }
 
 export async function registerChannelsRoutes(app: FastifyInstance) {
@@ -13,9 +16,11 @@ export async function registerChannelsRoutes(app: FastifyInstance) {
     // POST /v1/channels – returns channels the user can access
     app.post('/v1/channels', async (req, reply) => {
         try {
-            const {id} = bodySchema.parse((req.body ?? {}) as any);
+            const userId = await authenticate(req);
+            if (!userId) return reply.status(401).send('unauthorized');
+
             const channels = await prisma.channel.findMany();
-            const user = await prisma.user.findUnique({where: {id}});
+            const user = await prisma.user.findUnique({where: {id: userId}});
             const canReadAll = roleHasTicketsReadAll(user?.role ?? null);
 
             const accessed: any[] = [];
@@ -32,7 +37,7 @@ export async function registerChannelsRoutes(app: FastifyInstance) {
                 // In original code: if status.id !== 4 (magic constant). We keep same behavior.
                 if (ticket.status && (ticket.status as any).id !== 4) {
                     if (canReadAll) accessed.push(channel);
-                    else if (ticket.assignedUserId === id) accessed.push(channel);
+                    else if (ticket.assignedUserId === userId) accessed.push(channel);
                 }
             }
             return reply.send({success: true, accessedChannels: accessed});

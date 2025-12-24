@@ -90,17 +90,12 @@ export default function ChatWidget() {
         error?: string
     } | null> => {
         try {
-            const res = await fetch('/api/widget/session', {
+            const res = await apiFetch('/v1/widget/session', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({name})
             });
-            const data = await res.json().catch(() => null);
-            if (!res.ok || (data && !data.success)) {
-                return data ? {channelId: '', creds: null, error: data.error} : null;
-            }
-            const cid = data?.channelId;
-            const creds = data?.credentials;
+            const cid = res?.channelId;
+            const creds = res?.credentials;
             if (cid) {
                 try {
                     localStorage.setItem('widget_channel_id', cid);
@@ -108,7 +103,10 @@ export default function ChatWidget() {
                 }
             }
             return cid && creds ? {channelId: cid, creds} : {channelId: '', creds: null};
-        } catch {
+        } catch (err: any) {
+            if (err.message === 'session_expired') {
+                return {channelId: '', creds: null, error: 'session_expired'};
+            }
             return null;
         }
     }, []);
@@ -260,18 +258,15 @@ export default function ChatWidget() {
         if (!confirm('Voulez-vous vraiment fermer cette écoute ?')) return;
 
         try {
-            const res = await fetch('/api/widget/close', {
+            const res = await apiFetch('/v1/widget/close', {
                 method: 'POST',
             });
-            if (res.ok) {
-                const data = await res.json();
-                if (data.success) {
-                    setTicketStatus('closed');
-                    clearLocalStorage();
-                    // Close and reset immediately for a clean exit after manual close
-                    setOpen(false);
-                    resetState();
-                }
+            if (res.success) {
+                setTicketStatus('closed');
+                clearLocalStorage();
+                // Close and reset immediately for a clean exit after manual close
+                setOpen(false);
+                resetState();
             }
         } catch (e) {
             console.error('[widget] Error closing ticket:', e);
@@ -281,52 +276,48 @@ export default function ChatWidget() {
     const handleSend = useCallback(async () => {
         if (!channelId || !input.trim() || ticketStatus === 'closed' || ticketStatus === 'commented') return;
         try {
-            const res = await fetch(`/api/messages/widget/${channelId}`, {
+            const data = await apiFetch(`/v1/messages/widget/${channelId}`, {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({content: input.trim()}),
             });
-            if (res.ok) {
-                const data = await res.json().catch(() => null);
-                // Persist visitor userId for labeling/alignment
-                const uid: string | undefined = data?.message?.userId || data?.message?.userID;
-                if (uid) {
-                    setVisitorUserId(uid);
-                    try {
-                        localStorage.setItem('widget_user_id', uid);
-                    } catch {
-                    }
-                }
-                // Append message locally if not already present (handles race with WS)
-                setMessages((prev) => {
-                    const mid = data?.message?.id;
-                    if (mid && prev.some(m => m.id === mid)) return prev;
-                    return [...prev, {
-                        id: mid ?? Math.floor(Math.random() * 1e9),
-                        author: {id: uid || 'me', name: 'Moi', image: null, role: null},
-                        content: input.trim(),
-                        timestamp: Date.now(),
-                    }];
-                });
-                // Also emit via WS to ensure volunteers get it instantly even if HTTP broadcast fails
+            // Persist visitor userId for labeling/alignment
+            const uid: string | undefined = data?.message?.userId || data?.message?.userID;
+            if (uid) {
+                setVisitorUserId(uid);
                 try {
-                    const payload = {
-                        id: data?.message?.id,
-                        author: {id: uid || 'guest', image: null, name: 'utilisateur', role: null},
-                        content: input.trim(),
-                        timestamp: Date.now(),
-                        channel: {id: channelId},
-                        reactions: [],
-                        replyID: null,
-                        edited: false,
-                    };
-                    socket?.emit('sendMessage', payload);
+                    localStorage.setItem('widget_user_id', uid);
                 } catch {
                 }
-                setInput('');
-                // If WS is not connected, refresh via polling immediately
-                if (!wsConnected) await loadMessages(channelId);
             }
+            // Append message locally if not already present (handles race with WS)
+            setMessages((prev) => {
+                const mid = data?.message?.id;
+                if (mid && prev.some(m => m.id === mid)) return prev;
+                return [...prev, {
+                    id: mid ?? Math.floor(Math.random() * 1e9),
+                    author: {id: uid || 'me', name: 'Moi', image: null, role: null},
+                    content: input.trim(),
+                    timestamp: Date.now(),
+                }];
+            });
+            // Also emit via WS to ensure volunteers get it instantly even if HTTP broadcast fails
+            try {
+                const payload = {
+                    id: data?.message?.id,
+                    author: {id: uid || 'guest', image: null, name: 'utilisateur', role: null},
+                    content: input.trim(),
+                    timestamp: Date.now(),
+                    channel: {id: channelId},
+                    reactions: [],
+                    replyID: null,
+                    edited: false,
+                };
+                socket?.emit('sendMessage', payload);
+            } catch {
+            }
+            setInput('');
+            // If WS is not connected, refresh via polling immediately
+            if (!wsConnected) await loadMessages(channelId);
         } catch {
         }
     }, [channelId, input, loadMessages, socket, wsConnected]);

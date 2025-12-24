@@ -9,7 +9,12 @@ export default async function RecruitmentsPage() {
         headers: await headers(),
     });
 
-    if (!session || (session.user as any).role !== "admin") {
+    if (!session) {
+        redirect("/app");
+    }
+
+    const userRoles = ((session.user as any).role || "").split(",").map((r: string) => r.trim());
+    if (!userRoles.includes("admin")) {
         redirect("/app");
     }
 

@@ -952,7 +952,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                             ))}
                         </div>
                     ) : (
-                        <>
+                        <React.Fragment key="messages-list">
                             {loadingOlder && (
                                 <div className="flex justify-center py-2">
                                     <Skeleton className="h-4 w-1/3"/>
@@ -1007,7 +1007,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                     />
                                 );
                             })}
-                        </>
+                        </React.Fragment>
                     )}
                     <div ref={messagesListRef} className="h-px"/>
                 </div>
@@ -1153,6 +1153,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                                 }).then(res => {
                                                     if (res.success) {
                                                         setStatus(3)
+                                                        socket?.emit('update')
                                                     }
                                                 })
                                             }}>

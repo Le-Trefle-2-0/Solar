@@ -66,15 +66,24 @@ io.use(async (socket, next) => {
     }
 
     // 2) API key (bots/integrations)
-    if (!ok && apiToken && process.env.API_BASE_URL) {
+    if (!ok && apiToken) {
         try {
-            const res = await fetch(`${process.env.API_BASE_URL}/v1/keys/check`, {
+            const apiBase = process.env.API_BASE_URL || 'http://localhost:4000';
+            const res = await fetch(`${apiBase}/v1/keys/check`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({key: apiToken}),
             });
-            ok = res.ok;
-        } catch {
+            if (res.ok) {
+                const data = await res.json();
+                if (data.valid && data.user) {
+                    ok = true;
+                    (socket.data as any).botUserId = data.user.id;
+                    (socket.data as any).isBot = true;
+                }
+            }
+        } catch (e) {
+            console.error('[ws] API key validation error:', e);
         }
     }
 
@@ -108,10 +117,14 @@ io.use(async (socket, next) => {
 });
 
 io.on('connection', (socket) => {
-    console.log(`[ws] connected ${socket.id} from ${socket.handshake.address}`);
+    console.log(`[ws] connected ${socket.id} from ${socket.handshake.address} (isBot: ${(socket.data as any).isBot})`);
 
     if ((socket.data as any).isVolunteer) {
         socket.join('volunteers');
+    }
+
+    if ((socket.data as any).isBot) {
+        socket.join('bots');
     }
 
     socket.on('ping', (cb?: () => void) => cb && cb());
@@ -175,6 +188,16 @@ io.on('connection', (socket) => {
     socket.on('disconnect', (reason) => {
         console.log(`[ws] disconnected ${socket.id} (${reason})`);
     });
+
+    // Handle bot check in/out
+    socket.on('bot:checkin', async (data: { userId?: string }) => {
+        // Use botUserId from auth if available, or from payload as fallback
+        const botUserId = (socket.data as any).botUserId || data?.userId;
+        if (!botUserId) return;
+        socket.join('bots');
+        socket.data.botUserId = botUserId;
+        console.log(`[ws] bot checked in: ${botUserId}`);
+    });
 });
 
 // Lightweight HTTP endpoint to broadcast messages to a room (for server-to-server use)
@@ -183,6 +206,22 @@ httpServer.on('request', async (req: IncomingMessage, res: ServerResponse) => {
     if (!req.url) return;
     // Use a proper base for URL parsing
     const url = new URL(req.url, `http://${req.headers.host}`);
+
+    if (req.method === 'GET' && url.pathname === '/bot-status') {
+        const botUserId = url.searchParams.get('userId');
+        if (!botUserId) {
+            res.statusCode = 400;
+            res.end('missing userId');
+            return;
+        }
+        const sockets = await io.fetchSockets();
+        const isConnected = sockets.some(s => s.data.botUserId === botUserId);
+        res.statusCode = 200;
+        res.setHeader('content-type', 'application/json');
+        res.end(JSON.stringify({isConnected}));
+        return;
+    }
+
     if (req.method !== 'POST' || url.pathname !== '/broadcast') return;
 
     // Auth via shared secret header

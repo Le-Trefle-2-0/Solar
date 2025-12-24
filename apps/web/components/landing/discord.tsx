@@ -73,7 +73,7 @@ export function DiscordSection() {
                                     src="https://discord.com/widget?id=718246706319458365&theme=dark"
                                     width="100%"
                                     height="500"
-                                    allowtransparency="true"
+                                    allowTransparency={true}
                                     frameBorder="0"
                                     sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
                                 />

@@ -62,47 +62,39 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
             name: "Recrutement",
             url: "/app/recruitments",
             icon: Users,
+            adminOnly: true,
+        },
+        {
+            name: "Bot",
+            url: "/app/admin/bot",
+            icon: Signal,
+            adminOnly: true,
         },
         {
             name: "Utilisateurs",
             url: "/app/admin",
-            icon: ShieldUser
+            icon: ShieldUser,
+            adminOnly: true,
         },
     ]
-    const [data, setData] = useState([
-        {
-            name: "Accueil",
-            url: "/app",
-            icon: House,
-        },
-        {
-            name: "Discussion BE libre",
-            url: "/app/be",
-            icon: MessageSquareMore,
-        },
-        {
-            name: "Chat Permanence",
-            url: "/app/chat",
-            icon: MessagesSquare,
-        },
-        {
-            name: "Planning",
-            url: "/app/planning",
-            icon: CalendarDays,
-        },
-        {
-            name: "Recrutement",
-            url: "/app/recruitments",
-            icon: Users,
-        },
-        {
-            name: "Utilisateurs",
-            url: "/app/admin",
-            icon: ShieldUser
-        },
-    ]);
+    const [tickets, setTickets] = useState<any[]>([]);
     const socketRef = useRef<Socket | null>(null);
     const {socket} = useSocket();
+
+    const [session, setSession] = useState<any>(null);
+
+    useEffect(() => {
+        apiFetch('/v1/auth/get-session').then(res => setSession(res));
+    }, []);
+
+    const filteredBaseData = React.useMemo(() => {
+        if (!session) return baseData.filter(item => !(item as any).adminOnly);
+        const roles = (session.user.role || "").split(",").map((r: string) => r.trim());
+        const isAdmin = roles.includes("admin");
+        return baseData.filter(item => !(item as any).adminOnly || isAdmin);
+    }, [session]);
+
+    const data = React.useMemo(() => [...filteredBaseData, ...tickets], [filteredBaseData, tickets]);
 
     useEffect(() => {
         if (!socket) return;
@@ -127,7 +119,7 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
                             icon: Ear
                         };
                     });
-                    setData(data => [...baseData, ...items]);
+                    setTickets(items);
                 }
             })
             .catch(err => console.error('Failed to load tickets:', err));
@@ -135,7 +127,7 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
 
     useEffect(() => {
         updateTickets()
-    }, []);
+    }, [session]);
 
     return (
         <Sidebar variant="inset" {...props}>
