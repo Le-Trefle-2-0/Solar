@@ -1,9 +1,13 @@
 import type {FastifyInstance} from 'fastify';
 import {prisma} from '../../prisma';
+import {authenticate} from '../../auth';
 
 export async function registerMessagesRoutes(app: FastifyInstance) {
     // Read messages by channel with basic pagination
-    app.get('/v1/messages/:channelId', async (req) => {
+    app.get('/v1/messages/:channelId', async (req, reply) => {
+        const userId = await authenticate(req);
+        if (!userId) return reply.status(401).send('unauthorized');
+
         const {channelId} = req.params as any;
         const {limit: limitStr, before: beforeStr} = req.query as any;
         const limit = Math.max(1, Math.min(100, limitStr ? parseInt(String(limitStr), 10) : 60));
