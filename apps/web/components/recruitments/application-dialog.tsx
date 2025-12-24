@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import {Button} from "@/components/ui/button";
 import {ApplicationForm} from "./application-form";
-import {RecruitmentField} from "./field-manager";
+import type {RecruitmentField} from "@/lib/recruitments";
 import {Send} from "lucide-react";
 
 interface ApplicationDialogProps {
