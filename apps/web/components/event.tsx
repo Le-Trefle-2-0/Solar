@@ -26,7 +26,11 @@ export default function Event({event}: EventProps) {
 
     useEffect(() => {
         apiFetch(`/v1/events/${event.id}`)
-            .then(setEventDetails)
+            .then(res => {
+                if (res.success && res.event) {
+                    setEventDetails(res.event);
+                }
+            })
             .catch(err => {
                 console.error("Failed to fetch event details", err);
             });
@@ -40,17 +44,24 @@ export default function Event({event}: EventProps) {
 
         try {
             setLoading(true);
-            const payload: any = {type: "register"};
+            const payload: any = {};
             if (part) payload.part = part;
             if (roleSlotId) payload.roleSlotId = roleSlotId;
             const body = JSON.stringify(payload);
 
-            const updatedEvent = await apiFetch(`/v1/events/${event.id}`, {
+            const res = await apiFetch(`/v1/events/${event.id}/register`, {
                 method: 'POST',
                 body,
             });
-            setEventDetails(updatedEvent);
-            toast.success("Inscription validée");
+
+            if (res.success) {
+                // Refresh event details
+                const updated = await apiFetch(`/v1/events/${event.id}`);
+                if (updated.success && updated.event) {
+                    setEventDetails(updated.event);
+                }
+                toast.success("Inscription validée");
+            }
         } catch (e: any) {
             console.error("Registration failed", e);
             toast.error(e.message || 'Erreur inconnue');
@@ -67,17 +78,24 @@ export default function Event({event}: EventProps) {
 
         try {
             setLoading(true);
-            const payload: any = {type: "unregister"};
+            const payload: any = {};
             if (part) payload.part = part;
             if (roleSlotId) payload.roleSlotId = roleSlotId;
             const body = JSON.stringify(payload);
 
-            const updatedEvent = await apiFetch(`/v1/events/${event.id}`, {
+            const res = await apiFetch(`/v1/events/${event.id}/unregister`, {
                 method: 'POST',
                 body,
             });
-            setEventDetails(updatedEvent);
-            toast.success("Désinscription réussie");
+
+            if (res.success) {
+                // Refresh event details
+                const updated = await apiFetch(`/v1/events/${event.id}`);
+                if (updated.success && updated.event) {
+                    setEventDetails(updated.event);
+                }
+                toast.success("Désinscription réussie");
+            }
         } catch (e: any) {
             console.error("Unregistration failed", e);
             toast.error(e.message || 'Erreur inconnue');
@@ -94,7 +112,7 @@ export default function Event({event}: EventProps) {
 
     let badgeColor = 'bg-gray-300 text-gray-800';
 
-    if (eventDetails) {
+    if (eventDetails && eventDetails.roleSlots) {
         const managerSlot = eventDetails.roleSlots.find(slot => slot.role === 'manager');
         const part1Slot = eventDetails.roleSlots.find(slot => slot.role === 'volunteer' && slot.part === 'first');
         const part2Slot = eventDetails.roleSlots.find(slot => slot.role === 'volunteer' && slot.part === 'second');
@@ -125,7 +143,7 @@ export default function Event({event}: EventProps) {
                     <p className="text-sm text-muted-foreground">{time}</p>
                 </DialogHeader>
 
-                {eventDetails && (
+                {eventDetails && eventDetails.roleSlots && (
                     <div className="space-y-2 mb-4">
                         {eventDetails.roleSlots.map(slot => {
                             const registeredCount = slot.registrationsCount;

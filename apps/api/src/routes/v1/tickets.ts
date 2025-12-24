@@ -47,6 +47,41 @@ export async function registerTicketsRoutes(app: FastifyInstance) {
         return reply.send({success: true, tickets});
     });
 
+    // GET /v1/tickets/history – list closed/commented tickets
+    app.get('/v1/tickets/history', async (req, reply) => {
+        const userId = await authenticate(req);
+        if (!userId) return reply.status(401).send('unauthorized');
+
+        const user = await prisma.user.findUnique({where: {id: userId}});
+        const canReadAll = roleHasTicketsReadAll(user?.role ?? null);
+
+        if (!canReadAll) return reply.status(403).send('forbidden');
+
+        const tickets = await prisma.ticket.findMany({
+            where: {statusName: {in: ['closed', 'commented']}},
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        displayUsername: true
+                    }
+                }
+            },
+            orderBy: {updatedAt: 'desc'}
+        });
+
+        const history = tickets.map(t => {
+            const duration = Math.floor((t.updatedAt.getTime() - t.createdAt.getTime()) / 1000);
+            return {
+                ...t,
+                duration
+            };
+        });
+
+        return reply.send({success: true, tickets: history});
+    });
+
     // POST /v1/tickets/assign
     app.post('/v1/tickets/assign', async (req, reply) => {
         const bodySchema = z.object({ticketID: z.number(), assignmentID: z.string()});
@@ -78,23 +113,48 @@ export async function registerTicketsRoutes(app: FastifyInstance) {
 
     // POST /v1/tickets/close
     app.post('/v1/tickets/close', async (req, reply) => {
-        const bodySchema = z.object({channelID: z.string()});
+        const bodySchema = z.object({
+            channelID: z.string().optional(),
+            discordUserID: z.string().optional()
+        }).refine(data => data.channelID || data.discordUserID, {
+            message: "Either channelID or discordUserID must be provided"
+        });
+
         try {
-            const {channelID} = bodySchema.parse((req.body ?? {}) as any);
-            console.log(`[api] Closing ticket for channel ${channelID}`);
-            
-            const ticket = await prisma.ticket.findUnique({where: {channelId: channelID}});
+            const userId = await authenticate(req);
+            if (!userId) return reply.status(401).send('unauthorized');
+
+            const user = await prisma.user.findUnique({where: {id: userId}});
+            if (!user) return reply.status(401).send('unauthorized');
+
+            const canManage = roleHasTicketsReadAll(user.role);
+            if (!canManage) return reply.status(403).send('forbidden');
+
+            const {channelID, discordUserID} = bodySchema.parse((req.body ?? {}) as any);
+            console.log(`[api] Closing ticket for channel=${channelID} discordUserID=${discordUserID}`);
+
+            const ticket = await prisma.ticket.findFirst({
+                where: {
+                    OR: [
+                        {channelId: channelID || undefined},
+                        {discordUserID: discordUserID || undefined}
+                    ],
+                    statusName: {notIn: ['closed', 'commented']}
+                }
+            });
+
             if (!ticket) {
-                console.warn(`[api] No ticket found for channel ${channelID}`);
-                return reply.status(400).send('No ticket found');
+                console.warn(`[api] No active ticket found for identifier(s) provided`);
+                return reply.status(404).send({success: false, error: 'Ticket not found or already closed'});
             }
-            
+
             const status = await prisma.ticketStatus.findUnique({where: {name: 'closed'}});
             if (!status) {
                 console.error('[api] Status "closed" missing in database');
                 return reply.status(500).send({success: false, error: 'status_missing'});
             }
 
+            const cid = ticket.channelId!;
             const originalDiscordUserID = ticket.discordUserID;
             const update = await prisma.ticket.update({
                 where: {id: ticket.id},
@@ -106,26 +166,26 @@ export async function registerTicketsRoutes(app: FastifyInstance) {
                 },
             });
 
-            console.log(`[api] Ticket ${ticket.id} closed, original user: ${originalDiscordUserID}`);
+            console.log(`[api] Ticket ${ticket.id} closed by ${user.name}, original user: ${originalDiscordUserID}`);
 
-            await broadcastStatusUpdate(channelID, status.id, status.name);
+            await broadcastStatusUpdate(cid, status.id, status.name);
 
             // Broadcast ticketClosed to both global and channel rooms to be safe
             const closePayload = {
                 ticketId: ticket.id,
                 discordUserID: originalDiscordUserID,
-                channelId: channelID,
+                channelId: cid,
                 statusName: status.name
             };
 
             await broadcast(null, 'ticketClosed', closePayload);
-            await broadcast(channelID, 'ticketClosed', closePayload);
-            
+            await broadcast(cid, 'ticketClosed', closePayload);
+
             return reply.send({success: true, update});
         } catch (e) {
             console.error('[api] Error closing ticket:', e);
             if (e instanceof z.ZodError) return reply.status(400).send({success: false, error: e.flatten()});
-            return reply.status(400).send({success: false, error: String(e)});
+            return reply.status(500).send({success: false, error: String(e)});
         }
     });
 

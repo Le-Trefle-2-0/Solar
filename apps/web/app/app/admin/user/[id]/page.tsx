@@ -1,52 +1,33 @@
-import {Tickets} from "@/lib/interface";
 import prisma from "@/lib/prisma";
-import {TicketsTable} from "./tickets-table";
+import {HistoryTable} from "../../history/history-table";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {redirect} from "next/navigation";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui";
 
-async function getData(id: string): Promise<Tickets[]> {
-    const tickets = await prisma.ticket.findMany({
-        where: {
-            assignedUserId: id
-        }
-    });
-    return tickets.map(ticket => ({
-        id: ticket.id,
-        status: ticket.statusLabel,
-        createdAt: new Date(ticket.createdAt),
-        problematic: ticket.problematic,
-        observations: ticket.observations,
-        info: ticket.info,
-        channelID: ticket.channelId as string,
-    }));
-}
-
-export default async function TicketChat({
+export default async function UserDetail({
                                              params
                                          }: {
     params: Promise<{ id: string }>
 }) {
     const {id} = await params;
-    const data = await getData(id)
     const user = await prisma.user.findUnique({where: {id}});
     if (!user) return redirect("/app")
 
     return (
-        <div className="p-6 mt-6 flex flex-col gap-6">
+        <div className="p-6 mt-6 flex flex-col gap-6 overflow-auto">
             <Card>
-                <CardHeader className="flex flex-row">
-                    <Avatar className="rounded-lg">
+                <CardHeader className="flex flex-row items-center gap-4">
+                    <Avatar className="h-16 w-16 rounded-lg">
                         <AvatarImage src={user.image || undefined}/>
                         <AvatarFallback>
                             {(user.displayUsername || user.name).split(/\s+/).filter(word => word).map(word => word[0].toUpperCase()).join("")}
                         </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
-                        <CardTitle>
+                        <CardTitle className="text-2xl">
                             {user.displayUsername || user.name}
                         </CardTitle>
-                        <CardDescription>Créé
+                        <CardDescription>Compte créé
                             le {new Date(user.createdAt).toLocaleDateString('fr-FR')}</CardDescription>
                     </div>
                 </CardHeader>
@@ -56,13 +37,14 @@ export default async function TicketChat({
                     <CardTitle>
                         Historique d'écoute
                     </CardTitle>
+                    <CardDescription>
+                        Liste des écoutes passées attribuées à ce bénévole.
+                    </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <TicketsTable data={data}/>
+                    <HistoryTable userId={id}/>
                 </CardContent>
             </Card>
-            <div className="container mx-auto p-6">
-            </div>
         </div>
     );
 }

@@ -2,8 +2,10 @@
 import * as React from "react"
 import {useEffect, useRef, useState} from "react"
 import {
+    Bot,
     CalendarDays,
     Ear,
+    History,
     House,
     MessageSquareMore,
     MessagesSquare,
@@ -67,7 +69,13 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
         {
             name: "Bot",
             url: "/app/admin/bot",
-            icon: Signal,
+            icon: Bot,
+            adminOnly: true,
+        },
+        {
+            name: "Historique",
+            url: "/app/admin/history",
+            icon: History,
             adminOnly: true,
         },
         {
@@ -91,7 +99,14 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
         if (!session) return baseData.filter(item => !(item as any).adminOnly);
         const roles = (session.user.role || "").split(",").map((r: string) => r.trim());
         const isAdmin = roles.includes("admin");
-        return baseData.filter(item => !(item as any).adminOnly || isAdmin);
+        const isManager = roles.includes("manager");
+
+        return baseData.filter(item => {
+            if (!(item as any).adminOnly) return true;
+            if (isAdmin) return true;
+            if (isManager && item.name === "Historique") return true;
+            return false;
+        });
     }, [session]);
 
     const data = React.useMemo(() => [...filteredBaseData, ...tickets], [filteredBaseData, tickets]);
