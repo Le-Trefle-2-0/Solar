@@ -1,6 +1,6 @@
 import type {FastifyInstance} from 'fastify';
-import {prisma} from '../../prisma';
-import {authenticate} from '../../auth';
+import {prisma} from '../../prisma.js';
+import {authenticate} from '../../auth.js';
 
 export async function registerUsersRoutes(app: FastifyInstance) {
     app.get('/v1/users/:id', async (req, reply) => {
@@ -13,3 +13,4 @@ export async function registerUsersRoutes(app: FastifyInstance) {
         return user;
     });
 }
+

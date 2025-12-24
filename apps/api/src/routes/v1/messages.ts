@@ -1,6 +1,6 @@
 import type {FastifyInstance} from 'fastify';
-import {prisma} from '../../prisma';
-import {authenticate} from '../../auth';
+import {prisma} from '../../prisma.js';
+import {authenticate} from '../../auth.js';
 
 export async function registerMessagesRoutes(app: FastifyInstance) {
     // Read messages by channel with basic pagination
@@ -51,3 +51,4 @@ export async function registerMessagesRoutes(app: FastifyInstance) {
         return out.reverse();
     });
 }
+

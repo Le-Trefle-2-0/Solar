@@ -1,7 +1,7 @@
 import type {FastifyInstance} from 'fastify';
 import {z} from 'zod';
-import {prisma} from '../../prisma';
-import {authenticate} from '../../auth';
+import {prisma} from '../../prisma.js';
+import {authenticate} from '../../auth.js';
 import {broadcast} from '../../lib/broadcast.js';
 import {createHash} from 'crypto';
 
@@ -335,3 +335,4 @@ export async function registerTicketsRoutes(app: FastifyInstance) {
         }
     });
 }
+

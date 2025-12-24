@@ -3,8 +3,8 @@ import cors from '@fastify/cors';
 import cookie from '@fastify/cookie';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
-import {registerV1Routes} from './routes/v1/index';
-import {API_HOST, API_PORT} from './env';
+import {registerV1Routes} from './routes/v1/index.js';
+import {API_HOST, API_PORT} from './env.js';
 
 const app = Fastify({logger: true});
 
