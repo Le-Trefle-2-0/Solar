@@ -105,17 +105,17 @@ export function DonationForm() {
                     </div>
                 </div>
 
-                {selectedAmount === 5 && (
-                    <div className="p-4 bg-primary/5 rounded-xl border border-primary/10 text-sm text-center italic">
-                        "Votre don de 5€ permet de couvrir les frais de fonctionnement de notre serveur Discord pour une
-                        semaine."
-                    </div>
-                )}
-                {selectedAmount === 20 && (
-                    <div className="p-4 bg-primary/5 rounded-xl border border-primary/10 text-sm text-center italic">
-                        "Avec 20€, vous financez la formation d'un nouveau bénévole écoutant."
-                    </div>
-                )}
+                {/*{selectedAmount === 5 && (*/}
+                {/*    <div className="p-4 bg-primary/5 rounded-xl border border-primary/10 text-sm text-center italic">*/}
+                {/*        "Votre don de 5€ permet de couvrir les frais de fonctionnement de notre serveur Discord pour une*/}
+                {/*        semaine."*/}
+                {/*    </div>*/}
+                {/*)}*/}
+                {/*{selectedAmount === 20 && (*/}
+                {/*    <div className="p-4 bg-primary/5 rounded-xl border border-primary/10 text-sm text-center italic">*/}
+                {/*        "Avec 20€, vous financez la formation d'un nouveau bénévole écoutant."*/}
+                {/*    </div>*/}
+                {/*)}*/}
 
                 <div className="flex items-start gap-3 p-4 bg-muted/50 rounded-xl border text-sm text-muted-foreground">
                     <Info className="h-5 w-5 shrink-0 text-primary mt-0.5"/>
