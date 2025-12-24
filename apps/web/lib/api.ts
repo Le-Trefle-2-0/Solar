@@ -1,4 +1,11 @@
 export function getApiBase() {
+    if (typeof window !== 'undefined') {
+        const url = process.env.NEXT_PUBLIC_API_URL || window.location.origin.replace(':3000', ':4000');
+        if (!process.env.NEXT_PUBLIC_API_URL) {
+            console.warn(`NEXT_PUBLIC_API_URL is not set, falling back to ${url}`);
+        }
+        return url;
+    }
     return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 }
 

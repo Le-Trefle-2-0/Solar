@@ -86,6 +86,9 @@ pluginList.push(openAPI());
 // Development-friendly base URL and trusted origins
 const IS_DEV = process.env.NODE_ENV !== "production";
 const APP_URL = process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+if (!process.env.BETTER_AUTH_URL && !process.env.NEXT_PUBLIC_APP_URL) {
+    console.warn("[auth] BETTER_AUTH_URL or NEXT_PUBLIC_APP_URL not set, falling back to http://localhost:3000");
+}
 const DEFAULT_DEV_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"];
 const TRUSTED_ORIGINS = Array.from(new Set(IS_DEV ? [APP_URL, ...DEFAULT_DEV_ORIGINS] : [APP_URL]));
 

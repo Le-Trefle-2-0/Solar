@@ -10,6 +10,9 @@ const PORT = Number(process.env.WS_PORT || 5000);
 const HOST = process.env.WS_HOST || '0.0.0.0';
 // Better Auth JWKS lives on the web app; default to local dev origin
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+if (!process.env.NEXT_PUBLIC_APP_URL) {
+    console.warn('NEXT_PUBLIC_APP_URL is not set, falling back to http://localhost:3000');
+}
 const CORS_ORIGIN = process.env.WS_CORS_ORIGIN || '*';
 
 const httpServer = createServer();
@@ -69,6 +72,9 @@ io.use(async (socket, next) => {
     if (!ok && apiToken) {
         try {
             const apiBase = process.env.API_BASE_URL || 'http://localhost:4000';
+            if (!process.env.API_BASE_URL) {
+                console.warn('API_BASE_URL is not set, falling back to http://localhost:4000');
+            }
             const res = await fetch(`${apiBase}/v1/keys/check`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},

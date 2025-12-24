@@ -19,6 +19,9 @@ export async function initiateDonation(data: z.infer<typeof donationSchema>) {
     const amountInCents = Math.round(amount * 100);
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    if (!process.env.NEXT_PUBLIC_APP_URL) {
+        console.warn("NEXT_PUBLIC_APP_URL is not set, falling back to http://localhost:3000");
+    }
     // HelloAsso requires HTTPS for all redirect URLs (backUrl, errorUrl, returnUrl)
     const baseUrl = appUrl.startsWith("http://") ? appUrl.replace("http://", "https://") : appUrl;
 
