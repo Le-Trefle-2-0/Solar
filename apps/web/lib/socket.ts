@@ -7,18 +7,33 @@ export async function initSocket(jwt: string): Promise<Socket | null> {
 
     // Build a robust base URL for Socket.IO origin
     // Priority:
-    //  1) NEXT_PUBLIC_WS_URL when provided
-    //  2) http://localhost:5000 in dev (common default for the WS service)
-    //  3) window.location.origin as a last resort
-    const candidates: string[] = [];
-    const envUrl = process.env.NEXT_PUBLIC_WS_URL as string | undefined;
-    if (envUrl && envUrl.trim().length > 0) candidates.push(envUrl.trim());
-    if (typeof window !== 'undefined') {
+    //  1) NEXT_PUBLIC_WS_URL when provided (full URL like https://ws.example.com)
+    //  2) NEXT_PUBLIC_WS_HOST when provided (host[:port] like ws.example.com) → protocol inferred from window
+    //  3) In local dev, http://localhost:5000 (common default for the WS service)
+    //  4) Try to derive a ws.* subdomain from current location as a last resort in production
+    let base: string | undefined;
+    const envUrl = (process.env.NEXT_PUBLIC_WS_URL || '').trim();
+    const envHost = (process.env.NEXT_PUBLIC_WS_HOST || '').trim();
+
+    if (envUrl) {
+        base = envUrl;
+    } else if (typeof window !== 'undefined' && envHost) {
+        const proto = window.location.protocol === 'https:' ? 'https://' : 'http://';
+        base = `${proto}${envHost}`;
+    } else if (typeof window !== 'undefined') {
         const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        if (isLocal) candidates.push('http://localhost:5000');
-        candidates.push(window.location.origin);
+        if (isLocal) {
+            base = 'http://localhost:5000';
+        } else {
+            // Attempt to derive a ws subdomain automatically (e.g., beta.example.com → ws.beta.example.com)
+            const {protocol, hostname} = window.location;
+            const proto = protocol === 'https:' ? 'https://' : 'http://';
+            const derivedHost = hostname.startsWith('ws.') ? hostname : `ws.${hostname}`;
+            base = `${proto}${derivedHost}`;
+        }
     }
-    let base = candidates[0] || 'http://localhost:5000';
+    if (!base) base = 'http://localhost:5000';
+
     // socket.io expects http(s) origin; normalize ws(s) → http(s)
     if (base.startsWith('ws://')) base = 'http://' + base.slice('ws://'.length);
     if (base.startsWith('wss://')) base = 'https://' + base.slice('wss://'.length);

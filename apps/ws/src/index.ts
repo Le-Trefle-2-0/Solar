@@ -213,6 +213,14 @@ httpServer.on('request', async (req: IncomingMessage, res: ServerResponse) => {
     // Use a proper base for URL parsing
     const url = new URL(req.url, `http://${req.headers.host}`);
 
+    // Basic health check for reverse proxies (Traefik) and uptime monitoring
+    if (req.method === 'GET' && url.pathname === '/health') {
+        res.statusCode = 200;
+        res.setHeader('content-type', 'application/json');
+        res.end(JSON.stringify({ok: true}));
+        return;
+    }
+
     if (req.method === 'GET' && url.pathname === '/bot-status') {
         const botUserId = url.searchParams.get('userId');
         if (!botUserId) {
