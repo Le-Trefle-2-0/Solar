@@ -85,7 +85,7 @@ pluginList.push(openAPI());
 
 // Development-friendly base URL and trusted origins
 const IS_DEV = process.env.NODE_ENV !== "production";
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+const APP_URL = process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 const DEFAULT_DEV_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"];
 const TRUSTED_ORIGINS = Array.from(new Set(IS_DEV ? [APP_URL, ...DEFAULT_DEV_ORIGINS] : [APP_URL]));
 
@@ -96,6 +96,7 @@ export const auth = betterAuth({
     advanced: {
         // Disable secure cookies on http during development so OAuth works on localhost
         useSecureCookies: !IS_DEV,
+        trustProxy: true,
     },
     user: {
         additionalFields: {

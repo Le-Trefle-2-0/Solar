@@ -11,7 +11,6 @@ import {ac, admin, bot, manager, training, volunteer} from "@/lib/permissions";
 
 
 export const authClient = createAuthClient({
-    baseURL: process.env.NEXT_PUBLIC_APP_URL,
     plugins: [
         emailOTPClient(),
         adminClient({
