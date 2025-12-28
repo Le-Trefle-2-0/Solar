@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Solar</string>
+    <string name="title_activity_main">Solar</string>
+    <string name="package_name">org.letrefle.solar</string>
+    <string name="custom_url_scheme">org.letrefle.solar</string>
+</resources>
