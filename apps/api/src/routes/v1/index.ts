@@ -13,6 +13,7 @@ import {registerBotRoutes} from './bot.js';
 import {registerWidgetRoutes} from './widget.js';
 import {registerWsRoutes} from './ws.js';
 import {registerAuthRoutes} from './auth.js';
+import {registerNewslettersRoutes} from './newsletters.js';
 
 export async function registerV1Routes(app: FastifyInstance) {
     await registerUsersRoutes(app);
@@ -29,4 +30,5 @@ export async function registerV1Routes(app: FastifyInstance) {
     await registerWidgetRoutes(app);
     await registerWsRoutes(app);
     await registerAuthRoutes(app);
+    await registerNewslettersRoutes(app);
 }

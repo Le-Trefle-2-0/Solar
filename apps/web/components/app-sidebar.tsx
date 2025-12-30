@@ -7,6 +7,7 @@ import {
     Ear,
     History,
     House,
+    Mail,
     MessageSquareMore,
     MessagesSquare,
     Mic,
@@ -84,6 +85,12 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
             icon: ShieldUser,
             adminOnly: true,
         },
+        {
+            name: "Newsletter",
+            url: "/app/newsletters",
+            icon: Mail,
+            newsletterOnly: true,
+        },
     ]
     const [tickets, setTickets] = useState<any[]>([]);
     const socketRef = useRef<Socket | null>(null);
@@ -100,11 +107,13 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
         const roles = (session.user.role || "").split(",").map((r: string) => r.trim());
         const isAdmin = roles.includes("admin");
         const isManager = roles.includes("manager");
+        const isNewsletterManager = roles.includes("newsletterManager");
 
         return baseData.filter(item => {
-            if (!(item as any).adminOnly) return true;
+            if (!(item as any).adminOnly && !(item as any).newsletterOnly) return true;
             if (isAdmin) return true;
             if (isManager && item.name === "Historique") return true;
+            if (isNewsletterManager && (item as any).newsletterOnly) return true;
             return false;
         });
     }, [session]);

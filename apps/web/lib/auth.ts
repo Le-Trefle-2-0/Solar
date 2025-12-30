@@ -3,7 +3,7 @@ import {prismaAdapter} from "better-auth/adapters/prisma";
 import prisma from "@/lib/prisma";
 import {getResendClient} from "@/lib/resend";
 import {renderEmailTemplate} from "@/lib/email-template";
-import {ac, admin, bot, manager, training, volunteer} from "./permissions";
+import {ac, admin, bot, manager, newsletterManager, training, volunteer} from "./permissions";
 // Namespace import to access optional plugins that may not exist in older versions
 import * as betterPlugins from "better-auth/plugins";
 import {
@@ -47,7 +47,7 @@ const pluginList: any[] = [
     }),
     adminPlugin({
         ac, roles: {
-            training, volunteer, manager, bot, admin
+            training, volunteer, manager, bot, admin, newsletterManager
         },
         adminRoles: ['admin'],
         defaultRole: 'admin',
@@ -177,6 +177,11 @@ export const auth = betterAuth({
             casierRejectReason: {
                 type: "string",
                 required: false,
+            },
+            newsletterSubscription: {
+                type: "boolean",
+                required: false,
+                defaultValue: false,
             },
         }
     },

@@ -8,6 +8,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Newsletter {
+  id          String    @id @default(cuid())
+  title       String
+  content     Bytes // Store as JSON or Markdown (compressed or raw)
+  htmlContent Bytes? // Store rendered HTML for sending
+  status      String    @default("draft") // "draft", "scheduled", "sent"
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  sentAt      DateTime?
+  scheduledAt DateTime?
+  authorId    String
+  author      User      @relation(fields: [authorId], references: [id])
+
+  @@map("newsletter")
+}
+
 model User {
   id            String    @id
   name          String    @db.Text
@@ -57,6 +73,8 @@ model User {
   addressPostalCode String?   @db.Text
   addressCity       String?   @db.Text
 
+  newsletterSubscription Boolean @default(false)
+
   idCardFileId       String?
   idCardStatus       String? @default("missing") // "missing", "submitted", "validated", "rejected"
   idCardRejectReason String? @db.Text
@@ -64,6 +82,8 @@ model User {
   casierFileId       String?
   casierStatus       String? @default("missing") // "missing", "submitted", "validated", "rejected"
   casierRejectReason String? @db.Text
+
+  newsletters Newsletter[]
 
   @@unique([username])
   @@map("user")

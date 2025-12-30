@@ -7,7 +7,7 @@ import {
     twoFactorClient,
     usernameClient
 } from "better-auth/client/plugins";
-import {ac, admin, bot, manager, training, volunteer} from "@/lib/permissions";
+import {ac, admin, bot, manager, newsletterManager, training, volunteer} from "@/lib/permissions";
 
 
 import {getWebBase} from "@/lib/api";
@@ -18,7 +18,7 @@ export const authClient = createAuthClient({
         emailOTPClient(),
         adminClient({
             ac, roles: {
-                training, volunteer, manager, bot, admin
+                training, volunteer, manager, bot, admin, newsletterManager
             }
         }),
         organizationClient(),

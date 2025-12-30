@@ -9,6 +9,7 @@ import {
     UpdateAvatarCard,
     UpdateUsernameCard
 } from "@daveyplate/better-auth-ui"
+import {NewsletterCard} from "@/components/settings/newsletter-card";
 import {locale} from "@/app/auth/[pathname]/view";
 import {CircleX, KeyRound, UserPen} from "lucide-react";
 import {useRouter} from "next/navigation";
@@ -49,6 +50,7 @@ export default function SettingsPage() {
                 <div className="flex flex-col gap-6 w-full mx-auto p-12">
                     <UpdateAvatarCard localization={locale}/>
                     <UpdateUsernameCard localization={locale}/>
+                    <NewsletterCard/>
                 </div>
             </TabsContent>
             <TabsContent value="security">
