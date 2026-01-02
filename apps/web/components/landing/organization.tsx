@@ -138,6 +138,7 @@ function PersonCard({person}: { person: Person }) {
                                     sizes="96px"
                                     className="object-cover"
                                     priority={false}
+                                    unoptimized
                                 />
                             </div>
                         ) : (

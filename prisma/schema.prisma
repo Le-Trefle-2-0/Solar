@@ -224,6 +224,8 @@ model Message {
   edited Boolean @default(false)
 
   Reaction Reaction[]
+
+  @@map("message")
 }
 
 model Reaction {
@@ -293,6 +295,8 @@ model Ticket {
   observations String?
   info         String?
   voice Boolean @default(false)
+
+  @@map("ticket")
 }
 
 model TicketStatus {
@@ -378,6 +382,8 @@ model Recruitment {
   enabled      Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  @@map("recruitment")
 }
 
 model Image {

@@ -325,6 +325,7 @@ export function Message(props: {
                                     width={48}
                                     height={48}
                                     className="rounded-xl max-h-[48px]"
+                                    unoptimized
                                 />
                             ) : (
                                 <span className="hidden group-hover:block text-xs text-gray-500">
@@ -348,6 +349,7 @@ export function Message(props: {
                                         width={16}
                                         height={16}
                                         className="rounded-md flex-shrink-0"
+                                        unoptimized
                                     />
                                     <span className="font-medium text-gray-700">{replyOf.authorName}</span>
                                     <span

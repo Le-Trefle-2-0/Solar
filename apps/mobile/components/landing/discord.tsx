@@ -73,8 +73,7 @@ export function DiscordSection() {
                                     src="https://discord.com/widget?id=718246706319458365&theme=dark"
                                     width="100%"
                                     height="500"
-                                    allowTransparency={true}
-                                    frameBorder="0"
+                                    style={{border: 0}}
                                     sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
                                 />
                             </CardContent>
