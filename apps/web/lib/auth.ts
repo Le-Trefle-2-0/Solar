@@ -192,32 +192,31 @@ export const auth = betterAuth({
         enabled: true,
         async sendResetPassword(data, request) {
             console.log(`[auth] sendResetPassword triggered for ${data.user.email}`);
-            console.log(`[auth] Reset URL: ${data.url}`);
             const resend = getResendClient();
+
             const {html} = renderEmailTemplate({
-                title: "Invitation à rejoindre Solar",
+                title: "Réinitialisation de mot de passe",
                 content: `
                     <p>Bonjour ${data.user.name || ""},</p>
-                    <p>Vous avez été invité par un administrateur à rejoindre la plateforme Solar.</p>
-                    <p>Cliquez sur le bouton ci-dessous pour définir votre mot de passe et finaliser votre inscription :</p>
+                    <p>Vous avez demandé la réinitialisation de votre mot de passe pour votre compte Solar.</p>
+                    <p>Cliquez sur le bouton ci-dessous pour choisir un nouveau mot de passe :</p>
                     <div style="text-align: center; margin: 30px 0;">
-                        <a href="${data.url}" class="button" style="color: white !important;">Définir mon mot de passe</a>
+                        <a href="${data.url}" class="button" style="color: white !important;">Réinitialiser mon mot de passe</a>
                     </div>
                     <p>Ce lien expirera bientôt.</p>
-                    <p>Si vous n'êtes pas à l'origine de cette invitation, vous pouvez ignorer cet e-mail.</p>
+                    <p>Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet e-mail.</p>
                 `,
             });
-            console.log(`[auth] Sending invitation email via Resend to ${data.user.email}`);
+
+            console.log(`[auth] Sending reset email via Resend to ${data.user.email}`);
             const {error} = await resend.emails.send({
                 from: "Solar <noreply@solar.letrefle.org>",
                 to: data.user.email,
-                subject: "Solar - Invitation",
+                subject: "Solar - Réinitialisation de mot de passe",
                 html,
             });
             if (error) {
-                console.error("[auth] Resend error sending reset password email:", error);
-            } else {
-                console.log(`[auth] Invitation email successfully sent to ${data.user.email}`);
+                console.error("[auth] Resend error sending email:", error);
             }
         },
         autoSignIn: true,

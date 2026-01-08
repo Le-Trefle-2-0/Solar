@@ -5,6 +5,9 @@ import {headers} from "next/headers";
 import {z} from "zod";
 import prisma from "@/lib/prisma";
 import {hashPassword} from "better-auth/crypto";
+import {getResendClient} from "@/lib/resend";
+import {renderEmailTemplate} from "@/lib/email-template";
+import {createId} from "@paralleldrive/cuid2";
 
 const inviteSchema = z.object({
     name: z.string().min(1),
@@ -65,25 +68,55 @@ export async function inviteUserAction(formData: z.infer<typeof inviteSchema>) {
             return user;
         });
 
-        // 2. Trigger Forget Password (which calls our sendResetPassword hook)
-        console.log(`[inviteAction] Triggering forgetPassword for ${email}`);
+        // 2. Generate Password Reset Token and Send Invitation Email manually
+        console.log(`[inviteAction] Generating reset token for ${email}`);
 
-        // Better Auth 1.4.6 uses forgetPassword on the client, but the server API 
-        // operationId is requestPasswordReset for emailAndPassword plugin.
-        const forgetPassword = (auth.api as any).forgetPassword || (auth.api as any).requestPasswordReset;
+        const token = createId();
+        const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24 hours
 
-        if (typeof forgetPassword === "function") {
-            await forgetPassword({
-                body: {
-                    email: email.toLowerCase(),
-                    redirectTo: "/auth/reset-password",
-                },
-            });
-        } else {
-            console.error("[inviteAction] Could not find forgetPassword or requestPasswordReset on auth.api. Keys:", Object.keys(auth.api));
-            throw new Error("Authentication API configuration error");
+        await prisma.verification.create({
+            data: {
+                id: createId(),
+                identifier: email.toLowerCase(),
+                value: token,
+                expiresAt,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            }
+        });
+
+        const appUrl = process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+        const resetUrl = `${appUrl}/auth/reset-password?invite=true&token=${token}`;
+
+        console.log(`[inviteAction] Sending invitation email to ${email}`);
+        const resend = getResendClient();
+        const {html} = renderEmailTemplate({
+            title: "Invitation à rejoindre Solar",
+            content: `
+                <p>Bonjour ${name},</p>
+                <p>Vous avez été invité par un administrateur à rejoindre la plateforme Solar.</p>
+                <p>Cliquez sur le bouton ci-dessous pour définir votre mot de passe et finaliser votre inscription :</p>
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="${resetUrl}" class="button" style="color: white !important;">Définir mon mot de passe</a>
+                </div>
+                <p>Ce lien expirera dans 24 heures.</p>
+                <p>Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet e-mail.</p>
+            `,
+        });
+
+        const {error} = await resend.emails.send({
+            from: "Solar <noreply@solar.letrefle.org>",
+            to: email,
+            subject: "Solar - Invitation",
+            html,
+        });
+
+        if (error) {
+            console.error("[inviteAction] Resend error sending invitation:", error);
+            throw new Error("Failed to send invitation email");
         }
 
+        console.log(`[inviteAction] Invitation email sent successfully to ${email}`);
         return {success: true, user: userData};
     } catch (e: any) {
         console.error("[inviteAction] Error:", e);
