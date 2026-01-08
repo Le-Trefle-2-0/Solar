@@ -5,8 +5,12 @@ import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 import {registerV1Routes} from './routes/v1/index.js';
 import {API_HOST, API_PORT} from './env.js';
+import {startNewsletterScheduler} from './lib/scheduler.js';
 
-const app = Fastify({logger: true});
+const app = Fastify({
+    logger: true,
+    bodyLimit: 50 * 1024 * 1024 // 50MB
+});
 
 await app.register(cors, {origin: true, credentials: true});
 await app.register(cookie);
@@ -52,6 +56,9 @@ app.get('/health', async () => ({status: 'ok'}));
 
 // v1 routes (modular)
 await registerV1Routes(app);
+
+// Start background tasks
+startNewsletterScheduler();
 
 app
     .listen({port: API_PORT, host: API_HOST})

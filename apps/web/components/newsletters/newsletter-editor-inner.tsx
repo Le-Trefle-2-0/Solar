@@ -212,6 +212,23 @@ export default function NewsletterEditorInner({id, initialNewsletter, volunteerC
         }
     };
 
+    const handleUnschedule = async () => {
+        setSaving(true);
+        try {
+            await apiFetch(`/v1/newsletters/${id}/unschedule`, {
+                method: 'POST'
+            });
+            toast.success("Programmation annulée");
+            setNewsletter((prev: any) => ({...prev, status: 'draft', scheduledAt: null}));
+        } catch (error: any) {
+            toast.error("Erreur lors de l'annulation: " + error.message);
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const isReadOnly = newsletter?.status === 'sent' || newsletter?.status === 'scheduled';
+
     return (
         <div className="h-full flex flex-col overflow-hidden bg-muted/10">
             <header className="bg-background border-b px-6 py-4 flex items-center justify-between shadow-sm z-10">
@@ -226,21 +243,31 @@ export default function NewsletterEditorInner({id, initialNewsletter, volunteerC
                         onChange={(e) => setTitle(e.target.value)}
                         className="text-xl font-bold bg-transparent border-none focus-visible:ring-0 w-[400px] p-0 h-auto"
                         placeholder="Titre de la newsletter"
+                        disabled={isReadOnly}
                     />
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button variant="outline" onClick={() => saveNewsletter()} disabled={saving || sending}
+                    {newsletter?.status === 'scheduled' && (
+                        <Button variant="destructive" onClick={handleUnschedule} disabled={saving || sending}
+                                className="gap-2">
+                            {saving ? <Loader2 className="h-4 w-4 animate-spin"/> : <Calendar className="h-4 w-4"/>}
+                            Annuler la programmation
+                        </Button>
+                    )}
+                    <Button variant="outline" onClick={() => saveNewsletter()}
+                            disabled={saving || sending || isReadOnly}
                             className="gap-2">
                         {saving ? <Loader2 className="h-4 w-4 animate-spin"/> : <Save className="h-4 w-4"/>}
                         Enregistrer
                     </Button>
-                    <Button variant="outline" onClick={() => setScheduleDialogOpen(true)} disabled={saving || sending}
+                    <Button variant="outline" onClick={() => setScheduleDialogOpen(true)}
+                            disabled={saving || sending || isReadOnly}
                             className="gap-2 text-blue-600 border-blue-200 hover:bg-blue-50">
                         <Calendar className="h-4 w-4"/>
                         Programmer
                     </Button>
                     <Button onClick={() => setSendDialogOpen(true)}
-                            disabled={saving || sending || newsletter?.status === 'sent'}
+                            disabled={saving || sending || newsletter?.status === 'sent' || newsletter?.status === 'scheduled'}
                             className="gap-2 bg-green-600 hover:bg-green-700">
                         {sending ? <Loader2 className="h-4 w-4 animate-spin"/> : <Send className="h-4 w-4"/>}
                         Envoyer maintenant
@@ -250,6 +277,19 @@ export default function NewsletterEditorInner({id, initialNewsletter, volunteerC
 
             <main className="flex-1 overflow-y-auto p-8">
                 <div className="max-w-7xl mx-auto space-y-6">
+                    {isReadOnly && (
+                        <div
+                            className="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-md flex items-center gap-3">
+                            <Calendar className="h-5 w-5"/>
+                            <div>
+                                <p className="font-medium">
+                                    {newsletter?.status === 'sent'
+                                        ? "Cette newsletter a déjà été envoyée et ne peut plus être modifiée."
+                                        : `Cette newsletter est programmée pour le ${new Date(newsletter.scheduledAt).toLocaleString()} and est en lecture seule.`}
+                                </p>
+                            </div>
+                        </div>
+                    )}
                     <Card className="min-h-[600px] shadow-sm border-none ring-1 ring-border">
                         <CardContent className="pt-8">
                             <MantineProvider>
@@ -257,6 +297,7 @@ export default function NewsletterEditorInner({id, initialNewsletter, volunteerC
                                     editor={editor}
                                     theme="light"
                                     className="min-h-[500px]"
+                                    editable={!isReadOnly}
                                 />
                             </MantineProvider>
                         </CardContent>

@@ -57,6 +57,13 @@ export function renderEmailTemplate({title, content, footer}: EmailTemplateProps
         .content {
             font-size: 16px;
         }
+        .content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: ${borderRadius};
+            margin: 20px 0;
+            display: block;
+        }
         .content p {
             margin-bottom: 15px;
         }

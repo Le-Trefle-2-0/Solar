@@ -5,6 +5,7 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/compo
 import {Button} from "@/components/ui/button";
 import {Calendar, Edit, Loader2, Mail, Plus, Send, Trash2} from "lucide-react";
 import Link from "next/link";
+import {useRouter} from "next/navigation";
 import {format} from "date-fns";
 import {fr} from "date-fns/locale";
 import {toast} from "sonner";
@@ -12,6 +13,7 @@ import {toast} from "sonner";
 export default function NewslettersPage() {
     const [newsletters, setNewsletters] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const router = useRouter();
 
     const fetchNewsletters = async () => {
         setLoading(true);
@@ -36,7 +38,7 @@ export default function NewslettersPage() {
                 body: JSON.stringify({title: "Nouvelle newsletter", content: ""})
             });
             toast.success("Newsletter créée");
-            fetchNewsletters();
+            router.push(`/app/newsletters/${res.id}`);
         } catch (error: any) {
             toast.error("Erreur: " + error.message);
         }

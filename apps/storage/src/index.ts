@@ -5,7 +5,10 @@ import {lookup as mimeLookup} from 'mime-types';
 import {STORAGE_HOST, STORAGE_PORT} from './env.js';
 import {prisma} from './prisma.js';
 
-const app = Fastify({logger: true});
+const app = Fastify({
+    logger: true,
+    bodyLimit: 50 * 1024 * 1024 // 50MB
+});
 
 await app.register(cors, {origin: true, credentials: true});
 await app.register(multipart, {limits: {fileSize: 25 * 1024 * 1024}}); // 25 MB default

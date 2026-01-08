@@ -1,25 +1,9 @@
 import type {FastifyInstance} from 'fastify';
 import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
-import {Resend} from 'resend';
+import {decodeBytes, sendNewsletter} from '../../lib/newsletter-service.js';
 
 export async function registerNewslettersRoutes(app: FastifyInstance) {
-    const resend = new Resend(process.env.RESEND_API_KEY);
-
-    // Helper to decode Bytes fields from Prisma
-    const decodeBytes = (bytes: any): string => {
-        if (!bytes) return '';
-        if (Buffer.isBuffer(bytes)) {
-            return bytes.toString('utf8');
-        }
-        if (Array.isArray(bytes)) {
-            return Buffer.from(bytes).toString('utf8');
-        }
-        if (typeof bytes === 'object' && bytes.type === 'Buffer' && Array.isArray(bytes.data)) {
-            return Buffer.from(bytes.data).toString('utf8');
-        }
-        return String(bytes);
-    };
 
     // Middleware-like role check helper
     const checkNewsletterRole = async (req: any, reply: any) => {
@@ -93,6 +77,16 @@ export async function registerNewslettersRoutes(app: FastifyInstance) {
         const {id} = req.params as any;
         const {title, content, htmlContent, status, scheduledAt} = req.body as any;
 
+        const existing = await prisma.newsletter.findUnique({where: {id}});
+        if (!existing) return reply.status(404).send({error: 'not_found'});
+
+        if (existing.status === 'sent') {
+            return reply.status(400).send({error: 'already_sent'});
+        }
+        if (existing.status === 'scheduled' && status !== 'draft') {
+            return reply.status(400).send({error: 'already_scheduled_unschedule_first'});
+        }
+
         const updateData: any = {};
         if (title !== undefined) updateData.title = title;
         if (content !== undefined) updateData.content = Buffer.from(content || '', 'utf8');
@@ -103,6 +97,22 @@ export async function registerNewslettersRoutes(app: FastifyInstance) {
         const newsletter = await prisma.newsletter.update({
             where: {id},
             data: updateData
+        });
+        return newsletter;
+    });
+
+    // Unschedule newsletter
+    app.post('/v1/newsletters/:id/unschedule', async (req, reply) => {
+        await checkNewsletterRole(req, reply);
+        const {id} = req.params as any;
+
+        const existing = await prisma.newsletter.findUnique({where: {id}});
+        if (!existing) return reply.status(404).send({error: 'not_found'});
+        if (existing.status !== 'scheduled') return reply.status(400).send({error: 'not_scheduled'});
+
+        const newsletter = await prisma.newsletter.update({
+            where: {id},
+            data: {status: 'draft', scheduledAt: null}
         });
         return newsletter;
     });
@@ -120,50 +130,12 @@ export async function registerNewslettersRoutes(app: FastifyInstance) {
         await checkNewsletterRole(req, reply);
         const {id} = req.params as any;
 
-        const newsletter = await prisma.newsletter.findUnique({
-            where: {id}
-        });
-
-        if (!newsletter) return reply.status(404).send({error: 'not_found'});
-
-        const subscribers = await prisma.user.findMany({
-            where: {newsletterSubscription: true},
-            select: {email: true}
-        });
-
-        if (subscribers.length === 0) {
-            return reply.status(400).send({error: 'no_subscribers'});
-        }
-
-        // Use the stored HTML content if available, otherwise fallback to a basic wrap of the raw text
-        const html = newsletter.htmlContent
-            ? decodeBytes(newsletter.htmlContent)
-            : `<div>${decodeBytes(newsletter.content)}</div>`;
-
-        const emails = subscribers.map(s => s.email);
-
-        // Resend batch sending or loop
         try {
-            const {data, error} = await resend.emails.send({
-                from: "Newsletter <newsletter@solar.letrefle.org>",
-                to: emails,
-                subject: newsletter.title,
-                html,
-            });
-
-            if (error) {
-                console.error('[newsletters] Resend error:', error);
-                return reply.status(500).send({error: error.message});
-            }
-
-            await prisma.newsletter.update({
-                where: {id},
-                data: {status: 'sent', sentAt: new Date()}
-            });
-
+            const data = await sendNewsletter(id);
             return {success: true, data};
         } catch (e: any) {
-            console.error('[newsletters] Send error:', e);
+            if (e.message === 'not_found') return reply.status(404).send({error: 'not_found'});
+            if (e.message === 'no_subscribers') return reply.status(400).send({error: 'no_subscribers'});
             return reply.status(500).send({error: String(e)});
         }
     });
