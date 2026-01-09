@@ -106,10 +106,7 @@ export async function inviteUserAction(formData: z.infer<typeof inviteSchema>) {
             const api = auth.api;
 
             // Based on better-auth structure, we try to find the password reset function
-            const forgetFn = api.forgetPassword ||
-                api.forgotPassword ||
-                api.requestPasswordReset ||
-                (api.emailAndPassword && (api.emailAndPassword.forgetPassword || api.emailAndPassword.forgotPassword || api.emailAndPassword.requestPasswordReset));
+            const forgetFn = api.requestPasswordReset
 
             if (typeof forgetFn === 'function') {
                 await forgetFn({
