@@ -51,9 +51,93 @@ export async function registerChannelsRoutes(app: FastifyInstance) {
 
     // GET /v1/channel/:id – channel info
     app.get('/v1/channel/:id', async (req, reply) => {
+        const userId = await authenticate(req);
+        if (!userId) return reply.status(401).send('unauthorized');
+
         const {id} = req.params as any;
-        const channel = await prisma.channel.findUnique({where: {id}});
+        const channel = await prisma.channel.findUnique({
+            where: {id},
+            include: {
+                Ticket: {
+                    select: {
+                        assignedUserId: true,
+                    }
+                }
+            }
+        });
         if (!channel) return reply.status(404).send({error: 'not_found'});
-        return channel;
+
+        const user = await prisma.user.findUnique({where: {id: userId}});
+        const canReadAll = roleHasTicketsReadAll(user?.role ?? null);
+
+        let members: any[] = [];
+
+        // Channel '1' is public
+        if (id === '1') {
+            members = await prisma.user.findMany({
+                select: {
+                    id: true,
+                    name: true,
+                    displayUsername: true,
+                    image: true,
+                    role: true,
+                }
+            });
+        } else {
+            // Only members who have access to this channel
+            // For now, it's either the assigned user or anyone with roleHasTicketsReadAll
+            const ticket = await prisma.ticket.findUnique({
+                where: {channelId: id},
+            });
+
+            if (ticket) {
+                if (canReadAll) {
+                    // If the user can read all tickets, they probably want to see all potential members?
+                    // Or just the assigned user? The requirement says "display all users".
+                    // In a ticket channel, maybe "all users" means all staff?
+                    // Actually, "display all users" in the sidebar usually means all people who can see this channel.
+                    members = await prisma.user.findMany({
+                        where: {
+                            OR: [
+                                {id: ticket.assignedUserId || undefined},
+                                {role: {contains: 'admin'}},
+                                {role: {contains: 'manager'}},
+                                {role: {contains: 'training'}},
+                                {role: {contains: 'bot'}},
+                            ]
+                        },
+                        select: {
+                            id: true,
+                            name: true,
+                            displayUsername: true,
+                            image: true,
+                            role: true,
+                        }
+                    });
+                } else if (ticket.assignedUserId === userId) {
+                    // The assigned user can see themselves and staff
+                    members = await prisma.user.findMany({
+                        where: {
+                            OR: [
+                                {id: userId},
+                                {role: {contains: 'admin'}},
+                                {role: {contains: 'manager'}},
+                                {role: {contains: 'training'}},
+                                {role: {contains: 'bot'}},
+                            ]
+                        },
+                        select: {
+                            id: true,
+                            name: true,
+                            displayUsername: true,
+                            image: true,
+                            role: true,
+                        }
+                    });
+                }
+            }
+        }
+
+        return {...channel, members};
     });
 }
