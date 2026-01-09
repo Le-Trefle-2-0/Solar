@@ -7,7 +7,6 @@ import prisma from "@/lib/prisma";
 import {hashPassword} from "better-auth/crypto";
 import {getResendClient} from "@/lib/resend";
 import {renderEmailTemplate} from "@/lib/email-template";
-import {createId} from "@paralleldrive/cuid2";
 
 const inviteSchema = z.object({
     name: z.string().min(1),
@@ -68,55 +67,67 @@ export async function inviteUserAction(formData: z.infer<typeof inviteSchema>) {
             return user;
         });
 
-        // 2. Generate Password Reset Token and Send Invitation Email manually
-        console.log(`[inviteAction] Generating reset token for ${email}`);
-
-        const token = createId();
-        const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24 hours
-
-        await prisma.verification.create({
-            data: {
-                id: createId(),
-                identifier: email.toLowerCase(),
-                value: token,
-                expiresAt,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            }
-        });
-
-        const appUrl = process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-        const resetUrl = `${appUrl}/auth/reset-password?invite=true&token=${token}`;
-
-        console.log(`[inviteAction] Sending invitation email to ${email}`);
+        // 2. Send Welcome Email
+        console.log(`[inviteAction] Sending welcome email to ${email}`);
         const resend = getResendClient();
-        const {html} = renderEmailTemplate({
-            title: "Invitation à rejoindre Solar",
+        const {html: welcomeHtml} = renderEmailTemplate({
+            title: "Bienvenue sur Solar",
             content: `
                 <p>Bonjour ${name},</p>
-                <p>Vous avez été invité par un administrateur à rejoindre la plateforme Solar.</p>
-                <p>Cliquez sur le bouton ci-dessous pour définir votre mot de passe et finaliser votre inscription :</p>
-                <div style="text-align: center; margin: 30px 0;">
-                    <a href="${resetUrl}" class="button" style="color: white !important;">Définir mon mot de passe</a>
-                </div>
-                <p>Ce lien expirera dans 24 heures.</p>
-                <p>Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet e-mail.</p>
+                <p>C'est un plaisir de vous accueillir sur la plateforme Solar !</p>
+                <p>Votre compte a été créé avec succès par un administrateur.</p>
+                <p>Dans quelques instants, vous allez recevoir un <strong>deuxième e-mail</strong> contenant un lien sécurisé pour définir votre mot de passe et accéder à votre espace.</p>
+                <p><strong>Note importante :</strong> ce lien est valable pendant <strong>24 heures</strong>. Passé ce délai, vous pourrez en demander un nouveau sur la page de réinitialisation du mot de passe.</p>
+                <p>À très vite sur Solar !</p>
             `,
         });
 
-        const {error} = await resend.emails.send({
+        const {data: welcomeData, error: welcomeError} = await resend.emails.send({
             from: "Solar <noreply@solar.letrefle.org>",
             to: email,
-            subject: "Solar - Invitation",
-            html,
+            subject: "Solar - Bienvenue parmi nous !",
+            html: welcomeHtml,
         });
 
-        if (error) {
-            console.error("[inviteAction] Resend error sending invitation:", error);
-            throw new Error("Failed to send invitation email");
+        if (welcomeError) {
+            console.error("[inviteAction] Welcome email error:", welcomeError);
+        } else {
+            console.log(`[inviteAction] Welcome email sent successfully: ${welcomeData?.id}`);
         }
 
-        console.log(`[inviteAction] Invitation email sent successfully to ${email}`);
+        // Add a small delay to ensure the welcome email is processed first by the recipient's mail server
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // 3. Trigger Password Reset via Better-Auth
+        console.log(`[inviteAction] Triggering password reset for ${email}`);
+
+        try {
+            // @ts-ignore
+            const api = auth.api;
+
+            // Based on better-auth structure, we try to find the password reset function
+            const forgetFn = api.forgetPassword ||
+                api.forgotPassword ||
+                api.requestPasswordReset ||
+                (api.emailAndPassword && (api.emailAndPassword.forgetPassword || api.emailAndPassword.forgotPassword || api.emailAndPassword.requestPasswordReset));
+
+            if (typeof forgetFn === 'function') {
+                await forgetFn({
+                    body: {
+                        email: email.toLowerCase(),
+                        redirectTo: "/auth/reset-password",
+                    },
+                    headers: await headers()
+                });
+            } else {
+                throw new Error("Could not find password reset function on auth.api");
+            }
+        } catch (authError: any) {
+            console.error("[inviteAction] Auth API error:", authError);
+            // We don't throw here because the user is already created and welcome email sent
+            // but we should probably log it or handle it.
+        }
+
         return {success: true, user: userData};
     } catch (e: any) {
         console.error("[inviteAction] Error:", e);

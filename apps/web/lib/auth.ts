@@ -194,25 +194,31 @@ export const auth = betterAuth({
             console.log(`[auth] sendResetPassword triggered for ${data.user.email}`);
             const resend = getResendClient();
 
+            const title = "Réinitialisation de mot de passe";
+            const subject = "Solar - Réinitialisation de mot de passe";
+            const buttonText = "Réinitialiser mon mot de passe";
+
+            const content = `
+                <p>Bonjour ${data.user.name || ""},</p>
+                <p>Une demande de réinitialisation de mot de passe a été effectuée pour votre compte Solar.</p>
+                <p>Cliquez sur le bouton ci-dessous pour choisir un nouveau mot de passe :</p>
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="${data.url}" class="button" style="color: white !important;">${buttonText}</a>
+                </div>
+                <p>Ce lien expirera bientôt.</p>
+                <p>Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet e-mail.</p>
+            `;
+
             const {html} = renderEmailTemplate({
-                title: "Réinitialisation de mot de passe",
-                content: `
-                    <p>Bonjour ${data.user.name || ""},</p>
-                    <p>Vous avez demandé la réinitialisation de votre mot de passe pour votre compte Solar.</p>
-                    <p>Cliquez sur le bouton ci-dessous pour choisir un nouveau mot de passe :</p>
-                    <div style="text-align: center; margin: 30px 0;">
-                        <a href="${data.url}" class="button" style="color: white !important;">Réinitialiser mon mot de passe</a>
-                    </div>
-                    <p>Ce lien expirera bientôt.</p>
-                    <p>Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet e-mail.</p>
-                `,
+                title,
+                content,
             });
 
             console.log(`[auth] Sending reset email via Resend to ${data.user.email}`);
             const {error} = await resend.emails.send({
                 from: "Solar <noreply@solar.letrefle.org>",
                 to: data.user.email,
-                subject: "Solar - Réinitialisation de mot de passe",
+                subject,
                 html,
             });
             if (error) {
