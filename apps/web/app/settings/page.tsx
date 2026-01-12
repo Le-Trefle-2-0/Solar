@@ -2,13 +2,13 @@
 import {
     APIKeysCard,
     ChangeEmailCard,
-    ChangePasswordCard,
     ProvidersCard,
     SessionsCard,
     TwoFactorCard,
     UpdateAvatarCard,
     UpdateUsernameCard
 } from "@daveyplate/better-auth-ui"
+import ChangePasswordCustom from "@/components/settings/change-password-custom";
 import {NewsletterCard} from "@/components/settings/newsletter-card";
 import {locale} from "@/app/auth/[pathname]/view";
 import {CircleX, KeyRound, UserPen} from "lucide-react";
@@ -56,7 +56,7 @@ export default function SettingsPage() {
             <TabsContent value="security">
                 <div className="flex flex-col gap-6 w-full mx-auto p-12">
                     <ChangeEmailCard localization={locale}/>
-                    <ChangePasswordCard localization={locale}/>
+                    <ChangePasswordCustom />
                     <TwoFactorCard localization={locale}/>
                     <ProvidersCard localization={locale}/>
                     <SessionsCard localization={locale}/>
