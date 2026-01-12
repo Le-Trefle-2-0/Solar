@@ -9,7 +9,8 @@ import {
     registerUserToEvent,
     saveEvent,
     unregisterUserToEvent,
-    updateRegistrationStatus
+    updateRegistrationStatus,
+    removeUserFromEvent
 } from '../../lib/eventManager.js';
 
 const EventSchema = z.object({
@@ -53,6 +54,13 @@ export async function registerEventsRoutes(app: FastifyInstance) {
     app.post('/v1/events', async (req, reply) => {
         const userId = await checkAuth(req, reply);
         if (!userId) return;
+
+        // Only allow users with admin or manager roles to create events
+        const user = await prisma.user.findUnique({where: {id: userId}, select: {role: true}});
+        const userRoles = (user?.role || '').split(',').map(r => r.trim());
+        if (!userRoles.includes('admin') && !userRoles.includes('manager')) {
+            return reply.status(403).send({success: false, message: "Accès refusé : rôle admin ou manager requis"});
+        }
 
         try {
             const body = req.body;
@@ -222,10 +230,19 @@ export async function registerEventsRoutes(app: FastifyInstance) {
         if (!userId) return;
 
         const {id} = req.params as { id: string };
-        const {part, roleSlotId} = (req.body ?? {}) as { part?: 'first' | 'second', roleSlotId?: string };
+        const {part, roleSlotId, adminBypass} = (req.body ?? {}) as { part?: 'first' | 'second', roleSlotId?: string, adminBypass?: boolean };
+
+        // If admin bypass is requested, verify user has admin/manager role
+        if (adminBypass) {
+            const user = await prisma.user.findUnique({where: {id: userId}, select: {role: true}});
+            const userRoles = (user?.role || '').split(',').map(r => r.trim());
+            if (!userRoles.includes('admin') && !userRoles.includes('manager')) {
+                return reply.status(403).send({success: false, message: "Permissions insuffisantes pour utiliser le bypass administrateur"});
+            }
+        }
 
         try {
-            const registration = await registerUserToEvent(id, userId, part, roleSlotId);
+            const registration = await registerUserToEvent(id, userId, part, roleSlotId, adminBypass);
             return reply.send({success: true, registration});
         } catch (err: any) {
             return reply.status(400).send({success: false, message: err.message});
@@ -264,6 +281,25 @@ export async function registerEventsRoutes(app: FastifyInstance) {
         try {
             await updateRegistrationStatus(registrationId, status);
             return reply.send({success: true});
+        } catch (err: any) {
+            return reply.status(400).send({success: false, message: err.message});
+        }
+    });
+
+    app.post('/v1/events/:id/remove-user', async (req, reply) => {
+        const adminUserId = await checkAuth(req, reply);
+        if (!adminUserId) return;
+
+        const {id} = req.params as { id: string };
+        const {userId, roleSlotId} = (req.body ?? {}) as { userId: string, roleSlotId?: string };
+
+        if (!userId) {
+            return reply.status(400).send({success: false, message: "userId is required"});
+        }
+
+        try {
+            const registration = await removeUserFromEvent(id, userId, adminUserId, roleSlotId);
+            return reply.send({success: true, registration});
         } catch (err: any) {
             return reply.status(400).send({success: false, message: err.message});
         }

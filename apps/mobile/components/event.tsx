@@ -2,6 +2,7 @@
 
 import React, {useEffect, useState} from 'react';
 import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
+import {AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger} from "@/components/ui/alert-dialog";
 import {Badge} from "@/components/ui/badge";
 import {Button} from "@/components/ui/button";
 import {format, isAfter, setHours, setMinutes, setSeconds, startOfWeek} from 'date-fns';
@@ -26,6 +27,8 @@ export default function Event({event}: EventProps) {
     const [eventDetails, setEventDetails] = useState<EventData | null>(null);
     const [loading, setLoading] = useState(false);
     const [selectedPart, setSelectedPart] = useState<'part1' | 'part2' | null>(null);
+    const [deleteConfirm, setDeleteConfirm] = useState(false);
+    const [removeUserConfirm, setRemoveUserConfirm] = useState<{userId: string, userName: string, slotId?: string} | null>(null);
 
     const eventDate = new Date(event.start);
     const deadline = setSeconds(setMinutes(setHours(startOfWeek(eventDate, {weekStartsOn: 1}), 12), 0), 0);
@@ -113,9 +116,40 @@ export default function Event({event}: EventProps) {
         }
     }
 
-    async function handleDelete() {
-        if (!confirm("Voulez-vous vraiment supprimer cette permanence ?")) return;
+    async function handleRemoveUser(targetUserId: string, roleSlotId?: string) {
+        if (!isManagerOrAdmin) {
+            toast.error("Permissions insuffisantes");
+            return;
+        }
 
+        try {
+            setLoading(true);
+            const payload: any = { userId: targetUserId };
+            if (roleSlotId) payload.roleSlotId = roleSlotId;
+            const body = JSON.stringify(payload);
+
+            const res = await apiFetch(`/v1/events/${event.id}/remove-user`, {
+                method: 'POST',
+                body,
+            });
+
+            if (res.success) {
+                // Refresh event details
+                const updated = await apiFetch(`/v1/events/${event.id}`);
+                if (updated.success && updated.event) {
+                    setEventDetails(updated.event);
+                }
+                toast.success("Utilisateur retiré de l'événement");
+            }
+        } catch (e: any) {
+            console.error("Remove user failed", e);
+            toast.error(e.message || 'Erreur inconnue');
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    async function handleDelete() {
         try {
             setLoading(true);
             const res = await apiFetch(`/v1/events/${event.id}`, {
@@ -125,6 +159,7 @@ export default function Event({event}: EventProps) {
             if (res.success) {
                 toast.success("Permanence supprimée");
                 setOpen(false);
+                setDeleteConfirm(false);
                 router.refresh();
             }
         } catch (e: any) {
@@ -257,6 +292,43 @@ export default function Event({event}: EventProps) {
                                                             <X className="h-4 w-4"/>
                                                         </Button>
                                                     </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {isManagerOrAdmin && slot.registrations.filter(r => r.status === 'confirmed').length > 0 && (
+                                        <div className="bg-blue-50 p-2 rounded-sm space-y-2">
+                                            <p className="font-bold text-blue-800">Inscrits confirmés :</p>
+                                            {slot.registrations.filter(r => r.status === 'confirmed').map(reg => (
+                                                <div key={reg.id}
+                                                     className="flex justify-between items-center bg-white p-1 rounded border border-blue-200">
+                                                    <span>{reg.user?.name || reg.userId}</span>
+                                                    <AlertDialog open={removeUserConfirm?.userId === reg.userId} onOpenChange={(open) => { if (!open) setRemoveUserConfirm(null); }}>
+                                                        <AlertDialogTrigger asChild>
+                                                            <Button size="icon" variant="ghost"
+                                                                    className="h-6 w-6 text-red-600 hover:bg-red-50"
+                                                                    onClick={() => setRemoveUserConfirm({userId: reg.userId, userName: reg.user?.name || 'cet utilisateur', slotId: slot.id})}
+                                                                    disabled={loading}
+                                                                    title="Retirer cet utilisateur">
+                                                                <X className="h-4 w-4"/>
+                                                            </Button>
+                                                        </AlertDialogTrigger>
+                                                        <AlertDialogContent>
+                                                            <AlertDialogHeader>
+                                                                <AlertDialogTitle>Retirer cet utilisateur ?</AlertDialogTitle>
+                                                                <AlertDialogDescription>
+                                                                    Êtes-vous sûr de vouloir retirer {removeUserConfirm?.userName} de cet événement ?
+                                                                </AlertDialogDescription>
+                                                            </AlertDialogHeader>
+                                                            <AlertDialogFooter>
+                                                                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                                                <AlertDialogAction onClick={() => { if (removeUserConfirm) handleRemoveUser(removeUserConfirm.userId, removeUserConfirm.slotId); }} disabled={loading} className="bg-red-500 hover:bg-red-600">
+                                                                    Retirer
+                                                                </AlertDialogAction>
+                                                            </AlertDialogFooter>
+                                                        </AlertDialogContent>
+                                                    </AlertDialog>
                                                 </div>
                                             ))}
                                         </div>
