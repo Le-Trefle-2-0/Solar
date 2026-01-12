@@ -76,41 +76,6 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
     const [roleSlots, setRoleSlots] = useState<RoleSlotForm[]>([...DEFAULT_SLOTS]);
     const [currentMonth, setCurrentMonth] = useState(new Date());
 
-    async function createTestEvents() {
-        if (!userId) {
-            alert("Impossible de créer les événements de test : utilisateur non connecté");
-            return;
-        }
-
-        try {
-            const today = new Date();
-            for (let i = 0; i < 30; i++) {
-                const date = addDays(today, i);
-                const start = setMinutes(setHours(date, 20), 0);
-                const end = setMinutes(setHours(date, 23), 0);
-                const payload = {
-                    title: `Permanence`,
-                    description: "Créé automatiquement pour les tests",
-                    start,
-                    end,
-                    userId,
-                    roleSlots: [
-                        {role: 'manager', goalCount: 1},
-                        {role: 'volunteer', goalCount: 3, part: "first"},
-                        {role: 'volunteer', goalCount: 3, part: "second"}
-                    ]
-                };
-                await apiFetch('/v1/events', {
-                    method: 'POST',
-                    body: JSON.stringify(payload)
-                });
-            }
-            alert('Événements de test créés avec succès!');
-        } catch (e) {
-            console.error("Failed to create test events", e);
-            alert('Erreur lors de la création des événements de test');
-        }
-    }
 
     const daysOfWeek = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
@@ -252,9 +217,6 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
                         <ChevronRight className="h-5 w-5"/>
                     </button>
                 </div>
-                <Button onClick={createTestEvents}>
-                    Générer les événements de test
-                </Button>
 
 
                 <div className="flex gap-3 justify-end">
