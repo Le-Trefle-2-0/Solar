@@ -270,6 +270,7 @@ model EventRegistration {
   roleSlot     RoleSlot @relation(fields: [roleSlotId], references: [id])
   roleSlotId   String
   registeredAt DateTime @default(now())
+  status String @default("confirmed") // "confirmed", "pending"
   Event        Event?   @relation(fields: [eventId], references: [id])
   eventId      String?
 

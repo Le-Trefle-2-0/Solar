@@ -89,9 +89,18 @@ export type EventRoleSlot = {
     role: string;
     goalCount: number;
     registrationsCount: number;
+    pendingCount?: number;
     part?: 'first' | 'second' | null;
     registrations: {
+        id: string;
         userId: string;
+        status?: string;
+        user?: {
+            id: string;
+            name: string;
+            image: string | null;
+            role: string | null;
+        }
     }[];
 };
 
