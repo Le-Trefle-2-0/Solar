@@ -84,7 +84,10 @@ export async function createRecruitment(data: z.infer<typeof recruitmentSchema>)
         headers: await headers(),
     });
 
-    if (!session || (session.user as any).role !== "admin") {
+    const userRole = (session?.user as any)?.role || "";
+    const isAuthorized = userRole.split(",").some((r: string) => r === "admin" || r === "manager");
+
+    if (!session || !isAuthorized) {
         throw new Error("Non autorisé");
     }
 
@@ -110,7 +113,10 @@ export async function updateRecruitment(id: string, data: z.infer<typeof recruit
         headers: await headers(),
     });
 
-    if (!session || (session.user as any).role !== "admin") {
+    const userRole = (session?.user as any)?.role || "";
+    const isAuthorized = userRole.split(",").some((r: string) => r === "admin" || r === "manager");
+
+    if (!session || !isAuthorized) {
         throw new Error("Non autorisé");
     }
 
@@ -137,7 +143,10 @@ export async function deleteRecruitment(id: string) {
         headers: await headers(),
     });
 
-    if (!session || (session.user as any).role !== "admin") {
+    const userRole = (session?.user as any)?.role || "";
+    const isAuthorized = userRole.split(",").some((r: string) => r === "admin" || r === "manager");
+
+    if (!session || !isAuthorized) {
         throw new Error("Non autorisé");
     }
 

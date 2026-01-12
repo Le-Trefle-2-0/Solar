@@ -87,7 +87,7 @@ export default async function Admin() {
     if (!session) redirect('/auth/sign-in');
 
     const userRoles = ((session.user as any).role || "").split(",").map((r: string) => r.trim());
-    if (!userRoles.includes("admin")) {
+    if (!userRoles.includes("admin") && !userRoles.includes("manager")) {
         redirect("/app");
     }
 

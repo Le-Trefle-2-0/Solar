@@ -104,7 +104,7 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
         return baseData.filter(item => {
             if (!(item as any).adminOnly) return true;
             if (isAdmin) return true;
-            if (isManager && item.name === "Historique") return true;
+            if (isManager && (item.name === "Historique" || item.name === "Recrutement" || item.name === "Utilisateurs")) return true;
             return false;
         });
     }, [session]);

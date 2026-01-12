@@ -21,7 +21,7 @@ export default function Admin() {
 
         if (session) {
             const userRoles = ((session.user as any).role || "").split(",").map((r: string) => r.trim());
-            if (!userRoles.includes("admin")) {
+            if (!userRoles.includes("admin") && !userRoles.includes("manager")) {
                 router.push("/");
                 return;
             }

@@ -14,7 +14,7 @@ export default async function RecruitmentsPage() {
     }
 
     const userRoles = ((session.user as any).role || "").split(",").map((r: string) => r.trim());
-    if (!userRoles.includes("admin")) {
+    if (!userRoles.includes("admin") && !userRoles.includes("manager")) {
         redirect("/app");
     }
 
