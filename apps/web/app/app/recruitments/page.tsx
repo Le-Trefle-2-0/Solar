@@ -4,6 +4,13 @@ import {redirect} from "next/navigation";
 import {getRecruitments} from "@/app/actions/recruitments";
 import {RecruitmentClient} from "@/components/recruitments/recruitment-client";
 
+import {constructMetadata} from "@/lib/metadata";
+
+export const metadata = constructMetadata({
+    title: "Gestion des Recrutements",
+    noIndex: true,
+});
+
 export default async function RecruitmentsPage() {
     const session = await auth.api.getSession({
         headers: await headers(),

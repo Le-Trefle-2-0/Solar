@@ -74,21 +74,21 @@ export async function inviteUserAction(formData: z.infer<typeof inviteSchema>) {
         console.log(`[inviteAction] Sending welcome email to ${email}`);
         const resend = getResendClient();
         const {html: welcomeHtml} = renderEmailTemplate({
-            title: "Bienvenue sur Solar",
+            title: "Bienvenue sur Le Trèfle 2.0",
             content: `
                 <p>Bonjour ${name},</p>
-                <p>C'est un plaisir de vous accueillir sur la plateforme Solar !</p>
+                <p>C'est un plaisir de vous accueillir sur la plateforme du Trèfle 2.0 !</p>
                 <p>Votre compte a été créé avec succès par un administrateur.</p>
                 <p>Dans quelques instants, vous allez recevoir un <strong>deuxième e-mail</strong> contenant un lien sécurisé pour définir votre mot de passe et accéder à votre espace.</p>
                 <p><strong>Note importante :</strong> ce lien est valable pendant <strong>24 heures</strong>. Passé ce délai, vous pourrez en demander un nouveau sur la page de réinitialisation du mot de passe.</p>
-                <p>À très vite sur Solar !</p>
+                <p>À très vite sur Le Trèfle 2.0 !</p>
             `,
         });
 
         const {data: welcomeData, error: welcomeError} = await resend.emails.send({
-            from: "Solar <noreply@solar.letrefle.org>",
+            from: "Le Trèfle 2.0 <noreply@solar.letrefle.org>",
             to: email,
-            subject: "Solar - Bienvenue parmi nous !",
+            subject: "Le Trèfle 2.0 - Bienvenue parmi nous !",
             html: welcomeHtml,
         });
 

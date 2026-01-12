@@ -125,7 +125,7 @@ export function renderEmailTemplate({title, content, footer}: EmailTemplateProps
         </div>
         <div class="footer">
             <p>&copy; ${new Date().getFullYear()} Le Trèfle 2.0. Tous droits réservés.</p>
-            <p><a href="${appUrl}" style="color: ${primaryColor}; text-decoration: none;">Accéder à Solar</a></p>
+            <p><a href="${appUrl}" style="color: ${primaryColor}; text-decoration: none;">Accéder à l'espace bénévole</a></p>
         </div>
     </div>
 </body>

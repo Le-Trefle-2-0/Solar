@@ -27,7 +27,7 @@ export function PublicHeader({session}: { session: any }) {
             </Button>
             {session ? (
                 <Button asChild variant="outline" className="w-full lg:w-auto">
-                    <Link href="/app">Ouvrir Solar</Link>
+                    <Link href="/app">Espace Bénévole</Link>
                 </Button>
             ) : (
                 <Button asChild variant="outline" className="w-full lg:w-auto">

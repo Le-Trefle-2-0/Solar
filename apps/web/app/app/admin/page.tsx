@@ -5,6 +5,7 @@ import {subDays} from "date-fns";
 import {auth} from "@/lib/auth";
 import {headers} from "next/headers";
 import {redirect} from "next/navigation";
+import {constructMetadata} from "@/lib/metadata";
 
 async function getData(): Promise<DisplayAccount[]> {
     // Fetch data from your API here.
@@ -78,6 +79,11 @@ async function getData(): Promise<DisplayAccount[]> {
         casierRejectReason: acc.casierRejectReason,
     }));
 }
+
+export const metadata = constructMetadata({
+    title: "Administration",
+    noIndex: true,
+});
 
 export default async function Admin() {
     const session = await auth.api.getSession({

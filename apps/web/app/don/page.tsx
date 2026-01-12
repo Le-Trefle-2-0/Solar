@@ -5,6 +5,13 @@ import {PublicFooter} from "@/components/landing/footer";
 import {DonationForm} from "@/components/donations/donation-form";
 import {Heart} from "lucide-react";
 
+import {constructMetadata} from "@/lib/metadata";
+
+export const metadata = constructMetadata({
+    title: "Faire un don",
+    description: "Soutenez Le Trèfle 2.0. Vos dons nous permettent de maintenir nos services d'écoute gratuits et anonymes.",
+});
+
 export default async function DonationPage({
                                                searchParams,
                                            }: {

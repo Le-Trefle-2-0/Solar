@@ -3,6 +3,13 @@ import {headers} from "next/headers";
 import {redirect} from "next/navigation";
 import {HistoryTable} from "./history-table";
 
+import {constructMetadata} from "@/lib/metadata";
+
+export const metadata = constructMetadata({
+    title: "Historique",
+    noIndex: true,
+});
+
 export default async function HistoryPage() {
     const session = await auth.api.getSession({
         headers: await headers()

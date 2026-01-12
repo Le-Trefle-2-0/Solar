@@ -5,6 +5,13 @@ import {PublicFooter} from "@/components/landing/footer";
 import {FAQClient} from "@/components/landing/faq-client";
 import {HelpCircle} from "lucide-react";
 
+import {constructMetadata} from "@/lib/metadata";
+
+export const metadata = constructMetadata({
+    title: "FAQ",
+    description: "Tout ce que vous devez savoir sur Le Trèfle 2.0, notre fonctionnement et nos services d'écoute.",
+});
+
 export default async function FAQPage() {
     const session = await auth.api.getSession({
         headers: await headers(),

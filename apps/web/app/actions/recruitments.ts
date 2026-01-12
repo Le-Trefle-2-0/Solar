@@ -60,7 +60,7 @@ export async function applyToRecruitment(recruitmentId: string, data: Record<str
 
     try {
         const {error} = await resend.emails.send({
-            from: "noreply@solar.letrefle.org",
+            from: "Le Trèfle 2.0 <noreply@solar.letrefle.org>",
             to: recruitment.contactEmail || "contact@letrefle.org",
             replyTo: applicantEmail,
             subject: `[Recrutement] ${recruitment.title} - ${applicantName}`,

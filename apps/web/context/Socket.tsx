@@ -241,7 +241,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({childre
                 <div
                     className="fixed inset-0 z-[1000] flex items-center justify-center bg-background/90 backdrop-blur-sm">
                     <div className="flex flex-col items-center gap-4">
-                        <img src="/logo.svg" alt="Solar" className="h-16 w-16 animate-pulse-scale"/>
+                        <img src="/logo.svg" alt="Le Trèfle 2.0" className="h-16 w-16 animate-pulse-scale"/>
                         <p className="text-sm text-muted-foreground text-center px-4">
                             {trouble ? 'Nous rencontrons des difficultés de connexion. Nouvelle tentative…' : ''}
                         </p>

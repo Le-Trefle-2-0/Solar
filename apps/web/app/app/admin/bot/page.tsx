@@ -3,6 +3,13 @@ import {headers} from "next/headers";
 import {redirect} from "next/navigation";
 import {BotClient} from "@/components/admin/bot-client";
 
+import {constructMetadata} from "@/lib/metadata";
+
+export const metadata = constructMetadata({
+    title: "Gestion du Bot",
+    noIndex: true,
+});
+
 export default async function BotAdminPage() {
     const session = await auth.api.getSession({
         headers: await headers()

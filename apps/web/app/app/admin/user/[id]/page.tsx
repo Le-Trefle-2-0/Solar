@@ -4,6 +4,13 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/compo
 import {redirect} from "next/navigation";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui";
 
+import {constructMetadata} from "@/lib/metadata";
+
+export const metadata = constructMetadata({
+    title: "Profil Utilisateur",
+    noIndex: true,
+});
+
 export default async function UserDetail({
                                              params
                                          }: {

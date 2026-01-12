@@ -9,6 +9,13 @@ import * as Icons from "lucide-react";
 import {cn} from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
 
+import {constructMetadata} from "@/lib/metadata";
+
+export const metadata = constructMetadata({
+    title: "Devenir Bénévole",
+    description: "Rejoignez l'aventure Le Trèfle 2.0 et donnez de votre temps pour une cause qui a du sens. Découvrez nos opportunités de bénévolat.",
+});
+
 export default async function BenevolesPage() {
     const recruitments = await getRecruitments();
     const session = await auth.api.getSession({

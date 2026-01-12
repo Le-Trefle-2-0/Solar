@@ -4,6 +4,13 @@ import {PublicHeader} from "@/components/landing/header";
 import {PublicFooter} from "@/components/landing/footer";
 import {ShieldCheck} from "lucide-react";
 
+import {constructMetadata} from "@/lib/metadata";
+
+export const metadata = constructMetadata({
+    title: "Politique de Confidentialité",
+    description: "Comment nous protégeons vos données et respectons votre vie privée au sein du Trèfle 2.0.",
+});
+
 export default async function ConfidentialitePage() {
     const session = await auth.api.getSession({
         headers: await headers(),

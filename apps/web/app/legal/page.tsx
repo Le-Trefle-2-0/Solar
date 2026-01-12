@@ -4,6 +4,13 @@ import {PublicHeader} from "@/components/landing/header";
 import {PublicFooter} from "@/components/landing/footer";
 import {Scale} from "lucide-react";
 
+import {constructMetadata} from "@/lib/metadata";
+
+export const metadata = constructMetadata({
+    title: "Mentions Légales",
+    description: "Informations juridiques concernant l'association Le Trèfle 2.0.",
+});
+
 export default async function LegalPage() {
     const session = await auth.api.getSession({
         headers: await headers(),

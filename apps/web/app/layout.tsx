@@ -1,4 +1,4 @@
-import type {Metadata, Viewport} from "next"
+import type {Viewport} from "next"
 import {Geist, Geist_Mono} from "next/font/google"
 import type {ReactNode} from "react"
 
@@ -7,6 +7,7 @@ import "./globals.css"
 import {config} from '@fortawesome/fontawesome-svg-core'
 import '@fortawesome/fontawesome-svg-core/styles.css'
 import {Providers} from "./providers"
+import {constructMetadata} from "@/lib/metadata"
 
 config.autoAddCss = false
 
@@ -20,14 +21,7 @@ const geistMono = Geist_Mono({
     subsets: ["latin"]
 })
 
-export const metadata: Metadata = {
-    title: "Solar - Logiciel d'écoutes",
-    description: "Application de prise en charge d'écoutes anonymes pour Le Trèfle 2.0",
-    icons: {
-        icon: "/favicon.ico",
-        apple: "/logo.svg"
-    }
-}
+export const metadata = constructMetadata()
 
 export const viewport: Viewport = {
     initialScale: 1,
