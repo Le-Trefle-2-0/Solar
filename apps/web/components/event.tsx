@@ -20,12 +20,14 @@ interface EventProps {
 export default function Event({event}: EventProps) {
     const time = `${format(new Date(event.start), 'HH:mm', {locale: fr})} - ${format(new Date(event.end), 'HH:mm', {locale: fr})}`;
     const {data: session} = useSession();
+    const router = useRouter();
 
     const [open, setOpen] = useState(false);
     const [eventDetails, setEventDetails] = useState<EventData | null>(null);
     const [loading, setLoading] = useState(false);
     const [selectedPart, setSelectedPart] = useState<'part1' | 'part2' | null>(null);
 
+    const eventDate = new Date(event.start);
     const deadline = setSeconds(setMinutes(setHours(startOfWeek(eventDate, {weekStartsOn: 1}), 12), 0), 0);
     const isAfterDeadline = isAfter(new Date(), deadline);
 

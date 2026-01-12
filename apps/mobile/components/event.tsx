@@ -20,6 +20,7 @@ interface EventProps {
 export default function Event({event}: EventProps) {
     const time = `${format(new Date(event.start), 'HH:mm', {locale: fr})} - ${format(new Date(event.end), 'HH:mm', {locale: fr})}`;
     const {data: session} = useSession();
+    const router = useRouter();
 
     const [open, setOpen] = useState(false);
     const [eventDetails, setEventDetails] = useState<EventData | null>(null);
@@ -31,16 +32,18 @@ export default function Event({event}: EventProps) {
     const isAfterDeadline = isAfter(new Date(), deadline);
 
     useEffect(() => {
-        apiFetch(`/v1/events/${event.id}`)
-            .then(res => {
-                if (res.success && res.event) {
-                    setEventDetails(res.event);
-                }
-            })
-            .catch(err => {
-                console.error("Failed to fetch event details", err);
-            });
-    }, [event.id]);
+        if (open) {
+            apiFetch(`/v1/events/${event.id}`)
+                .then(res => {
+                    if (res.success && res.event) {
+                        setEventDetails(res.event);
+                    }
+                })
+                .catch(err => {
+                    console.error("Failed to fetch event details", err);
+                });
+        }
+    }, [event.id, open]);
 
     async function handleRegister(part?: 'first' | 'second', roleSlotId?: string) {
         if (!session?.user?.id) {
@@ -191,8 +194,14 @@ export default function Event({event}: EventProps) {
             </DialogTrigger>
             <DialogContent className="max-w-md">
                 <DialogHeader>
-                    <DialogTitle>
-                        {event.title} du {format(new Date(event.start), "EEEE d MMMM yyyy", {locale: fr})}
+                    <DialogTitle className="flex justify-between items-center">
+                        <span>{event.title} du {format(new Date(event.start), "EEEE d MMMM yyyy", {locale: fr})}</span>
+                        {isAdmin && (
+                            <Button variant="ghost" size="icon" onClick={handleDelete} disabled={loading}
+                                    className="text-red-500 hover:text-red-700 hover:bg-red-50">
+                                <Trash2 className="h-4 w-4"/>
+                            </Button>
+                        )}
                     </DialogTitle>
                     <p className="text-sm text-muted-foreground">{time}</p>
                 </DialogHeader>

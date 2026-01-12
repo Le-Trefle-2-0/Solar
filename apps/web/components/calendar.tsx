@@ -22,6 +22,7 @@ import Event from './event';
 import {EventData} from "@/lib/interface";
 import {
     Button,
+    Checkbox,
     Dialog,
     DialogClose,
     DialogContent,
@@ -54,6 +55,20 @@ const permSchema = z.object({
     startTime: z.string(),
     endDate: z.date(),
     endTime: z.string(),
+    isBulk: z.boolean().default(false),
+    bulkUntil: z.date().optional(),
+}).refine(data => {
+    if (data.isBulk && !data.bulkUntil) return false;
+    return true;
+}, {
+    message: "La date de fin de série est requise",
+    path: ["bulkUntil"]
+}).refine(data => {
+    if (data.isBulk && data.bulkUntil && data.bulkUntil < data.startDate) return false;
+    return true;
+}, {
+    message: "La date de fin de série doit être après la date de début",
+    path: ["bulkUntil"]
 })
 export default function PlanningCalendar({events, userId}: { events: EventData[], userId?: string }) {
     type RoleSlotForm = { role: 'manager' | 'volunteer'; goalCount: number; part?: 'first' | 'second' };
@@ -69,6 +84,7 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
             startTime: "20:00",
             endDate: new Date(),
             endTime: "23:00",
+            isBulk: false,
         },
     });
 
@@ -182,27 +198,7 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
     };
 
     async function createEvent(data: z.infer<typeof permSchema>) {
-        console.log(data)
         try {
-            const [startHour, startMinute] = data.startTime.split(":").map(Number)
-            const start = setSeconds(
-                setMinutes(setHours(new Date(data.startDate), startHour), startMinute),
-                0
-            )
-
-            const [endHour, endMinute] = data.endTime.split(":").map(Number)
-            const end = setSeconds(
-                setMinutes(setHours(new Date(data.endDate), endHour), endMinute),
-                0
-            )
-
-            if (start >= end) {
-                toast("Erreur", {
-                    description: "La date et l'heure de début doivent être avant celles de fin.",
-                })
-                return
-            }
-
             const sanitizedSlots = roleSlots
                 .map(s => ({
                     role: s.role,
@@ -210,21 +206,79 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
                     part: s.role === 'volunteer' ? s.part : undefined,
                 }));
 
-            const payload = {
-                title: "Permanence",
-                description: "Permanence",
-                start,
-                end,
-                userId,
-                roleSlots: sanitizedSlots,
+            const [startHour, startMinute] = data.startTime.split(":").map(Number)
+            const [endHour, endMinute] = data.endTime.split(":").map(Number)
+
+            const eventsToCreate = [];
+
+            if (data.isBulk && data.bulkUntil) {
+                let currentDate = new Date(data.startDate);
+                const untilDate = new Date(data.bulkUntil);
+
+                while (currentDate <= untilDate) {
+                    const start = setSeconds(
+                        setMinutes(setHours(new Date(currentDate), startHour), startMinute),
+                        0
+                    )
+
+                    const originalStart = setSeconds(
+                        setMinutes(setHours(new Date(data.startDate), startHour), startMinute),
+                        0
+                    )
+                    const originalEnd = setSeconds(
+                        setMinutes(setHours(new Date(data.endDate), endHour), endMinute),
+                        0
+                    )
+                    const durationMs = originalEnd.getTime() - originalStart.getTime();
+
+                    const end = new Date(start.getTime() + durationMs);
+
+                    eventsToCreate.push({
+                        title: `Permanence`,
+                        description: "Permanence",
+                        start,
+                        end,
+                        userId,
+                        roleSlots: sanitizedSlots
+                    });
+
+                    currentDate = addDays(currentDate, 1);
+                }
+            } else {
+                const start = setSeconds(
+                    setMinutes(setHours(new Date(data.startDate), startHour), startMinute),
+                    0
+                )
+                const end = setSeconds(
+                    setMinutes(setHours(new Date(data.endDate), endHour), endMinute),
+                    0
+                )
+
+                if (start >= end) {
+                    toast.error("Erreur", {
+                        description: "La date et l'heure de début doivent être avant celles de fin.",
+                    })
+                    return
+                }
+
+                eventsToCreate.push({
+                    title: `Permanence`,
+                    description: "Permanence",
+                    start,
+                    end,
+                    userId,
+                    roleSlots: sanitizedSlots
+                });
             }
 
-            await apiFetch('/v1/events', {
-                method: 'POST',
-                body: JSON.stringify(payload)
-            });
+            for (const payload of eventsToCreate) {
+                await apiFetch('/v1/events', {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+            }
 
-            toast.success("Événement créé !")
+            toast.success(`${eventsToCreate.length} permanence(s) créée(s) !`)
 
             router.refresh()
         } catch (error) {
@@ -394,6 +448,74 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
                                             )}
                                         />
                                     </div>
+
+                                    <div className="flex items-center space-x-2 mt-4">
+                                        <FormField
+                                            control={createEventForm.control}
+                                            name="isBulk"
+                                            render={({field}) => (
+                                                <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                                                    <FormControl>
+                                                        <Checkbox
+                                                            checked={field.value}
+                                                            onCheckedChange={field.onChange}
+                                                        />
+                                                    </FormControl>
+                                                    <FormLabel
+                                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                                        Créer en série (tous les jours)
+                                                    </FormLabel>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+
+                                    {createEventForm.watch("isBulk") && (
+                                        <div className="flex gap-4 mt-4">
+                                            <FormField
+                                                control={createEventForm.control}
+                                                name="bulkUntil"
+                                                render={({field}) => (
+                                                    <FormItem className="flex flex-col flex-1">
+                                                        <FormLabel>Répéter jusqu'au</FormLabel>
+                                                        <Popover>
+                                                            <PopoverTrigger asChild>
+                                                                <FormControl>
+                                                                    <Button
+                                                                        variant="outline"
+                                                                        className={cn(
+                                                                            "pl-3 text-left font-normal",
+                                                                            !field.value && "text-muted-foreground"
+                                                                        )}
+                                                                    >
+                                                                        {field.value ? (
+                                                                            format(field.value, "PPP", {locale: fr})
+                                                                        ) : (
+                                                                            <span>Choisir une date</span>
+                                                                        )}
+                                                                        <CalendarIcon
+                                                                            className="ml-auto h-4 w-4 opacity-50"/>
+                                                                    </Button>
+                                                                </FormControl>
+                                                            </PopoverTrigger>
+                                                            <PopoverContent className="w-auto p-0" align="start">
+                                                                <Calendar
+                                                                    mode="single"
+                                                                    selected={field.value}
+                                                                    onSelect={field.onChange}
+                                                                    captionLayout="dropdown"
+                                                                    locale={fr}
+                                                                    weekStartsOn={1}
+                                                                    disabled={(date) => date < new Date("1900-01-01")}
+                                                                />
+                                                            </PopoverContent>
+                                                        </Popover>
+                                                        <FormMessage/>
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+                                    )}
 
                                     <div className="mt-4 border-t pt-4">
                                         <h3 className="text-sm font-semibold mb-2">Gestion des créneaux par rôle</h3>

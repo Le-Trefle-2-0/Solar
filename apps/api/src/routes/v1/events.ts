@@ -201,6 +201,13 @@ export async function registerEventsRoutes(app: FastifyInstance) {
         const userId = await checkAuth(req, reply);
         if (!userId) return;
 
+        // Check if user is admin
+        const user = await prisma.user.findUnique({where: {id: userId}, select: {role: true}});
+        const userRoles = (user?.role || '').split(',').map(r => r.trim());
+        if (!userRoles.includes('admin')) {
+            return reply.status(403).send({success: false, message: "Forbidden: Admin role required"});
+        }
+
         const {id} = req.params as { id: string };
         try {
             await prisma.event.delete({where: {id}});
