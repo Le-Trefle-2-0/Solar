@@ -399,24 +399,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
     };
 
     const [onlineUsers, setOnlineUsers] = useState<UserFromList[]>([]);
-    const [allMembers, setAllMembers] = useState<UserFromList[]>([]);
 
-
-    useEffect(() => {
-        if (channelID) {
-            apiFetch(`/v1/channel/${channelID}`).then((data: any) => {
-                if (data && data.members) {
-                    const normalized = data.members.map((u: any) => ({
-                        id: u.id,
-                        username: u.displayUsername || u.name,
-                        image: u.image,
-                        role: u.role
-                    }));
-                    setAllMembers(normalized);
-                }
-            });
-        }
-    }, [channelID]);
 
     useEffect(() => {
         if (!socket) return;
@@ -456,7 +439,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
         };
 
         const requestSnapshot = () => {
-            if (!socket || !socket.connected) return;
+            if (!socket) return;
             socket.emit('getOnlineUsers', {channelID}, (users: UserFromList[]) => {
                 const normalized = (users || []).map(u => ({...u, role: getHighestRole(u.role as any)}));
                 setOnlineUsers(ensureSelfIncluded(normalized));
@@ -464,24 +447,16 @@ export function Chat(props: { channelID: string, statusID: number }) {
         };
 
         function handleConnect() {
-            if (!socket || !socket.connected) return;
+            if (!socket) return;
             requestSnapshot();
         }
 
-        // initial snapshot - wait for socket to be connected
-        if (socket?.connected) {
-            handleConnect();
-        }
+        // initial snapshot
+        handleConnect();
 
-        function handleUserList(payload: any) {
-            // Handle both legacy (array) and new (object with channelId) formats
-            const users = Array.isArray(payload) ? payload : payload?.users;
-            const cid = Array.isArray(payload) ? channelID : payload?.channelId;
-
-            if (cid === channelID) {
-                const normalized = (users || []).map((u: any) => ({...u, role: getHighestRole(u.role as any)}));
-                setOnlineUsers(ensureSelfIncluded(normalized));
-            }
+        function handleUserList(users: UserFromList[]) {
+            const normalized = (users || []).map(u => ({...u, role: getHighestRole(u.role as any)}));
+            setOnlineUsers(ensureSelfIncluded(normalized));
         }
 
         socket.on("userList", handleUserList);
@@ -497,7 +472,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
         };
         const handleLeft = (payload: { channelId: string; user: UserFromList }) => {
             if (payload?.channelId === channelID && payload.user) {
-                setOnlineUsers(prev => ensureSelfIncluded(prev.filter(u => u.id !== payload.user.id)));
+                setOnlineUsers(prev => prev.filter(u => u.id !== payload.user.id));
             }
         };
 
@@ -1548,8 +1523,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                         {onlineUsers.length} utilisateur{onlineUsers.length >= 2 ? "s" : null} connecté{onlineUsers.length >= 2 ? "s" : null}
                     </small>
                 </div>
-                <div className="flex flex-col overflow-y-auto">
-                    {/* Online Users Grouped by Role */}
+                <div className="flex flex-col">
                     {Object.entries(
                         onlineUsers.reduce((acc, user) => {
                             const roleKey = Array.isArray(user.role) ? (user.role[0] as string) : (user.role as string);
@@ -1558,8 +1532,8 @@ export function Chat(props: { channelID: string, statusID: number }) {
                         }, {} as Record<string, UserFromList[]>)
                     ).sort(
                         ([roleA], [roleB]) =>
-                            (displayRoleOrder as readonly string[]).indexOf(roleA as any) -
-                            (displayRoleOrder as readonly string[]).indexOf(roleB as any)
+                            (displayRoleOrder as readonly string[]).indexOf(roleA) -
+                            (displayRoleOrder as readonly string[]).indexOf(roleB)
                     ).map(([role, users]) => (
                         <div key={role} className="mb-4">
                             <h4 className="text-md font-semibold text-gray-700 mb-2 capitalize">
@@ -1571,15 +1545,11 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                         key={user.id}
                                         className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                                     >
-                                        <div className="relative">
-                                            <img
-                                                src={user.image || "/logo.svg"}
-                                                alt={user.username}
-                                                className="w-8 h-8 rounded-lg object-cover"
-                                            />
-                                            <div
-                                                className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-white dark:border-gray-800 rounded-full"></div>
-                                        </div>
+                                        <img
+                                            src={user.image || "/logo.svg"}
+                                            alt={user.username}
+                                            className="w-8 h-8 rounded-lg object-cover"
+                                        />
                                         <span className="text-sm text-gray-900 dark:text-gray-100 truncate">
                                         {user.username}
                                       </span>
@@ -1588,39 +1558,6 @@ export function Chat(props: { channelID: string, statusID: number }) {
                             </div>
                         </div>
                     ))}
-
-                    {/* Offline Users */}
-                    {(() => {
-                        const onlineIds = new Set(onlineUsers.map(u => u.id));
-                        const offlineUsers = allMembers.filter(u => !onlineIds.has(u.id));
-
-                        if (offlineUsers.length === 0) return null;
-
-                        return (
-                            <div className="mb-4">
-                                <h4 className="text-md font-semibold text-gray-400 mb-2 capitalize">
-                                    Hors ligne
-                                </h4>
-                                <div className="flex flex-col gap-2">
-                                    {offlineUsers.map(user => (
-                                        <div
-                                            key={user.id}
-                                            className="flex items-center gap-2 p-2 rounded-lg opacity-60"
-                                        >
-                                            <img
-                                                src={user.image || "/logo.svg"}
-                                                alt={user.username}
-                                                className="w-8 h-8 rounded-lg object-cover grayscale"
-                                            />
-                                            <span className="text-sm text-gray-500 dark:text-gray-400 truncate">
-                                                {user.username}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        );
-                    })()}
                 </div>
             </div>
         </div>
