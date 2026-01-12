@@ -23,7 +23,7 @@ setInterval(() => {
 
 async function validateJWT(token) {
     try {
-        const authUrl = (process.env.INTERNAL_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/$/, '');
+        const authUrl = process.env.INTERNAL_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL;
         const JWKS = createRemoteJWKSet(new URL(`${authUrl}/api/auth/jwks`));
         const {payload} = await jwtVerify(token, JWKS, {
             issuer: process.env.NEXT_PUBLIC_APP_URL,
@@ -38,17 +38,14 @@ async function validateJWT(token) {
 
 async function validateAPIKey(token) {
     try {
-        const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000').replace(/\/$/, '');
-        console.log(`[ws] Validating API key against ${apiUrl}/v1/keys/check`);
-        const res = await fetch(`${apiUrl}/v1/keys/check`, {
+        const authUrl = process.env.INTERNAL_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL;
+        const res = await fetch(`${authUrl}/api/check-key`, {
             body: JSON.stringify({key: token}),
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
         });
-        const data = await res.json();
-        return data.valid ? data : false;
+        return await res.json();
     } catch (error) {
-        console.error('[ws] API key validation error:', error);
         return false;
     }
 }
