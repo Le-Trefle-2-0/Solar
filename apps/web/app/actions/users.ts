@@ -19,7 +19,10 @@ export async function inviteUserAction(formData: z.infer<typeof inviteSchema>) {
         headers: await headers(),
     });
 
-    if (!session || (session.user as any).role !== "admin") {
+    const userRole = (session?.user as any)?.role || "";
+    const isAuthorized = userRole.split(",").some((r: string) => r === "admin" || r === "manager");
+
+    if (!session || !isAuthorized) {
         return {error: "Unauthorized"};
     }
 
@@ -192,7 +195,10 @@ export async function validateDocumentsAction(userId: string, type: 'idCard' | '
         headers: await headers(),
     });
 
-    if (!session || (session.user as any).role !== "admin") {
+    const userRole = (session?.user as any)?.role || "";
+    const isAuthorized = userRole.split(",").some((r: string) => r === "admin" || r === "manager");
+
+    if (!session || !isAuthorized) {
         return {error: "Unauthorized"};
     }
 
@@ -235,7 +241,10 @@ export async function rejectDocumentAction(userId: string, type: 'idCard' | 'cas
         headers: await headers(),
     });
 
-    if (!session || (session.user as any).role !== "admin") {
+    const userRole = (session?.user as any)?.role || "";
+    const isAuthorized = userRole.split(",").some((r: string) => r === "admin" || r === "manager");
+
+    if (!session || !isAuthorized) {
         return {error: "Unauthorized"};
     }
 
@@ -267,7 +276,10 @@ export async function requestRenewalAction(userId: string) {
         headers: await headers(),
     });
 
-    if (!session || (session.user as any).role !== "admin") {
+    const userRole = (session?.user as any)?.role || "";
+    const isAuthorized = userRole.split(",").some((r: string) => r === "admin" || r === "manager");
+
+    if (!session || !isAuthorized) {
         return {error: "Unauthorized"};
     }
 
@@ -297,7 +309,10 @@ export async function requestAllRenewalAction() {
         headers: await headers(),
     });
 
-    if (!session || (session.user as any).role !== "admin") {
+    const userRole = (session?.user as any)?.role || "";
+    const isAuthorized = userRole.split(",").some((r: string) => r === "admin" || r === "manager");
+
+    if (!session || !isAuthorized) {
         return {error: "Unauthorized"};
     }
 

@@ -31,7 +31,7 @@ export default async function RootLayout({
 
     const user = session.user as any;
     const userRoles = (user.role || "").split(",").map((r: string) => r.trim());
-    const isAdmin = userRoles.includes("admin");
+    const isAdmin = userRoles.includes("admin") || userRoles.includes("manager");
 
     let showDocDialog = false;
     let isRenewal = false;

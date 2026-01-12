@@ -16,8 +16,8 @@ async function checkAuth(req: any, reply: any) {
 async function hasManagePermission(userId: string) {
     const user = await prisma.user.findUnique({where: {id: userId}});
     if (!user) return false;
-    const role = (user.role || '').toLowerCase();
-    return role === 'admin' || role === 'moderator' || role === 'owner' || role === 'manager';
+    const roles = (user.role || '').toLowerCase().split(',').map(r => r.trim());
+    return roles.some(role => role === 'admin' || role === 'moderator' || role === 'owner' || role === 'manager');
 }
 
 export async function registerMessageRoutes(app: FastifyInstance) {

@@ -49,7 +49,7 @@ const pluginList: any[] = [
         ac, roles: {
             training, volunteer, manager, bot, admin, newsletterManager
         },
-        adminRoles: ['admin'],
+        adminRoles: ['admin', 'manager'],
         defaultRole: 'admin',
         // defaultRole: process.env.NODE_ENV === "production" ? "training" : "admin",
     }),

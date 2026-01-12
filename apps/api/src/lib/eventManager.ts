@@ -176,6 +176,8 @@ export async function registerUserToEvent(eventId: string, userId: string, part?
     }
 
     // Deadline logic: Monday 12:00 of the week of the event
+    const eventDate = new Date(event.start);
+    const deadline = setSeconds(setMinutes(setHours(startOfWeek(eventDate, {weekStartsOn: 1}), 12), 0), 0);
     const now = new Date();
     const status = isAfter(now, deadline) ? 'pending' : 'confirmed';
 

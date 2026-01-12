@@ -10,7 +10,9 @@ async function checkAdmin(req: any, reply: any) {
     }
 
     const user = await prisma.user.findUnique({where: {id: userId}});
-    if (!user || user.role !== 'admin') {
+    const isAuthorized = (user?.role || "").split(",").some((r: string) => r === "admin" || r === "manager");
+
+    if (!user || !isAuthorized) {
         return reply.status(401).send('unauthorized');
     }
     return user;
