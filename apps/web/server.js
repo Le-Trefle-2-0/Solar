@@ -54,8 +54,18 @@ async function validateAPIKey(token) {
 }
 
 async function getChannels(id) {
-    // This function is now superseded by getChannelsWithAuth(socket)
-    return null;
+    try {
+        const authUrl = process.env.INTERNAL_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL;
+        const res = await fetch(`${authUrl}/api/channels`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({id}),
+        });
+        const body = await res.json();
+        if (body.success) return body.accessedChannels;
+    } catch (error) {
+        return null;
+    }
 }
 
 app.prepare().then(() => {
@@ -83,91 +93,48 @@ app.prepare().then(() => {
     io.use(async (socket, next) => {
         try {
             let validJWT = false;
-            if (socket.handshake.auth.jwt) {
-                validJWT = await validateJWT(socket.handshake.auth.jwt);
-                if (validJWT) {
-                    socket.jwt = socket.handshake.auth.jwt;
-                    socket.user = {
-                        ...validJWT,
-                        id: validJWT.id || validJWT.sub,
-                    };
-                }
-            }
+            if (socket.handshake.auth.jwt) validJWT = await validateJWT(socket.handshake.auth.jwt);
 
             let validToken = false;
-            if (socket.handshake.auth.token) {
-                validToken = await validateAPIKey(socket.handshake.auth.token);
-                if (validToken) {
-                    socket.user = validToken.user;
-                    socket.token = socket.handshake.auth.token;
-                }
-            }
+            if (socket.handshake.auth.token) validToken = await validateAPIKey(socket.handshake.auth.token);
 
-            if (!socket.user) throw new Error("Authentication failed");
+            if (validJWT) socket.user = validJWT;
+            if (validToken) socket.user = validToken.user;
 
-            console.log(`[ws] User ${socket.user.id} authenticated`);
+            if (!validJWT && !validToken) throw new Error("Invalid API key");
+
             next();
         } catch (err) {
-            console.error('[ws] Auth middleware error:', err.message);
             next(new Error("Authentication error"));
         }
     });
 
-    async function getChannelsWithAuth(socket) {
-        try {
-            const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000').replace(/\/$/, '');
-            const headers = {'Content-Type': 'application/json'};
-            if (socket.jwt) headers['Authorization'] = `Bearer ${socket.jwt}`;
-            if (socket.token) headers['token'] = socket.token;
-
-            const res = await fetch(`${apiUrl}/v1/channels`, {
-                method: 'POST',
-                headers: headers
-            });
-            const body = await res.json();
-            if (body.success) return body.accessedChannels;
-            return null;
-        } catch (error) {
-            console.error('[ws] getChannels error:', error);
-            return null;
-        }
-    }
-
-    function normalizeUser(u) {
-        if (!u) return null;
-        let role = u.role || 'training';
-        if (typeof role === 'string') {
-            role = role.split(',').map(r => r.trim().toLowerCase());
-        }
-        return {
-            id: u.id,
-            username: u.displayUsername || u.name || 'Inconnu',
-            image: u.image || null,
-            role: role
-        };
-    }
-
     io.on("connection", async (socket) => {
         const userID = socket.user.id;
-        const channels = await getChannelsWithAuth(socket);
-        if (!channels) {
-            console.warn(`[ws] No channels found for user ${userID}`);
-            // Still join internal update room
-            socket.on('update', () => io.emit('updateRequest'));
-            return;
-        }
+        const channels = await getChannels(userID);
+        if (!channels) return;
 
-        console.log(`[ws] User ${userID} joining ${channels.length} channels`);
         for (let channel of channels) {
             const id = channel.id;
             socket.join(id);
 
-            const userObject = normalizeUser(socket.user);
+            const userObject = {
+                id: socket.user.id,
+                username: socket.user.displayUsername || socket.user.name,
+                image: socket.user.image,
+                role: socket.user.role
+            };
+
             socket.to(id).emit("joined", {channelId: id, user: userObject});
 
             const sockets = await io.in(id).fetchSockets();
-            const users = sockets.map(s => normalizeUser(s.user)).filter(Boolean);
-            io.in(id).emit("userList", {channelId: id, users});
+            const users = sockets.map(s => ({
+                id: s.user.id,
+                username: s.user.displayUsername || s.user.name,
+                image: s.user.image,
+                role: s.user.role
+            }));
+            io.in(id).emit("userList", users);
         }
 
         let lastSeen = Date.now();
@@ -179,11 +146,16 @@ app.prepare().then(() => {
         });
 
         const interval = setInterval(() => {
-            if (Date.now() - lastSeen > 15000) { // Increased to 15s to be safer
+            if (Date.now() - lastSeen > 10000) {
                 for (let channel of channels) {
                     socket.to(channel.id).emit("left", {
                         channelId: channel.id,
-                        user: normalizeUser(socket.user)
+                        user: {
+                            id: socket.user.id,
+                            username: socket.user.displayUsername || socket.user.name,
+                            image: socket.user.image,
+                            role: socket.user.role
+                        }
                     });
                 }
                 socket.disconnect(true);
@@ -192,36 +164,39 @@ app.prepare().then(() => {
         }, 5000);
 
         socket.on("disconnect", async () => {
-            console.log(`[ws] User ${userID} disconnected`);
             for (let channel of channels) {
-                const payload = {
+                socket.to(channel.id).emit("left", {
                     channelId: channel.id,
-                    user: normalizeUser(socket.user)
-                };
-                socket.to(channel.id).emit("left", payload);
-
+                    user: {
+                        id: socket.user.id,
+                        username: socket.user.displayUsername || socket.user.name,
+                        image: socket.user.image,
+                        role: socket.user.role
+                    }
+                });
                 const sockets = await io.in(channel.id).fetchSockets();
-                const users = sockets.map(s => normalizeUser(s.user)).filter(Boolean);
-                io.in(channel.id).emit("userList", {channelId: channel.id, users});
+                const users = sockets.map(s => ({
+                    id: s.user.id,
+                    username: s.user.displayUsername || s.user.name,
+                    image: s.user.image,
+                    role: s.user.role
+                }));
+                io.in(channel.id).emit("userList", users);
             }
             clearInterval(interval);
         });
         socket.on('listen', async (data) => {
-            if (!data.id) return;
             socket.join(data.id);
-            // After joining, broadcast presence to others and send current list to the user
-            const userObject = normalizeUser(socket.user);
-            socket.to(data.id).emit("joined", {channelId: data.id, user: userObject});
-
-            const sockets = await io.in(data.id).fetchSockets();
-            const users = sockets.map(s => normalizeUser(s.user)).filter(Boolean);
-            io.in(data.id).emit("userList", {channelId: data.id, users});
         })
 
         socket.on('getOnlineUsers', async (data, cb) => {
-            if (!data.channelID) return cb([]);
             const sockets = await io.in(data.channelID).fetchSockets();
-            cb(sockets.map(s => normalizeUser(s.user)).filter(Boolean));
+            cb(sockets.map(s => ({
+                id: s.user.id,
+                username: s.user.displayUsername || s.user.name,
+                image: s.user.image,
+                role: s.user.role
+            })));
         });
         socket.on("ping", (cb) => cb());
         socket.on("sendMessage", (data) => socket.broadcast.to(data.channel.id).emit("message", data));
