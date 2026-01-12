@@ -50,7 +50,8 @@ export async function getEvents() {
             id: slot.id,
             role: slot.role,
             goalCount: slot.goalCount,
-            registrationsCount: slot.registrations.length,
+            registrationsCount: slot.registrations.filter(r => r.status === 'confirmed').length,
+            pendingCount: slot.registrations.filter(r => r.status === 'pending').length,
         })),
     }));
 }
@@ -64,8 +65,15 @@ export async function findEvent(eventId: string) {
             roleSlots: {
                 include: {
                     registrations: {
-                        select: {
-                            userId: true
+                        include: {
+                            user: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    image: true,
+                                    role: true,
+                                }
+                            }
                         }
                     },
                 },
@@ -84,7 +92,7 @@ export async function findEvent(eventId: string) {
             role: slot.role,
             part: slot.part,
             goalCount: slot.goalCount,
-            registrationsCount: slot.registrations.length,
+            registrationsCount: slot.registrations.filter(r => r.status === 'confirmed').length,
             registrations: slot.registrations,
         }))
     };
@@ -98,6 +106,15 @@ export async function registerUserToEvent(eventId: string, userId: string, part?
 
     if (!user || !user.role) {
         throw new Error("User not found.");
+    }
+
+    const event = await prisma.event.findUnique({
+        where: {id: eventId},
+        select: {start: true}
+    });
+
+    if (!event) {
+        throw new Error("Event not found.");
     }
 
     const userRoles = user.role.split(',').map(r => r.trim()).filter(Boolean);
@@ -142,7 +159,7 @@ export async function registerUserToEvent(eventId: string, userId: string, part?
             throw new Error(`No available slots for your roles${part ? ` and part "${part}"` : ''} in this event.`);
         }
 
-        targetSlot = matchingSlots.find((s: any) => s.registrations.length < s.goalCount) ?? matchingSlots[0];
+        targetSlot = matchingSlots.find((s: any) => s.registrations.filter((r: any) => r.status === 'confirmed').length < s.goalCount) ?? matchingSlots[0];
     }
 
     const alreadyRegistered = await prisma.eventRegistration.findFirst({
@@ -153,19 +170,37 @@ export async function registerUserToEvent(eventId: string, userId: string, part?
         throw new Error("User is already registered for this slot.");
     }
 
-    if (targetSlot.registrations.length >= targetSlot.goalCount) {
+    const confirmedCount = targetSlot.registrations.filter((r: any) => r.status === 'confirmed').length;
+    if (confirmedCount >= targetSlot.goalCount) {
         throw new Error("This slot is full.");
     }
+
+    // Deadline logic: Monday 12:00 of the week of the event
+    const now = new Date();
+    const status = isAfter(now, deadline) ? 'pending' : 'confirmed';
 
     const registration = await prisma.eventRegistration.create({
         data: {
             userId,
             roleSlotId: targetSlot.id,
             eventId,
+            status,
         },
     });
 
     return registration;
+}
+
+export async function updateRegistrationStatus(registrationId: string, status: 'confirmed' | 'rejected') {
+    if (status === 'rejected') {
+        return prisma.eventRegistration.delete({
+            where: {id: registrationId},
+        });
+    }
+    return prisma.eventRegistration.update({
+        where: {id: registrationId},
+        data: {status},
+    });
 }
 
 export async function unregisterUserToEvent(eventId: string, userId: string, part?: 'first' | 'second', roleSlotId?: string) {

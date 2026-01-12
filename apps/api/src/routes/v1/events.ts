@@ -3,7 +3,14 @@ import {z} from 'zod';
 import {createHash} from 'crypto';
 import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
-import {findEvent, getEvents, registerUserToEvent, saveEvent, unregisterUserToEvent} from '../../lib/eventManager.js';
+import {
+    findEvent,
+    getEvents,
+    registerUserToEvent,
+    saveEvent,
+    unregisterUserToEvent,
+    updateRegistrationStatus
+} from '../../lib/eventManager.js';
 
 const EventSchema = z.object({
     title: z.string().min(1),
@@ -228,6 +235,28 @@ export async function registerEventsRoutes(app: FastifyInstance) {
         try {
             const registration = await unregisterUserToEvent(id, userId, part, roleSlotId);
             return reply.send({success: true, registration});
+        } catch (err: any) {
+            return reply.status(400).send({success: false, message: err.message});
+        }
+    });
+
+    app.post('/v1/events/registrations/:registrationId/status', async (req, reply) => {
+        const userId = await checkAuth(req, reply);
+        if (!userId) return;
+
+        // Check if user is manager or admin
+        const user = await prisma.user.findUnique({where: {id: userId}, select: {role: true}});
+        const userRoles = (user?.role || '').split(',').map(r => r.trim());
+        if (!userRoles.includes('manager') && !userRoles.includes('admin')) {
+            return reply.status(403).send({success: false, message: "Forbidden"});
+        }
+
+        const {registrationId} = req.params as { registrationId: string };
+        const {status} = (req.body ?? {}) as { status: 'confirmed' | 'rejected' };
+
+        try {
+            await updateRegistrationStatus(registrationId, status);
+            return reply.send({success: true});
         } catch (err: any) {
             return reply.status(400).send({success: false, message: err.message});
         }

@@ -4,12 +4,14 @@ import React, {useEffect, useState} from 'react';
 import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
 import {Badge} from "@/components/ui/badge";
 import {Button} from "@/components/ui/button";
-import {format} from 'date-fns';
+import {format, isAfter, setHours, setMinutes, setSeconds, startOfWeek} from 'date-fns';
 import {fr} from 'date-fns/locale/fr';
 import type {EventData} from "@/lib/interface";
 import {useSession} from "@/lib/auth-client";
 import {toast} from "sonner";
 import {apiFetch} from "@/lib/api";
+import {useRouter} from "next/navigation";
+import {Check, Trash2, X} from "lucide-react";
 
 interface EventProps {
     event: EventData;
@@ -23,6 +25,10 @@ export default function Event({event}: EventProps) {
     const [eventDetails, setEventDetails] = useState<EventData | null>(null);
     const [loading, setLoading] = useState(false);
     const [selectedPart, setSelectedPart] = useState<'part1' | 'part2' | null>(null);
+
+    const eventDate = new Date(event.start);
+    const deadline = setSeconds(setMinutes(setHours(startOfWeek(eventDate, {weekStartsOn: 1}), 12), 0), 0);
+    const isAfterDeadline = isAfter(new Date(), deadline);
 
     useEffect(() => {
         apiFetch(`/v1/events/${event.id}`)
@@ -60,7 +66,7 @@ export default function Event({event}: EventProps) {
                 if (updated.success && updated.event) {
                     setEventDetails(updated.event);
                 }
-                toast.success("Inscription validée");
+                toast.success(res.registration.status === 'pending' ? "Demande d'inscription envoyée" : "Inscription validée");
             }
         } catch (e: any) {
             console.error("Registration failed", e);
@@ -104,18 +110,66 @@ export default function Event({event}: EventProps) {
         }
     }
 
+    async function handleDelete() {
+        if (!confirm("Voulez-vous vraiment supprimer cette permanence ?")) return;
+
+        try {
+            setLoading(true);
+            const res = await apiFetch(`/v1/events/${event.id}`, {
+                method: 'DELETE'
+            });
+
+            if (res.success) {
+                toast.success("Permanence supprimée");
+                setOpen(false);
+                router.refresh();
+            }
+        } catch (e: any) {
+            toast.error(e.message || "Erreur lors de la suppression");
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    async function handleUpdateRegistrationStatus(registrationId: string, status: 'confirmed' | 'rejected') {
+        try {
+            setLoading(true);
+            const res = await apiFetch(`/v1/events/registrations/${registrationId}/status`, {
+                method: 'POST',
+                body: JSON.stringify({status})
+            });
+
+            if (res.success) {
+                toast.success(status === 'confirmed' ? "Inscription approuvée" : "Inscription rejetée");
+                // Refresh event details
+                const updated = await apiFetch(`/v1/events/${event.id}`);
+                if (updated.success && updated.event) {
+                    setEventDetails(updated.event);
+                }
+            }
+        } catch (e: any) {
+            toast.error(e.message || "Erreur lors de la mise à jour");
+        } finally {
+            setLoading(false);
+        }
+    }
+
     const userId = session?.user?.id;
     const userRoles: string[] = (session?.user?.role || '')
         .split(',')
         .map((r: string) => r.trim())
         .filter(Boolean);
 
-    let badgeColor = 'bg-gray-300 text-gray-800';
+    const isManagerOrAdmin = userRoles.includes('manager') || userRoles.includes('admin');
+    const isAdmin = userRoles.includes('admin');
 
-    if (eventDetails && eventDetails.roleSlots) {
-        const managerSlot = eventDetails.roleSlots.find(slot => slot.role === 'manager');
-        const part1Slot = eventDetails.roleSlots.find(slot => slot.role === 'volunteer' && slot.part === 'first');
-        const part2Slot = eventDetails.roleSlots.find(slot => slot.role === 'volunteer' && slot.part === 'second');
+    let badgeColor = 'bg-gray-300 text-gray-800';
+    const slotsToUse = eventDetails?.roleSlots || event.roleSlots;
+
+    if (slotsToUse) {
+        const managerSlot = slotsToUse.find(slot => slot.role === 'manager');
+        const part1Slot = slotsToUse.find(slot => slot.role === 'volunteer' && slot.part === 'first');
+        const part2Slot = slotsToUse.find(slot => slot.role === 'volunteer' && slot.part === 'second');
 
         const hasManager = managerSlot && managerSlot.registrationsCount >= 1;
         const part1Count = part1Slot?.registrationsCount ?? 0;
@@ -144,7 +198,7 @@ export default function Event({event}: EventProps) {
                 </DialogHeader>
 
                 {eventDetails && eventDetails.roleSlots && (
-                    <div className="space-y-2 mb-4">
+                    <div className="space-y-4 mb-4">
                         {eventDetails.roleSlots.map(slot => {
                             const registeredCount = slot.registrationsCount;
 
@@ -155,32 +209,65 @@ export default function Event({event}: EventProps) {
 
                             const displayRole = roleDisplayNames[slot.role] ?? slot.role;
 
-                            const isRegistered = slot.registrations.some(r => r.userId === userId);
+                            const userRegistration = slot.registrations.find(r => r.userId === userId);
+                            const isRegistered = !!userRegistration;
                             const isEligible = userRoles.includes(slot.role);
                             const isFull = registeredCount >= slot.goalCount;
                             const labelPart = slot.part ? (slot.part === 'first' ? '1 : 20h00-21h30' : '2 : 21h30-23h00') : '';
                             const partValue = slot.part ? (slot.part as 'first' | 'second') : undefined;
+
+                            const pendingRegistrations = slot.registrations.filter(r => r.status === 'pending');
+
                             return (
-                                <div key={slot.id} className="text-xs flex flex-col gap-1">
-                                    <div className="flex justify-between items-center">
+                                <div key={slot.id} className="text-xs flex flex-col gap-2 p-2 border rounded-md">
+                                    <div className="flex justify-between items-center font-semibold">
                                     <span>
                                       {displayRole} {slot.part ? `(partie ${labelPart})` : ''}
                                     </span>
                                         <span>{registeredCount} / {slot.goalCount} inscrits</span>
                                     </div>
-                                    <div className="flex justify-end">
+
+                                    {isManagerOrAdmin && pendingRegistrations.length > 0 && (
+                                        <div className="bg-orange-50 p-2 rounded-sm space-y-2">
+                                            <p className="font-bold text-orange-800">Demandes en attente :</p>
+                                            {pendingRegistrations.map(reg => (
+                                                <div key={reg.id}
+                                                     className="flex justify-between items-center bg-white p-1 rounded border border-orange-200">
+                                                    <span>{reg.user?.name || reg.userId}</span>
+                                                    <div className="flex gap-1">
+                                                        <Button size="icon" variant="ghost"
+                                                                className="h-6 w-6 text-green-600"
+                                                                onClick={() => handleUpdateRegistrationStatus(reg.id, 'confirmed')}
+                                                                disabled={loading}>
+                                                            <Check className="h-4 w-4"/>
+                                                        </Button>
+                                                        <Button size="icon" variant="ghost"
+                                                                className="h-6 w-6 text-red-600"
+                                                                onClick={() => handleUpdateRegistrationStatus(reg.id, 'rejected')}
+                                                                disabled={loading}>
+                                                            <X className="h-4 w-4"/>
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    <div className="flex justify-end items-center gap-2">
+                                        {isRegistered && userRegistration?.status === 'pending' && (
+                                            <Badge variant="outline" className="text-orange-600 border-orange-600">En
+                                                attente de validation</Badge>
+                                        )}
                                         <Button
                                             size="sm"
                                             variant={isRegistered ? 'destructive' : 'default'}
                                             disabled={loading || (!isRegistered && (isFull || !isEligible))}
                                             onClick={() => isRegistered
                                                 ? handleUnregister(partValue, slot.id)
-                                                : handleRegister(partValue, slot.id).then(() => {
-                                                }).catch(() => {
-                                                })
+                                                : handleRegister(partValue, slot.id)
                                             }
                                         >
-                                            {isRegistered ? 'Se désinscrire' : isEligible ? (isFull ? 'Complet' : "S'inscrire") : 'Non admissible'}
+                                            {isRegistered ? 'Se désinscrire' : isEligible ? (isFull ? 'Complet' : (isAfterDeadline ? "Demander l'inscription" : "S'inscrire")) : 'Non admissible'}
                                         </Button>
                                     </div>
                                 </div>
