@@ -1,0 +1,27 @@
+{
+  "name": "storage",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@fastify/cors": "^10.0.0",
+    "@fastify/multipart": "^9.0.1",
+    "@prisma/client": "^6.9.0",
+    "dotenv": "^16.5.0",
+    "fastify": "^5.0.0",
+    "mime-types": "^2.1.35",
+    "pino": "^9.0.0",
+    "uuid": "^11.0.3"
+  },
+  "devDependencies": {
+    "@types/mime-types": "^3.0.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}

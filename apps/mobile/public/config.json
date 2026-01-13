@@ -1,0 +1,7 @@
+{
+  "apiBase": "https://api.beta.letrefle.org",
+  "wsBase": "https://ws.beta.letrefle.org",
+  "appBase": "https://beta.letrefle.org",
+  "storageBase": "https://cdn.beta.letrefle.org",
+  "voiceBase": "https://voice.beta.letrefle.org"
+}

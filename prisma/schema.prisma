@@ -1,11 +1,27 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  binaryTargets = ["native", "windows", "debian-openssl-3.0.x", "linux-musl"]
 }
 
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model Newsletter {
+  id          String    @id @default(cuid())
+  title       String
+  content     Bytes // Store as JSON or Markdown (compressed or raw)
+  htmlContent Bytes? // Store rendered HTML for sending
+  status      String    @default("draft") // "draft", "scheduled", "sent"
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  sentAt      DateTime?
+  scheduledAt DateTime?
+  authorId    String
+  author      User      @relation(fields: [authorId], references: [id])
+
+  @@map("newsletter")
 }
 
 model User {
@@ -42,8 +58,46 @@ model User {
   passkeys Passkey[]
   Reaction Reaction[]
 
+  // Document validation fields
+  documentsStatus      String?   @default("missing") // "missing", "submitted", "validated", "rejected"
+  documentsSentAt      DateTime?
+  documentsValidatedAt DateTime?
+  documentsRenewalAt   DateTime?
+  documentsText        String?   @db.Text
+
+  firstName         String?   @db.Text
+  lastName          String?   @db.Text
+  birthDate         DateTime?
+  addressStreet     String?   @db.Text
+  addressNumber     String?   @db.Text
+  addressPostalCode String?   @db.Text
+  addressCity       String?   @db.Text
+
+  newsletterSubscription Boolean @default(false)
+
+  idCardFileId       String?
+  idCardStatus       String? @default("missing") // "missing", "submitted", "validated", "rejected"
+  idCardRejectReason String? @db.Text
+
+  casierFileId       String?
+  casierStatus       String? @default("missing") // "missing", "submitted", "validated", "rejected"
+  casierRejectReason String? @db.Text
+
+  newsletters Newsletter[]
+
   @@unique([username])
   @@map("user")
+}
+
+model File {
+  id        String   @id @default(uuid())
+  filename  String   @db.Text
+  content   Bytes    @db.LongBlob
+  mime      String   @db.Text
+  size      Int
+  createdAt DateTime @default(now())
+
+  @@map("file")
 }
 
 model Session {
@@ -160,13 +214,18 @@ model Channel {
 model Message {
   id        Int      @id @default(autoincrement())
   createdAt DateTime
+  discordID String?
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   channelId String
   channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
   content   Bytes
+  replyID Int?
+  edited Boolean @default(false)
 
   Reaction Reaction[]
+
+  @@map("message")
 }
 
 model Reaction {
@@ -211,6 +270,7 @@ model EventRegistration {
   roleSlot     RoleSlot @relation(fields: [roleSlotId], references: [id])
   roleSlotId   String
   registeredAt DateTime @default(now())
+  status String @default("confirmed") // "confirmed", "pending"
   Event        Event?   @relation(fields: [eventId], references: [id])
   eventId      String?
 
@@ -220,6 +280,8 @@ model EventRegistration {
 model Ticket {
   id           Int          @id @default(autoincrement())
   discordUserID  String
+  source   String @default("discord")
+  metadata Json?
   channelId    String?      @unique
   channelName  String?
   channel      Channel?     @relation(fields: [channelId, channelName], references: [id, name], onDelete: Cascade)
@@ -233,6 +295,9 @@ model Ticket {
   problematic  String?
   observations String?
   info         String?
+  voice Boolean @default(false)
+
+  @@map("ticket")
 }
 
 model TicketStatus {
@@ -306,6 +371,20 @@ model Passkey {
   aaguid       String?   @db.Text
 
   @@map("passkey")
+}
+
+model Recruitment {
+  id           String   @id @default(cuid())
+  title        String
+  description  String   @db.LongText
+  icon         String?
+  contactEmail String?
+  fields       Json
+  enabled      Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("recruitment")
 }
 
 model Image {

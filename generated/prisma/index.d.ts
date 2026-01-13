@@ -11895,68 +11895,90 @@ export namespace Prisma {
 
   export type MessageAvgAggregateOutputType = {
     id: number | null
+      replyID: number | null
   }
 
   export type MessageSumAggregateOutputType = {
     id: number | null
+      replyID: number | null
   }
 
   export type MessageMinAggregateOutputType = {
     id: number | null
     createdAt: Date | null
+      discordID: string | null
     userId: string | null
     channelId: string | null
     content: Uint8Array | null
+      replyID: number | null
+      edited: boolean | null
   }
 
   export type MessageMaxAggregateOutputType = {
     id: number | null
     createdAt: Date | null
+      discordID: string | null
     userId: string | null
     channelId: string | null
     content: Uint8Array | null
+      replyID: number | null
+      edited: boolean | null
   }
 
   export type MessageCountAggregateOutputType = {
     id: number
     createdAt: number
+      discordID: number
     userId: number
     channelId: number
     content: number
+      replyID: number
+      edited: number
     _all: number
   }
 
 
   export type MessageAvgAggregateInputType = {
     id?: true
+      replyID?: true
   }
 
   export type MessageSumAggregateInputType = {
     id?: true
+      replyID?: true
   }
 
   export type MessageMinAggregateInputType = {
     id?: true
     createdAt?: true
+      discordID?: true
     userId?: true
     channelId?: true
     content?: true
+      replyID?: true
+      edited?: true
   }
 
   export type MessageMaxAggregateInputType = {
     id?: true
     createdAt?: true
+      discordID?: true
     userId?: true
     channelId?: true
     content?: true
+      replyID?: true
+      edited?: true
   }
 
   export type MessageCountAggregateInputType = {
     id?: true
     createdAt?: true
+      discordID?: true
     userId?: true
     channelId?: true
     content?: true
+      replyID?: true
+      edited?: true
     _all?: true
   }
 
@@ -12047,9 +12069,12 @@ export namespace Prisma {
   export type MessageGroupByOutputType = {
     id: number
     createdAt: Date
+      discordID: string | null
     userId: string
     channelId: string
     content: Uint8Array
+      replyID: number | null
+      edited: boolean
     _count: MessageCountAggregateOutputType | null
     _avg: MessageAvgAggregateOutputType | null
     _sum: MessageSumAggregateOutputType | null
@@ -12074,9 +12099,12 @@ export namespace Prisma {
   export type MessageSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     createdAt?: boolean
+      discordID?: boolean
     userId?: boolean
     channelId?: boolean
     content?: boolean
+      replyID?: boolean
+      edited?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     channel?: boolean | ChannelDefaultArgs<ExtArgs>
       Reaction?: boolean | Message$ReactionArgs<ExtArgs>
@@ -12088,12 +12116,15 @@ export namespace Prisma {
   export type MessageSelectScalar = {
     id?: boolean
     createdAt?: boolean
+      discordID?: boolean
     userId?: boolean
     channelId?: boolean
     content?: boolean
+      replyID?: boolean
+      edited?: boolean
   }
 
-  export type MessageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "userId" | "channelId" | "content", ExtArgs["result"]["message"]>
+    export type MessageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "discordID" | "userId" | "channelId" | "content" | "replyID" | "edited", ExtArgs["result"]["message"]>
   export type MessageInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     channel?: boolean | ChannelDefaultArgs<ExtArgs>
@@ -12111,9 +12142,12 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: number
       createdAt: Date
+        discordID: string | null
       userId: string
       channelId: string
       content: Uint8Array
+        replyID: number | null
+        edited: boolean
     }, ExtArgs["result"]["message"]>
     composites: {}
   }
@@ -12488,9 +12522,12 @@ export namespace Prisma {
   interface MessageFieldRefs {
     readonly id: FieldRef<"Message", 'Int'>
     readonly createdAt: FieldRef<"Message", 'DateTime'>
+        readonly discordID: FieldRef<"Message", 'String'>
     readonly userId: FieldRef<"Message", 'String'>
     readonly channelId: FieldRef<"Message", 'String'>
     readonly content: FieldRef<"Message", 'Bytes'>
+        readonly replyID: FieldRef<"Message", 'Int'>
+        readonly edited: FieldRef<"Message", 'Boolean'>
   }
 
 
@@ -16843,6 +16880,7 @@ export namespace Prisma {
       problematic: string | null
       observations: string | null
       info: string | null
+      voice: boolean | null
   }
 
   export type TicketMaxAggregateOutputType = {
@@ -16858,6 +16896,7 @@ export namespace Prisma {
       problematic: string | null
       observations: string | null
       info: string | null
+      voice: boolean | null
   }
 
   export type TicketCountAggregateOutputType = {
@@ -16873,6 +16912,7 @@ export namespace Prisma {
       problematic: number
       observations: number
       info: number
+      voice: number
     _all: number
   }
 
@@ -16898,6 +16938,7 @@ export namespace Prisma {
       problematic?: true
       observations?: true
       info?: true
+      voice?: true
   }
 
   export type TicketMaxAggregateInputType = {
@@ -16913,6 +16954,7 @@ export namespace Prisma {
       problematic?: true
       observations?: true
       info?: true
+      voice?: true
   }
 
   export type TicketCountAggregateInputType = {
@@ -16928,6 +16970,7 @@ export namespace Prisma {
       problematic?: true
       observations?: true
       info?: true
+      voice?: true
     _all?: true
   }
 
@@ -17028,6 +17071,7 @@ export namespace Prisma {
       problematic: string | null
       observations: string | null
       info: string | null
+      voice: boolean
     _count: TicketCountAggregateOutputType | null
     _avg: TicketAvgAggregateOutputType | null
     _sum: TicketSumAggregateOutputType | null
@@ -17062,6 +17106,7 @@ export namespace Prisma {
       problematic?: boolean
       observations?: boolean
       info?: boolean
+      voice?: boolean
     channel?: boolean | Ticket$channelArgs<ExtArgs>
     user?: boolean | Ticket$userArgs<ExtArgs>
       status?: boolean | TicketStatusDefaultArgs<ExtArgs>
@@ -17082,9 +17127,10 @@ export namespace Prisma {
       problematic?: boolean
       observations?: boolean
       info?: boolean
+      voice?: boolean
   }
 
-    export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "discordUserID" | "channelId" | "channelName" | "createdAt" | "updatedAt" | "assignedUserId" | "statusName" | "statusLabel" | "problematic" | "observations" | "info", ExtArgs["result"]["ticket"]>
+    export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "discordUserID" | "channelId" | "channelName" | "createdAt" | "updatedAt" | "assignedUserId" | "statusName" | "statusLabel" | "problematic" | "observations" | "info" | "voice", ExtArgs["result"]["ticket"]>
   export type TicketInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     channel?: boolean | Ticket$channelArgs<ExtArgs>
     user?: boolean | Ticket$userArgs<ExtArgs>
@@ -17111,6 +17157,7 @@ export namespace Prisma {
         problematic: string | null
         observations: string | null
         info: string | null
+        voice: boolean
     }, ExtArgs["result"]["ticket"]>
     composites: {}
   }
@@ -17495,6 +17542,7 @@ export namespace Prisma {
         readonly problematic: FieldRef<"Ticket", 'String'>
         readonly observations: FieldRef<"Ticket", 'String'>
         readonly info: FieldRef<"Ticket", 'String'>
+        readonly voice: FieldRef<"Ticket", 'Boolean'>
   }
 
 
@@ -23778,9 +23826,12 @@ export namespace Prisma {
   export const MessageScalarFieldEnum: {
     id: 'id',
     createdAt: 'createdAt',
+      discordID: 'discordID',
     userId: 'userId',
     channelId: 'channelId',
-    content: 'content'
+      content: 'content',
+      replyID: 'replyID',
+      edited: 'edited'
   };
 
   export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]
@@ -23845,7 +23896,8 @@ export namespace Prisma {
       statusLabel: 'statusLabel',
       problematic: 'problematic',
       observations: 'observations',
-      info: 'info'
+      info: 'info',
+      voice: 'voice'
   };
 
   export type TicketScalarFieldEnum = (typeof TicketScalarFieldEnum)[keyof typeof TicketScalarFieldEnum]
@@ -24052,6 +24104,7 @@ export namespace Prisma {
 
 
   export const MessageOrderByRelevanceFieldEnum: {
+      discordID: 'discordID',
     userId: 'userId',
     channelId: 'channelId'
   };
@@ -24887,9 +24940,12 @@ export namespace Prisma {
     NOT?: MessageWhereInput | MessageWhereInput[]
     id?: IntFilter<"Message"> | number
     createdAt?: DateTimeFilter<"Message"> | Date | string
+      discordID?: StringNullableFilter<"Message"> | string | null
     userId?: StringFilter<"Message"> | string
     channelId?: StringFilter<"Message"> | string
     content?: BytesFilter<"Message"> | Uint8Array
+      replyID?: IntNullableFilter<"Message"> | number | null
+      edited?: BoolFilter<"Message"> | boolean
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     channel?: XOR<ChannelScalarRelationFilter, ChannelWhereInput>
       Reaction?: ReactionListRelationFilter
@@ -24898,9 +24954,12 @@ export namespace Prisma {
   export type MessageOrderByWithRelationInput = {
     id?: SortOrder
     createdAt?: SortOrder
+      discordID?: SortOrderInput | SortOrder
     userId?: SortOrder
     channelId?: SortOrder
     content?: SortOrder
+      replyID?: SortOrderInput | SortOrder
+      edited?: SortOrder
     user?: UserOrderByWithRelationInput
     channel?: ChannelOrderByWithRelationInput
       Reaction?: ReactionOrderByRelationAggregateInput
@@ -24913,9 +24972,12 @@ export namespace Prisma {
     OR?: MessageWhereInput[]
     NOT?: MessageWhereInput | MessageWhereInput[]
     createdAt?: DateTimeFilter<"Message"> | Date | string
+      discordID?: StringNullableFilter<"Message"> | string | null
     userId?: StringFilter<"Message"> | string
     channelId?: StringFilter<"Message"> | string
     content?: BytesFilter<"Message"> | Uint8Array
+      replyID?: IntNullableFilter<"Message"> | number | null
+      edited?: BoolFilter<"Message"> | boolean
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     channel?: XOR<ChannelScalarRelationFilter, ChannelWhereInput>
       Reaction?: ReactionListRelationFilter
@@ -24924,9 +24986,12 @@ export namespace Prisma {
   export type MessageOrderByWithAggregationInput = {
     id?: SortOrder
     createdAt?: SortOrder
+      discordID?: SortOrderInput | SortOrder
     userId?: SortOrder
     channelId?: SortOrder
     content?: SortOrder
+      replyID?: SortOrderInput | SortOrder
+      edited?: SortOrder
     _count?: MessageCountOrderByAggregateInput
     _avg?: MessageAvgOrderByAggregateInput
     _max?: MessageMaxOrderByAggregateInput
@@ -24940,9 +25005,12 @@ export namespace Prisma {
     NOT?: MessageScalarWhereWithAggregatesInput | MessageScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"Message"> | number
     createdAt?: DateTimeWithAggregatesFilter<"Message"> | Date | string
+      discordID?: StringNullableWithAggregatesFilter<"Message"> | string | null
     userId?: StringWithAggregatesFilter<"Message"> | string
     channelId?: StringWithAggregatesFilter<"Message"> | string
     content?: BytesWithAggregatesFilter<"Message"> | Uint8Array
+      replyID?: IntNullableWithAggregatesFilter<"Message"> | number | null
+      edited?: BoolWithAggregatesFilter<"Message"> | boolean
   }
 
     export type ReactionWhereInput = {
@@ -25226,6 +25294,7 @@ export namespace Prisma {
       problematic?: StringNullableFilter<"Ticket"> | string | null
       observations?: StringNullableFilter<"Ticket"> | string | null
       info?: StringNullableFilter<"Ticket"> | string | null
+      voice?: BoolFilter<"Ticket"> | boolean
     channel?: XOR<ChannelNullableScalarRelationFilter, ChannelWhereInput> | null
     user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
       status?: XOR<TicketStatusScalarRelationFilter, TicketStatusWhereInput>
@@ -25244,6 +25313,7 @@ export namespace Prisma {
       problematic?: SortOrderInput | SortOrder
       observations?: SortOrderInput | SortOrder
       info?: SortOrderInput | SortOrder
+      voice?: SortOrder
     channel?: ChannelOrderByWithRelationInput
     user?: UserOrderByWithRelationInput
       status?: TicketStatusOrderByWithRelationInput
@@ -25266,6 +25336,7 @@ export namespace Prisma {
       problematic?: StringNullableFilter<"Ticket"> | string | null
       observations?: StringNullableFilter<"Ticket"> | string | null
       info?: StringNullableFilter<"Ticket"> | string | null
+      voice?: BoolFilter<"Ticket"> | boolean
     channel?: XOR<ChannelNullableScalarRelationFilter, ChannelWhereInput> | null
     user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
       status?: XOR<TicketStatusScalarRelationFilter, TicketStatusWhereInput>
@@ -25284,6 +25355,7 @@ export namespace Prisma {
       problematic?: SortOrderInput | SortOrder
       observations?: SortOrderInput | SortOrder
       info?: SortOrderInput | SortOrder
+      voice?: SortOrder
     _count?: TicketCountOrderByAggregateInput
     _avg?: TicketAvgOrderByAggregateInput
     _max?: TicketMaxOrderByAggregateInput
@@ -25307,6 +25379,7 @@ export namespace Prisma {
       problematic?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
       observations?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
       info?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
+      voice?: BoolWithAggregatesFilter<"Ticket"> | boolean
   }
 
     export type TicketStatusWhereInput = {
@@ -26444,7 +26517,10 @@ export namespace Prisma {
 
   export type MessageCreateInput = {
     createdAt: Date | string
+      discordID?: string | null
     content: Uint8Array
+      replyID?: number | null
+      edited?: boolean
     user: UserCreateNestedOneWithoutMessagesInput
     channel: ChannelCreateNestedOneWithoutMessageInput
       Reaction?: ReactionCreateNestedManyWithoutMessageInput
@@ -26453,15 +26529,21 @@ export namespace Prisma {
   export type MessageUncheckedCreateInput = {
     id?: number
     createdAt: Date | string
+      discordID?: string | null
     userId: string
     channelId: string
     content: Uint8Array
+      replyID?: number | null
+      edited?: boolean
       Reaction?: ReactionUncheckedCreateNestedManyWithoutMessageInput
   }
 
   export type MessageUpdateInput = {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+      discordID?: NullableStringFieldUpdateOperationsInput | string | null
     content?: BytesFieldUpdateOperationsInput | Uint8Array
+      replyID?: NullableIntFieldUpdateOperationsInput | number | null
+      edited?: BoolFieldUpdateOperationsInput | boolean
     user?: UserUpdateOneRequiredWithoutMessagesNestedInput
     channel?: ChannelUpdateOneRequiredWithoutMessageNestedInput
       Reaction?: ReactionUpdateManyWithoutMessageNestedInput
@@ -26470,31 +26552,43 @@ export namespace Prisma {
   export type MessageUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+      discordID?: NullableStringFieldUpdateOperationsInput | string | null
     userId?: StringFieldUpdateOperationsInput | string
     channelId?: StringFieldUpdateOperationsInput | string
     content?: BytesFieldUpdateOperationsInput | Uint8Array
+      replyID?: NullableIntFieldUpdateOperationsInput | number | null
+      edited?: BoolFieldUpdateOperationsInput | boolean
       Reaction?: ReactionUncheckedUpdateManyWithoutMessageNestedInput
   }
 
   export type MessageCreateManyInput = {
     id?: number
     createdAt: Date | string
+      discordID?: string | null
     userId: string
     channelId: string
     content: Uint8Array
+      replyID?: number | null
+      edited?: boolean
   }
 
   export type MessageUpdateManyMutationInput = {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+      discordID?: NullableStringFieldUpdateOperationsInput | string | null
     content?: BytesFieldUpdateOperationsInput | Uint8Array
+      replyID?: NullableIntFieldUpdateOperationsInput | number | null
+      edited?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type MessageUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+      discordID?: NullableStringFieldUpdateOperationsInput | string | null
     userId?: StringFieldUpdateOperationsInput | string
     channelId?: StringFieldUpdateOperationsInput | string
     content?: BytesFieldUpdateOperationsInput | Uint8Array
+      replyID?: NullableIntFieldUpdateOperationsInput | number | null
+      edited?: BoolFieldUpdateOperationsInput | boolean
   }
 
     export type ReactionCreateInput = {
@@ -26753,6 +26847,7 @@ export namespace Prisma {
       problematic?: string | null
       observations?: string | null
       info?: string | null
+      voice?: boolean
     channel?: ChannelCreateNestedOneWithoutTicketInput
     user?: UserCreateNestedOneWithoutTicketInput
       status: TicketStatusCreateNestedOneWithoutTicketInput
@@ -26771,6 +26866,7 @@ export namespace Prisma {
       problematic?: string | null
       observations?: string | null
       info?: string | null
+      voice?: boolean
   }
 
   export type TicketUpdateInput = {
@@ -26780,6 +26876,7 @@ export namespace Prisma {
       problematic?: NullableStringFieldUpdateOperationsInput | string | null
       observations?: NullableStringFieldUpdateOperationsInput | string | null
       info?: NullableStringFieldUpdateOperationsInput | string | null
+      voice?: BoolFieldUpdateOperationsInput | boolean
     channel?: ChannelUpdateOneWithoutTicketNestedInput
     user?: UserUpdateOneWithoutTicketNestedInput
       status?: TicketStatusUpdateOneRequiredWithoutTicketNestedInput
@@ -26798,6 +26895,7 @@ export namespace Prisma {
       problematic?: NullableStringFieldUpdateOperationsInput | string | null
       observations?: NullableStringFieldUpdateOperationsInput | string | null
       info?: NullableStringFieldUpdateOperationsInput | string | null
+      voice?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type TicketCreateManyInput = {
@@ -26813,6 +26911,7 @@ export namespace Prisma {
       problematic?: string | null
       observations?: string | null
       info?: string | null
+      voice?: boolean
   }
 
   export type TicketUpdateManyMutationInput = {
@@ -26822,6 +26921,7 @@ export namespace Prisma {
       problematic?: NullableStringFieldUpdateOperationsInput | string | null
       observations?: NullableStringFieldUpdateOperationsInput | string | null
       info?: NullableStringFieldUpdateOperationsInput | string | null
+      voice?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type TicketUncheckedUpdateManyInput = {
@@ -26837,6 +26937,7 @@ export namespace Prisma {
       problematic?: NullableStringFieldUpdateOperationsInput | string | null
       observations?: NullableStringFieldUpdateOperationsInput | string | null
       info?: NullableStringFieldUpdateOperationsInput | string | null
+      voice?: BoolFieldUpdateOperationsInput | boolean
   }
 
     export type TicketStatusCreateInput = {
@@ -27922,6 +28023,17 @@ export namespace Prisma {
     not?: NestedBytesFilter<$PrismaModel> | Uint8Array
   }
 
+    export type IntNullableFilter<$PrismaModel = never> = {
+        equals?: number | IntFieldRefInput<$PrismaModel> | null
+        in?: number[] | null
+        notIn?: number[] | null
+        lt?: number | IntFieldRefInput<$PrismaModel>
+        lte?: number | IntFieldRefInput<$PrismaModel>
+        gt?: number | IntFieldRefInput<$PrismaModel>
+        gte?: number | IntFieldRefInput<$PrismaModel>
+        not?: NestedIntNullableFilter<$PrismaModel> | number | null
+    }
+
   export type ChannelScalarRelationFilter = {
     is?: ChannelWhereInput
     isNot?: ChannelWhereInput
@@ -27936,33 +28048,44 @@ export namespace Prisma {
   export type MessageCountOrderByAggregateInput = {
     id?: SortOrder
     createdAt?: SortOrder
+      discordID?: SortOrder
     userId?: SortOrder
     channelId?: SortOrder
     content?: SortOrder
+      replyID?: SortOrder
+      edited?: SortOrder
   }
 
   export type MessageAvgOrderByAggregateInput = {
     id?: SortOrder
+      replyID?: SortOrder
   }
 
   export type MessageMaxOrderByAggregateInput = {
     id?: SortOrder
     createdAt?: SortOrder
+      discordID?: SortOrder
     userId?: SortOrder
     channelId?: SortOrder
     content?: SortOrder
+      replyID?: SortOrder
+      edited?: SortOrder
   }
 
   export type MessageMinOrderByAggregateInput = {
     id?: SortOrder
     createdAt?: SortOrder
+      discordID?: SortOrder
     userId?: SortOrder
     channelId?: SortOrder
     content?: SortOrder
+      replyID?: SortOrder
+      edited?: SortOrder
   }
 
   export type MessageSumOrderByAggregateInput = {
     id?: SortOrder
+      replyID?: SortOrder
   }
 
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
@@ -27990,6 +28113,22 @@ export namespace Prisma {
     _min?: NestedBytesFilter<$PrismaModel>
     _max?: NestedBytesFilter<$PrismaModel>
   }
+
+    export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+        equals?: number | IntFieldRefInput<$PrismaModel> | null
+        in?: number[] | null
+        notIn?: number[] | null
+        lt?: number | IntFieldRefInput<$PrismaModel>
+        lte?: number | IntFieldRefInput<$PrismaModel>
+        gt?: number | IntFieldRefInput<$PrismaModel>
+        gte?: number | IntFieldRefInput<$PrismaModel>
+        not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+        _count?: NestedIntNullableFilter<$PrismaModel>
+        _avg?: NestedFloatNullableFilter<$PrismaModel>
+        _sum?: NestedIntNullableFilter<$PrismaModel>
+        _min?: NestedIntNullableFilter<$PrismaModel>
+        _max?: NestedIntNullableFilter<$PrismaModel>
+    }
 
     export type MessageScalarRelationFilter = {
         is?: MessageWhereInput
@@ -28205,6 +28344,7 @@ export namespace Prisma {
       problematic?: SortOrder
       observations?: SortOrder
       info?: SortOrder
+      voice?: SortOrder
   }
 
   export type TicketAvgOrderByAggregateInput = {
@@ -28224,6 +28364,7 @@ export namespace Prisma {
       problematic?: SortOrder
       observations?: SortOrder
       info?: SortOrder
+      voice?: SortOrder
   }
 
   export type TicketMinOrderByAggregateInput = {
@@ -28239,6 +28380,7 @@ export namespace Prisma {
       problematic?: SortOrder
       observations?: SortOrder
       info?: SortOrder
+      voice?: SortOrder
   }
 
   export type TicketSumOrderByAggregateInput = {
@@ -28281,17 +28423,6 @@ export namespace Prisma {
     export type TicketStatusSumOrderByAggregateInput = {
         id?: SortOrder
     }
-
-  export type IntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
 
   export type ApikeyOrderByRelevanceInput = {
     fields: ApikeyOrderByRelevanceFieldEnum | ApikeyOrderByRelevanceFieldEnum[]
@@ -28387,22 +28518,6 @@ export namespace Prisma {
     rateLimitMax?: SortOrder
     requestCount?: SortOrder
     remaining?: SortOrder
-  }
-
-  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedIntNullableFilter<$PrismaModel>
-    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
   export type JwksOrderByRelevanceInput = {
@@ -29405,6 +29520,14 @@ export namespace Prisma {
     set?: Uint8Array
   }
 
+    export type NullableIntFieldUpdateOperationsInput = {
+        set?: number | null
+        increment?: number
+        decrement?: number
+        multiply?: number
+        divide?: number
+    }
+
   export type UserUpdateOneRequiredWithoutMessagesNestedInput = {
     create?: XOR<UserCreateWithoutMessagesInput, UserUncheckedCreateWithoutMessagesInput>
     connectOrCreate?: UserCreateOrConnectWithoutMessagesInput
@@ -29791,14 +29914,6 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
-  export type NullableIntFieldUpdateOperationsInput = {
-    set?: number | null
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
-  }
-
   export type UserUpdateOneRequiredWithoutApikeysNestedInput = {
     create?: XOR<UserCreateWithoutApikeysInput, UserUncheckedCreateWithoutApikeysInput>
     connectOrCreate?: UserCreateOrConnectWithoutApikeysInput
@@ -30132,7 +30247,10 @@ export namespace Prisma {
 
   export type MessageCreateWithoutUserInput = {
     createdAt: Date | string
+      discordID?: string | null
     content: Uint8Array
+      replyID?: number | null
+      edited?: boolean
     channel: ChannelCreateNestedOneWithoutMessageInput
       Reaction?: ReactionCreateNestedManyWithoutMessageInput
   }
@@ -30140,8 +30258,11 @@ export namespace Prisma {
   export type MessageUncheckedCreateWithoutUserInput = {
     id?: number
     createdAt: Date | string
+      discordID?: string | null
     channelId: string
     content: Uint8Array
+      replyID?: number | null
+      edited?: boolean
       Reaction?: ReactionUncheckedCreateNestedManyWithoutMessageInput
   }
 
@@ -30296,6 +30417,7 @@ export namespace Prisma {
       problematic?: string | null
       observations?: string | null
       info?: string | null
+      voice?: boolean
     channel?: ChannelCreateNestedOneWithoutTicketInput
       status: TicketStatusCreateNestedOneWithoutTicketInput
   }
@@ -30312,6 +30434,7 @@ export namespace Prisma {
       problematic?: string | null
       observations?: string | null
       info?: string | null
+      voice?: boolean
   }
 
   export type TicketCreateOrConnectWithoutUserInput = {
@@ -30527,9 +30650,12 @@ export namespace Prisma {
     NOT?: MessageScalarWhereInput | MessageScalarWhereInput[]
     id?: IntFilter<"Message"> | number
     createdAt?: DateTimeFilter<"Message"> | Date | string
+      discordID?: StringNullableFilter<"Message"> | string | null
     userId?: StringFilter<"Message"> | string
     channelId?: StringFilter<"Message"> | string
     content?: BytesFilter<"Message"> | Uint8Array
+      replyID?: IntNullableFilter<"Message"> | number | null
+      edited?: BoolFilter<"Message"> | boolean
   }
 
   export type MemberUpsertWithWhereUniqueWithoutUserInput = {
@@ -30704,6 +30830,7 @@ export namespace Prisma {
       problematic?: StringNullableFilter<"Ticket"> | string | null
       observations?: StringNullableFilter<"Ticket"> | string | null
       info?: StringNullableFilter<"Ticket"> | string | null
+      voice?: BoolFilter<"Ticket"> | boolean
   }
 
   export type ApikeyUpsertWithWhereUniqueWithoutUserInput = {
@@ -31646,7 +31773,10 @@ export namespace Prisma {
 
   export type MessageCreateWithoutChannelInput = {
     createdAt: Date | string
+      discordID?: string | null
     content: Uint8Array
+      replyID?: number | null
+      edited?: boolean
     user: UserCreateNestedOneWithoutMessagesInput
       Reaction?: ReactionCreateNestedManyWithoutMessageInput
   }
@@ -31654,8 +31784,11 @@ export namespace Prisma {
   export type MessageUncheckedCreateWithoutChannelInput = {
     id?: number
     createdAt: Date | string
+      discordID?: string | null
     userId: string
     content: Uint8Array
+      replyID?: number | null
+      edited?: boolean
       Reaction?: ReactionUncheckedCreateNestedManyWithoutMessageInput
   }
 
@@ -31676,6 +31809,7 @@ export namespace Prisma {
       problematic?: string | null
       observations?: string | null
       info?: string | null
+      voice?: boolean
     user?: UserCreateNestedOneWithoutTicketInput
       status: TicketStatusCreateNestedOneWithoutTicketInput
   }
@@ -31691,6 +31825,7 @@ export namespace Prisma {
       problematic?: string | null
       observations?: string | null
       info?: string | null
+      voice?: boolean
   }
 
   export type TicketCreateOrConnectWithoutChannelInput = {
@@ -31999,7 +32134,10 @@ export namespace Prisma {
 
     export type MessageCreateWithoutReactionInput = {
         createdAt: Date | string
+        discordID?: string | null
         content: Uint8Array
+        replyID?: number | null
+        edited?: boolean
         user: UserCreateNestedOneWithoutMessagesInput
         channel: ChannelCreateNestedOneWithoutMessageInput
     }
@@ -32007,9 +32145,12 @@ export namespace Prisma {
     export type MessageUncheckedCreateWithoutReactionInput = {
         id?: number
         createdAt: Date | string
+        discordID?: string | null
         userId: string
         channelId: string
         content: Uint8Array
+        replyID?: number | null
+        edited?: boolean
     }
 
     export type MessageCreateOrConnectWithoutReactionInput = {
@@ -32091,7 +32232,10 @@ export namespace Prisma {
 
     export type MessageUpdateWithoutReactionInput = {
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        discordID?: NullableStringFieldUpdateOperationsInput | string | null
         content?: BytesFieldUpdateOperationsInput | Uint8Array
+        replyID?: NullableIntFieldUpdateOperationsInput | number | null
+        edited?: BoolFieldUpdateOperationsInput | boolean
         user?: UserUpdateOneRequiredWithoutMessagesNestedInput
         channel?: ChannelUpdateOneRequiredWithoutMessageNestedInput
     }
@@ -32099,9 +32243,12 @@ export namespace Prisma {
     export type MessageUncheckedUpdateWithoutReactionInput = {
         id?: IntFieldUpdateOperationsInput | number
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        discordID?: NullableStringFieldUpdateOperationsInput | string | null
         userId?: StringFieldUpdateOperationsInput | string
         channelId?: StringFieldUpdateOperationsInput | string
         content?: BytesFieldUpdateOperationsInput | Uint8Array
+        replyID?: NullableIntFieldUpdateOperationsInput | number | null
+        edited?: BoolFieldUpdateOperationsInput | boolean
     }
 
     export type UserUpsertWithoutReactionInput = {
@@ -33005,6 +33152,7 @@ export namespace Prisma {
         problematic?: string | null
         observations?: string | null
         info?: string | null
+        voice?: boolean
         channel?: ChannelCreateNestedOneWithoutTicketInput
         user?: UserCreateNestedOneWithoutTicketInput
     }
@@ -33020,6 +33168,7 @@ export namespace Prisma {
         problematic?: string | null
         observations?: string | null
         info?: string | null
+        voice?: boolean
     }
 
     export type TicketCreateOrConnectWithoutStatusInput = {
@@ -33334,8 +33483,11 @@ export namespace Prisma {
   export type MessageCreateManyUserInput = {
     id?: number
     createdAt: Date | string
+      discordID?: string | null
     channelId: string
     content: Uint8Array
+      replyID?: number | null
+      edited?: boolean
   }
 
   export type MemberCreateManyUserInput = {
@@ -33390,6 +33542,7 @@ export namespace Prisma {
       problematic?: string | null
       observations?: string | null
       info?: string | null
+      voice?: boolean
   }
 
   export type ApikeyCreateManyUserInput = {
@@ -33517,7 +33670,10 @@ export namespace Prisma {
 
   export type MessageUpdateWithoutUserInput = {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+      discordID?: NullableStringFieldUpdateOperationsInput | string | null
     content?: BytesFieldUpdateOperationsInput | Uint8Array
+      replyID?: NullableIntFieldUpdateOperationsInput | number | null
+      edited?: BoolFieldUpdateOperationsInput | boolean
     channel?: ChannelUpdateOneRequiredWithoutMessageNestedInput
       Reaction?: ReactionUpdateManyWithoutMessageNestedInput
   }
@@ -33525,16 +33681,22 @@ export namespace Prisma {
   export type MessageUncheckedUpdateWithoutUserInput = {
     id?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+      discordID?: NullableStringFieldUpdateOperationsInput | string | null
     channelId?: StringFieldUpdateOperationsInput | string
     content?: BytesFieldUpdateOperationsInput | Uint8Array
+      replyID?: NullableIntFieldUpdateOperationsInput | number | null
+      edited?: BoolFieldUpdateOperationsInput | boolean
       Reaction?: ReactionUncheckedUpdateManyWithoutMessageNestedInput
   }
 
   export type MessageUncheckedUpdateManyWithoutUserInput = {
     id?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+      discordID?: NullableStringFieldUpdateOperationsInput | string | null
     channelId?: StringFieldUpdateOperationsInput | string
     content?: BytesFieldUpdateOperationsInput | Uint8Array
+      replyID?: NullableIntFieldUpdateOperationsInput | number | null
+      edited?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type MemberUpdateWithoutUserInput = {
@@ -33668,6 +33830,7 @@ export namespace Prisma {
       problematic?: NullableStringFieldUpdateOperationsInput | string | null
       observations?: NullableStringFieldUpdateOperationsInput | string | null
       info?: NullableStringFieldUpdateOperationsInput | string | null
+      voice?: BoolFieldUpdateOperationsInput | boolean
     channel?: ChannelUpdateOneWithoutTicketNestedInput
       status?: TicketStatusUpdateOneRequiredWithoutTicketNestedInput
   }
@@ -33684,6 +33847,7 @@ export namespace Prisma {
       problematic?: NullableStringFieldUpdateOperationsInput | string | null
       observations?: NullableStringFieldUpdateOperationsInput | string | null
       info?: NullableStringFieldUpdateOperationsInput | string | null
+      voice?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type TicketUncheckedUpdateManyWithoutUserInput = {
@@ -33698,6 +33862,7 @@ export namespace Prisma {
       problematic?: NullableStringFieldUpdateOperationsInput | string | null
       observations?: NullableStringFieldUpdateOperationsInput | string | null
       info?: NullableStringFieldUpdateOperationsInput | string | null
+      voice?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type ApikeyUpdateWithoutUserInput = {
@@ -33893,8 +34058,11 @@ export namespace Prisma {
   export type MessageCreateManyChannelInput = {
     id?: number
     createdAt: Date | string
+      discordID?: string | null
     userId: string
     content: Uint8Array
+      replyID?: number | null
+      edited?: boolean
   }
 
   export type TicketCreateManyChannelInput = {
@@ -33908,6 +34076,7 @@ export namespace Prisma {
       problematic?: string | null
       observations?: string | null
       info?: string | null
+      voice?: boolean
   }
 
     export type EventCreateManyChannelInput = {
@@ -33923,7 +34092,10 @@ export namespace Prisma {
 
   export type MessageUpdateWithoutChannelInput = {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+      discordID?: NullableStringFieldUpdateOperationsInput | string | null
     content?: BytesFieldUpdateOperationsInput | Uint8Array
+      replyID?: NullableIntFieldUpdateOperationsInput | number | null
+      edited?: BoolFieldUpdateOperationsInput | boolean
     user?: UserUpdateOneRequiredWithoutMessagesNestedInput
       Reaction?: ReactionUpdateManyWithoutMessageNestedInput
   }
@@ -33931,16 +34103,22 @@ export namespace Prisma {
   export type MessageUncheckedUpdateWithoutChannelInput = {
     id?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+      discordID?: NullableStringFieldUpdateOperationsInput | string | null
     userId?: StringFieldUpdateOperationsInput | string
     content?: BytesFieldUpdateOperationsInput | Uint8Array
+      replyID?: NullableIntFieldUpdateOperationsInput | number | null
+      edited?: BoolFieldUpdateOperationsInput | boolean
       Reaction?: ReactionUncheckedUpdateManyWithoutMessageNestedInput
   }
 
   export type MessageUncheckedUpdateManyWithoutChannelInput = {
     id?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+      discordID?: NullableStringFieldUpdateOperationsInput | string | null
     userId?: StringFieldUpdateOperationsInput | string
     content?: BytesFieldUpdateOperationsInput | Uint8Array
+      replyID?: NullableIntFieldUpdateOperationsInput | number | null
+      edited?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type TicketUpdateWithoutChannelInput = {
@@ -33950,6 +34128,7 @@ export namespace Prisma {
       problematic?: NullableStringFieldUpdateOperationsInput | string | null
       observations?: NullableStringFieldUpdateOperationsInput | string | null
       info?: NullableStringFieldUpdateOperationsInput | string | null
+      voice?: BoolFieldUpdateOperationsInput | boolean
     user?: UserUpdateOneWithoutTicketNestedInput
       status?: TicketStatusUpdateOneRequiredWithoutTicketNestedInput
   }
@@ -33965,6 +34144,7 @@ export namespace Prisma {
       problematic?: NullableStringFieldUpdateOperationsInput | string | null
       observations?: NullableStringFieldUpdateOperationsInput | string | null
       info?: NullableStringFieldUpdateOperationsInput | string | null
+      voice?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type TicketUncheckedUpdateManyWithoutChannelInput = {
@@ -33978,6 +34158,7 @@ export namespace Prisma {
       problematic?: NullableStringFieldUpdateOperationsInput | string | null
       observations?: NullableStringFieldUpdateOperationsInput | string | null
       info?: NullableStringFieldUpdateOperationsInput | string | null
+      voice?: BoolFieldUpdateOperationsInput | boolean
   }
 
     export type EventUpdateWithoutChannelInput = {
@@ -34138,6 +34319,7 @@ export namespace Prisma {
         problematic?: string | null
         observations?: string | null
         info?: string | null
+        voice?: boolean
     }
 
     export type TicketUpdateWithoutStatusInput = {
@@ -34147,6 +34329,7 @@ export namespace Prisma {
         problematic?: NullableStringFieldUpdateOperationsInput | string | null
         observations?: NullableStringFieldUpdateOperationsInput | string | null
         info?: NullableStringFieldUpdateOperationsInput | string | null
+        voice?: BoolFieldUpdateOperationsInput | boolean
         channel?: ChannelUpdateOneWithoutTicketNestedInput
         user?: UserUpdateOneWithoutTicketNestedInput
     }
@@ -34162,6 +34345,7 @@ export namespace Prisma {
         problematic?: NullableStringFieldUpdateOperationsInput | string | null
         observations?: NullableStringFieldUpdateOperationsInput | string | null
         info?: NullableStringFieldUpdateOperationsInput | string | null
+        voice?: BoolFieldUpdateOperationsInput | boolean
     }
 
     export type TicketUncheckedUpdateManyWithoutStatusInput = {
@@ -34175,6 +34359,7 @@ export namespace Prisma {
         problematic?: NullableStringFieldUpdateOperationsInput | string | null
         observations?: NullableStringFieldUpdateOperationsInput | string | null
         info?: NullableStringFieldUpdateOperationsInput | string | null
+        voice?: BoolFieldUpdateOperationsInput | boolean
     }
 
 

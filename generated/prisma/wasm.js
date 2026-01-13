@@ -217,9 +217,12 @@ exports.Prisma.ChannelScalarFieldEnum = {
 exports.Prisma.MessageScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
+  discordID: 'discordID',
   userId: 'userId',
   channelId: 'channelId',
-  content: 'content'
+    content: 'content',
+    replyID: 'replyID',
+    edited: 'edited'
 };
 
 exports.Prisma.ReactionScalarFieldEnum = {
@@ -269,7 +272,8 @@ exports.Prisma.TicketScalarFieldEnum = {
   statusLabel: 'statusLabel',
   problematic: 'problematic',
   observations: 'observations',
-  info: 'info'
+    info: 'info',
+    voice: 'voice'
 };
 
 exports.Prisma.TicketStatusScalarFieldEnum = {
@@ -422,6 +426,7 @@ exports.Prisma.ChannelOrderByRelevanceFieldEnum = {
 };
 
 exports.Prisma.MessageOrderByRelevanceFieldEnum = {
+  discordID: 'discordID',
   userId: 'userId',
   channelId: 'channelId'
 };

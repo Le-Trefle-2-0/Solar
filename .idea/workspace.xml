@@ -4,21 +4,153 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="add dynamic volunteer list retrieval">
-      <change afterPath="$PROJECT_DIR$/app/app/admin/columns.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/app/admin/data-table.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/app/admin/page.tsx" afterDir="false" />
+    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="Upgrade the monolithic architecture to full dynamic independant microservices">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/app-sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/app-sidebar.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/ui/table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/table.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/interface.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/interface.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/app-build-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/app-build-manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/0.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/0.pack.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/1.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/1.pack.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/10.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/10.pack.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/11.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/11.pack.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/2.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/2.pack.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/3.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/3.pack.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/4.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/4.pack.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/5.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/5.pack.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/6.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/6.pack.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/7.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/7.pack.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/8.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/8.pack.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/9.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/9.pack.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/index.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/index.pack.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/index.pack.gz.old" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/index.pack.gz.old" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/0.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/0.pack.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/1.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/1.pack.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/10.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/10.pack.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/11.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/11.pack.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/2.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/2.pack.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/3.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/3.pack.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/4.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/4.pack.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/5.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/5.pack.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/6.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/6.pack.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/7.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/7.pack.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/8.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/8.pack.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/9.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/9.pack.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/index.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/index.pack.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/index.pack.gz.old" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/index.pack.gz.old" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/prerender-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/prerender-manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/react-loadable-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/react-loadable-manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/app-paths-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/server/app-paths-manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/app/_not-found/page.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/app/_not-found/page_client-reference-manifest.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/app/api/auth/[...all]/route.js" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/server/app/api/auth/[...all]/route.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/app/api/auth/[...all]/route_client-reference-manifest.js" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/server/app/api/auth/[...all]/route_client-reference-manifest.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/app/api/events/getAvailable/route.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/app/api/events/getAvailable/route_client-reference-manifest.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/app/app/be/page.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/app/app/be/page_client-reference-manifest.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/app/favicon.ico/route.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/middleware-react-loadable-manifest.js" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/server/middleware-react-loadable-manifest.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/server-reference-manifest.js" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/server/server-reference-manifest.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/server-reference-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/server/server-reference-manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@babel.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@better-auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@better-auth.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@better-fetch.js" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@better-fetch.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@daveyplate.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@floating-ui.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@fortawesome.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@hcaptcha.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@hookform.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@marsidev.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@msgpack.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@radix-ui.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@react-email.js" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@react-email.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@socket.io.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@swc.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@wojtekmaj.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/aria-hidden.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/better-auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/better-auth.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/class-variance-authority.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/clsx.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/cmdk.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/engine.io-client.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/engine.io-parser.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/frimousse.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/get-nonce.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/gif-picker-react.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/hoist-non-react-statics.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/input-otp.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/js-sha256.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/lucide-react.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/ms.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/nanostores.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/next-themes.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/next.js" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/next.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/object-assign.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/peerjs-js-binarypack.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/peerjs.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/prop-types.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/qr.js.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/react-async-script.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/react-google-recaptcha.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/react-hook-form.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/react-is.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/react-qr-code.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/react-remove-scroll-bar.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/react-remove-scroll.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/react-style-singleton.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/resend.js" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/resend.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/sdp.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/socket.io-client.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/socket.io-parser.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/sonner.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/styled-jsx.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/supports-color.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/tailwind-merge.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/tslib.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/ua-parser-js.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/use-callback-ref.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/use-sidecar.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/use-sync-external-store.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/vaul.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/warning.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/webrtc-adapter.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/xmlhttprequest-ssl.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/zod.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/webpack-runtime.js" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/server/webpack-runtime.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/chunks/app-pages-internals.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/chunks/app/_not-found/page.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/chunks/app/api/events/getAvailable/route.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/chunks/app/app/be/page.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/chunks/app/app/layout.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/chunks/app/layout.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/chunks/webpack.js" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/static/chunks/webpack.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/css/app/layout.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/media/4cf2300e9c8272f7-s.p.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/media/747892c23ea88013-s.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/media/8d697b304b401681-s.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/media/93f479601ee12b01-s.p.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/media/9610d9e46709d722-s.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/media/ba015fad6dcf6784-s.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/media/logo.7c80edea.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/webpack/19afdf2addea5fe1.webpack.hot-update.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/webpack/29fc0510e1d02a79.webpack.hot-update.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/webpack/app/layout.19afdf2addea5fe1.hot-update.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/webpack/webpack.19afdf2addea5fe1.hot-update.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/webpack/webpack.29fc0510e1d02a79.hot-update.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/trace" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/trace" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/types/app/api/events/getAvailable/route.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/types/app/app/be/page.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/types/app/app/layout.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/.next/types/app/layout.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/components/chat.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/chat.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/context/Socket.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/context/Socket.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="151" />
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -26,8 +158,8 @@
         <option value="tsconfig.json" />
         <option value="CSS File" />
         <option value="JavaScript File" />
-        <option value="TypeScript File" />
         <option value="TypeScript JSX File" />
+        <option value="TypeScript File" />
       </list>
     </option>
   </component>
@@ -46,6 +178,7 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RESET_MODE" value="HARD" />
+    <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -56,7 +189,8 @@
   <component name="GithubProjectSettings">
     <option name="branchProtectionPatterns">
       <list>
-        <option value="Main" />
+        <option value="stable" />
+        <option value="dev" />
       </list>
     </option>
   </component>
@@ -81,10 +215,15 @@
   &quot;keyToString&quot;: {
     &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;remake&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/admin/WebstormProjects/Solar/app/app/chat&quot;,
+    &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/admin/WebstormProjects/School-buttons-main&quot;,
     &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -92,6 +231,7 @@
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
     &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\admin\\WebstormProjects\\Solar\\node_modules\\typescript\\lib&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
@@ -119,7 +259,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-WS-243.25659.40" />
+        <option value="bundled-js-predefined-d6986cc7102b-c7e53b3be11b-JavaScript-WS-253.28294.332" />
       </set>
     </attachedChunks>
   </component>
@@ -146,62 +286,8 @@
       <workItem from="1750363667156" duration="9319000" />
       <workItem from="1750427135972" duration="32156000" />
       <workItem from="1750726875409" duration="13460000" />
-    </task>
-    <task id="LOCAL-00008" summary="update password recovery system">
-      <option name="closed" value="true" />
-      <created>1749470676615</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1749470676615</updated>
-    </task>
-    <task id="LOCAL-00009" summary="autofix unused imports">
-      <option name="closed" value="true" />
-      <created>1749470914261</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1749470914261</updated>
-    </task>
-    <task id="LOCAL-00010" summary="update auth style and translate pages to french">
-      <option name="closed" value="true" />
-      <created>1749473074490</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1749473074490</updated>
-    </task>
-    <task id="LOCAL-00011" summary="install auth plugins">
-      <option name="closed" value="true" />
-      <created>1749477683069</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1749477683069</updated>
-    </task>
-    <task id="LOCAL-00012" summary="update prisma schema for plugins">
-      <option name="closed" value="true" />
-      <created>1749477728445</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1749477728445</updated>
-    </task>
-    <task id="LOCAL-00013" summary="base app layout">
-      <option name="closed" value="true" />
-      <created>1749477787312</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1749477787312</updated>
-    </task>
-    <task id="LOCAL-00014" summary="sidebar styling">
-      <option name="closed" value="true" />
-      <created>1749514590389</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1749514590389</updated>
+      <workItem from="1752089213252" duration="381000" />
+      <workItem from="1765641987408" duration="21918000" />
     </task>
     <task id="LOCAL-00015" summary="base app interface layout">
       <option name="closed" value="true" />
@@ -539,7 +625,63 @@
       <option name="project" value="LOCAL" />
       <updated>1751332397346</updated>
     </task>
-    <option name="localTasksCounter" value="57" />
+    <task id="LOCAL-00057" summary="add basic admin page">
+      <option name="closed" value="true" />
+      <created>1751335212158</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1751335212158</updated>
+    </task>
+    <task id="LOCAL-00058" summary="better-auth minor update">
+      <option name="closed" value="true" />
+      <created>1751418528449</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1751418528449</updated>
+    </task>
+    <task id="LOCAL-00059" summary="add temporary user info endpoint">
+      <option name="closed" value="true" />
+      <created>1751418542304</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1751418542304</updated>
+    </task>
+    <task id="LOCAL-00060" summary="remove unused console.log">
+      <option name="closed" value="true" />
+      <created>1751418576498</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1751418576499</updated>
+    </task>
+    <task id="LOCAL-00061" summary="add admin user page">
+      <option name="closed" value="true" />
+      <created>1751418616782</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1751418616783</updated>
+    </task>
+    <task id="LOCAL-00062" summary="include user detail page link in admin table">
+      <option name="closed" value="true" />
+      <created>1751418655761</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1751418655761</updated>
+    </task>
+    <task id="LOCAL-00063" summary="Upgrade the monolithic architecture to full dynamic independant microservices">
+      <option name="closed" value="true" />
+      <created>1765670461240</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1765670461241</updated>
+    </task>
+    <option name="localTasksCounter" value="64" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -557,12 +699,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="add dynamic ticket links in sidebar" />
-    <MESSAGE value="add dynamic ticket page" />
-    <MESSAGE value="update userManager" />
-    <MESSAGE value="add event management api endpoint" />
-    <MESSAGE value="remove placeholder dashboard page" />
-    <MESSAGE value="adapt server and chat page to handle secure websocket connexion" />
     <MESSAGE value="install shadcn components" />
     <MESSAGE value="base ui setup" />
     <MESSAGE value="components.json install" />
@@ -575,14 +711,20 @@
     <MESSAGE value="update ticket page to sync with chat update" />
     <MESSAGE value="prisma update" />
     <MESSAGE value="include role data in message info" />
-    <MESSAGE value="remove unused console.log" />
     <MESSAGE value="update message rendering to handle multi message from single user and text wrapping" />
     <MESSAGE value="add temporary getAvailable endpoint" />
     <MESSAGE value="export socket as global" />
     <MESSAGE value="add formVolunteer interface" />
     <MESSAGE value="add assignment api endpoint" />
     <MESSAGE value="add dynamic volunteer list retrieval" />
-    <option name="LAST_COMMIT_MESSAGE" value="add dynamic volunteer list retrieval" />
+    <MESSAGE value="add basic admin page" />
+    <MESSAGE value="better-auth minor update" />
+    <MESSAGE value="add temporary user info endpoint" />
+    <MESSAGE value="remove unused console.log" />
+    <MESSAGE value="add admin user page" />
+    <MESSAGE value="include user detail page link in admin table" />
+    <MESSAGE value="Upgrade the monolithic architecture to full dynamic independant microservices" />
+    <option name="LAST_COMMIT_MESSAGE" value="Upgrade the monolithic architecture to full dynamic independant microservices" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>

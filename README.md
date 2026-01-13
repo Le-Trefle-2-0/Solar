@@ -1,36 +1,106 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Solar Monorepo
 
-## Getting Started
+Monorepo Node.js avec plusieurs services :
 
-First, run the development server:
+- `apps/web` – Front-end Next.js
+- `apps/api` – API REST Fastify (Prisma/MySQL)
+- `apps/ws` – Service WebSocket Socket.IO
+- `apps/voice` – SFU voix basé sur Mediasoup
+- `apps/storage` – Service de stockage
+
+---
+
+## 🛠 Procédure d'Installation
+
+Cette application est destinée aux bénévoles enregistrés d'une ONG. Le processus d'inscription n'est pas ouvert au
+public. Un outil de configuration est fourni pour créer le premier compte administrateur.
+
+### Prérequis
+
+- Node.js 20+
+- MySQL 8+
+- Redis (optionnel, sauf pour le scale-out WS)
+
+### 1. Installation des dépendances
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Configuration de l'environnement
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Créez un fichier `.env` à la racine du projet.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Configuration minimale :
 
-## Learn More
+```env
+# URL du Front-end
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 
-To learn more about Next.js, take a look at the following resources:
+# URL WebSocket
+NEXT_PUBLIC_WS_URL=ws://localhost:5000
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Base de données (MySQL)
+DATABASE_URL="mysql://utilisateur:motdepasse@localhost:3306/solar"
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Clé secrète pour l'authentification
+BETTER_AUTH_SECRET=une_cle_secrete_tres_longue
 
-## Deploy on Vercel
+# Configuration Email (Resend)
+RESEND_API_KEY=re_your_key
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 3. Initialisation de la base de données
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run generate
+# Si c'est une nouvelle installation :
+# npx prisma db push
+```
+
+### 4. Création du compte Administrateur
+
+Utilisez l'outil de configuration pour créer le premier compte administrateur. Ce compte vous permettra ensuite
+d'inviter d'autres membres.
+
+```bash
+npm run setup:admin
+```
+
+Suivez les instructions à l'écran pour saisir le nom, l'email et le mot de passe de l'administrateur.
+
+### 5. Lancement de l'application
+
+En mode développement :
+
+```bash
+npm run dev:all
+```
+
+L'application sera accessible sur `http://localhost:3000`.
+
+---
+
+## 🚀 Utilisation (Docker Compose)
+
+Pour lancer toute la stack avec Docker :
+
+```bash
+npm run compose:up
+```
+
+---
+
+## 🔒 Authentification et Accès
+
+L'accès à la partie connectée de l'application se fait uniquement sur invitation. Une fois le premier administrateur
+créé via l'outil de configuration, celui-ci peut gérer les membres et les invitations depuis l'onglet "Utilisateurs".
+
+---
+
+## 📜 Scripts utiles
+
+- `npm run dev:all` : Lance tous les services en mode dev.
+- `npm run setup:admin` : Outil de création du premier administrateur.
+- `npm run db` : Réinitialise la base de données (Attention : destructif).
+- `npm run build:all` : Compile tous les services pour la production.
