@@ -5,8 +5,8 @@ const config: CapacitorConfig = {
     appName: 'Solar',
     webDir: 'public',
     server: {
-        url: "https://beta.letrefle.org",
-        cleartext: false,
+        url: "http://localhost:3000",
+        cleartext: true,
     }
 };
 

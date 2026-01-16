@@ -225,7 +225,7 @@ export default function Event({event}: EventProps) {
                             const labelPart = slot.part ? (slot.part === 'first' ? '1 : 20h00-21h30' : '2 : 21h30-23h00') : '';
                             const partValue = slot.part ? (slot.part as 'first' | 'second') : undefined;
 
-                            const pendingRegistrations = slot.registrations.filter(r => r.status === 'pending');
+                            const pendingRegistrations = slot.registrations.filter((r: any) => r.status === 'pending');
 
                             return (
                                 <div key={slot.id} className="text-xs flex flex-col gap-2 p-2 border rounded-md">
@@ -239,7 +239,7 @@ export default function Event({event}: EventProps) {
                                     {isManagerOrAdmin && pendingRegistrations.length > 0 && (
                                         <div className="bg-orange-50 p-2 rounded-sm space-y-2">
                                             <p className="font-bold text-orange-800">Demandes en attente :</p>
-                                            {pendingRegistrations.map(reg => (
+                                            {pendingRegistrations.map((reg: any) => (
                                                 <div key={reg.id}
                                                      className="flex justify-between items-center bg-white p-1 rounded border border-orange-200">
                                                     <span>{reg.user?.name || reg.userId}</span>
@@ -263,7 +263,7 @@ export default function Event({event}: EventProps) {
                                     )}
 
                                     <div className="flex justify-end items-center gap-2">
-                                        {isRegistered && userRegistration?.status === 'pending' && (
+                                        {isRegistered && (userRegistration as any)?.status === 'pending' && (
                                             <Badge variant="outline" className="text-orange-600 border-orange-600">En
                                                 attente de validation</Badge>
                                         )}

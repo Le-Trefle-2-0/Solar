@@ -3,7 +3,15 @@ import {io, Socket} from "socket.io-client";
 let socket: Socket | null = null;
 
 export async function initSocket(jwt: string): Promise<Socket | null> {
-    if (socket) return socket;
+    if (socket) {
+        if (jwt && (socket.auth as any)?.jwt !== jwt) {
+            // eslint-disable-next-line no-console
+            console.log('[ws] updating jwt and reconnecting');
+            (socket.auth as any).jwt = jwt;
+            socket.disconnect().connect();
+        }
+        return socket;
+    }
 
     // Build a robust base URL for Socket.IO origin
     // Priority:
@@ -23,7 +31,7 @@ export async function initSocket(jwt: string): Promise<Socket | null> {
     } else if (typeof window !== 'undefined') {
         const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
         if (isLocal) {
-            base = 'http://localhost:5000';
+            base = 'http://localhost:3002';
         } else {
             // Attempt to derive a ws subdomain automatically (e.g., beta.example.com → ws.beta.example.com)
             const {protocol, hostname} = window.location;
@@ -32,7 +40,7 @@ export async function initSocket(jwt: string): Promise<Socket | null> {
             base = `${proto}${derivedHost}`;
         }
     }
-    if (!base) base = 'http://localhost:5000';
+    if (!base) base = 'http://localhost:3002';
 
     // socket.io expects http(s) origin; normalize ws(s) → http(s)
     if (base.startsWith('ws://')) base = 'http://' + base.slice('ws://'.length);

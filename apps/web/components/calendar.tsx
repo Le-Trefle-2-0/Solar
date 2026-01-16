@@ -55,7 +55,7 @@ const permSchema = z.object({
     startTime: z.string(),
     endDate: z.date(),
     endTime: z.string(),
-    isBulk: z.boolean().default(false),
+    isBulk: z.boolean(),
     bulkUntil: z.date().optional(),
 }).refine(data => {
     if (data.isBulk && !data.bulkUntil) return false;
