@@ -294,7 +294,7 @@ export default function NewsletterEditorInner({id, initialNewsletter, volunteerC
                         <CardContent className="pt-8">
                             <MantineProvider>
                                 <BlockNoteEditor
-                                    editor={editor}
+                                    editor={editor as any}
                                     theme="light"
                                     className="min-h-[500px]"
                                     editable={!isReadOnly}

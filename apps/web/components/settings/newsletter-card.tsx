@@ -11,12 +11,12 @@ export function NewsletterCard() {
     const session = authClient.useSession();
     const [loading, setLoading] = useState(false);
 
-    const newsletterSubscription = session.data?.user?.newsletterSubscription as boolean | undefined;
+    const newsletterSubscription = (session.data?.user as any)?.newsletterSubscription as boolean | undefined;
 
     const handleToggle = async (checked: boolean) => {
         setLoading(true);
         try {
-            await authClient.updateUser({
+            await (authClient.updateUser as any)({
                 newsletterSubscription: checked
             });
             toast.success("Préférences de newsletter mises à jour");

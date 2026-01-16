@@ -132,7 +132,7 @@ app.post('/v1/consume', async (req, reply) => {
     };
 });
 
-const port = Number(process.env.VOICE_PORT || 6000);
+const port = Number(process.env.VOICE_PORT || 3003);
 const host = process.env.VOICE_HOST || '0.0.0.0';
 
 app

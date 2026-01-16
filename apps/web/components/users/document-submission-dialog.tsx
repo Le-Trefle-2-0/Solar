@@ -92,7 +92,7 @@ export function DocumentSubmissionDialog({
     const uploadFile = async (file: File) => {
         const formData = new FormData();
         formData.append('file', file);
-        const res = await fetch(`${process.env.NEXT_PUBLIC_STORAGE_URL || 'http://localhost:7000'}/v1/files`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_STORAGE_URL || 'http://localhost:7001'}/v1/files`, {
             method: 'POST',
             body: formData,
         });

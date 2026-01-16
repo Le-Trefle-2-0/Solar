@@ -6,7 +6,7 @@ import {createAdapter} from '@socket.io/redis-adapter';
 import {createRemoteJWKSet, jwtVerify} from 'jose';
 import {createHmac} from 'crypto';
 
-const PORT = Number(process.env.WS_PORT || 5000);
+const PORT = Number(process.env.WS_PORT || 3002);
 const HOST = process.env.WS_HOST || '0.0.0.0';
 // Better Auth JWKS lives on the web app; default to local dev origin
 const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/$/, '');
@@ -72,9 +72,9 @@ io.use(async (socket, next) => {
     // 2) API key (bots/integrations)
     if (!ok && apiToken) {
         try {
-            const apiBase = process.env.API_BASE_URL || 'http://localhost:4000';
+            const apiBase = process.env.API_BASE_URL || 'http://localhost:3001';
             if (!process.env.API_BASE_URL) {
-                console.warn('API_BASE_URL is not set, falling back to http://localhost:4000');
+                console.warn('API_BASE_URL is not set, falling back to http://localhost:3001');
             }
             const res = await fetch(`${apiBase}/v1/keys/check`, {
                 method: 'POST',

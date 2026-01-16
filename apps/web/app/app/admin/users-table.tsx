@@ -514,7 +514,7 @@ export function UsersTable({data}: DataTableProps) {
                                                         </Badge>
                                                         {account.idCardFileId && (
                                                             <a
-                                                                href={`${process.env.NEXT_PUBLIC_STORAGE_URL || 'http://localhost:7000'}/v1/files/${account.idCardFileId}`}
+                                                                href={`${process.env.NEXT_PUBLIC_STORAGE_URL || 'http://localhost:3004'}/v1/files/${account.idCardFileId}`}
                                                                 target="_blank"
                                                                 className="text-xs text-blue-600 hover:underline flex items-center gap-1"
                                                             >
@@ -583,7 +583,7 @@ export function UsersTable({data}: DataTableProps) {
                                                         </Badge>
                                                         {account.casierFileId && (
                                                             <a
-                                                                href={`${process.env.NEXT_PUBLIC_STORAGE_URL || 'http://localhost:7000'}/v1/files/${account.casierFileId}`}
+                                                                href={`${process.env.NEXT_PUBLIC_STORAGE_URL || 'http://localhost:7001'}/v1/files/${account.casierFileId}`}
                                                                 target="_blank"
                                                                 className="text-xs text-blue-600 hover:underline flex items-center gap-1"
                                                             >
