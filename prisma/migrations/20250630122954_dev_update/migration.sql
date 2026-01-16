@@ -5,7 +5,7 @@
 
 */
 -- Keep message content type update (already consistent with later migration)
-ALTER TABLE `message` MODIFY `content` LONGBLOB NOT NULL;
+ALTER TABLE `Message` MODIFY `content` LONGBLOB NOT NULL;
 
 -- Columns `displayUsername` and `username` were already added in 20250619134439_update
 -- Skipping duplicate additions here to avoid MySQL 1060 duplicate column errors.
