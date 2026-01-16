@@ -1,3 +1,3 @@
 -- AlterTable
-ALTER TABLE `recruitment`
+ALTER TABLE `Recruitment`
     ADD COLUMN `contactEmail` VARCHAR(191) NULL;
