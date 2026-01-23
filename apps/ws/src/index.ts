@@ -6,7 +6,7 @@ import {createAdapter} from '@socket.io/redis-adapter';
 import {createRemoteJWKSet, jwtVerify} from 'jose';
 import {createHmac} from 'crypto';
 
-const PORT = Number(process.env.WS_PORT || 3002);
+const PORT = Number(process.env.WS_PORT || 5000);
 const HOST = process.env.WS_HOST || '0.0.0.0';
 // Better Auth JWKS lives on the web app; keep issuer public and JWKS fetch internal when available
 const AUTH_ISSUER = (process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/$/, '');
@@ -173,9 +173,8 @@ io.on('connection', (socket) => {
                 return cb && cb(false);
             }
         }
-        // emit to everyone else in the room + all volunteers (for toasts)
-        // This avoids sending back to the sender
-        socket.to(room).to('volunteers').emit('message', data);
+        // emit to everyone in the room + all volunteers (for toasts)
+        io.to(room).to('volunteers').emit('message', data);
         cb && cb(true);
     });
 

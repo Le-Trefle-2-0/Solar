@@ -113,7 +113,7 @@ export default function ChatWidget() {
 
     const loadMessages = useCallback(async (cid: string) => {
         try {
-            const data = await apiFetch(`/v1/messages/${cid}?limit=60`);
+            const data = await apiFetch(`/v1/messages/widget/${cid}?limit=60`);
             setMessages(data || []);
         } catch (e) {
             // silent
@@ -206,6 +206,7 @@ export default function ChatWidget() {
                             if (base.startsWith('wss://')) base = 'https://' + base.slice('wss://'.length);
 
                             const s = io(base, {
+                                path: '/socket.io/',
                                 auth: {guest: creds},
                                 withCredentials: true,
                                 reconnection: true,
@@ -234,7 +235,11 @@ export default function ChatWidget() {
                                     }
                                     return [...prev, {
                                         id: data.id ?? Math.floor(Math.random() * 1e9),
-                                        author: data.author,
+                                        author: data.author ? {
+                                            ...data.author,
+                                            name: (data.author.id === visitorUserId || data.author.id === creds.uid) ? 'Moi' : 'Bénévole Écoutant',
+                                            image: (data.author.id === visitorUserId || data.author.id === creds.uid) ? data.author.image : null,
+                                        } : data.author,
                                         content: data.content,
                                         timestamp: data.timestamp || Date.now(),
                                     }].sort((a, b) => a.timestamp - b.timestamp);
@@ -281,8 +286,8 @@ export default function ChatWidget() {
                 body: JSON.stringify({content: input.trim()}),
             });
             // Persist visitor userId for labeling/alignment
-            const uid: string | undefined = data?.message?.userId || data?.message?.userID;
-            if (uid) {
+            const uid: string | undefined = data?.message?.userId || data?.message?.userID || data?.message?.author?.id;
+            if (uid && uid !== visitorUserId) {
                 setVisitorUserId(uid);
                 try {
                     localStorage.setItem('widget_user_id', uid);
@@ -295,16 +300,16 @@ export default function ChatWidget() {
                 if (mid && prev.some(m => m.id === mid)) return prev;
                 return [...prev, {
                     id: mid ?? Math.floor(Math.random() * 1e9),
-                    author: {id: uid || 'me', name: 'Moi', image: null, role: null},
+                    author: {id: uid || visitorUserId || 'guest', name: 'Moi', image: null, role: null},
                     content: input.trim(),
                     timestamp: Date.now(),
-                }];
+                }].sort((a, b) => a.timestamp - b.timestamp);
             });
             // Also emit via WS to ensure volunteers get it instantly even if HTTP broadcast fails
             try {
                 const payload = {
                     id: data?.message?.id,
-                    author: {id: uid || 'guest', image: null, name: 'utilisateur', role: null},
+                    author: {id: uid || visitorUserId || 'guest', image: null, name: 'Utilisateur', role: null},
                     content: input.trim(),
                     timestamp: Date.now(),
                     channel: {id: channelId},
@@ -419,15 +424,7 @@ export default function ChatWidget() {
                                                         localStorage.setItem('widget_visitor_name', name);
                                                     } catch {
                                                     }
-                                                    setLoading(true);
-                                                    const session = await initSession(name);
-                                                    const cid = session?.channelId;
-                                                    if (cid) {
-                                                        setChannelId(cid);
-                                                        await loadMessages(cid);
-                                                        // WS will be set by the effect reacting to `consented`
-                                                    }
-                                                    setLoading(false);
+                                                    // The useEffect will handle session initialization when consented becomes true
                                                 }}
                                                 className="rounded-xl bg-primary px-6 py-3 text-primary-foreground shadow-lg font-medium hover:opacity-90 transition-opacity"
                                             >Continuer et ouvrir le chat
@@ -452,7 +449,7 @@ export default function ChatWidget() {
                                             bénévole vous répondra.</div>
                                     )}
                                     {messages.map((m) => {
-                                        const isMe = visitorUserId && m.author?.id === visitorUserId;
+                                        const isMe = (visitorUserId && m.author?.id === visitorUserId) || m.author?.name === 'Moi';
                                         return (
                                             <div key={m.id}
                                                  className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
@@ -461,7 +458,7 @@ export default function ChatWidget() {
                                                     <div className="flex items-baseline gap-2 mb-1">
                             <span
                                 className={`text-[10px] uppercase tracking-wide ${isMe ? 'opacity-90' : 'text-muted-foreground'}`}>
-                              {isMe ? 'Moi' : 'Bénévole Écoutant'}
+                                {isMe ? 'Moi' : 'Bénévole Écoutant'}
                             </span>
                                                         <span className="text-[10px] text-muted-foreground">
                               {new Date(m.timestamp).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}

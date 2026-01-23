@@ -5,7 +5,7 @@ import {Button} from "@/components/ui/button";
 import Image from "next/image";
 import {useState} from "react";
 import {ContactDialog} from "./contact-dialog";
-import {Menu, UserPlus, Mail} from "lucide-react";
+import {Mail, Menu, UserPlus} from "lucide-react";
 import {Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger,} from "@/components/ui/sheet";
 
 export function PublicHeader({session}: { session: any }) {

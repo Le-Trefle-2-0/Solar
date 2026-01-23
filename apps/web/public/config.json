@@ -1,6 +1,6 @@
 {
   "apiBase": "http://localhost:3001",
-  "wsBase": "http://localhost:3002",
+  "wsBase": "http://localhost:5000",
   "appBase": "http://localhost:3000",
   "storageBase": "http://localhost:3004",
   "voiceBase": "http://localhost:3003"

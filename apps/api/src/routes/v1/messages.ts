@@ -23,30 +23,33 @@ export async function registerMessagesRoutes(app: FastifyInstance) {
 
         const out: any[] = [];
         for (const msg of raw) {
-            const user = await prisma.user.findUnique({where: {id: msg.userId}});
-            const reactions = await prisma.reaction.findMany({where: {messageID: msg.id}});
-            if (user) {
-                const contentBuffer: any = (msg as any).content as any;
-                const content = Buffer.isBuffer(contentBuffer)
-                    ? contentBuffer.toString('utf8')
-                    : Buffer.from(new Uint8Array(Object.values(contentBuffer ?? {}))).toString('utf8');
-                out.push({
-                    id: msg.id,
-                    author: {
-                        id: user.id,
-                        image: user.image,
-                        name: (user.displayUsername || user.name) as string,
-                        role: user.role,
-                    },
-                    content,
-                    timestamp: new Date(msg.createdAt).getTime(),
-                    channel: {id: channelId},
-                    discordID: (msg as any).discordID,
-                    reactions,
-                    replyID: (msg as any).replyID ?? null,
-                    edited: (msg as any).edited,
-                });
+            let user = null;
+            if (msg.userId) {
+                user = await prisma.user.findUnique({where: {id: msg.userId}});
             }
+            const reactions = await prisma.reaction.findMany({where: {messageID: msg.id}});
+
+            const contentBuffer: any = (msg as any).content as any;
+            const content = Buffer.isBuffer(contentBuffer)
+                ? contentBuffer.toString('utf8')
+                : Buffer.from(new Uint8Array(Object.values(contentBuffer ?? {}))).toString('utf8');
+
+            out.push({
+                id: msg.id,
+                author: {
+                    id: user?.id ?? (msg.userId || 'guest'),
+                    image: user?.image ?? null,
+                    name: user ? (user.displayUsername || user.name) : (msg.userId?.startsWith('guest_') ? 'utilisateur' : (msg.userId ? 'Admin' : 'utilisateur')),
+                    role: user?.role ?? null,
+                },
+                content,
+                timestamp: new Date(msg.createdAt).getTime(),
+                channel: {id: channelId},
+                discordID: (msg as any).discordID,
+                reactions,
+                replyID: (msg as any).replyID ?? null,
+                edited: (msg as any).edited,
+            });
         }
         return out.reverse();
     });
