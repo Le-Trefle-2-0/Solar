@@ -26,7 +26,7 @@ const pluginList: any[] = [
                 title: "Code de vérification",
                 content: `
                     <p>Bonjour,</p>
-                    <p>Voici votre code de vérification pour vous connecter à Solar :</p>
+                    <p>Voici votre code de vérification pour vous connecter au Trèfle 2.0 :</p>
                     <div style="font-size: 32px; font-weight: 700; letter-spacing: 5px; text-align: center; margin: 30px 0; padding: 20px; background-color: #f9f9f9; border-radius: 8px; color: #8cc088; border: 1px dashed #8cc088;">
                         ${otp}
                     </div>
@@ -35,9 +35,9 @@ const pluginList: any[] = [
                 `,
             });
             const {error} = await resend.emails.send({
-                from: "Solar <noreply@solar.letrefle.org>",
+                from: "Le Trèfle 2.0 <noreply@solar.letrefle.org>",
                 to: email,
-                subject: "Solar - Votre code de vérification",
+                subject: "Le Trèfle 2.0 - Votre code de vérification",
                 html,
             });
             if (error) {
@@ -195,12 +195,12 @@ export const auth = betterAuth({
             const resend = getResendClient();
 
             const title = "Réinitialisation de mot de passe";
-            const subject = "Solar - Réinitialisation de mot de passe";
+            const subject = "Le Trèfle 2.0 - Réinitialisation de mot de passe";
             const buttonText = "Réinitialiser mon mot de passe";
 
             const content = `
                 <p>Bonjour ${data.user.name || ""},</p>
-                <p>Une demande de réinitialisation de mot de passe a été effectuée pour votre compte Solar.</p>
+                <p>Une demande de réinitialisation de mot de passe a été effectuée pour votre compte Le Trèfle 2.0.</p>
                 <p>Cliquez sur le bouton ci-dessous pour choisir un nouveau mot de passe :</p>
                 <div style="text-align: center; margin: 30px 0;">
                     <a href="${data.url}" class="button" style="color: white !important;">${buttonText}</a>
@@ -216,7 +216,7 @@ export const auth = betterAuth({
 
             console.log(`[auth] Sending reset email via Resend to ${data.user.email}`);
             const {error} = await resend.emails.send({
-                from: "Solar <noreply@solar.letrefle.org>",
+                from: "Le Trèfle 2.0 <noreply@solar.letrefle.org>",
                 to: data.user.email,
                 subject,
                 html,

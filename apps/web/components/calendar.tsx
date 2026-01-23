@@ -49,6 +49,7 @@ import {Calendar} from "@/components/ui/calendar";
 import {toast} from 'sonner';
 import {apiFetch} from "@/lib/api";
 import {useRouter} from "next/navigation";
+import {useSession} from "@/lib/auth-client";
 
 const permSchema = z.object({
     startDate: z.date(),
@@ -91,6 +92,12 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
     const router = useRouter();
     const [roleSlots, setRoleSlots] = useState<RoleSlotForm[]>([...DEFAULT_SLOTS]);
     const [currentMonth, setCurrentMonth] = useState(new Date());
+    const {data: session} = useSession();
+    const userRoles: string[] = (session?.user?.role || '')
+        .split(',')
+        .map((r: string) => r.trim())
+        .filter(Boolean);
+    const canCreate = userRoles.includes('admin') || userRoles.includes('manager');
 
 
     const daysOfWeek = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
@@ -277,16 +284,17 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
                     <h2 className="text-xl font-semibold capitalize">
                         {format(currentMonth, 'MMMM yyyy', {locale: fr})}
                     </h2>
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <Button variant="outline" onClick={() => setRoleSlots([...DEFAULT_SLOTS])}
-                                    aria-label="Ajouter une permanence">
-                                <CalendarPlus/>
-                            </Button>
-                        </DialogTrigger>
+                    {canCreate && (
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <Button variant="outline" onClick={() => setRoleSlots([...DEFAULT_SLOTS])}
+                                        aria-label="Ajouter une permanence">
+                                    <CalendarPlus/>
+                                </Button>
+                            </DialogTrigger>
 
-                        <DialogContent
-                            className="max-w-[95vw] sm:max-w-xl md:max-w-2xl lg:max-w-3xl max-h-[85vh] overflow-y-auto focus:outline-none">
+                            <DialogContent
+                                className="max-w-[95vw] sm:max-w-xl md:max-w-2xl lg:max-w-3xl max-h-[85vh] overflow-y-auto focus:outline-none">
                             <Form {...createEventForm}>
                                 <form onSubmit={createEventForm.handleSubmit(createEvent)}>
                                     <DialogHeader>
@@ -584,7 +592,8 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
                                 </form>
                             </Form>
                         </DialogContent>
-                    </Dialog>
+                        </Dialog>
+                    )}
                 </div>
             </div>
             <div className="grid grid-cols-7 gap-2 text-center text-xs font-medium text-gray-700 mb-2 flex-shrink-0">

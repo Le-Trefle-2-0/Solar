@@ -33,7 +33,7 @@ export function NewsletterCard() {
             <CardHeader>
                 <CardTitle>Newsletter</CardTitle>
                 <CardDescription>
-                    Gérez votre abonnement à la newsletter Solar.
+                    Gérez votre abonnement à notre newsletter.
                 </CardDescription>
             </CardHeader>
             <CardContent>

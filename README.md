@@ -48,6 +48,9 @@ BETTER_AUTH_SECRET=une_cle_secrete_tres_longue
 
 # Configuration Email (Resend)
 RESEND_API_KEY=re_your_key
+
+# Options d'administration
+HIDE_EMAILS_IN_ADMIN=true # Masque les emails dans l'onglet admin (u***@domain.com)
 ```
 
 ### Proxy inverse (Traefik)

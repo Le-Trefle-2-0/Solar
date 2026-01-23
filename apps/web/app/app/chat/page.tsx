@@ -2,6 +2,13 @@ import {subHours} from 'date-fns';
 import {Chat} from "@/components/chat";
 import prisma from "@/lib/prisma";
 
+import {constructMetadata} from "@/lib/metadata";
+
+export const metadata = constructMetadata({
+    title: "Chat",
+    noIndex: true,
+});
+
 export default async function MainChat() {
     const now = new Date();
     const twoHoursAgo = subHours(now, 2);

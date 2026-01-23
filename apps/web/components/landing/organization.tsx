@@ -66,7 +66,7 @@ export function OrganizationTree() {
 
             <div className="px-4 md:px-8 w-full max-w-7xl mx-auto relative z-10">
                 <ScrollReveal className="text-center mb-16">
-                    <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-4">
+                    <h2 className="text-3xl font-semibold tracking-tighter sm:text-4xl md:text-5xl mb-4 font-barlow">
                         Notre Structure
                     </h2>
                     <p className="text-muted-foreground md:text-lg max-w-2xl mx-auto">
@@ -84,7 +84,8 @@ export function OrganizationTree() {
                         <ScrollReveal animation="fade-in"
                                       className="flex items-center gap-4 justify-center bg-background/80 backdrop-blur-sm w-fit mx-auto px-4 py-1 rounded-full border border-primary/20">
                             <Shield className="h-5 w-5 text-primary"/>
-                            <h3 className="text-xl font-bold uppercase tracking-widest text-primary">Le Conseil
+                            <h3 className="text-xl font-semibold uppercase tracking-widest text-primary font-barlow">Le
+                                Conseil
                                 d'Administration</h3>
                         </ScrollReveal>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
@@ -101,7 +102,7 @@ export function OrganizationTree() {
                         <ScrollReveal animation="fade-in"
                                       className="flex items-center gap-4 justify-center bg-background/80 backdrop-blur-sm w-fit mx-auto px-4 py-1 rounded-full border border-primary/20">
                             <Users className="h-5 w-5 text-primary"/>
-                            <h3 className="text-xl font-bold uppercase tracking-widest text-primary">Les
+                            <h3 className="text-xl font-semibold uppercase tracking-widest text-primary font-barlow">Les
                                 Responsables</h3>
                         </ScrollReveal>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
@@ -146,7 +147,7 @@ function PersonCard({person}: { person: Person }) {
                         )}
                     </div>
                 </div>
-                <h4 className="font-bold text-xl tracking-tight">{person.name}</h4>
+                <h4 className="font-semibold text-xl tracking-tight font-barlow">{person.name}</h4>
                 <p className="text-sm font-medium text-primary/70 uppercase tracking-wider mt-1">{person.role}</p>
             </CardContent>
         </Card>

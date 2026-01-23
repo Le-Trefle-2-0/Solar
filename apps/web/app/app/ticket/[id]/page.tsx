@@ -1,6 +1,13 @@
 import {Chat} from "@/components/chat";
 import prisma from "@/lib/prisma";
 
+import {constructMetadata} from "@/lib/metadata";
+
+export const metadata = constructMetadata({
+    title: "Détails de l'écoute",
+    noIndex: true,
+});
+
 export default async function TicketChat({
                                              params
                                          }: {

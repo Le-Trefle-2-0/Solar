@@ -1,4 +1,3 @@
-import type {Metadata} from "next";
 import {SidebarProvider, SidebarTrigger} from "@/components/ui";
 import {AppSidebar} from "@/components/app-sidebar";
 import {redirect} from "next/navigation";
@@ -10,14 +9,13 @@ import {DocumentSubmissionDialog} from "@/components/users/document-submission-d
 import {addDays, differenceInDays, format} from "date-fns";
 import {fr} from "date-fns/locale";
 
-export const metadata: Metadata = {
+import {constructMetadata} from "@/lib/metadata";
+
+export const metadata = constructMetadata({
     title: "Solar - Le Trèfle 2.0",
     description: "Logiciel d'écoute",
-    icons: {
-        icon: "/favicon.ico",
-        apple: "/logo.svg"
-    }
-};
+    noIndex: true,
+});
 
 export default async function RootLayout({
                                              children,

@@ -43,7 +43,7 @@ export async function sendContactEmail(formData: z.infer<typeof contactSchema>) 
 
     try {
         const {data, error} = await resend.emails.send({
-            from: "noreply@solar.letrefle.org",
+            from: "Le Trèfle 2.0 <noreply@solar.letrefle.org>",
             to: "contact@letrefle.org",
             replyTo: email,
             subject: `Nouveau message depuis letrefle.org`,

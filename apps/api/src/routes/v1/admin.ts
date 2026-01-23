@@ -37,6 +37,22 @@ export async function registerAdminRoutes(app: FastifyInstance) {
             }
         });
 
+        const hideEmails = process.env.HIDE_EMAILS_IN_ADMIN === "true";
+        if (hideEmails && user.email) {
+            const [localPart, domain] = user.email.split('@');
+            if (localPart && domain) {
+                const visibleLength = Math.min(3, Math.floor(localPart.length / 2));
+                user.email = `${localPart.substring(0, visibleLength)}***@${domain}`;
+            } else {
+                user.email = "***";
+            }
+        }
+
+        // @ts-ignore
+        delete user.password;
+        // @ts-ignore
+        delete user.twoFactorSecret;
+
         return reply.send({user});
     });
 }

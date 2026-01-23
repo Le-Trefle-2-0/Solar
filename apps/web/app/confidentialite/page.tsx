@@ -4,6 +4,13 @@ import {PublicHeader} from "@/components/landing/header";
 import {PublicFooter} from "@/components/landing/footer";
 import {ShieldCheck} from "lucide-react";
 
+import {constructMetadata} from "@/lib/metadata";
+
+export const metadata = constructMetadata({
+    title: "Politique de Confidentialité",
+    description: "Comment nous protégeons vos données et respectons votre vie privée au sein du Trèfle 2.0.",
+});
+
 export default async function ConfidentialitePage() {
     const session = await auth.api.getSession({
         headers: await headers(),
@@ -25,7 +32,7 @@ export default async function ConfidentialitePage() {
                         <div className="inline-flex p-3 rounded-2xl bg-primary/10 text-primary mb-6">
                             <ShieldCheck className="h-10 w-10"/>
                         </div>
-                        <h1 className="text-4xl md:text-6xl font-bold tracking-tight italic mb-6">
+                        <h1 className="text-4xl md:text-6xl font-semibold tracking-tight italic mb-6">
                             Politique de Confidentialité
                         </h1>
                         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">

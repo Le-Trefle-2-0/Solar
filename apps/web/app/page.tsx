@@ -9,6 +9,13 @@ import {PublicFooter} from "@/components/landing/footer";
 import {ScrollReveal} from "@/components/landing/scroll-reveal";
 import ChatWidget from "@/components/chat-widget";
 
+import {constructMetadata} from "@/lib/metadata";
+
+export const metadata = constructMetadata({
+    title: "Le Trèfle 2.0 - Services d'écoute et de soutien moral",
+    description: "Soutien moral et écoute anonyme par l'association Le Trèfle 2.0. Échangez gratuitement et en toute sécurité avec nos écoutants.",
+});
+
 export default async function Home() {
     const session = await auth.api.getSession({
         headers: await headers(),

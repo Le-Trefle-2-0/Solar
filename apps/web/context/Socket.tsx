@@ -1,12 +1,11 @@
 'use client';
 
 import React, {createContext, useContext, useEffect, useRef, useState} from "react";
-import {closeSocket, initSocket, joinChannel, leaveChannel} from "@/lib/socket";
-import {apiFetch, clearJwtCache, getJwt} from "@/lib/api";
+import {initSocket, joinChannel, leaveChannel} from "@/lib/socket";
+import {apiFetch, getJwt} from "@/lib/api";
 import {Socket} from "socket.io-client";
 import {usePathname, useRouter} from "next/navigation";
 import {toast} from "sonner";
-import {useSession} from "@/lib/auth-client";
 
 interface SocketContextProps {
     socket: Socket | null;
@@ -55,55 +54,27 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({childre
         }
     }, []);
 
-    const {data: session, isPending} = useSession();
-
     useEffect(() => {
-        let mounted = true;
-        let retryTimer: NodeJS.Timeout | null = null;
-
-        if (isPending) return;
-
-        if (!session) {
-            closeSocket();
-            setSocket(null);
-            setConnected(false);
-            setConnecting(false);
-            return;
-        }
-
         const init = async () => {
             try {
-                // When session changes, we must clear the JWT cache to get a fresh one
-                clearJwtCache();
                 const token = await getJwt();
                 if (!token) {
-                    if (!mounted) return;
                     console.warn('[ws] no JWT token found');
                     // Retry in 2 seconds if no token (maybe session is still loading)
-                    retryTimer = setTimeout(init, 2000);
+                    setTimeout(init, 2000);
                     setConnecting(false);
                     return;
                 }
                 const s = await initSocket(token);
-                if (mounted) {
-                    setSocket(s);
-                    setConnecting(true);
-                }
+                setSocket(s);
+                setConnecting(true);
             } catch (e) {
-                if (mounted) {
-                    console.error('[ws] failed to init socket', e);
-                    setConnecting(false);
-                }
+                console.error('[ws] failed to init socket', e);
+                setConnecting(false);
             }
         };
-
         init();
-
-        return () => {
-            mounted = false;
-            if (retryTimer) clearTimeout(retryTimer);
-        };
-    }, [session, isPending]);
+    }, []);
 
     useEffect(() => {
         if (!socket) return;
@@ -241,7 +212,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({childre
                 <div
                     className="fixed inset-0 z-[1000] flex items-center justify-center bg-background/90 backdrop-blur-sm">
                     <div className="flex flex-col items-center gap-4">
-                        <img src="/logo.svg" alt="Solar" className="h-16 w-16 animate-pulse-scale"/>
+                        <img src="/logo.svg" alt="Le Trèfle 2.0" className="h-16 w-16 animate-pulse-scale"/>
                         <p className="text-sm text-muted-foreground text-center px-4">
                             {trouble ? 'Nous rencontrons des difficultés de connexion. Nouvelle tentative…' : ''}
                         </p>

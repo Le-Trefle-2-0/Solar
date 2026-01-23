@@ -4,6 +4,13 @@ import {PublicHeader} from "@/components/landing/header";
 import {PublicFooter} from "@/components/landing/footer";
 import {Scale} from "lucide-react";
 
+import {constructMetadata} from "@/lib/metadata";
+
+export const metadata = constructMetadata({
+    title: "Mentions Légales",
+    description: "Informations juridiques concernant l'association Le Trèfle 2.0.",
+});
+
 export default async function LegalPage() {
     const session = await auth.api.getSession({
         headers: await headers(),
@@ -25,7 +32,7 @@ export default async function LegalPage() {
                         <div className="inline-flex p-3 rounded-2xl bg-primary/10 text-primary mb-6">
                             <Scale className="h-10 w-10"/>
                         </div>
-                        <h1 className="text-4xl md:text-6xl font-bold tracking-tight italic mb-6">
+                        <h1 className="text-4xl md:text-6xl font-semibold tracking-tight italic mb-6">
                             Mentions Légales
                         </h1>
                         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">

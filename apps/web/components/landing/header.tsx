@@ -5,37 +5,50 @@ import {Button} from "@/components/ui/button";
 import Image from "next/image";
 import {useState} from "react";
 import {ContactDialog} from "./contact-dialog";
-import {Menu} from "lucide-react";
+import {Mail, Menu, UserPlus} from "lucide-react";
 import {Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger,} from "@/components/ui/sheet";
 
 export function PublicHeader({session}: { session: any }) {
     const [contactOpen, setContactOpen] = useState(false);
 
-    const NavItems = ({className = ""}: { className?: string }) => (
-        <div className={className}>
-            <Link href="/benevoles" className="transition-colors hover:text-foreground/80 text-foreground/60">
-                Devenir bénévole
-            </Link>
-            <button
-                onClick={() => setContactOpen(true)}
-                className="transition-colors hover:text-foreground/80 text-foreground/60 cursor-pointer text-left"
-            >
-                Contact
-            </button>
-            <Button asChild variant="default" className="w-full lg:w-auto">
-                <Link href="/don">Faire un don</Link>
-            </Button>
-            {session ? (
-                <Button asChild variant="outline" className="w-full lg:w-auto">
-                    <Link href="/app">Ouvrir Solar</Link>
-                </Button>
-            ) : (
-                <Button asChild variant="outline" className="w-full lg:w-auto">
-                    <Link href="/auth/sign-in">Connexion Bénévole</Link>
-                </Button>
-            )}
-        </div>
-    );
+    const NavItems = ({className = ""}: { className?: string }) => {
+        const isMobile = className.includes("flex-col");
+        const linkBase = isMobile
+            ? "block w-full py-3 px-4 rounded-md transition-colors text-foreground text-left bg-transparent hover:bg-muted/50"
+            : "transition-colors hover:text-foreground/80 text-foreground/60";
+
+        return (
+            <div className={className}>
+                <Link href="/benevoles" className={`${linkBase} flex items-center gap-3`}>
+                    {isMobile && <UserPlus className="h-5 w-5 text-foreground/80" />}
+                    <span>Devenir bénévole</span>
+                </Link>
+                <button
+                    onClick={() => setContactOpen(true)}
+                    className={`${linkBase} cursor-pointer flex items-center gap-3`}
+                >
+                    {isMobile && <Mail className="h-5 w-5 text-foreground/80" />}
+                    <span>Contact</span>
+                </button>
+                <div className={isMobile ? "px-4" : ""}>
+                    <Button asChild variant="default" className="w-full lg:w-auto">
+                        <Link href="/don">Faire un don</Link>
+                    </Button>
+                </div>
+                <div className={isMobile ? "px-4" : ""}>
+                    {session ? (
+                        <Button asChild variant="outline" className="w-full lg:w-auto">
+                            <Link href="/app">Espace Bénévole</Link>
+                        </Button>
+                    ) : (
+                        <Button asChild variant="outline" className="w-full lg:w-auto">
+                            <Link href="/auth/sign-in">Connexion Bénévole</Link>
+                        </Button>
+                    )}
+                </div>
+            </div>
+        );
+    };
 
     return (
         <header
@@ -44,7 +57,7 @@ export function PublicHeader({session}: { session: any }) {
                 <div className="flex items-center gap-2">
                     <Link href="/" className="flex items-center gap-2">
                         <Image src="/logo.svg" alt="Le Trèfle 2.0" width={40} height={40}/>
-                        <span className="text-xl font-bold hidden sm:inline-block">Le Trèfle 2.0</span>
+                        <span className="text-xl font-semibold hidden sm:inline-block">Le Trèfle 2.0</span>
                     </Link>
                 </div>
 
@@ -62,7 +75,7 @@ export function PublicHeader({session}: { session: any }) {
                                 <span className="sr-only">Toggle menu</span>
                             </Button>
                         </SheetTrigger>
-                        <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                        <SheetContent side="right" className="sm:w-[400px] sm:h-auto">
                             <SheetHeader className="text-left">
                                 <SheetTitle className="flex items-center gap-2">
                                     <Image src="/logo.svg" alt="Le Trèfle 2.0" width={32} height={32}/>

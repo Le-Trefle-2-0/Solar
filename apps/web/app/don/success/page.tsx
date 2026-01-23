@@ -6,6 +6,13 @@ import {Button} from "@/components/ui/button";
 import {ArrowRight, CheckCircle} from "lucide-react";
 import Link from "next/link";
 
+import {constructMetadata} from "@/lib/metadata";
+
+export const metadata = constructMetadata({
+    title: "Merci pour votre don",
+    noIndex: true,
+});
+
 export default async function DonationSuccessPage() {
     const session = await auth.api.getSession({
         headers: await headers(),

@@ -3,6 +3,13 @@ import {auth} from "@/lib/auth";
 import {headers} from "next/headers";
 import {redirect} from "next/navigation";
 
+import {constructMetadata} from "@/lib/metadata";
+
+export const metadata = constructMetadata({
+    title: "Historique du Salon",
+    noIndex: true,
+});
+
 export default async function HistoryDetailPage({
                                                     params
                                                 }: {

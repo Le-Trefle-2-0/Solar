@@ -5,6 +5,13 @@ import {PublicFooter} from "@/components/landing/footer";
 import {FAQClient} from "@/components/landing/faq-client";
 import {HelpCircle} from "lucide-react";
 
+import {constructMetadata} from "@/lib/metadata";
+
+export const metadata = constructMetadata({
+    title: "FAQ",
+    description: "Tout ce que vous devez savoir sur Le Trèfle 2.0, notre fonctionnement et nos services d'écoute.",
+});
+
 export default async function FAQPage() {
     const session = await auth.api.getSession({
         headers: await headers(),
@@ -27,7 +34,7 @@ export default async function FAQPage() {
                         <div className="inline-flex p-3 rounded-2xl bg-primary/10 text-primary mb-6">
                             <HelpCircle className="h-10 w-10"/>
                         </div>
-                        <h1 className="text-4xl md:text-6xl font-bold tracking-tight italic mb-6">
+                        <h1 className="text-4xl md:text-6xl font-semibold tracking-tight italic mb-6 font-barlow">
                             Foire Aux Questions
                         </h1>
                         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">

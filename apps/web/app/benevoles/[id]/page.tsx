@@ -12,6 +12,18 @@ import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import Link from "next/link";
 import {Button} from "@/components/ui/button";
 
+import {constructMetadata} from "@/lib/metadata";
+
+export async function generateMetadata({params}: { params: Promise<{ id: string }> }) {
+    const {id} = await params;
+    const recruitment = await getRecruitmentById(id);
+
+    return constructMetadata({
+        title: recruitment?.title || "Recrutement",
+        description: recruitment?.description?.slice(0, 160) || "Détails du recrutement chez Le Trèfle 2.0",
+    });
+}
+
 export default async function RecruitmentDetailPage({params}: { params: Promise<{ id: string }> }) {
     const {id} = await params;
     const recruitment = await getRecruitmentById(id);
