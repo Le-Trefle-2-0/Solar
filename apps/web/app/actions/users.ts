@@ -8,6 +8,8 @@ import {hashPassword} from "better-auth/crypto";
 import {getResendClient} from "@/lib/resend";
 import {renderEmailTemplate} from "@/lib/email-template";
 
+import {truncateEmail} from "@/lib/utils";
+
 const inviteSchema = z.object({
     name: z.string().min(1),
     email: z.string().email(),
