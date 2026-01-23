@@ -8,9 +8,9 @@ const app = Fastify({logger: true});
 
 await app.register(cors, {origin: true, credentials: true});
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-if (!process.env.NEXT_PUBLIC_APP_URL) {
-    app.log.warn('NEXT_PUBLIC_APP_URL is not set, falling back to http://localhost:3000');
+const APP_URL = process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+if (!process.env.BETTER_AUTH_URL && !process.env.NEXT_PUBLIC_APP_URL) {
+    app.log.warn('BETTER_AUTH_URL or NEXT_PUBLIC_APP_URL is not set, falling back to http://localhost:3000');
 }
 const JWKS = createRemoteJWKSet(new URL(`${APP_URL}/api/auth/jwks`));
 
