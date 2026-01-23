@@ -128,6 +128,11 @@ export async function inviteUserAction(formData: z.infer<typeof inviteSchema>) {
             // but we should probably log it or handle it.
         }
 
+        const hideEmails = process.env.HIDE_EMAILS_IN_ADMIN === "true";
+        if (hideEmails) {
+            userData.email = truncateEmail(userData.email);
+        }
+
         return {success: true, user: userData};
     } catch (e: any) {
         console.error("[inviteAction] Error:", e);

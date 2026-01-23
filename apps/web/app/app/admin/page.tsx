@@ -6,8 +6,11 @@ import {auth} from "@/lib/auth";
 import {headers} from "next/headers";
 import {redirect} from "next/navigation";
 import {constructMetadata} from "@/lib/metadata";
+import {truncateEmail} from "@/lib/utils";
 
 async function getData(): Promise<DisplayAccount[]> {
+    const hideEmails = process.env.HIDE_EMAILS_IN_ADMIN === "true";
+
     // Fetch data from your API here.
     const accountsWithLatestTicket = await prisma.user.findMany({
         select: {
@@ -52,32 +55,34 @@ async function getData(): Promise<DisplayAccount[]> {
     });
 
     // Map user with the latest ticket date
-    return accountsWithLatestTicket.map(acc => ({
-        id: acc.id,
-        name: acc.name,
-        username: acc.username as string,
-        email: acc.email,
-        role: acc.role as string,
-        lastTicketTimestamp: acc.Ticket.length > 0 ? acc.Ticket[0].createdAt.getTime() : 0,
-        documentsStatus: acc.documentsStatus,
-        documentsSentAt: acc.documentsSentAt,
-        documentsValidatedAt: acc.documentsValidatedAt,
-        documentsRenewalAt: acc.documentsRenewalAt,
-        documentsText: acc.documentsText,
-        firstName: acc.firstName,
-        lastName: acc.lastName,
-        birthDate: acc.birthDate,
-        addressStreet: acc.addressStreet,
-        addressNumber: acc.addressNumber,
-        addressPostalCode: acc.addressPostalCode,
-        addressCity: acc.addressCity,
-        idCardFileId: acc.idCardFileId,
-        idCardStatus: acc.idCardStatus,
-        idCardRejectReason: acc.idCardRejectReason,
-        casierFileId: acc.casierFileId,
-        casierStatus: acc.casierStatus,
-        casierRejectReason: acc.casierRejectReason,
-    }));
+    return accountsWithLatestTicket.map(acc => {
+        return {
+            id: acc.id,
+            name: acc.name,
+            username: acc.username as string,
+            email: hideEmails ? truncateEmail(acc.email) : acc.email,
+            role: acc.role as string,
+            lastTicketTimestamp: acc.Ticket.length > 0 ? acc.Ticket[0].createdAt.getTime() : 0,
+            documentsStatus: acc.documentsStatus,
+            documentsSentAt: acc.documentsSentAt,
+            documentsValidatedAt: acc.documentsValidatedAt,
+            documentsRenewalAt: acc.documentsRenewalAt,
+            documentsText: acc.documentsText,
+            firstName: acc.firstName,
+            lastName: acc.lastName,
+            birthDate: acc.birthDate,
+            addressStreet: acc.addressStreet,
+            addressNumber: acc.addressNumber,
+            addressPostalCode: acc.addressPostalCode,
+            addressCity: acc.addressCity,
+            idCardFileId: acc.idCardFileId,
+            idCardStatus: acc.idCardStatus,
+            idCardRejectReason: acc.idCardRejectReason,
+            casierFileId: acc.casierFileId,
+            casierStatus: acc.casierStatus,
+            casierRejectReason: acc.casierRejectReason,
+        };
+    });
 }
 
 export const metadata = constructMetadata({
