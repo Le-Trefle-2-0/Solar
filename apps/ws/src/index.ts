@@ -9,9 +9,9 @@ import {createHmac} from 'crypto';
 const PORT = Number(process.env.WS_PORT || 3002);
 const HOST = process.env.WS_HOST || '0.0.0.0';
 // Better Auth JWKS lives on the web app; default to local dev origin
-const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/$/, '');
-if (!process.env.NEXT_PUBLIC_APP_URL) {
-    console.warn('NEXT_PUBLIC_APP_URL is not set, falling back to http://localhost:3000');
+const APP_URL = (process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/$/, '');
+if (!process.env.BETTER_AUTH_URL && !process.env.NEXT_PUBLIC_APP_URL) {
+    console.warn('BETTER_AUTH_URL or NEXT_PUBLIC_APP_URL is not set, falling back to http://localhost:3000');
 }
 const CORS_ORIGIN = process.env.WS_CORS_ORIGIN || '*';
 

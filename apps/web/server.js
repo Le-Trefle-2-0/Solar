@@ -23,11 +23,12 @@ setInterval(() => {
 
 async function validateJWT(token) {
     try {
-        const authUrl = process.env.INTERNAL_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL;
+        const authUrl = process.env.INTERNAL_AUTH_URL || process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
         const JWKS = createRemoteJWKSet(new URL(`${authUrl}/api/auth/jwks`));
+        const issuer = process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
         const {payload} = await jwtVerify(token, JWKS, {
-            issuer: process.env.NEXT_PUBLIC_APP_URL,
-            audience: process.env.NEXT_PUBLIC_APP_URL,
+            issuer,
+            audience: issuer,
         });
         return payload;
     } catch (error) {
@@ -38,7 +39,7 @@ async function validateJWT(token) {
 
 async function validateAPIKey(token) {
     try {
-        const authUrl = process.env.INTERNAL_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL;
+        const authUrl = process.env.INTERNAL_AUTH_URL || process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
         const res = await fetch(`${authUrl}/api/check-key`, {
             body: JSON.stringify({key: token}),
             method: 'POST',
@@ -52,7 +53,7 @@ async function validateAPIKey(token) {
 
 async function getChannels(id) {
     try {
-        const authUrl = process.env.INTERNAL_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL;
+        const authUrl = process.env.INTERNAL_AUTH_URL || process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
         const res = await fetch(`${authUrl}/api/channels`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},

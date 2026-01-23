@@ -50,6 +50,23 @@ BETTER_AUTH_SECRET=une_cle_secrete_tres_longue
 RESEND_API_KEY=re_your_key
 ```
 
+### Proxy inverse (Traefik)
+
+Si l'app est servie derriere Traefik, assurez-vous que les services utilisent la meme origine publique pour
+l'emission et la validation des JWT :
+
+```env
+# URL publique (doit correspondre au domaine https public)
+NEXT_PUBLIC_APP_URL=https://solar.example.org
+BETTER_AUTH_URL=https://solar.example.org
+
+# URL interne pour que les services puissent joindre Better Auth
+INTERNAL_AUTH_URL=http://web:3000
+
+# Base API publique si Traefik route /v1 vers l'API
+NEXT_PUBLIC_API_URL=https://solar.example.org
+```
+
 ### 3. Initialisation de la base de données
 
 ```bash
