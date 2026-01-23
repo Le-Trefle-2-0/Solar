@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE `Message`
+    ADD COLUMN `discordID` VARCHAR(191) NULL,
+    ADD COLUMN `edited` BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN `replyID` INTEGER NULL;

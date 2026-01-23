@@ -1,0 +1,423 @@
+Index: components/chat.tsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>\"use client\";\r\nimport Image from \"next/image\";\r\nimport {FontAwesomeIcon} from \"@fortawesome/react-fontawesome\";\r\nimport {faCircle} from \"@fortawesome/free-solid-svg-icons\";\r\nimport GifPicker from \"gif-picker-react\";\r\nimport EmojiPicker, {EmojiStyle} from \"emoji-picker-react\";\r\nimport {\r\n    Bot,\r\n    Check,\r\n    ChevronsUpDown,\r\n    Laugh,\r\n    MessageCircleOff,\r\n    PhoneCall,\r\n    Send,\r\n    TvMinimalPlay,\r\n    UserRoundPlus\r\n} from \"lucide-react\";\r\nimport {FormEvent, useEffect, useRef, useState} from \"react\";\r\nimport {formVolunteer, Msg} from \"@/lib/interface\";\r\nimport {z, ZodError} from \"zod\";\r\nimport {toast} from \"sonner\";\r\nimport {saveMessage} from \"@/lib/messageManager\";\r\nimport {useSession} from \"@/lib/auth-client\";\r\nimport {io, Socket} from \"socket.io-client\";\r\nimport Peer from \"peerjs\";\r\nimport {Button} from \"@/components/ui\";\r\nimport {\r\n    AlertDialog,\r\n    AlertDialogAction,\r\n    AlertDialogCancel,\r\n    AlertDialogContent,\r\n    AlertDialogDescription,\r\n    AlertDialogFooter,\r\n    AlertDialogHeader,\r\n    AlertDialogTitle,\r\n    AlertDialogTrigger,\r\n} from \"@/components/ui/alert-dialog\"\r\nimport {zodResolver} from \"@hookform/resolvers/zod\"\r\nimport {useForm} from \"react-hook-form\"\r\nimport {cn} from \"@/lib/utils\"\r\nimport {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,} from \"@/components/ui/command\"\r\nimport {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage,} from \"@/components/ui/form\"\r\nimport {Popover, PopoverContent, PopoverTrigger,} from \"@/components/ui/popover\"\r\n\r\nexport function Chat(props: { channelID: string }) {\r\n    const channelID = props.channelID;\r\n    const {data: session} = useSession();\r\n    const [emojiOpen, setEmojiOpen] = useState(false);\r\n    const [gifOpen, setGifOpen] = useState(false);\r\n    const [showTyping, setShowTyping] = useState(false);\r\n    const [currentMsg, setCurrentMsg] = useState(\"\");\r\n    const [channelName, setChannelName] = useState(\"le chat\");\r\n    const [chat, setChat] = useState<Msg[]>([])\r\n    const formRef = useRef<HTMLFormElement>(null);\r\n    const textRef = useRef<HTMLTextAreaElement>(null);\r\n    const rootDivRef = useRef<HTMLDivElement>(null);\r\n    const socketRef = useRef<Socket | null>(null);\r\n    const messagesListRef = useRef<HTMLDivElement>(null);\r\n    const myVideoRef = useRef<HTMLVideoElement>(null);\r\n    const callingVideoRef = useRef<HTMLVideoElement>(null);\r\n    const [peerInstance, setPeerInstance] = useState<Peer | null>(null);\r\n    const [idToCall, setIdToCall] = useState('');\r\n    const [localStream, setLocalStream] = useState<MediaStream | null>(null);\r\n    const [callColor, setCallColor] = useState<string>(\"#000\");\r\n    const [available, setAvailable] = useState<formVolunteer[]>([]);\r\n\r\n    const messageSchema = z\r\n        .string()\r\n        .max(2000, \"Votre message est trop long\")\r\n        .refine((val) => val.trim().length >= 1, {\r\n            message: \"Contenu du message non supporté\",\r\n        });\r\n\r\n\r\n    const sendMessage = (content: string) => {\r\n        const msg: Msg = {\r\n            author: {\r\n                id: session?.user.id as string,\r\n                name: session?.user.displayUsername as string || session?.user.name as string,\r\n                image: session?.user.image as string,\r\n                role: session?.user.role as string,\r\n            },\r\n            timestamp: Date.now(),\r\n            channel: {\r\n                id: channelID,\r\n            },\r\n            content\r\n        }\r\n\r\n        saveMessage(msg)\r\n        socketRef.current?.emit(\"sendMessage\", msg);\r\n        setChat((pre) => [...pre, msg])\r\n    }\r\n\r\n    const sendForm = async (e: FormEvent<HTMLFormElement>) => {\r\n        e.preventDefault();\r\n\r\n        try {\r\n            messageSchema.parse(currentMsg);\r\n        } catch (error) {\r\n            if (error instanceof ZodError) {\r\n                return toast.error(error.errors[0].message);\r\n            }\r\n        }\r\n        if (currentMsg !== \"\") {\r\n            sendMessage(currentMsg);\r\n            setCurrentMsg(\"\");\r\n        }\r\n    }\r\n\r\n    const sendTyping = async () => {\r\n        await socketRef.current?.emit('typing', {id: channelID});\r\n    }\r\n\r\n    const handleCall = async () => {\r\n        if (peerInstance) {\r\n            peerInstance.disconnect();\r\n            setPeerInstance(null);\r\n            setCallColor(\"#000\")\r\n        } else {\r\n            navigator.mediaDevices.getUserMedia({video: false, audio: true})\r\n                .then(stream => {\r\n                    if (myVideoRef.current) {\r\n                        myVideoRef.current.srcObject = stream;\r\n                    }\r\n                    const callID = Math.random().toString(36).substring(2);\r\n                    const peer = new Peer(callID, {\r\n                        host: process.env.NEXT_PUBLIC_HOST,\r\n                        port: 9000,\r\n                        path: '/',\r\n                        secure: true\r\n                    });\r\n                    setPeerInstance(peer);\r\n\r\n                    peer.on('call', call => {\r\n                        call.answer(stream);\r\n\r\n                        setCallColor(\"#5de03a\")\r\n                        call.on('stream', userVideoStream => {\r\n                            if (callingVideoRef.current) {\r\n                                callingVideoRef.current.srcObject = userVideoStream;\r\n                            }\r\n                        });\r\n                    });\r\n\r\n                    setCallColor(\"#e0c43a\")\r\n\r\n                    sendMessage(`${process.env.NEXT_PUBLIC_APP_URL || \"http://localhost:3000\"}/webrtc/${callID}`)\r\n                })\r\n                .catch(error => {\r\n                    console.error(\"Error accessing media devices:\", error);\r\n                    alert(\"Please allow access to the camera and microphone to use this feature.\");\r\n                });\r\n        }\r\n    };\r\n\r\n    useEffect(() => {\r\n        fetch(`/api/messages/${channelID}`)\r\n            .then(res => res.json())\r\n            .then(data => {\r\n                setChat(data)\r\n                messagesListRef.current?.scrollIntoView()\r\n            });\r\n        fetch(`/api/channel/${channelID}`)\r\n            .then(res => res.json())\r\n            .then(data => {\r\n                setChannelName(data.name)\r\n            })\r\n        fetch(`/api/events/getAvailable`)\r\n            .then(res => res.json())\r\n            .then(data => {\r\n                setAvailable(prevAvailable => [\r\n                    ...prevAvailable,\r\n                    ...data.map((user: { name: any; id: any; }) => ({\r\n                        label: user.name,\r\n                        value: user.id\r\n                    }))\r\n                ]);\r\n            })\r\n        fetch(\"/api/auth/token\").then(async res => {\r\n            const body = await res.json();\r\n            if (body.token) {\r\n                socketRef.current = io(process.env.NEXT_PUBLIC_APP_URL, {\r\n                    auth: {\r\n                        jwt: body.token\r\n                    },\r\n                    transports: ['websocket'],\r\n                    withCredentials: true,\r\n                    rejectUnauthorized: (process.env.NODE_ENV == 'production')\r\n                });\r\n\r\n                socketRef.current?.on(\"message\", (data: Msg) => {\r\n                    setChat((pre) => [...pre, data])\r\n                });\r\n\r\n                let timer: NodeJS.Timeout;\r\n                socketRef.current?.on('typingIndicator', () => {\r\n                    setShowTyping(true);\r\n                    if (timer) clearTimeout(timer);\r\n                    timer = setTimeout(() => {\r\n                        setShowTyping(false);\r\n                    }, 5000)\r\n                });\r\n\r\n                socketRef.current?.emit('listen', {id: channelID})\r\n            }\r\n        })\r\n        rootDivRef.current?.focus();\r\n\r\n        return () => {\r\n        }\r\n    }, []);\r\n\r\n    useEffect(() => {\r\n        // This effect will log the updated `available` array whenever it changes\r\n        console.log(available);\r\n    }, [available]);\r\n\r\n    const nonChar = [\r\n        // Navigation\r\n        \"ArrowUp\", \"ArrowDown\", \"ArrowLeft\", \"ArrowRight\",\r\n        \"Home\", \"End\", \"PageUp\", \"PageDown\",\r\n\r\n        // Control & UI\r\n        \"Escape\", \"Enter\", \"Tab\",\r\n        \"ContextMenu\", \"PrintScreen\", \"Pause\", \"ScrollLock\",\r\n\r\n        // Modifier keys\r\n        \"Alt\", \"AltGraph\", \"CapsLock\", \"Control\", \"Fn\", \"FnLock\",\r\n        \"Meta\", \"Shift\", \"NumLock\", \"Symbol\", \"SymbolLock\", \"Hyper\",\r\n\r\n        // Function keys\r\n        \"F1\", \"F2\", \"F3\", \"F4\", \"F5\", \"F6\",\r\n        \"F7\", \"F8\", \"F9\", \"F10\", \"F11\", \"F12\",\r\n        \"Soft1\", \"Soft2\", \"Soft3\", \"Soft4\",\r\n\r\n        // Editing keys\r\n        \"Clear\",\r\n        \"Copy\",\r\n\r\n        // Media keys\r\n        \"MediaPlay\", \"MediaPause\", \"MediaStop\",\r\n        \"MediaTrackNext\", \"MediaTrackPrevious\", \"MediaSelect\",\r\n\r\n        // Audio controls\r\n        \"VolumeMute\", \"VolumeDown\", \"VolumeUp\",\r\n        \"AudioVolumeMute\", \"AudioVolumeDown\", \"AudioVolumeUp\",\r\n\r\n        // App launch\r\n        \"LaunchMail\", \"LaunchMediaPlayer\",\r\n\r\n        // Speech-related\r\n        \"SpeechToggle\", \"SpeechDictation\",\r\n\r\n        // Numpad keys (non-textual)\r\n        \"NumpadEnter\",\r\n        \"NumpadAdd\", \"NumpadSubtract\", \"NumpadMultiply\", \"NumpadDivide\",\r\n        \"NumpadDecimal\",\r\n        \"NumpadEqual\",\r\n        \"NumpadParenLeft\", \"NumpadParenRight\",\r\n        \"NumpadMemoryAdd\", \"NumpadMemoryClear\", \"NumpadMemoryRecall\",\r\n        \"NumpadMemoryStore\", \"NumpadMemorySubtract\",\r\n\r\n        // Misc\r\n        \"Help\", \"Insert\", \"Clear\",\r\n\r\n        // Unidentified\r\n        \"Unidentified\"\r\n    ];\r\n\r\n    const tenorGifRegex = /^https:\\/\\/media\\.tenor\\.com\\/[A-Za-z0-9_-]+\\/[A-Za-z0-9_-]+\\.gif$/;\r\n\r\n    const FormSchema = z.object({\r\n        volunteer: z.string({\r\n            required_error: \"Merci de sélectionner un Bénévole Écoutant\",\r\n        }),\r\n    });\r\n\r\n    const form = useForm<z.infer<typeof FormSchema>>({\r\n        resolver: zodResolver(FormSchema),\r\n    });\r\n\r\n    function onSubmit(data: z.infer<typeof FormSchema>) {\r\n        toast(\"You submitted the following values\", {\r\n            description: (\r\n                <pre className=\"mt-2 w-[320px] rounded-md bg-neutral-950 p-4\">\r\n          <code className=\"text-white\">{JSON.stringify(data, null, 2)}</code>\r\n        </pre>\r\n            ),\r\n        })\r\n    }\r\n\r\n    return (\r\n        <div className=\"flex flex-col h-screen p-3 gap-4 w-full\" onKeyDown={(e) => {\r\n            // if (!nonChar.includes(e.key) && !gifOpen) {\r\n            //     textRef.current?.focus();\r\n            // }\r\n        }} tabIndex={0} ref={rootDivRef}>\r\n            <video className='w-0 h-0' playsInline ref={callingVideoRef} autoPlay/>\r\n            <div className=\"flex flex-col flex-grow overflow-y-auto gap-6\">\r\n                {chat.map(({author, content, timestamp}, key) => {\r\n                    const showAuthorInfo = key === 0 || chat[key - 1].author.id !== author.id;\r\n\r\n                    return (\r\n                        <div className=\"w-full flex flex-row gap-2\" key={key}>\r\n                            {showAuthorInfo && (\r\n                                <Image\r\n                                    src={author.image ? author.image : '/logo.svg'}\r\n                                    alt=\"Image de profil\"\r\n                                    width={48}\r\n                                    height={48}\r\n                                    className=\"rounded-xl max-h-[48px]\"\r\n                                />\r\n                            )}\r\n                            <div className={!showAuthorInfo ? \"ml-14\" : \"\"}>\r\n                                {showAuthorInfo && (\r\n                                    <div className=\"flex flex-row items-center gap-4\">\r\n                        <span\r\n                            className={\r\n                                author.role === 'bot'\r\n                                    ? \"font-semibold text-sm text-blue-800 flex flex-row gap-3\"\r\n                                    : \"font-semibold text-sm text-gray-900 flex flex-row gap-3\"\r\n                            }\r\n                        >\r\n                            {author.name}\r\n                            {author.role === \"bot\" && <Bot className=\"-translate-y-1\"/>}\r\n                        </span>\r\n                                        <span className=\"font-light text-sm text-gray-900\">\r\n                            {new Date(timestamp).toLocaleString('fr-FR')}\r\n                        </span>\r\n                                    </div>\r\n                                )}\r\n                                <h3 className=\"text-lg text-gray-900 whitespace-pre-wrap break-words max-w-full\">\r\n                                    {tenorGifRegex.test(content) ? (\r\n                                        <Image\r\n                                            src={content}\r\n                                            alt=\"gif\"\r\n                                            height={256}\r\n                                            width={256}\r\n                                            unoptimized\r\n                                        />\r\n                                    ) : (\r\n                                        content\r\n                                    )}\r\n                                </h3>\r\n                            </div>\r\n                        </div>\r\n                    );\r\n                })}\r\n\r\n\r\n\r\n                <div ref={messagesListRef} className=\"h-px\"/>\r\n            </div>\r\n            <div className={showTyping ? 'flex flex-row gap-1 relative left-2 bottom-3' : 'hidden'}>\r\n                <FontAwesomeIcon icon={faCircle} className=\"text-gray-400 animate-opacityPulse1\"/>\r\n                <FontAwesomeIcon icon={faCircle} className=\"text-gray-400 animate-opacityPulse2\"/>\r\n                <FontAwesomeIcon icon={faCircle} className=\"text-gray-400 animate-opacityPulse3\"/>\r\n            </div>\r\n\r\n            {channelID !== \"1\" ?\r\n                <div className=\"fixed top-6 right-6 flex flex-row gap-2\">\r\n                    <AlertDialog>\r\n                        <AlertDialogTrigger asChild>\r\n                            <Button variant=\"outline\">\r\n                                <UserRoundPlus/> Attribuer\r\n                            </Button>\r\n                        </AlertDialogTrigger>\r\n                        <AlertDialogContent>\r\n                            <AlertDialogHeader>\r\n                                <AlertDialogTitle>Merci de choisir le bénévole à attribuer</AlertDialogTitle>\r\n                            </AlertDialogHeader>\r\n                            <Form {...form}>\r\n                                <form onSubmit={form.handleSubmit(onSubmit)} className=\"space-y-6\">\r\n                                    <FormField\r\n                                        control={form.control}\r\n                                        name=\"volunteer\"\r\n                                        render={({field}) => (\r\n                                            <FormItem className=\"flex flex-col\">\r\n                                                <FormLabel>Bénévole Écoutant</FormLabel>\r\n                                                <Popover>\r\n                                                    <PopoverTrigger asChild>\r\n                                                        <FormControl>\r\n                                                            <Button\r\n                                                                variant=\"outline\"\r\n                                                                role=\"combobox\"\r\n                                                                className={cn(\r\n                                                                    \"w-[350px] justify-between\",\r\n                                                                    !field.value && \"text-muted-foreground\"\r\n                                                                )}\r\n                                                            >\r\n                                                                {field.value\r\n                                                                    ? available.find(\r\n                                                                        (available) => available.value === field.value\r\n                                                                    )?.label\r\n                                                                    : \"Sélectionner le bénévole\"}\r\n                                                                <ChevronsUpDown className=\"opacity-50\"/>\r\n                                                            </Button>\r\n                                                        </FormControl>\r\n                                                    </PopoverTrigger>\r\n                                                    <PopoverContent className=\"w-[350px] p-0\">\r\n                                                        <Command>\r\n                                                            <CommandInput\r\n                                                                placeholder=\"Rechercher un bénévole...\"\r\n                                                                className=\"h-9\"\r\n                                                            />\r\n                                                            <CommandList>\r\n                                                                <CommandEmpty>Aucun bénévole trouvé</CommandEmpty>\r\n                                                                <CommandGroup>\r\n                                                                    {available.map((available) => (\r\n                                                                        <CommandItem\r\n                                                                            value={available.label}\r\n                                                                            key={available.value}\r\n                                                                            onSelect={() => {\r\n                                                                                form.setValue(\"volunteer\", available.value)\r\n                                                                            }}\r\n                                                                        >\r\n                                                                            {available.label}\r\n                                                                            <Check\r\n                                                                                className={cn(\r\n                                                                                    \"ml-auto\",\r\n                                                                                    available.value === field.value\r\n                                                                                        ? \"opacity-100\"\r\n                                                                                        : \"opacity-0\"\r\n                                                                                )}\r\n                                                                            />\r\n                                                                        </CommandItem>\r\n                                                                    ))}\r\n                                                                </CommandGroup>\r\n                                                            </CommandList>\r\n                                                        </Command>\r\n                                                    </PopoverContent>\r\n                                                </Popover>\r\n                                                <FormDescription>\r\n                                                    Le bénévole aura ensuite accès à l'écoute\r\n                                                </FormDescription>\r\n                                                <FormMessage/>\r\n                                            </FormItem>\r\n                                        )}\r\n                                    />\r\n\r\n                                    <AlertDialogFooter>\r\n                                        <AlertDialogCancel>Annuler</AlertDialogCancel>\r\n                                        <AlertDialogAction asChild>\r\n                                            <Button type=\"submit\">Valider</Button>\r\n                                        </AlertDialogAction>\r\n                                    </AlertDialogFooter>\r\n                                </form>\r\n                            </Form>\r\n                        </AlertDialogContent>\r\n                    </AlertDialog>\r\n\r\n                    <Button variant='outline' color={callColor} onClick={handleCall}>\r\n                        <PhoneCall color={callColor}/> Démarrer un vocal\r\n                    </Button>\r\n\r\n                    <AlertDialog>\r\n                        <AlertDialogTrigger asChild>\r\n                            <Button variant=\"destructive\">\r\n                                <MessageCircleOff/> Fermer l'écoute\r\n                            </Button>\r\n                        </AlertDialogTrigger>\r\n                        <AlertDialogContent>\r\n                            <AlertDialogHeader>\r\n                                <AlertDialogTitle>Attention, êtes vous certain ?</AlertDialogTitle>\r\n                                <AlertDialogDescription>\r\n                                    La fermeture d'une écoute est irréversible. Pour simplement retourner au chat de\r\n                                    permanence merci d'utiliser l'onglet latéral.\r\n                                </AlertDialogDescription>\r\n                            </AlertDialogHeader>\r\n                            <AlertDialogFooter>\r\n                                <AlertDialogCancel>Annuler</AlertDialogCancel>\r\n                                <AlertDialogAction>Fermer l'écoute</AlertDialogAction>\r\n                            </AlertDialogFooter>\r\n                        </AlertDialogContent>\r\n                    </AlertDialog>\r\n                </div> : null\r\n            }\r\n\r\n            <div className=\"sticky bottom-0\">\r\n                <div className={gifOpen ? \"block absolute right-2 bottom-15\" : \"hidden\"}>\r\n                    <GifPicker tenorApiKey={\"AIzaSyDUnTsv0aerH1JSzXRmKTVrpx3YEz3e_RM\"} onGifClick={(gif) => {\r\n                        sendMessage(gif.url)\r\n                        setGifOpen(false);\r\n                    }}/>\r\n                </div>\r\n                <div className=\"absolute right-2 bottom-15\">\r\n                    <EmojiPicker emojiStyle={EmojiStyle.TWITTER} onEmojiClick={(emoji) => {\r\n                        setCurrentMsg(currentMsg + ' ' + emoji.emoji);\r\n                        setEmojiOpen(false);\r\n                        textRef.current?.focus();\r\n                    }} open={emojiOpen}/>\r\n                </div>\r\n\r\n                <form ref={formRef} onSubmit={(e) => sendForm(e)}\r\n                      className='flex flex-row w-full gap-2 items-center'>\r\n                    <textarea\r\n                        placeholder={`Envoyer un message dans ${channelName}`}\r\n                        onChange={(e) => {\r\n                            setCurrentMsg(e.target.value)\r\n                            sendTyping()\r\n                        }}\r\n                        ref={textRef}\r\n                        onKeyDown={(e) => {\r\n                            if (e.key === \"Enter\" && !e.shiftKey) {\r\n                                e.preventDefault();\r\n                                formRef.current?.requestSubmit();\r\n                            }\r\n                        }}\r\n                        spellCheck=\"true\"\r\n                        data-ms-editor=\"true\"\r\n                        value={currentMsg}\r\n                        className=\"w-full flex flex-row outline-main outline-1 p-2 rounded-lg resize-none\"\r\n                    />\r\n                    <Laugh onClick={() => {\r\n                        if (emojiOpen) setEmojiOpen(false);\r\n                        else {\r\n                            setEmojiOpen(true);\r\n                            if (gifOpen) setGifOpen(false);\r\n                        }\r\n                    }} className={emojiOpen ? 'cursor-pointer text-main' : 'cursor-pointer'} width={42}/>\r\n\r\n                    <TvMinimalPlay onClick={() => {\r\n                        if (gifOpen) setGifOpen(false);\r\n                        else {\r\n                            setGifOpen(true);\r\n                            if (emojiOpen) setEmojiOpen(false);\r\n                        }\r\n                    }} className={gifOpen ? 'cursor-pointer text-main' : 'cursor-pointer'} width={42}/>\r\n                    <button className='cursor-pointer'><Send width={42}/></button>\r\n                </form>\r\n            </div>\r\n        </div>\r\n    );\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/components/chat.tsx b/components/chat.tsx
+--- a/components/chat.tsx	(revision 77648c06dbc2517cf5420c12ea811d9190930843)
++++ b/components/chat.tsx	(date 1751419244978)
+@@ -15,7 +15,7 @@
+     TvMinimalPlay,
+     UserRoundPlus
+ } from "lucide-react";
+-import {FormEvent, useEffect, useRef, useState} from "react";
++import {FormEvent, Suspense, useEffect, useRef, useState} from "react";
+ import {formVolunteer, Msg} from "@/lib/interface";
+ import {z, ZodError} from "zod";
+ import {toast} from "sonner";
+@@ -41,6 +41,7 @@
+ import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,} from "@/components/ui/command"
+ import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form"
+ import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover"
++import { Skeleton } from "@/components/ui/skeleton"
+ 
+ export function Chat(props: { channelID: string }) {
+     const channelID = props.channelID;
+@@ -298,23 +299,32 @@
+         }} tabIndex={0} ref={rootDivRef}>
+             <video className='w-0 h-0' playsInline ref={callingVideoRef} autoPlay/>
+             <div className="flex flex-col flex-grow overflow-y-auto gap-6">
+-                {chat.map(({author, content, timestamp}, key) => {
+-                    const showAuthorInfo = key === 0 || chat[key - 1].author.id !== author.id;
++                <Suspense fallback={
++                    <div className="flex items-center space-x-4">
++                        <Skeleton className="h-12 w-12 rounded-full" />
++                        <div className="space-y-2">
++                            <Skeleton className="h-4 w-[250px]" />
++                            <Skeleton className="h-4 w-[200px]" />
++                        </div>
++                    </div>
++                }>
++                    {chat.map(({author, content, timestamp}, key) => {
++                        const showAuthorInfo = key === 0 || chat[key - 1].author.id !== author.id;
+ 
+-                    return (
+-                        <div className="w-full flex flex-row gap-2" key={key}>
+-                            {showAuthorInfo && (
+-                                <Image
+-                                    src={author.image ? author.image : '/logo.svg'}
+-                                    alt="Image de profil"
+-                                    width={48}
+-                                    height={48}
+-                                    className="rounded-xl max-h-[48px]"
+-                                />
+-                            )}
+-                            <div className={!showAuthorInfo ? "ml-14" : ""}>
+-                                {showAuthorInfo && (
+-                                    <div className="flex flex-row items-center gap-4">
++                        return (
++                            <div className="w-full flex flex-row gap-2" key={key}>
++                                {showAuthorInfo && (
++                                    <Image
++                                        src={author.image ? author.image : '/logo.svg'}
++                                        alt="Image de profil"
++                                        width={48}
++                                        height={48}
++                                        className="rounded-xl max-h-[48px]"
++                                    />
++                                )}
++                                <div className={!showAuthorInfo ? "ml-14" : ""}>
++                                    {showAuthorInfo && (
++                                        <div className="flex flex-row items-center gap-4">
+                         <span
+                             className={
+                                 author.role === 'bot'
+@@ -325,32 +335,30 @@
+                             {author.name}
+                             {author.role === "bot" && <Bot className="-translate-y-1"/>}
+                         </span>
+-                                        <span className="font-light text-sm text-gray-900">
++                                            <span className="font-light text-sm text-gray-900">
+                             {new Date(timestamp).toLocaleString('fr-FR')}
+                         </span>
+-                                    </div>
+-                                )}
+-                                <h3 className="text-lg text-gray-900 whitespace-pre-wrap break-words max-w-full">
+-                                    {tenorGifRegex.test(content) ? (
+-                                        <Image
+-                                            src={content}
+-                                            alt="gif"
+-                                            height={256}
+-                                            width={256}
+-                                            unoptimized
+-                                        />
+-                                    ) : (
+-                                        content
+-                                    )}
+-                                </h3>
+-                            </div>
+-                        </div>
+-                    );
+-                })}
+-
+-
+-
+-                <div ref={messagesListRef} className="h-px"/>
++                                        </div>
++                                    )}
++                                    <h3 className="text-lg text-gray-900 whitespace-pre-wrap break-words max-w-full">
++                                        {tenorGifRegex.test(content) ? (
++                                            <Image
++                                                src={content}
++                                                alt="gif"
++                                                height={256}
++                                                width={256}
++                                                unoptimized
++                                            />
++                                        ) : (
++                                            content
++                                        )}
++                                    </h3>
++                                </div>
++                            </div>
++                        );
++                    })}
++                    <div ref={messagesListRef} className="h-px"/>
++                </Suspense>
+             </div>
+             <div className={showTyping ? 'flex flex-row gap-1 relative left-2 bottom-3' : 'hidden'}>
+                 <FontAwesomeIcon icon={faCircle} className="text-gray-400 animate-opacityPulse1"/>
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"b45674df-c67a-49eb-a4d9-5be73889a59a\" name=\"Changes\" comment=\"add dynamic volunteer list retrieval\">\r\n      <change afterPath=\"$PROJECT_DIR$/app/app/admin/columns.tsx\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/app/app/admin/data-table.tsx\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/app/app/admin/page.tsx\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/components/app-sidebar.tsx\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/components/app-sidebar.tsx\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/components/ui/table.tsx\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/components/ui/table.tsx\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/lib/interface.ts\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/lib/interface.ts\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/package-lock.json\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/package-lock.json\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/package.json\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/package.json\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"tsconfig.json\" />\r\n        <option value=\"CSS File\" />\r\n        <option value=\"JavaScript File\" />\r\n        <option value=\"TypeScript File\" />\r\n        <option value=\"TypeScript JSX File\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"FormatOnSaveOptions\">\r\n    <option name=\"myRunOnSave\" value=\"false\" />\r\n    <option name=\"myAllFileTypesSelected\" value=\"true\" />\r\n    <option name=\"mySelectedFileTypes\">\r\n      <set />\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_BRANCH_BY_REPOSITORY\">\r\n      <map>\r\n        <entry key=\"$PROJECT_DIR$\" value=\"beta-1.0-updated\" />\r\n      </map>\r\n    </option>\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n    <option name=\"RESET_MODE\" value=\"HARD\" />\r\n  </component>\r\n  <component name=\"GitHubPullRequestSearchHistory\">{\r\n  &quot;lastFilter&quot;: {\r\n    &quot;state&quot;: &quot;OPEN&quot;,\r\n    &quot;assignee&quot;: &quot;PaulPR-44&quot;\r\n  }\r\n}</component>\r\n  <component name=\"GithubProjectSettings\">\r\n    <option name=\"branchProtectionPatterns\">\r\n      <list>\r\n        <option value=\"Main\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"GithubPullRequestsUISettings\">{\r\n  &quot;selectedUrlAndAccountId&quot;: {\r\n    &quot;url&quot;: &quot;https://github.com/Le-Trefle-2-0/Solar.git&quot;,\r\n    &quot;accountId&quot;: &quot;aa84fc37-7a25-4061-a16d-6cd63ff7a22f&quot;\r\n  }\r\n}</component>\r\n  <component name=\"ProblemsViewState\">\r\n    <option name=\"selectedTabId\" value=\"ProjectErrors\" />\r\n  </component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;associatedIndex&quot;: 5\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"2y5enfk6v7qnKkFGLHy191opMjZ\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\">{\r\n  &quot;keyToString&quot;: {\r\n    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,\r\n    &quot;git-widget-placeholder&quot;: &quot;remake&quot;,\r\n    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,\r\n    &quot;last_opened_file_path&quot;: &quot;C:/Users/admin/WebstormProjects/Solar/app/app/chat&quot;,\r\n    &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,\r\n    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,\r\n    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,\r\n    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,\r\n    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,\r\n    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,\r\n    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,\r\n    &quot;ts.external.directory.path&quot;: &quot;C:\\\\Users\\\\admin\\\\WebstormProjects\\\\Solar\\\\node_modules\\\\typescript\\\\lib&quot;,\r\n    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;\r\n  },\r\n  &quot;keyToStringList&quot;: {\r\n    &quot;DatabaseDriversLRU&quot;: [\r\n      &quot;mysql&quot;\r\n    ]\r\n  }\r\n}</component>\r\n  <component name=\"RecentsManager\">\r\n    <key name=\"CopyFile.RECENT_KEYS\">\r\n      <recent name=\"C:\\Users\\admin\\WebstormProjects\\Solar\\app\\app\\chat\" />\r\n      <recent name=\"$PROJECT_DIR$/app/app/chat\" />\r\n      <recent name=\"$PROJECT_DIR$/components/ui/modals\" />\r\n      <recent name=\"$PROJECT_DIR$/lib\" />\r\n    </key>\r\n    <key name=\"MoveFile.RECENT_KEYS\">\r\n      <recent name=\"C:\\Users\\admin\\WebstormProjects\\Solar\\ssl\" />\r\n      <recent name=\"$PROJECT_DIR$/app\" />\r\n      <recent name=\"C:\\Users\\admin\\WebstormProjects\\Solar\\app\\api\\messages\" />\r\n      <recent name=\"C:\\Users\\admin\\WebstormProjects\\Solar\\lib\" />\r\n      <recent name=\"C:\\Users\\admin\\WebstormProjects\\Solar\\public\" />\r\n    </key>\r\n  </component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-WS-243.25659.40\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"b45674df-c67a-49eb-a4d9-5be73889a59a\" name=\"Changes\" comment=\"\" />\r\n      <created>1749129029242</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1749129029242</updated>\r\n      <workItem from=\"1749129030358\" duration=\"8079000\" />\r\n      <workItem from=\"1749387412260\" duration=\"1223000\" />\r\n      <workItem from=\"1749388665920\" duration=\"7169000\" />\r\n      <workItem from=\"1749471981714\" duration=\"4976000\" />\r\n      <workItem from=\"1749477012478\" duration=\"15760000\" />\r\n      <workItem from=\"1749913419546\" duration=\"1325000\" />\r\n      <workItem from=\"1750256176404\" duration=\"27172000\" />\r\n      <workItem from=\"1750317616997\" duration=\"272000\" />\r\n      <workItem from=\"1750317896164\" duration=\"6375000\" />\r\n      <workItem from=\"1750325497089\" duration=\"5738000\" />\r\n      <workItem from=\"1750343385303\" duration=\"1148000\" />\r\n      <workItem from=\"1750344542615\" duration=\"13911000\" />\r\n      <workItem from=\"1750363667156\" duration=\"9319000\" />\r\n      <workItem from=\"1750427135972\" duration=\"32156000\" />\r\n      <workItem from=\"1750726875409\" duration=\"13460000\" />\r\n    </task>\r\n    <task id=\"LOCAL-00008\" summary=\"update password recovery system\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1749470676615</created>\r\n      <option name=\"number\" value=\"00008\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00008\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1749470676615</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00009\" summary=\"autofix unused imports\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1749470914261</created>\r\n      <option name=\"number\" value=\"00009\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00009\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1749470914261</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00010\" summary=\"update auth style and translate pages to french\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1749473074490</created>\r\n      <option name=\"number\" value=\"00010\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00010\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1749473074490</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00011\" summary=\"install auth plugins\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1749477683069</created>\r\n      <option name=\"number\" value=\"00011\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00011\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1749477683069</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00012\" summary=\"update prisma schema for plugins\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1749477728445</created>\r\n      <option name=\"number\" value=\"00012\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00012\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1749477728445</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00013\" summary=\"base app layout\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1749477787312</created>\r\n      <option name=\"number\" value=\"00013\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00013\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1749477787312</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00014\" summary=\"sidebar styling\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1749514590389</created>\r\n      <option name=\"number\" value=\"00014\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00014\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1749514590389</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00015\" summary=\"base app interface layout\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1749522876431</created>\r\n      <option name=\"number\" value=\"00015\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00015\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1749522876431</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00016\" summary=\"install socket.io\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1749547285771</created>\r\n      <option name=\"number\" value=\"00016\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00016\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1749547285771</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00017\" summary=\"setup socket server\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750260978496</created>\r\n      <option name=\"number\" value=\"00017\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00017\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750260978496</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00018\" summary=\"auth ui update\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750261079133</created>\r\n      <option name=\"number\" value=\"00018\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00018\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750261079133</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00019\" summary=\"update prisma schema\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750285059162</created>\r\n      <option name=\"number\" value=\"00019\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00019\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750285059162</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00020\" summary=\"prisma client update\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750285082078</created>\r\n      <option name=\"number\" value=\"00020\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00020\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750285082078</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00021\" summary=\"add typing interfaces\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750285100163</created>\r\n      <option name=\"number\" value=\"00021\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00021\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750285100163</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00022\" summary=\"include message managing and fetching route\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750285130172</created>\r\n      <option name=\"number\" value=\"00022\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00022\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750285130172</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00023\" summary=\"update sidebar width\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750285142236</created>\r\n      <option name=\"number\" value=\"00023\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00023\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750285142236</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00024\" summary=\"chat page with instant socket messaging and database storage and fetching\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750285185292</created>\r\n      <option name=\"number\" value=\"00024\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00024\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750285185292</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00025\" summary=\"WebStorm update\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750285205272</created>\r\n      <option name=\"number\" value=\"00025\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00025\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750285205272</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00026\" summary=\"add react-input-emoji package\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750285220906</created>\r\n      <option name=\"number\" value=\"00026\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00026\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750285220906</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00027\" summary=\"add emoji selector to message sending\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750288120949</created>\r\n      <option name=\"number\" value=\"00027\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00027\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750288120949</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00028\" summary=\"clean up console.log\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750288190511</created>\r\n      <option name=\"number\" value=\"00028\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00028\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750288190511</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00029\" summary=\"remove double styling property\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750288272068</created>\r\n      <option name=\"number\" value=\"00029\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00029\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750288272068</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00030\" summary=\"update database and text components to save long strings and line breaks\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750324502631</created>\r\n      <option name=\"number\" value=\"00030\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00030\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750324502632</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00031\" summary=\"update better-auth-ui to 2.0 and add Discord OAuth support\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750424112157</created>\r\n      <option name=\"number\" value=\"00031\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00031\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750424112157</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00032\" summary=\"fix message fetching\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750424507773</created>\r\n      <option name=\"number\" value=\"00032\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00032\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750424507773</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00033\" summary=\"add dynamic ticket links in sidebar\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750426899116</created>\r\n      <option name=\"number\" value=\"00033\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00033\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750426899116</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00034\" summary=\"add dynamic ticket page\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750426910945</created>\r\n      <option name=\"number\" value=\"00034\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00034\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750426910945</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00035\" summary=\"remove placeholder dashboard page\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750683047338</created>\r\n      <option name=\"number\" value=\"00035\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00035\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750683047338</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00036\" summary=\"adapt server and chat page to handle secure websocket connexion\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750683154094</created>\r\n      <option name=\"number\" value=\"00036\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00036\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750683154094</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00037\" summary=\"install shadcn components\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750683507543</created>\r\n      <option name=\"number\" value=\"00037\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00037\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750683507543</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00038\" summary=\"base ui setup\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750684455908</created>\r\n      <option name=\"number\" value=\"00038\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00038\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750684455908</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00039\" summary=\"components.json install\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750684924361</created>\r\n      <option name=\"number\" value=\"00039\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00039\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750684924361</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00040\" summary=\"update responsive sidebar\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750723515593</created>\r\n      <option name=\"number\" value=\"00040\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00040\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750723515593</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00041\" summary=\"update message retrieving including username\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750724634772</created>\r\n      <option name=\"number\" value=\"00041\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00041\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750724634772</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00042\" summary=\"remove unused console.log\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750725638026</created>\r\n      <option name=\"number\" value=\"00042\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00042\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750725638026</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00043\" summary=\"update app layout and chat ui styling\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750725657844</created>\r\n      <option name=\"number\" value=\"00043\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00043\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750725657844</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00044\" summary=\"remove old auth pages\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750727345697</created>\r\n      <option name=\"number\" value=\"00044\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00044\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750727345697</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00045\" summary=\"ui update\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750729550940</created>\r\n      <option name=\"number\" value=\"00045\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00045\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750729550940</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00046\" summary=\"update socket connection property in chat and ui update\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750814061836</created>\r\n      <option name=\"number\" value=\"00046\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00046\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750814061836</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00047\" summary=\"update ticket page to sync with chat update\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1750814234942</created>\r\n      <option name=\"number\" value=\"00047\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00047\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1750814234942</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00048\" summary=\"prisma update\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1751292086586</created>\r\n      <option name=\"number\" value=\"00048\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00048\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1751292086586</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00049\" summary=\"include role data in message info\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1751292126571</created>\r\n      <option name=\"number\" value=\"00049\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00049\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1751292126571</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00050\" summary=\"remove unused console.log\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1751292620762</created>\r\n      <option name=\"number\" value=\"00050\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00050\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1751292620762</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00051\" summary=\"update message rendering to handle multi message from single user and text wrapping\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1751293485105</created>\r\n      <option name=\"number\" value=\"00051\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00051\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1751293485105</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00052\" summary=\"add temporary getAvailable endpoint\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1751331512506</created>\r\n      <option name=\"number\" value=\"00052\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00052\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1751331512506</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00053\" summary=\"export socket as global\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1751331522470</created>\r\n      <option name=\"number\" value=\"00053\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00053\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1751331522470</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00054\" summary=\"add formVolunteer interface\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1751331539091</created>\r\n      <option name=\"number\" value=\"00054\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00054\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1751331539091</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00055\" summary=\"add assignment api endpoint\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1751331556176</created>\r\n      <option name=\"number\" value=\"00055\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00055\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1751331556176</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00056\" summary=\"add dynamic volunteer list retrieval\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1751332397346</created>\r\n      <option name=\"number\" value=\"00056\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00056\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1751332397346</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"57\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State />\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"add dynamic ticket links in sidebar\" />\r\n    <MESSAGE value=\"add dynamic ticket page\" />\r\n    <MESSAGE value=\"update userManager\" />\r\n    <MESSAGE value=\"add event management api endpoint\" />\r\n    <MESSAGE value=\"remove placeholder dashboard page\" />\r\n    <MESSAGE value=\"adapt server and chat page to handle secure websocket connexion\" />\r\n    <MESSAGE value=\"install shadcn components\" />\r\n    <MESSAGE value=\"base ui setup\" />\r\n    <MESSAGE value=\"components.json install\" />\r\n    <MESSAGE value=\"update responsive sidebar\" />\r\n    <MESSAGE value=\"update message retrieving including username\" />\r\n    <MESSAGE value=\"update app layout and chat ui styling\" />\r\n    <MESSAGE value=\"remove old auth pages\" />\r\n    <MESSAGE value=\"ui update\" />\r\n    <MESSAGE value=\"update socket connection property in chat and ui update\" />\r\n    <MESSAGE value=\"update ticket page to sync with chat update\" />\r\n    <MESSAGE value=\"prisma update\" />\r\n    <MESSAGE value=\"include role data in message info\" />\r\n    <MESSAGE value=\"remove unused console.log\" />\r\n    <MESSAGE value=\"update message rendering to handle multi message from single user and text wrapping\" />\r\n    <MESSAGE value=\"add temporary getAvailable endpoint\" />\r\n    <MESSAGE value=\"export socket as global\" />\r\n    <MESSAGE value=\"add formVolunteer interface\" />\r\n    <MESSAGE value=\"add assignment api endpoint\" />\r\n    <MESSAGE value=\"add dynamic volunteer list retrieval\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"add dynamic volunteer list retrieval\" />\r\n    <option name=\"OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT\" value=\"true\" />\r\n    <option name=\"REFORMAT_BEFORE_PROJECT_COMMIT\" value=\"true\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 77648c06dbc2517cf5420c12ea811d9190930843)
++++ b/.idea/workspace.xml	(date 1765642382876)
+@@ -4,21 +4,19 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="add dynamic volunteer list retrieval">
+-      <change afterPath="$PROJECT_DIR$/app/app/admin/columns.tsx" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/app/app/admin/data-table.tsx" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/app/app/admin/page.tsx" afterDir="false" />
++    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="include user detail page link in admin table">
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/components/app-sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/app-sidebar.tsx" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/components/ui/table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/table.tsx" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/lib/interface.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/interface.ts" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/components/chat.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/chat.tsx" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/lib/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/auth.ts" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+     <option name="LAST_RESOLUTION" value="IGNORE" />
++  </component>
++  <component name="EmbeddingIndexingInfo">
++    <option name="cachedIndexableFilesCount" value="151" />
++    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
+   </component>
+   <component name="FileTemplateManagerImpl">
+     <option name="RECENT_TEMPLATES">
+@@ -26,8 +24,8 @@
+         <option value="tsconfig.json" />
+         <option value="CSS File" />
+         <option value="JavaScript File" />
++        <option value="TypeScript JSX File" />
+         <option value="TypeScript File" />
+-        <option value="TypeScript JSX File" />
+       </list>
+     </option>
+   </component>
+@@ -46,6 +44,7 @@
+     </option>
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+     <option name="RESET_MODE" value="HARD" />
++    <option name="UPDATE_TYPE" value="REBASE" />
+   </component>
+   <component name="GitHubPullRequestSearchHistory">{
+   &quot;lastFilter&quot;: {
+@@ -77,30 +76,36 @@
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="PropertiesComponent">{
+-  &quot;keyToString&quot;: {
+-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+-    &quot;git-widget-placeholder&quot;: &quot;remake&quot;,
+-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+-    &quot;last_opened_file_path&quot;: &quot;C:/Users/admin/WebstormProjects/Solar/app/app/chat&quot;,
+-    &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
+-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+-    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\admin\\WebstormProjects\\Solar\\node_modules\\typescript\\lib&quot;,
+-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
++  <component name="PropertiesComponent"><![CDATA[{
++  "keyToString": {
++    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
++    "RunOnceActivity.ShowReadmeOnStart": "true",
++    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
++    "RunOnceActivity.git.unshallow": "true",
++    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
++    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
++    "git-widget-placeholder": "remake",
++    "ignore.virus.scanning.warn.message": "true",
++    "javascript.preferred.runtime.type.id": "node",
++    "junie.onboarding.icon.badge.shown": "true",
++    "last_opened_file_path": "C:/Users/admin/WebstormProjects/School-buttons-main",
++    "list.type.of.created.stylesheet": "CSS",
++    "node.js.detected.package.eslint": "true",
++    "node.js.detected.package.tslint": "true",
++    "node.js.selected.package.eslint": "(autodetect)",
++    "node.js.selected.package.tslint": "(autodetect)",
++    "nodejs_package_manager_path": "npm",
++    "settings.editor.selected.configurable": "preferences.pluginManager",
++    "to.speed.mode.migration.done": "true",
++    "ts.external.directory.path": "C:\\Users\\admin\\WebstormProjects\\Solar\\node_modules\\typescript\\lib",
++    "vue.rearranger.settings.migration": "true"
+   },
+-  &quot;keyToStringList&quot;: {
+-    &quot;DatabaseDriversLRU&quot;: [
+-      &quot;mysql&quot;
++  "keyToStringList": {
++    "DatabaseDriversLRU": [
++      "mysql"
+     ]
+   }
+-}</component>
++}]]></component>
+   <component name="RecentsManager">
+     <key name="CopyFile.RECENT_KEYS">
+       <recent name="C:\Users\admin\WebstormProjects\Solar\app\app\chat" />
+@@ -119,7 +124,7 @@
+   <component name="SharedIndexes">
+     <attachedChunks>
+       <set>
+-        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-WS-243.25659.40" />
++        <option value="bundled-js-predefined-d6986cc7102b-c7e53b3be11b-JavaScript-WS-253.28294.332" />
+       </set>
+     </attachedChunks>
+   </component>
+@@ -146,54 +151,8 @@
+       <workItem from="1750363667156" duration="9319000" />
+       <workItem from="1750427135972" duration="32156000" />
+       <workItem from="1750726875409" duration="13460000" />
+-    </task>
+-    <task id="LOCAL-00008" summary="update password recovery system">
+-      <option name="closed" value="true" />
+-      <created>1749470676615</created>
+-      <option name="number" value="00008" />
+-      <option name="presentableId" value="LOCAL-00008" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1749470676615</updated>
+-    </task>
+-    <task id="LOCAL-00009" summary="autofix unused imports">
+-      <option name="closed" value="true" />
+-      <created>1749470914261</created>
+-      <option name="number" value="00009" />
+-      <option name="presentableId" value="LOCAL-00009" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1749470914261</updated>
+-    </task>
+-    <task id="LOCAL-00010" summary="update auth style and translate pages to french">
+-      <option name="closed" value="true" />
+-      <created>1749473074490</created>
+-      <option name="number" value="00010" />
+-      <option name="presentableId" value="LOCAL-00010" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1749473074490</updated>
+-    </task>
+-    <task id="LOCAL-00011" summary="install auth plugins">
+-      <option name="closed" value="true" />
+-      <created>1749477683069</created>
+-      <option name="number" value="00011" />
+-      <option name="presentableId" value="LOCAL-00011" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1749477683069</updated>
+-    </task>
+-    <task id="LOCAL-00012" summary="update prisma schema for plugins">
+-      <option name="closed" value="true" />
+-      <created>1749477728445</created>
+-      <option name="number" value="00012" />
+-      <option name="presentableId" value="LOCAL-00012" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1749477728445</updated>
+-    </task>
+-    <task id="LOCAL-00013" summary="base app layout">
+-      <option name="closed" value="true" />
+-      <created>1749477787312</created>
+-      <option name="number" value="00013" />
+-      <option name="presentableId" value="LOCAL-00013" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1749477787312</updated>
++      <workItem from="1752089213252" duration="381000" />
++      <workItem from="1765641987408" duration="393000" />
+     </task>
+     <task id="LOCAL-00014" summary="sidebar styling">
+       <option name="closed" value="true" />
+@@ -539,7 +498,55 @@
+       <option name="project" value="LOCAL" />
+       <updated>1751332397346</updated>
+     </task>
+-    <option name="localTasksCounter" value="57" />
++    <task id="LOCAL-00057" summary="add basic admin page">
++      <option name="closed" value="true" />
++      <created>1751335212158</created>
++      <option name="number" value="00057" />
++      <option name="presentableId" value="LOCAL-00057" />
++      <option name="project" value="LOCAL" />
++      <updated>1751335212158</updated>
++    </task>
++    <task id="LOCAL-00058" summary="better-auth minor update">
++      <option name="closed" value="true" />
++      <created>1751418528449</created>
++      <option name="number" value="00058" />
++      <option name="presentableId" value="LOCAL-00058" />
++      <option name="project" value="LOCAL" />
++      <updated>1751418528449</updated>
++    </task>
++    <task id="LOCAL-00059" summary="add temporary user info endpoint">
++      <option name="closed" value="true" />
++      <created>1751418542304</created>
++      <option name="number" value="00059" />
++      <option name="presentableId" value="LOCAL-00059" />
++      <option name="project" value="LOCAL" />
++      <updated>1751418542304</updated>
++    </task>
++    <task id="LOCAL-00060" summary="remove unused console.log">
++      <option name="closed" value="true" />
++      <created>1751418576498</created>
++      <option name="number" value="00060" />
++      <option name="presentableId" value="LOCAL-00060" />
++      <option name="project" value="LOCAL" />
++      <updated>1751418576499</updated>
++    </task>
++    <task id="LOCAL-00061" summary="add admin user page">
++      <option name="closed" value="true" />
++      <created>1751418616782</created>
++      <option name="number" value="00061" />
++      <option name="presentableId" value="LOCAL-00061" />
++      <option name="project" value="LOCAL" />
++      <updated>1751418616783</updated>
++    </task>
++    <task id="LOCAL-00062" summary="include user detail page link in admin table">
++      <option name="closed" value="true" />
++      <created>1751418655761</created>
++      <option name="number" value="00062" />
++      <option name="presentableId" value="LOCAL-00062" />
++      <option name="project" value="LOCAL" />
++      <updated>1751418655761</updated>
++    </task>
++    <option name="localTasksCounter" value="63" />
+     <servers />
+   </component>
+   <component name="TypeScriptGeneratedFilesManager">
+@@ -557,11 +564,6 @@
+     </option>
+   </component>
+   <component name="VcsManagerConfiguration">
+-    <MESSAGE value="add dynamic ticket links in sidebar" />
+-    <MESSAGE value="add dynamic ticket page" />
+-    <MESSAGE value="update userManager" />
+-    <MESSAGE value="add event management api endpoint" />
+-    <MESSAGE value="remove placeholder dashboard page" />
+     <MESSAGE value="adapt server and chat page to handle secure websocket connexion" />
+     <MESSAGE value="install shadcn components" />
+     <MESSAGE value="base ui setup" />
+@@ -575,14 +577,19 @@
+     <MESSAGE value="update ticket page to sync with chat update" />
+     <MESSAGE value="prisma update" />
+     <MESSAGE value="include role data in message info" />
+-    <MESSAGE value="remove unused console.log" />
+     <MESSAGE value="update message rendering to handle multi message from single user and text wrapping" />
+     <MESSAGE value="add temporary getAvailable endpoint" />
+     <MESSAGE value="export socket as global" />
+     <MESSAGE value="add formVolunteer interface" />
+     <MESSAGE value="add assignment api endpoint" />
+     <MESSAGE value="add dynamic volunteer list retrieval" />
+-    <option name="LAST_COMMIT_MESSAGE" value="add dynamic volunteer list retrieval" />
++    <MESSAGE value="add basic admin page" />
++    <MESSAGE value="better-auth minor update" />
++    <MESSAGE value="add temporary user info endpoint" />
++    <MESSAGE value="remove unused console.log" />
++    <MESSAGE value="add admin user page" />
++    <MESSAGE value="include user detail page link in admin table" />
++    <option name="LAST_COMMIT_MESSAGE" value="include user detail page link in admin table" />
+     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
+     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
+   </component>
+Index: lib/auth.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import {betterAuth} from \"better-auth\";\r\nimport {dashboardPlugin} from \"better-auth-dashboard\";\r\nimport {prismaAdapter} from \"better-auth/adapters/prisma\";\r\nimport {PrismaClient} from \"@/generated/prisma\";\r\nimport {resend} from \"@/lib/resend\";\r\nimport {ac, admin, bot, manager, training, volunteer} from \"./permissions\"\r\nimport {\r\n    admin as adminPlugin,\r\n    apiKey,\r\n    bearer,\r\n    emailOTP,\r\n    jwt,\r\n    organization,\r\n    twoFactor,\r\n    username\r\n} from \"better-auth/plugins\";\r\nimport {passkey} from \"better-auth/plugins/passkey\";\r\n\r\nconst prisma = new PrismaClient();\r\nexport const auth = betterAuth({\r\n    database: prismaAdapter(prisma, {\r\n        provider: \"mysql\", // or \"mysql\", \"postgresql\", ...etc\r\n    }),\r\n    emailAndPassword: {\r\n        enabled: true,\r\n        async sendResetPassword(data, request) {\r\n            await resend.emails.send({\r\n                from: \"noreply@solar.letrefle.org\",\r\n                to: data.user.email,\r\n                subject: \"Réinitialisation de mot de passe\",\r\n                html: data.url\r\n            });\r\n        },\r\n        autoSignIn: true,\r\n    },\r\n    plugins: [\r\n        emailOTP({\r\n            async sendVerificationOTP({ email, otp, type }) {\r\n                await resend.emails.send({\r\n                    from: \"noreply@solar.letrefle.org\",\r\n                    to: email,\r\n                    subject: \"OTP connection\",\r\n                    html: otp\r\n                });\r\n            }\r\n        }),\r\n        adminPlugin({\r\n            ac, roles: {\r\n                training, volunteer, manager, bot, admin\r\n            },\r\n            adminRoles: ['admin'],\r\n            defaultRole: 'admin'\r\n            // defaultRole: process.env.NODE_ENV === \"production\" ? \"training\" : \"admin\",\r\n        }),\r\n        organization(),\r\n        twoFactor(),\r\n        username(),\r\n        apiKey({\r\n            rateLimit: {\r\n                enabled: false\r\n            }\r\n        }),\r\n        jwt(),\r\n        bearer(),\r\n        dashboardPlugin(),\r\n        passkey()\r\n    ],\r\n    account: {\r\n        accountLinking: {\r\n            enabled: true\r\n        }\r\n    },\r\n    socialProviders: {\r\n        discord: {\r\n            clientId: process.env.DISCORD_CLIENT_ID as string,\r\n            clientSecret: process.env.DISCORD_CLIENT_SECRET as string,\r\n        }\r\n    }\r\n});
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lib/auth.ts b/lib/auth.ts
+--- a/lib/auth.ts	(revision 77648c06dbc2517cf5420c12ea811d9190930843)
++++ b/lib/auth.ts	(date 1751417543422)
+@@ -49,7 +49,8 @@
+                 training, volunteer, manager, bot, admin
+             },
+             adminRoles: ['admin'],
+-            defaultRole: 'admin'
++            adminUserIds: ['4UpfjVehJtVSXeEy2gYQvEG6wglmN7Q5']
++            // defaultRole: 'admin'
+             // defaultRole: process.env.NODE_ENV === "production" ? "training" : "admin",
+         }),
+         organization(),

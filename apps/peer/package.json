@@ -1,0 +1,17 @@
+{
+  "name": "peer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "commonjs",
+  "main": "peer.js",
+  "scripts": {
+    "dev": "node peer.js",
+    "start": "node peer.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "peer": "^1.0.2"
+  }
+}

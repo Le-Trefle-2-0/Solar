@@ -160,11 +160,14 @@ model Channel {
 model Message {
   id        Int      @id @default(autoincrement())
   createdAt DateTime
+  discordID String?
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   channelId String
   channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
   content   Bytes
+  replyID Int?
+  edited  Boolean @default(false)
 
   Reaction Reaction[]
 }
@@ -233,6 +236,7 @@ model Ticket {
   problematic  String?
   observations String?
   info         String?
+  voice        Boolean      @default(false)
 }
 
 model TicketStatus {
