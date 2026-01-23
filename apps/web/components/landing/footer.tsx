@@ -11,7 +11,7 @@ export function PublicFooter() {
                     <div className="flex flex-col gap-4">
                         <Link href="/" className="flex items-center gap-2">
                             <Image src="/logo.svg" alt="Le Trèfle 2.0" width={32} height={32}/>
-                            <span className="text-xl font-bold">Le Trèfle 2.0</span>
+                            <span className="text-xl font-semibold font-barlow">Le Trèfle 2.0</span>
                         </Link>
                         <p className="text-sm text-muted-foreground">
                             324, chemin de Goulsou<br/>
@@ -20,7 +20,7 @@ export function PublicFooter() {
                         </p>
                     </div>
                     <div className="flex flex-col gap-4">
-                        <h3 className="font-semibold">Newsletter</h3>
+                        <h3 className="font-semibold font-barlow">Newsletter</h3>
                         <p className="text-sm text-muted-foreground">S'inscrire à notre lettre d'actualité</p>
                         <form className="flex gap-2">
                             <Input placeholder="Adresse courriel" type="email"/>

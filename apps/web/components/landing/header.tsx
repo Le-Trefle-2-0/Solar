@@ -57,7 +57,7 @@ export function PublicHeader({session}: { session: any }) {
                 <div className="flex items-center gap-2">
                     <Link href="/" className="flex items-center gap-2">
                         <Image src="/logo.svg" alt="Le Trèfle 2.0" width={40} height={40}/>
-                        <span className="text-xl font-bold hidden sm:inline-block">Le Trèfle 2.0</span>
+                        <span className="text-xl font-semibold hidden sm:inline-block">Le Trèfle 2.0</span>
                     </Link>
                 </div>
 

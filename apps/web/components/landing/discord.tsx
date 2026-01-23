@@ -25,7 +25,7 @@ export function DiscordSection() {
                             <MessageCircle className="mr-2 h-4 w-4"/>
                             Une association sur Discord
                         </div>
-                        <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+                        <h2 className="text-3xl font-semibold tracking-tighter sm:text-4xl md:text-5xl font-barlow">
                             Pourquoi nous avons choisi Discord
                         </h2>
                         <p className="text-muted-foreground md:text-lg">

@@ -32,7 +32,7 @@ export default async function LegalPage() {
                         <div className="inline-flex p-3 rounded-2xl bg-primary/10 text-primary mb-6">
                             <Scale className="h-10 w-10"/>
                         </div>
-                        <h1 className="text-4xl md:text-6xl font-bold tracking-tight italic mb-6">
+                        <h1 className="text-4xl md:text-6xl font-semibold tracking-tight italic mb-6">
                             Mentions Légales
                         </h1>
                         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">

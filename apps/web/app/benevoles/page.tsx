@@ -29,8 +29,8 @@ export default async function BenevolesPage() {
                 <section className="py-20 bg-gradient-to-b from-primary/10 to-background dark:from-primary/5 w-full">
                     <div className="px-4 md:px-8 w-full max-w-7xl mx-auto">
                         <div className="text-center mb-16">
-                            <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl italic mb-6">
-                                Rejoignez l'aventure Le Trèfle 2.0
+                            <h1 className="text-4xl font-semibold tracking-tighter sm:text-5xl md:text-6xl italic mb-6 font-barlow">
+                                « Une petite action pour vous, mais une grande aide pour les autres »
                             </h1>
                             <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
                                 Vous souhaitez donner de votre temps pour une cause qui a du sens ?

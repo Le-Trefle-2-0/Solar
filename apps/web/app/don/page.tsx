@@ -38,7 +38,7 @@ export default async function DonationPage({
                             <div className="inline-flex p-3 rounded-2xl bg-primary/10 text-primary mb-4">
                                 <Heart className="h-8 w-8 fill-current"/>
                             </div>
-                            <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl italic mb-4">
+                            <h1 className="text-4xl font-semibold tracking-tighter sm:text-5xl italic mb-4">
                                 Soutenez Le Trèfle 2.0
                             </h1>
                             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">

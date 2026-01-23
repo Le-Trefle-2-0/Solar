@@ -23,7 +23,7 @@ export function Partners() {
                 <div className="w-[800px] h-[300px] bg-primary rounded-full"/>
             </div>
             <div className="w-full relative z-10">
-                <h3 className="text-center text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] mb-10 opacity-70">
+                <h3 className="text-center text-xs font-semibold text-muted-foreground uppercase tracking-[0.2em] mb-10 opacity-70 font-barlow">
                     Avec le soutien de
                 </h3>
                 <div className="relative flex overflow-x-hidden mask-marquee">

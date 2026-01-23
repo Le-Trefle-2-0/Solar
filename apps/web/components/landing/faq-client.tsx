@@ -222,7 +222,8 @@ export function FAQClient() {
                 filteredData.map((section) => (
                     <div key={section.date} className="space-y-6">
                         <div className="flex items-center gap-4">
-                            <h2 className="text-2xl font-bold italic text-primary">F.A.Q. du {section.date}</h2>
+                            <h2 className="text-2xl font-semibold italic text-primary font-barlow">F.A.Q.
+                                du {section.date}</h2>
                             <div className="h-px flex-1 bg-gradient-to-r from-primary/20 to-transparent"/>
                         </div>
 
@@ -243,7 +244,7 @@ export function FAQClient() {
                                     <CollapsibleTrigger asChild>
                                         <button
                                             className="flex w-full items-center justify-between p-6 rounded-2xl bg-card hover:bg-accent/50 text-left transition-all shadow-sm border border-transparent hover:border-primary/10">
-                                            <span className="text-lg font-semibold pr-8">{q.question}</span>
+                                            <span className="text-lg font-semibold pr-8 font-barlow">{q.question}</span>
                                             <ChevronDown className={cn(
                                                 "h-5 w-5 text-muted-foreground transition-transform duration-300 shrink-0",
                                                 openItems.includes(q.id) && "rotate-180 text-primary"

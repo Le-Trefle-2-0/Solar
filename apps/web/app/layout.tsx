@@ -1,5 +1,5 @@
 import type {Viewport} from "next"
-import {Geist, Geist_Mono} from "next/font/google"
+import {Barlow_Condensed, Geist, Geist_Mono} from "next/font/google"
 import type {ReactNode} from "react"
 
 import "./globals.css"
@@ -21,6 +21,12 @@ const geistMono = Geist_Mono({
     subsets: ["latin"]
 })
 
+const barlowCondensed = Barlow_Condensed({
+    variable: "--font-barlow-condensed",
+    subsets: ["latin"],
+    weight: ["400", "500", "600", "700"]
+})
+
 export const metadata = constructMetadata()
 
 export const viewport: Viewport = {
@@ -40,7 +46,8 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" suppressHydrationWarning>
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
+        <body className={`${geistSans.variable} ${geistMono.variable} ${barlowCondensed.variable} antialiased`}
+              suppressHydrationWarning>
         <Providers>
             <div className="flex min-h-svh flex-col">
                 {children}
