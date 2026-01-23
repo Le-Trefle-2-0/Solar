@@ -12,7 +12,22 @@ const app = Fastify({
     bodyLimit: 50 * 1024 * 1024 // 50MB
 });
 
-await app.register(cors, {origin: true, credentials: true});
+const corsOriginEnv = process.env.API_CORS_ORIGIN || '';
+const corsOriginList = corsOriginEnv
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean);
+const corsOrigin = corsOriginList.length
+    ? (origin: string | undefined, cb: (err: Error | null, allow?: boolean) => void) => {
+        if (!origin) return cb(null, true);
+        if (corsOriginList.includes('*') || corsOriginList.includes(origin)) {
+            return cb(null, true);
+        }
+        return cb(new Error(`CORS origin not allowed: ${origin}`), false);
+    }
+    : true;
+
+await app.register(cors, {origin: corsOrigin, credentials: true});
 await app.register(cookie);
 
 await app.register(swagger, {

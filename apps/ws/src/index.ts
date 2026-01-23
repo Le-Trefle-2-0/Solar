@@ -8,11 +8,12 @@ import {createHmac} from 'crypto';
 
 const PORT = Number(process.env.WS_PORT || 3002);
 const HOST = process.env.WS_HOST || '0.0.0.0';
-// Better Auth JWKS lives on the web app; default to local dev origin
-const APP_URL = (process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/$/, '');
+// Better Auth JWKS lives on the web app; keep issuer public and JWKS fetch internal when available
+const AUTH_ISSUER = (process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/$/, '');
 if (!process.env.BETTER_AUTH_URL && !process.env.NEXT_PUBLIC_APP_URL) {
     console.warn('BETTER_AUTH_URL or NEXT_PUBLIC_APP_URL is not set, falling back to http://localhost:3000');
 }
+const INTERNAL_AUTH_URL = (process.env.INTERNAL_AUTH_URL || AUTH_ISSUER).replace(/\/$/, '');
 const CORS_ORIGIN = process.env.WS_CORS_ORIGIN || '*';
 
 const httpServer = createServer();
@@ -30,13 +31,13 @@ if (process.env.REDIS_URL) {
     io.adapter(createAdapter(pub, sub));
 }
 
-const JWKS = createRemoteJWKSet(new URL(`${APP_URL}/api/auth/jwks`));
+const JWKS = createRemoteJWKSet(new URL(`${INTERNAL_AUTH_URL}/api/auth/jwks`));
 
 async function validateJWT(token: string) {
     try {
         const {payload} = await jwtVerify(token, JWKS, {
-            issuer: APP_URL,
-            audience: APP_URL,
+            issuer: AUTH_ISSUER,
+            audience: AUTH_ISSUER,
         });
         return payload;
     } catch (e: any) {
