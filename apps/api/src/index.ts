@@ -18,7 +18,7 @@ const corsOriginList = corsOriginEnv
     .map((value) => value.trim())
     .filter(Boolean);
 const corsOrigin = corsOriginList.length
-    ? (origin: string | undefined, cb: (err: Error | null, allow?: boolean) => void) => {
+    ? (origin: string | undefined, cb: (err: Error | null, allow: boolean) => void) => {
         if (!origin) return cb(null, true);
         if (corsOriginList.includes('*') || corsOriginList.includes(origin)) {
             return cb(null, true);
