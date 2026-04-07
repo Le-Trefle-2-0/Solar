@@ -79,9 +79,13 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({childre
     useEffect(() => {
         if (!socket) return;
 
-        // Always show overlay while establishing (or re-establishing) the first connection
-        setShowOverlay(true);
-        if (!overlayTimerRef.current) overlayTimerRef.current = setTimeout(() => setTrouble(true), 5000);
+        // Initial state check based on current socket status
+        const isConnected = socket.connected;
+        setConnected(isConnected);
+        setShowOverlay(!isConnected);
+        if (!isConnected && !overlayTimerRef.current) {
+            overlayTimerRef.current = setTimeout(() => setTrouble(true), 5000);
+        }
 
         const onConnect = () => {
             setConnected(true);

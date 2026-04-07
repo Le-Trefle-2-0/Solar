@@ -35,6 +35,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({childre
     const [trouble, setTrouble] = useState(false);
     const currentPathRef = useRef<string>(pathname); // add ref
     const overlayTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const disconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         currentPathRef.current = pathname;
@@ -55,33 +56,43 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({childre
     }, []);
 
     useEffect(() => {
+        let isMounted = true;
         const init = async () => {
             try {
                 const token = await getJwt();
                 if (!token) {
-                    console.warn('[ws] no JWT token found');
-                    // Retry in 2 seconds if no token (maybe session is still loading)
-                    setTimeout(init, 2000);
-                    setConnecting(false);
+                    if (isMounted) {
+                        console.warn('[ws] no JWT token found, retrying...');
+                        setTimeout(init, 2000);
+                    }
                     return;
                 }
                 const s = await initSocket(token);
-                setSocket(s);
-                setConnecting(true);
+                if (isMounted) {
+                    setSocket(s);
+                    setConnecting(false);
+                }
             } catch (e) {
                 console.error('[ws] failed to init socket', e);
-                setConnecting(false);
+                if (isMounted) setConnecting(false);
             }
         };
         init();
+        return () => {
+            isMounted = false;
+        };
     }, []);
 
     useEffect(() => {
         if (!socket) return;
 
-        // Always show overlay while establishing (or re-establishing) the first connection
-        setShowOverlay(true);
-        if (!overlayTimerRef.current) overlayTimerRef.current = setTimeout(() => setTrouble(true), 5000);
+        // Initial state check based on current socket status
+        const isConnected = socket.connected;
+        setConnected(isConnected);
+        setShowOverlay(!isConnected);
+        if (!isConnected && !overlayTimerRef.current) {
+            overlayTimerRef.current = setTimeout(() => setTrouble(true), 5000);
+        }
 
         const onConnect = () => {
             setConnected(true);
@@ -92,21 +103,38 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({childre
                 clearTimeout(overlayTimerRef.current);
                 overlayTimerRef.current = null;
             }
+            if (disconnectTimerRef.current) {
+                clearTimeout(disconnectTimerRef.current);
+                disconnectTimerRef.current = null;
+            }
         };
 
-        const onConnectError = () => {
+        const onConnectError = (err: any) => {
             setConnected(false);
             setConnecting(false);
-            setShowOverlay(true);
-            if (!overlayTimerRef.current) overlayTimerRef.current = setTimeout(() => setTrouble(true), 5000);
-            setTimeout(() => setShowOverlay(false), 8000);
+            // Don't show overlay immediately on connect error if we were already connected
+            // This prevents blinking when switching transports or during brief interruptions
+            if (!connected && !socket.active) {
+                setShowOverlay(true);
+            }
         };
 
-        const onDisconnect = () => {
+        const onDisconnect = (reason: string) => {
             setConnected(false);
-            setShowOverlay(true);
-            if (!overlayTimerRef.current) overlayTimerRef.current = setTimeout(() => setTrouble(true), 5000);
-            setTimeout(() => setShowOverlay(false), 8000);
+            console.warn('[ws] disconnected:', reason);
+
+            // If it's a deliberate disconnect, don't show overlay
+            if (reason === 'io client disconnect' || reason === 'io server disconnect') return;
+
+            // Wait 2 seconds before showing overlay to handle micro-reconnections
+            if (!disconnectTimerRef.current) {
+                disconnectTimerRef.current = setTimeout(() => {
+                    if (!socket.connected) {
+                        setShowOverlay(true);
+                        if (!overlayTimerRef.current) overlayTimerRef.current = setTimeout(() => setTrouble(true), 5000);
+                    }
+                }, 2000);
+            }
         };
 
         const onReconnectAttempt = () => {
@@ -130,17 +158,15 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({childre
         socket.io.on('reconnect_attempt', onReconnectAttempt);
         socket.io.on('reconnect', onReconnect);
 
-        const heartbeatInterval = setInterval(() => socket.emit('heartbeat'), 5000);
-
         return () => {
             socket.off('connect', onConnect);
             socket.off('connect_error', onConnectError);
             socket.off('disconnect', onDisconnect);
             socket.io.off('reconnect_attempt', onReconnectAttempt);
             socket.io.off('reconnect', onReconnect);
-            clearInterval(heartbeatInterval);
+            if (disconnectTimerRef.current) clearTimeout(disconnectTimerRef.current);
         };
-    }, [socket]);
+    }, [socket, connected]);
 
     useEffect(() => {
         if (!socket) return;

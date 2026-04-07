@@ -83,7 +83,7 @@ app.prepare().then(() => {
 
     const io = new Server(server, {
         cors: {origin: '*'},
-        transports: ['websocket'],
+        transports: ['websocket', 'polling'],
         pingInterval: 10000,
         pingTimeout: 20000
     });
