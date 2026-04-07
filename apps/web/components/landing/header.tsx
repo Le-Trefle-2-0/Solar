@@ -5,7 +5,7 @@ import {Button} from "@/components/ui/button";
 import Image from "next/image";
 import {useState} from "react";
 import {ContactDialog} from "./contact-dialog";
-import {Mail, Menu, UserPlus} from "lucide-react";
+import {Home, Mail, Menu, UserPlus} from "lucide-react";
 import {Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger,} from "@/components/ui/sheet";
 
 export function PublicHeader({session}: { session: any }) {
@@ -19,6 +19,10 @@ export function PublicHeader({session}: { session: any }) {
 
         return (
             <div className={className}>
+                <Link href="/" className={`${linkBase} flex items-center gap-3`}>
+                    {isMobile && <Home className="h-5 w-5 text-foreground/80"/>}
+                    <span>Accueil</span>
+                </Link>
                 <Link href="/benevoles" className={`${linkBase} flex items-center gap-3`}>
                     {isMobile && <UserPlus className="h-5 w-5 text-foreground/80" />}
                     <span>Devenir bénévole</span>

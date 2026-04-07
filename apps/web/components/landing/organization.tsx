@@ -5,6 +5,14 @@ import {Shield, Users} from "lucide-react";
 import {cn} from "@/lib/utils";
 import {ScrollReveal} from "./scroll-reveal";
 import Image from "next/image";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger
+} from "@/components/ui/dialog";
 
 interface Person {
     name: string;
@@ -40,12 +48,6 @@ const managers: Person[] = [
         role: "Responsable Pôle Écoute",
         icon: Users,
         image: "https://cdn.discordapp.com/avatars/869076177686523954/b6549e8d4c6a96e7423f731dc5563d7b.jpeg?size=1024"
-    },
-    {
-        name: "Romain D.",
-        role: "Responsable Pôle Écoute",
-        icon: Users,
-        image: "https://cdn.discordapp.com/avatars/911352415268257823/608f160b1e5e70944079cb9ec75b41ae.jpeg?size=1024"
     },
     {
         name: "Louise BURTÉ",
@@ -122,34 +124,62 @@ export function OrganizationTree() {
 function PersonCard({person}: { person: Person }) {
     const Icon = person.icon;
     return (
-        <Card className={cn(
-            "group hover:border-primary/50 transition-all duration-300 bg-card/50 backdrop-blur-sm shadow-md border border-transparent",
-            // Removed leader-specific highlight
-        )}>
-            <CardContent className="pt-8 flex flex-col items-center text-center">
-                <div className="relative">
-                    <div
-                        className="w-24 h-24 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mb-6 group-hover:rotate-6 transition-transform duration-500 shadow-inner overflow-hidden">
-                        {person.image ? (
-                            <div className="relative w-full h-full">
-                                <Image
-                                    src={person.image}
-                                    alt={`${person.name} – ${person.role}`}
-                                    fill
-                                    sizes="96px"
-                                    className="object-cover"
-                                    priority={false}
-                                    unoptimized
-                                />
+        <Dialog>
+            <DialogTrigger asChild>
+                <Card className={cn(
+                    "group hover:border-primary/50 transition-all duration-300 bg-card/50 backdrop-blur-sm shadow-md border border-transparent cursor-pointer",
+                )}>
+                    <CardContent className="pt-8 flex flex-col items-center text-center">
+                        <div className="relative">
+                            <div
+                                className="w-24 h-24 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mb-6 group-hover:rotate-6 transition-transform duration-500 shadow-inner overflow-hidden">
+                                {person.image ? (
+                                    <div className="relative w-full h-full">
+                                        <Image
+                                            src={person.image}
+                                            alt={`${person.name} – ${person.role}`}
+                                            fill
+                                            sizes="96px"
+                                            className="object-cover"
+                                            priority={false}
+                                            unoptimized
+                                        />
+                                    </div>
+                                ) : (
+                                    <Icon className="h-10 w-10 text-primary"/>
+                                )}
                             </div>
-                        ) : (
-                            <Icon className="h-10 w-10 text-primary"/>
-                        )}
+                        </div>
+                        <h4 className="font-semibold text-xl tracking-tight font-barlow">{person.name}</h4>
+                        <p className="text-sm font-medium text-primary/70 uppercase tracking-wider mt-1">{person.role}</p>
+                    </CardContent>
+                </Card>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <div className="flex items-center gap-4">
+                        <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-primary/20">
+                            {person.image ? (
+                                <Image src={person.image} alt={person.name} width={64} height={64}
+                                       className="object-cover" unoptimized/>
+                            ) : (
+                                <div className="w-full h-full bg-primary/10 flex items-center justify-center">
+                                    <Icon className="h-8 w-8 text-primary"/>
+                                </div>
+                            )}
+                        </div>
+                        <div>
+                            <DialogTitle className="font-barlow text-2xl">{person.name}</DialogTitle>
+                            <p className="text-primary font-medium">{person.role}</p>
+                        </div>
                     </div>
-                </div>
-                <h4 className="font-semibold text-xl tracking-tight font-barlow">{person.name}</h4>
-                <p className="text-sm font-medium text-primary/70 uppercase tracking-wider mt-1">{person.role}</p>
-            </CardContent>
-        </Card>
+                </DialogHeader>
+                <DialogDescription className="text-base leading-relaxed mt-4">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore
+                    et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+                    aliquip ex ea commodo consequat.
+                </DialogDescription>
+            </DialogContent>
+        </Dialog>
     );
 }

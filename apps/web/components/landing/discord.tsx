@@ -19,9 +19,10 @@ export function DiscordSection() {
 
             <div className="px-4 md:px-8 w-full relative z-10">
                 <div className="grid gap-12 lg:grid-cols-2 items-center">
-                    <ScrollReveal animation="slide-right" className="flex flex-col gap-6 order-1 lg:order-2">
+                    <ScrollReveal animation="slide-right"
+                                  className="flex flex-col gap-6 order-1 lg:text-right lg:items-end">
                         <div
-                            className="inline-flex items-center rounded-lg bg-[#5865F2]/10 px-3 py-1 text-sm font-medium text-[#5865F2]">
+                            className="inline-flex items-center rounded-lg bg-[#5865F2]/10 px-3 py-1 text-sm font-medium text-[#5865F2] w-fit">
                             <MessageCircle className="mr-2 h-4 w-4"/>
                             Une association sur Discord
                         </div>
@@ -34,7 +35,7 @@ export function DiscordSection() {
                             l’association.
                         </p>
                         <div className="space-y-4">
-                            <div className="flex gap-4">
+                            <div className="flex gap-4 lg:flex-row-reverse">
                                 <div
                                     className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#5865F2]/20 text-[#5865F2]">
                                     <Check className="h-4 w-4"/>
@@ -45,7 +46,7 @@ export function DiscordSection() {
                                         échanges avec nos bénévoles totalement anonymes.</p>
                                 </div>
                             </div>
-                            <div className="flex gap-4">
+                            <div className="flex gap-4 lg:flex-row-reverse">
                                 <div
                                     className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#5865F2]/20 text-[#5865F2]">
                                     <Check className="h-4 w-4"/>
@@ -57,7 +58,7 @@ export function DiscordSection() {
                                 </div>
                             </div>
                         </div>
-                        <div className="flex flex-col sm:flex-row gap-4 mt-4">
+                        <div className="flex flex-col sm:flex-row gap-4 mt-4 lg:justify-end">
                             <Button size="lg" className="bg-[#5865F2] hover:bg-[#4752C4] text-white" asChild>
                                 <Link href="https://discord.gg/letrefle" target="_blank" rel="noopener noreferrer">
                                     Rejoindre le Discord
@@ -66,7 +67,7 @@ export function DiscordSection() {
                             </Button>
                         </div>
                     </ScrollReveal>
-                    <ScrollReveal animation="slide-left" className="order-2 lg:order-1">
+                    <ScrollReveal animation="slide-left" className="order-2">
                         <Card className="p-0 overflow-hidden border-none shadow-2xl bg-[#313338]">
                             <CardContent className="p-0">
                                 <iframe

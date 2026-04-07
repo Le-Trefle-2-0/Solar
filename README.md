@@ -68,6 +68,9 @@ INTERNAL_AUTH_URL=http://web:3000
 
 # Base API publique si Traefik route /v1 vers l'API
 NEXT_PUBLIC_API_URL=https://solar.example.org
+
+# CORS API (liste d'origines separees par des virgules)
+API_CORS_ORIGIN=https://solar.example.org,https://beta.letrefle.org
 ```
 
 ### 3. Initialisation de la base de données

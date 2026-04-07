@@ -48,7 +48,7 @@ export async function initSocket(jwt: string): Promise<Socket | null> {
 
     // eslint-disable-next-line no-console
     console.log('[ws] connecting to', base);
-    const transportsEnv = (process.env.NEXT_PUBLIC_WS_TRANSPORTS || 'polling,websocket')
+    const transportsEnv = (process.env.NEXT_PUBLIC_WS_TRANSPORTS || 'websocket')
         .split(',')
         .map(s => s.trim())
         .filter(Boolean);
@@ -56,7 +56,7 @@ export async function initSocket(jwt: string): Promise<Socket | null> {
     const rejectUnauthorized = rejectUnauth ? rejectUnauth === 'true' : process.env.NODE_ENV === 'production';
     socket = io(base, {
         auth: {jwt},
-        transports: transportsEnv as any, // default to websocket only for stability
+        transports: transportsEnv as any,
         withCredentials: true,
         reconnection: true,
         reconnectionAttempts: Infinity,

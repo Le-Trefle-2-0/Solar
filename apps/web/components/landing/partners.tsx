@@ -5,18 +5,18 @@ import Link from "next/link";
 
 export function Partners() {
     const partners = [
-        {name: "Académie de Montpellier", logo: "/partners/Ac_Montpellier.png"},
-        {name: "Discord", logo: "/partners/Discord.png"},
-        {name: "Éducation Nationale", logo: "/partners/Educ_Nat.png"},
-        {name: "Microsoft 365", logo: "/partners/Microsoft_365.png"},
-        {name: "Microsoft Azure", logo: "/partners/Microsoft_Azure.png"},
+        {name: "Académie de Montpellier", logo: "/partners/Ac_Montpellier.png", slug: "academie-montpellier"},
+        {name: "Discord", logo: "/partners/Discord.png", slug: "discord"},
+        {name: "Éducation Nationale", logo: "/partners/Educ_Nat.png", slug: "education-nationale"},
+        {name: "Microsoft 365", logo: "/partners/Microsoft_365.png", slug: "microsoft-365"},
+        {name: "Microsoft Azure", logo: "/partners/Microsoft_Azure.png", slug: "microsoft-azure"},
     ];
 
     // Create two identical large sets to ensure it covers even ultra-wide screens (4K/8K)
     const partnerSet = Array(8).fill(partners).flat();
 
     return (
-        <section id="about"
+        <section id="partners"
                  className="relative py-12 bg-gradient-to-b from-background to-muted/30 w-full overflow-hidden">
             <div
                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 opacity-5 dark:opacity-10 blur-[100px]">
@@ -33,7 +33,7 @@ export function Partners() {
                             {partnerSet.map((partner, index) => (
                                 <Link
                                     key={`set1-${index}`}
-                                    href="#"
+                                    href={`/partner/${partner.slug}`}
                                     className="opacity-40 hover:opacity-100 grayscale hover:grayscale-0 transition-all duration-500 block transform hover:scale-110 shrink-0"
                                 >
                                     <Image
@@ -51,7 +51,7 @@ export function Partners() {
                             {partnerSet.map((partner, index) => (
                                 <Link
                                     key={`set2-${index}`}
-                                    href="#"
+                                    href={`/partner/${partner.slug}`}
                                     className="opacity-40 hover:opacity-100 grayscale hover:grayscale-0 transition-all duration-500 block transform hover:scale-110 shrink-0"
                                 >
                                     <Image

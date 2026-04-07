@@ -368,10 +368,11 @@ export const locale = {
 }
 
 export function AuthView({pathname}: { pathname: string }) {
-
     return (
-        <main className="flex grow flex-col items-center justify-center gap-4 p-4">
-            <AuthCard pathname={pathname} redirectTo="/app" localization={locale}/>
+        <main className="flex grow flex-col items-center justify-center p-4 w-full">
+            <div className="w-full max-w-[400px]">
+                <AuthCard pathname={pathname} redirectTo="/app" localization={locale}/>
+            </div>
         </main>
     )
 }

@@ -2,6 +2,7 @@ import {auth} from "@/lib/auth";
 import {headers} from "next/headers";
 import {PublicHeader} from "@/components/landing/header";
 import {Hero} from "@/components/landing/hero";
+import {AboutSection} from "@/components/landing/about";
 import {Partners} from "@/components/landing/partners";
 import {DiscordSection} from "@/components/landing/discord";
 import {OrganizationTree} from "@/components/landing/organization";
@@ -27,10 +28,13 @@ export default async function Home() {
             <main className="flex-1">
                 <Hero/>
                 <ScrollReveal>
-                    <Partners/>
+                    <AboutSection/>
                 </ScrollReveal>
                 <ScrollReveal>
                     <DiscordSection/>
+                </ScrollReveal>
+                <ScrollReveal>
+                    <Partners/>
                 </ScrollReveal>
                 <ScrollReveal>
                     <OrganizationTree/>
