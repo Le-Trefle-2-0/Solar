@@ -124,7 +124,7 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
                 days.push(
                     <div
                         key={cloneDay.toString()}
-                        className={`flex flex-col border rounded-lg p-1 min-h-0 h-full ${
+                        className={`flex flex-col border rounded-lg p-1 min-h-[120px] h-full ${
                             !isSameMonth(cloneDay, monthStart) ? 'bg-gray-50 text-gray-400' : ''
                         }`}
                     >
@@ -135,7 +135,7 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
             >
               {format(cloneDay, 'd')}
             </span>
-                        <div className="flex flex-col w-full text-[10px] text-gray-500 space-y-1 overflow-hidden">
+                        <div className="flex flex-col w-full text-[10px] text-gray-500 space-y-1 overflow-y-auto">
                             {dayEvents.length > 0 ? (
                                 dayEvents.map(event => (
                                     <Event key={event.id} event={event}/>
@@ -151,7 +151,7 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
             rows.push(
                 <div
                     key={day.toString()}
-                    className="grid grid-cols-7 gap-2 h-full"
+                    className="grid grid-cols-7 gap-2 h-full min-h-[120px]"
                 >
                     {days}
                 </div>
@@ -265,8 +265,8 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
     }
 
     return (
-        <div className="h-svh flex flex-col pt-16 px-6 pb-6 min-h-0">
-            <div className="flex justify-between items-center mb-4 flex-shrink-0">
+        <div className="h-full flex flex-col pt-0 px-2 pb-2">
+            <div className="flex justify-between items-center mb-2 flex-shrink-0">
                 <div className="flex items-center gap-2">
                     <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
                         <ChevronLeft className="h-5 w-5"/>

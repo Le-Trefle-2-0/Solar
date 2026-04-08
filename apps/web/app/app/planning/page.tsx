@@ -5,6 +5,7 @@ import type {EventData} from "@/lib/interface";
 import PlanningCalendar from "@/components/calendar";
 import {useSession} from "@/lib/auth-client"; // adjust if needed
 import {apiFetch} from "@/lib/api";
+import {Page} from "@/components/ui";
 
 export default function PlanningPage() {
     const [events, setEvents] = useState<EventData[]>([]);
@@ -24,9 +25,12 @@ export default function PlanningPage() {
     }, []);
 
     return (
-        <PlanningCalendar
-            events={events}
-            userId={session?.user?.id}
-        />
+        <Page title="Planning" description="Consultez et inscrivez-vous aux sessions d'écoute" className="p-0"
+              containerClassName="overflow-y-hidden">
+            <PlanningCalendar
+                events={events}
+                userId={session?.user?.id}
+            />
+        </Page>
     );
 }

@@ -4,6 +4,7 @@ import {redirect} from "next/navigation";
 import {BotClient} from "@/components/admin/bot-client";
 
 import {constructMetadata} from "@/lib/metadata";
+import {Page} from "@/components/ui";
 
 export const metadata = constructMetadata({
     title: "Gestion du Bot",
@@ -22,5 +23,9 @@ export default async function BotAdminPage() {
         redirect("/app");
     }
 
-    return <BotClient/>;
+    return (
+        <Page title="Gestion du Bot" description="Configurez le comportement du bot Discord">
+            <BotClient/>
+        </Page>
+    );
 }

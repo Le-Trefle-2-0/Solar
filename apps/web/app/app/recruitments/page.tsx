@@ -5,6 +5,7 @@ import {getRecruitments} from "@/app/actions/recruitments";
 import {RecruitmentClient} from "@/components/recruitments/recruitment-client";
 
 import {constructMetadata} from "@/lib/metadata";
+import {Page} from "@/components/ui";
 
 export const metadata = constructMetadata({
     title: "Gestion des Recrutements",
@@ -28,11 +29,8 @@ export default async function RecruitmentsPage() {
     const recruitments = await getRecruitments();
 
     return (
-        <div className="flex-1 space-y-4 p-8 pt-16 overflow-auto h-full">
-            <div className="flex items-center justify-between space-y-2">
-                <h2 className="text-3xl font-bold tracking-tight">Recrutements</h2>
-            </div>
+        <Page title="Recrutements" description="Gérez les candidatures et les nouveaux membres">
             <RecruitmentClient initialData={recruitments as any}/>
-        </div>
+        </Page>
     );
 }

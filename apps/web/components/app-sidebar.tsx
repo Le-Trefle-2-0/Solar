@@ -4,6 +4,7 @@ import {useEffect, useRef, useState} from "react"
 import {
     Bot,
     CalendarDays,
+    ChevronRight,
     Ear,
     History,
     House,
@@ -26,7 +27,12 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarMenuSub,
+    SidebarMenuSubButton,
+    SidebarMenuSubItem,
+    SidebarSeparator,
 } from "@/components/ui/sidebar"
+import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/ui/collapsible";
 import Image from "next/image";
 import {apiFetch} from "@/lib/api";
 import logo from "@/public/logo.svg";
@@ -118,7 +124,7 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
         });
     }, [session]);
 
-    const data = React.useMemo(() => [...filteredBaseData, ...tickets], [filteredBaseData, tickets]);
+    const MAX_TICKETS_BEFORE_COLLAPSE = 5;
 
     useEffect(() => {
         if (!socket) return;
@@ -175,7 +181,43 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
                 </SidebarMenu>
             </SidebarHeader>
             <SidebarContent>
-                <NavProjects projects={data}/>
+                <NavProjects projects={filteredBaseData}/>
+                {tickets.length > 0 && (
+                    <>
+                        <SidebarSeparator/>
+                        {tickets.length > MAX_TICKETS_BEFORE_COLLAPSE ? (
+                            <SidebarMenu className="px-2">
+                                <Collapsible asChild className="group/collapsible">
+                                    <SidebarMenuItem>
+                                        <CollapsibleTrigger asChild>
+                                            <SidebarMenuButton tooltip="Tickets">
+                                                <Ear/>
+                                                <span>Tickets ({tickets.length})</span>
+                                                <ChevronRight
+                                                    className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"/>
+                                            </SidebarMenuButton>
+                                        </CollapsibleTrigger>
+                                        <CollapsibleContent>
+                                            <SidebarMenuSub>
+                                                {tickets.map((ticket) => (
+                                                    <SidebarMenuSubItem key={ticket.name}>
+                                                        <SidebarMenuSubButton asChild>
+                                                            <a href={ticket.url}>
+                                                                <span>{ticket.name}</span>
+                                                            </a>
+                                                        </SidebarMenuSubButton>
+                                                    </SidebarMenuSubItem>
+                                                ))}
+                                            </SidebarMenuSub>
+                                        </CollapsibleContent>
+                                    </SidebarMenuItem>
+                                </Collapsible>
+                            </SidebarMenu>
+                        ) : (
+                            <NavProjects projects={tickets}/>
+                        )}
+                    </>
+                )}
             </SidebarContent>
             <SidebarFooter>
                 {/* Reserved area for voice controls to avoid flex layout shifts */}

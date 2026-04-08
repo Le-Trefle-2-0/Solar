@@ -7,6 +7,7 @@ import {headers} from "next/headers";
 import {redirect} from "next/navigation";
 import {constructMetadata} from "@/lib/metadata";
 import {truncateEmail} from "@/lib/utils";
+import {Page} from "@/components/ui";
 
 async function getData(): Promise<DisplayAccount[]> {
     const hideEmails = process.env.HIDE_EMAILS_IN_ADMIN === "true";
@@ -105,8 +106,8 @@ export default async function Admin() {
     const data = await getData()
 
     return (
-        <div className="container mx-auto p-6">
+        <Page title="Administration" description="Gérez les comptes utilisateurs et les accès">
             <UsersTable data={data}/>
-        </div>
+        </Page>
     )
 }
