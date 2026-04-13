@@ -34,26 +34,26 @@ CREATE TABLE `event_registration`
     `registeredAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `eventId`      VARCHAR(191) NULL,
 
-    UNIQUE INDEX `EventRegistration_userId_roleSlotId_key`(`userId`, `roleSlotId`),
+    UNIQUE INDEX `event_registration_userId_roleSlotId_key`(`userId`, `roleSlotId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
 ALTER TABLE `event`
-    ADD CONSTRAINT `Event_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+    ADD CONSTRAINT `event_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `role_slot`
-    ADD CONSTRAINT `RoleSlot_eventId_fkey` FOREIGN KEY (`eventId`) REFERENCES `event` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+    ADD CONSTRAINT `role_slot_eventId_fkey` FOREIGN KEY (`eventId`) REFERENCES `event` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `event_registration`
-    ADD CONSTRAINT `EventRegistration_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+    ADD CONSTRAINT `event_registration_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `event_registration`
-    ADD CONSTRAINT `EventRegistration_roleSlotId_fkey` FOREIGN KEY (`roleSlotId`) REFERENCES `role_slot` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+    ADD CONSTRAINT `event_registration_roleSlotId_fkey` FOREIGN KEY (`roleSlotId`) REFERENCES `role_slot` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `event_registration`
-    ADD CONSTRAINT `EventRegistration_eventId_fkey` FOREIGN KEY (`eventId`) REFERENCES `event` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+    ADD CONSTRAINT `event_registration_eventId_fkey` FOREIGN KEY (`eventId`) REFERENCES `event` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;

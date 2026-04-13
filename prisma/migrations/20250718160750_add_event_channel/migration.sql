@@ -10,4 +10,4 @@ ALTER TABLE `event`
 
 -- AddForeignKey
 ALTER TABLE `event`
-    ADD CONSTRAINT `Event_channelID_fkey` FOREIGN KEY (`channelID`) REFERENCES `channel` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+    ADD CONSTRAINT `event_channelID_fkey` FOREIGN KEY (`channelID`) REFERENCES `channel` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

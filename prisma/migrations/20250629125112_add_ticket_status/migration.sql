@@ -18,10 +18,10 @@ CREATE TABLE `ticket_status`
     `label` VARCHAR(192) NOT NULL,
 
     UNIQUE INDEX `name`(`name`),
-    UNIQUE INDEX `TicketStatus_name_label_key`(`name`, `label`),
+    UNIQUE INDEX `ticket_status_name_label_key`(`name`, `label`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
 ALTER TABLE `ticket`
-    ADD CONSTRAINT `Ticket_statusName_statusLabel_fkey` FOREIGN KEY (`statusName`, `statusLabel`) REFERENCES `ticket_status` (`name`, `label`) ON DELETE RESTRICT ON UPDATE CASCADE;
+    ADD CONSTRAINT `ticket_statusName_statusLabel_fkey` FOREIGN KEY (`statusName`, `statusLabel`) REFERENCES `ticket_status` (`name`, `label`) ON DELETE RESTRICT ON UPDATE CASCADE;

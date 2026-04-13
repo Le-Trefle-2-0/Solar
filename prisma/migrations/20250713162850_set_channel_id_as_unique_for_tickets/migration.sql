@@ -5,4 +5,4 @@
 
 */
 -- CreateIndex
-CREATE UNIQUE INDEX `Ticket_channelId_key` ON `ticket` (`channelId`);
+CREATE UNIQUE INDEX `ticket_channelId_key` ON `ticket` (`channelId`);

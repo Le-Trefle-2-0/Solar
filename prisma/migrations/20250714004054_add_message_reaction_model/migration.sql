@@ -11,8 +11,8 @@ CREATE TABLE `reaction`
 
 -- AddForeignKey
 ALTER TABLE `reaction`
-    ADD CONSTRAINT `Reaction_messageID_fkey` FOREIGN KEY (`messageID`) REFERENCES `message` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+    ADD CONSTRAINT `reaction_messageID_fkey` FOREIGN KEY (`messageID`) REFERENCES `message` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `reaction`
-    ADD CONSTRAINT `Reaction_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+    ADD CONSTRAINT `reaction_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

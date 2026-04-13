@@ -1,17 +1,17 @@
 -- DropForeignKey
-ALTER TABLE `message` DROP FOREIGN KEY `Message_channelId_fkey`;
+ALTER TABLE `message` DROP FOREIGN KEY `message_channelId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `message` DROP FOREIGN KEY `Message_userId_fkey`;
+ALTER TABLE `message` DROP FOREIGN KEY `message_userId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `ticket` DROP FOREIGN KEY `Ticket_assignedUserId_fkey`;
+ALTER TABLE `ticket` DROP FOREIGN KEY `ticket_assignedUserId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `ticket` DROP FOREIGN KEY `Ticket_channelId_channelName_fkey`;
+ALTER TABLE `ticket` DROP FOREIGN KEY `ticket_channelId_channelName_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `ticket` DROP FOREIGN KEY `Ticket_statusName_statusLabel_fkey`;
+ALTER TABLE `ticket` DROP FOREIGN KEY `ticket_statusName_statusLabel_fkey`;
 
 -- AlterTable
 ALTER TABLE `event_registration`
@@ -38,4 +38,4 @@ ALTER TABLE `ticket`
     ADD CONSTRAINT `ticket_statusName_statusLabel_fkey` FOREIGN KEY (`statusName`, `statusLabel`) REFERENCES `ticket_status` (`name`, `label`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- RenameIndex
-ALTER TABLE `ticket` RENAME INDEX `Ticket_channelId_key` TO `ticket_channelId_key`;
+ALTER TABLE `ticket` RENAME INDEX `ticket_channelId_key` TO `ticket_channelId_key`;

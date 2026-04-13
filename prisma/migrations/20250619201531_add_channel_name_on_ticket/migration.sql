@@ -6,18 +6,18 @@
 
 */
 -- DropForeignKey
-ALTER TABLE `ticket` DROP FOREIGN KEY `Ticket_channelId_fkey`;
+ALTER TABLE `ticket` DROP FOREIGN KEY `ticket_channelId_fkey`;
 
 -- DropIndex
-DROP INDEX `Ticket_channelId_fkey` ON `ticket`;
+DROP INDEX `ticket_channelId_fkey` ON `ticket`;
 
 -- AlterTable
 ALTER TABLE `ticket`
     ADD COLUMN `channelName` VARCHAR(191) NOT NULL;
 
 -- CreateIndex
-CREATE UNIQUE INDEX `Channel_id_name_key` ON `channel` (`id`, `name`);
+CREATE UNIQUE INDEX `channel_id_name_key` ON `channel` (`id`, `name`);
 
 -- AddForeignKey
 ALTER TABLE `ticket`
-    ADD CONSTRAINT `Ticket_channelId_channelName_fkey` FOREIGN KEY (`channelId`, `channelName`) REFERENCES `channel` (`id`, `name`) ON DELETE CASCADE ON UPDATE CASCADE;
+    ADD CONSTRAINT `ticket_channelId_channelName_fkey` FOREIGN KEY (`channelId`, `channelName`) REFERENCES `channel` (`id`, `name`) ON DELETE CASCADE ON UPDATE CASCADE;

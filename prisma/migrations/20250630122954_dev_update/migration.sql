@@ -17,7 +17,7 @@ ALTER TABLE `message` MODIFY `content` LONGBLOB NOT NULL;
 --     `id` VARCHAR(191) NOT NULL,
 --     `name` VARCHAR(191) NOT NULL,
 --
---     UNIQUE INDEX `Channel_id_name_key`(`id`, `name`),
+--     UNIQUE INDEX `channel_id_name_key`(`id`, `name`),
 --     PRIMARY KEY (`id`)
 -- ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -52,8 +52,8 @@ ALTER TABLE `message` MODIFY `content` LONGBLOB NOT NULL;
 -- Skipping duplicate index creation here.
 -- CREATE UNIQUE INDEX `user_username_key` ON `user`(`username`);
 
--- Skipped: Message_channelId_fkey already added in earlier migration
--- ALTER TABLE `message` ADD CONSTRAINT `Message_channelId_fkey` FOREIGN KEY (...);
+-- Skipped: message_channelId_fkey already added in earlier migration
+-- ALTER TABLE `message` ADD CONSTRAINT `message_channelId_fkey` FOREIGN KEY (...);
 
 -- Skipped: Event_userId_fkey already exists
 
@@ -65,11 +65,11 @@ ALTER TABLE `message` MODIFY `content` LONGBLOB NOT NULL;
 
 -- Skipped: EventRegistration_eventId_fkey already exists
 
--- Skipped: Ticket_channelId_channelName_fkey handled by later migrations
+-- Skipped: ticket_channelId_channelName_fkey handled by later migrations
 
--- Skipped: Ticket_assignedUserId_fkey handled by later migrations
+-- Skipped: ticket_assignedUserId_fkey handled by later migrations
 
--- Skipped: Ticket_statusName_statusLabel_fkey handled by later migrations
+-- Skipped: ticket_statusName_statusLabel_fkey handled by later migrations
 
 -- Skipped: apikey_userId_fkey exists from 20250620134831_add_api_key_plugin
 

@@ -12,4 +12,4 @@ ALTER TABLE `ticket`
 
 -- AddForeignKey
 ALTER TABLE `ticket`
-    ADD CONSTRAINT `Ticket_assignedUserId_fkey` FOREIGN KEY (`assignedUserId`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+    ADD CONSTRAINT `ticket_assignedUserId_fkey` FOREIGN KEY (`assignedUserId`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
