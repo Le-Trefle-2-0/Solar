@@ -7,6 +7,7 @@ interface PageProps {
     children: React.ReactNode;
     className?: string;
     containerClassName?: string;
+    hideHeader?: boolean;
 }
 
 export function Page({
@@ -15,11 +16,12 @@ export function Page({
                          children,
                          className,
                          containerClassName,
+                         hideHeader = false,
                      }: PageProps) {
     return (
         <div className={cn("flex flex-col w-full h-full min-h-0", containerClassName)}>
-            {(title || description) && (
-                <div className="flex flex-col gap-1 p-6 pb-2 shrink-0">
+            {!hideHeader && (title || description) && (
+                <div className="flex flex-col gap-1 p-6 pl-14 pb-2 shrink-0">
                     {title && (
                         <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
                     )}
@@ -28,7 +30,7 @@ export function Page({
                     )}
                 </div>
             )}
-            <div className={cn("flex-1 p-6 pt-0 overflow-y-auto", className)}>
+            <div className={cn("flex-1 p-6 pt-0 overflow-y-auto", hideHeader && "pt-6", className)}>
                 {children}
             </div>
         </div>

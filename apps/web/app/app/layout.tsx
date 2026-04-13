@@ -86,10 +86,9 @@ export default async function RootLayout({
             <PeerProvider>
                 <SidebarProvider>
                     <AppSidebar className="border-r-main border-r"/>
-                    <div className="flex flex-col h-full w-full overflow-hidden">
-                        <div className="flex items-center gap-2 px-6 pt-6 shrink-0">
-                            <SidebarTrigger/>
-                        </div>
+                    <div className="flex flex-col h-full w-full overflow-hidden relative">
+                        <SidebarTrigger
+                            className="absolute top-2 left-2 z-50 bg-background/50 backdrop-blur shadow-sm border rounded-md"/>
                         {children}
                     </div>
                     {showDocDialog && (

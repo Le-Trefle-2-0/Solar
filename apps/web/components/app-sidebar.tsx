@@ -14,9 +14,10 @@ import {
     Mic,
     MicOff,
     PhoneOff,
+    Shield,
     ShieldUser,
     Signal,
-    Users
+    Users,
 } from "lucide-react"
 import {NavProjects} from "@/components/nav-projects"
 import {
@@ -36,13 +37,10 @@ import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/
 import Image from "next/image";
 import {apiFetch} from "@/lib/api";
 import logo from "@/public/logo.svg";
-import dynamic from "next/dynamic";
 import {Socket} from "socket.io-client";
 import {useSocket} from "@/context/Socket";
 import {usePeer} from "@/context/VoicePeer";
-// Disable SSR for UserButton to avoid hydration mismatches originating from
-// client-only behavior (Radix IDs, image load state, timers, etc.).
-const UserButton = dynamic(() => import("@daveyplate/better-auth-ui").then(m => m.UserButton), {ssr: false});
+import {UserButton} from "@/components/user-button";
 
 export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
     const {peerInstance, isMuted, toggleMute, stopCall, connectedUsers, netQuality, rttMs, lossPct} = usePeer();
@@ -87,8 +85,14 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
         },
         {
             name: "Utilisateurs",
-            url: "/app/admin",
+            url: "/app/admin/users",
             icon: ShieldUser,
+            adminOnly: true,
+        },
+        {
+            name: "Rôles",
+            url: "/app/admin/roles",
+            icon: Shield,
             adminOnly: true,
         },
         {
@@ -279,8 +283,7 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
                         <div className="h-full rounded-md border border-transparent bg-transparent"/>
                     )}
                 </div>
-                <UserButton
-                    className="w-full bg-white text-neutral-700 hover:bg-gray-50"/>
+                <UserButton/>
             </SidebarFooter>
         </Sidebar>
     )

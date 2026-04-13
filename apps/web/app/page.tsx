@@ -22,6 +22,9 @@ export default async function Home() {
         headers: await headers(),
     });
 
+    // Onboarding: ne pas rediriger d'ici, laisser la page d'accueil publique
+    // La redirection se fera dans la page d'authentification si nécessaire
+
     return (
         <div className="flex min-h-screen flex-col">
             <PublicHeader session={session}/>

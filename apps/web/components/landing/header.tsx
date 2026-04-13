@@ -3,12 +3,15 @@
 import Link from "next/link";
 import {Button} from "@/components/ui/button";
 import Image from "next/image";
+import {useSession} from "@/lib/auth-client";
 import {useState} from "react";
 import {ContactDialog} from "./contact-dialog";
 import {Home, Mail, Menu, UserPlus} from "lucide-react";
 import {Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger,} from "@/components/ui/sheet";
 
-export function PublicHeader({session}: { session: any }) {
+export function PublicHeader({session: initialSession}: { session: any }) {
+    const {data: sessionData} = useSession();
+    const session = sessionData?.user ? sessionData : initialSession;
     const [contactOpen, setContactOpen] = useState(false);
 
     const NavItems = ({className = ""}: { className?: string }) => {

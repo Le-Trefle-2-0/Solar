@@ -5,10 +5,8 @@ import {getResendClient} from "@/lib/resend";
 import {renderEmailTemplate} from "@/lib/email-template";
 import {ac, admin, bot, manager, newsletterManager, training, volunteer} from "./permissions";
 // Namespace import to access optional plugins that may not exist in older versions
-import * as betterPlugins from "better-auth/plugins";
 import {
     admin as adminPlugin,
-    apiKey,
     bearer,
     emailOTP,
     jwt,
@@ -17,6 +15,8 @@ import {
     twoFactor,
     username
 } from "better-auth/plugins";
+import {apiKey} from "@better-auth/api-key";
+import {passkey} from "@better-auth/passkey";
 
 const pluginList: any[] = [
     emailOTP({
@@ -51,7 +51,6 @@ const pluginList: any[] = [
         },
         adminRoles: ['admin', 'manager'],
         defaultRole: 'admin',
-        // defaultRole: process.env.NODE_ENV === "production" ? "training" : "admin",
     }),
     organization(),
     twoFactor(),
@@ -63,22 +62,8 @@ const pluginList: any[] = [
     }),
     jwt(),
     bearer(),
+    passkey(),
 ];
-
-// Insert passkey plugin before openAPI if it exists and is a function
-if (typeof (betterPlugins as any).passkey === 'function') {
-    try {
-        pluginList.push((betterPlugins as any).passkey());
-        // eslint-disable-next-line no-console
-        console.log("[auth] passkey plugin enabled");
-    } catch (e) {
-        // eslint-disable-next-line no-console
-        console.warn("[auth] failed to initialize passkey plugin, continuing without it", e);
-    }
-} else {
-    // eslint-disable-next-line no-console
-    console.warn("[auth] passkey plugin not available in installed better-auth version; skipping");
-}
 
 // Always add OpenAPI at the end
 pluginList.push(openAPI());
@@ -229,7 +214,8 @@ export const auth = betterAuth({
     },
     hooks: {
         before: async (context) => {
-            if (context?.request?.url.includes("sign-up")) {
+            const path = (context as any)?.request?.url || (context as any)?.path || "";
+            if (path.includes("sign-up")) {
                 const userCount = await prisma.user.count();
                 if (userCount > 0) {
                     throw new Error("Registration is closed. Please contact an administrator.");
@@ -248,7 +234,6 @@ export const auth = betterAuth({
         discord: {
             clientId: process.env.DISCORD_CLIENT_ID as string,
             clientSecret: process.env.DISCORD_CLIENT_SECRET as string,
-            disableSignUp: true,
         }
     }
 });

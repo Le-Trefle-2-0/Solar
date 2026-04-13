@@ -26,7 +26,7 @@ export default async function TicketChat({
 
     return (
         <Page title={`Ticket #${ticket?.id || id}`} description={`Suivi de l'écoute sur le canal ${id}`}
-              className="p-0">
+              className="p-0" hideHeader>
             <Chat channelID={id as string} statusID={ticket?.status.id as number}/>
         </Page>
     );

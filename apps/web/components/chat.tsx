@@ -30,6 +30,9 @@ import {saveMessage} from "@/lib/messageManager";
 import {useSession} from "@/lib/auth-client";
 import {Socket} from "socket.io-client";
 import {
+    Avatar,
+    AvatarFallback,
+    AvatarImage,
     Button,
     Dialog,
     DialogContent,
@@ -1332,8 +1335,14 @@ export function Chat(props: { channelID: string, statusID: number }) {
                             className="mb-2 px-3 py-1 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full shadow-sm border border-gray-200 dark:border-gray-700 flex items-center gap-2 text-xs text-gray-700 dark:text-gray-200">
                             <div className="flex -space-x-2">
                                 {typingUsers.slice(0, 3).map(u => (
-                                    <img key={u.id} src={u.image || '/logo.svg'} alt={u.name}
-                                         className="w-5 h-5 rounded-full border border-white dark:border-gray-800 object-cover"/>
+                                    <Avatar key={u.id}
+                                            className="h-5 w-5 rounded-full border border-white dark:border-gray-800">
+                                        <AvatarImage src={u.image || ""} alt={u.name}/>
+                                        <AvatarFallback
+                                            className="rounded-full bg-primary text-[6px] text-primary-foreground font-bold">
+                                            {u.name?.slice(0, 2).toUpperCase() || "US"}
+                                        </AvatarFallback>
+                                    </Avatar>
                                 ))}
                             </div>
                             <span className="whitespace-nowrap">
@@ -1540,11 +1549,13 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                         key={user.id}
                                         className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                                     >
-                                        <img
-                                            src={user.image || "/logo.svg"}
-                                            alt={user.username}
-                                            className="w-8 h-8 rounded-lg object-cover"
-                                        />
+                                        <Avatar className="h-8 w-8 rounded-lg border">
+                                            <AvatarImage src={user.image || ""} alt={user.username}/>
+                                            <AvatarFallback
+                                                className="rounded-lg bg-primary text-primary-foreground font-bold">
+                                                {user.username?.slice(0, 2).toUpperCase() || "US"}
+                                            </AvatarFallback>
+                                        </Avatar>
                                         <span className="text-sm text-gray-900 dark:text-gray-100 truncate">
                                         {user.username}
                                       </span>

@@ -36,6 +36,7 @@ export const getMessages = async (
 
     const out: MsgWithID[] = [];
     for (const msg of raw) {
+        if (!msg.userId) continue;
         const user = await prisma.user.findUnique({where: {id: msg.userId}});
         const reactions = await prisma.reaction.findMany({where: {messageID: msg.id}});
         if (user) {
