@@ -2,6 +2,7 @@ import {auth} from "@/lib/auth";
 import {headers} from "next/headers";
 import {PublicHeader} from "@/components/landing/header";
 import {Hero} from "@/components/landing/hero";
+import {AboutSection} from "@/components/landing/about";
 import {Partners} from "@/components/landing/partners";
 import {DiscordSection} from "@/components/landing/discord";
 import {OrganizationTree} from "@/components/landing/organization";
@@ -21,16 +22,22 @@ export default async function Home() {
         headers: await headers(),
     });
 
+    // Onboarding: ne pas rediriger d'ici, laisser la page d'accueil publique
+    // La redirection se fera dans la page d'authentification si nécessaire
+
     return (
         <div className="flex min-h-screen flex-col">
             <PublicHeader session={session}/>
             <main className="flex-1">
                 <Hero/>
                 <ScrollReveal>
-                    <Partners/>
+                    <AboutSection/>
                 </ScrollReveal>
                 <ScrollReveal>
                     <DiscordSection/>
+                </ScrollReveal>
+                <ScrollReveal>
+                    <Partners/>
                 </ScrollReveal>
                 <ScrollReveal>
                     <OrganizationTree/>

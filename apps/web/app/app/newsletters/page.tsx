@@ -9,6 +9,7 @@ import {useRouter} from "next/navigation";
 import {format} from "date-fns";
 import {fr} from "date-fns/locale";
 import {toast} from "sonner";
+import {Page} from "@/components/ui";
 
 export default function NewslettersPage() {
     const [newsletters, setNewsletters] = useState<any[]>([]);
@@ -56,16 +57,11 @@ export default function NewslettersPage() {
     };
 
     return (
-        <div className="p-8 h-full overflow-y-auto">
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold flex items-center gap-2">
-                        <Mail className="h-8 w-8 text-primary"/>
-                        Gestion des Newsletters
-                    </h1>
-                    <p className="text-muted-foreground">Créez, éditez et programmez vos communications pour les
-                        bénévoles.</p>
-                </div>
+        <Page
+            title="Gestion des Newsletters"
+            description="Créez, éditez et programmez vos communications pour les bénévoles."
+        >
+            <div className="flex justify-end mb-6">
                 <Button onClick={createNewsletter} className="gap-2">
                     <Plus className="h-4 w-4"/> Nouvelle newsletter
                 </Button>
@@ -137,6 +133,6 @@ export default function NewslettersPage() {
                     ))}
                 </div>
             )}
-        </div>
+        </Page>
     );
 }

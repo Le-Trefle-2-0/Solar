@@ -2,6 +2,7 @@ import {auth} from "@/lib/auth";
 import {headers} from "next/headers";
 import {redirect} from "next/navigation";
 import {HistoryTable} from "./history-table";
+import {Page} from "@/components/ui";
 
 import {constructMetadata} from "@/lib/metadata";
 
@@ -25,9 +26,8 @@ export default async function HistoryPage() {
     }
 
     return (
-        <div className="container mx-auto p-6">
-            <h1 className="text-2xl font-bold mb-6">Historique des écoutes</h1>
+        <Page title="Historique des écoutes" description="Consultez les échanges passés et les statistiques">
             <HistoryTable/>
-        </div>
+        </Page>
     )
 }

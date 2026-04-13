@@ -14,6 +14,7 @@ import {
     useReactTable,
     VisibilityState,
 } from "@tanstack/react-table";
+import * as Icons from "lucide-react";
 import {
     ArrowUpDown,
     Check,
@@ -91,24 +92,18 @@ import {fr} from "date-fns/locale";
 import {Textarea} from "@/components/ui/textarea";
 import {Label} from "@/components/ui/label";
 
-const roles = [
-    {label: "Responsable de pôle/Admin", value: "admin"},
-    {label: "Référent Bénévoles Écoutants", value: "manager"},
-    {label: "Bénévole en Formation", value: "training"},
-    {label: "Bénévole Écoutant", value: "volunteer"},
-    {label: "Bot", value: "bot"},
-] as const
 const FormSchema = z.object({
     name: z.string(),
     email: z.string(),
-    roles: z.array(z.enum(["admin", "manager", "training", "volunteer", "bot"])).min(1),
+    roles: z.array(z.string()).min(1),
 });
 
 interface DataTableProps {
     data: DisplayAccount[];
+    availableRoles: { id: string, name: string, icon?: string }[];
 }
 
-export function UsersTable({data}: DataTableProps) {
+export function UsersTable({data, availableRoles}: DataTableProps) {
     const [users, setUsers] = useState<DisplayAccount[]>(data);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [allRenewalAlertOpen, setAllRenewalAlertOpen] = useState(false);
@@ -121,6 +116,12 @@ export function UsersTable({data}: DataTableProps) {
     const [columnVisibility, setColumnVisibility] =
         React.useState<VisibilityState>({});
     const [rowSelection, setRowSelection] = React.useState({});
+
+    const getRoleIcon = (roleName: string) => {
+        const role = availableRoles.find(r => r.name === roleName);
+        const Icon = (Icons as any)[role?.icon || "Shield"] || Icons.Shield;
+        return <Icon className="h-4 w-4"/>;
+    };
 
     const columns: ColumnDef<DisplayAccount>[] = [
         {
@@ -198,9 +199,22 @@ export function UsersTable({data}: DataTableProps) {
         },
         {
             accessorKey: "role",
-            header: () => <div className="text-right">Role</div>,
+            header: () => <div className="text-center">Rôles</div>,
             cell: ({row}) => {
-                return <div className="text-right">{row.getValue("role")}</div>;
+                const roles = String(row.getValue("role") || "")
+                    .split(",")
+                    .map((r) => r.trim())
+                    .filter(Boolean);
+                return (
+                    <div className="flex items-center justify-center gap-2">
+                        {roles.map((r, idx) => (
+                            <span key={r + idx} title={r}
+                                  className="inline-flex items-center justify-center rounded-md bg-muted px-1.5 py-1">
+                                {getRoleIcon(r)}
+                            </span>
+                        ))}
+                    </div>
+                );
             },
         },
         {
@@ -250,14 +264,8 @@ export function UsersTable({data}: DataTableProps) {
                 const [rejectType, setRejectType] = useState<'idCard' | 'casier' | null>(null);
                 const [rejectReasonText, setRejectReasonText] = useState("");
 
-                const roles = [
-                    {label: "Responsable de pôle/Admin", value: "admin"},
-                    {label: "Référent Bénévoles Écoutants", value: "manager"},
-                    {label: "Bénévole en Formation", value: "training"},
-                    {label: "Bénévole Écoutant", value: "volunteer"},
-                ] as const
                 const FormSchema = z.object({
-                    roles: z.array(z.enum(["admin", "manager", "training", "volunteer"]))
+                    roles: z.array(z.string())
                 });
 
                 async function onSubmit(formData: z.infer<typeof FormSchema>) {
@@ -277,7 +285,7 @@ export function UsersTable({data}: DataTableProps) {
                             )
                         );
 
-                        setDialogOpen(false);
+                        setEditDialogOpen(false);
                         toast("Rôles modifiés")
                         form.reset();
                     } catch (e: any) {
@@ -294,7 +302,7 @@ export function UsersTable({data}: DataTableProps) {
                 const form = useForm<z.infer<typeof FormSchema>>({
                     resolver: zodResolver(FormSchema),
                     defaultValues: {
-                        roles: (account.role || '').split(',').map(r => r.trim()).filter(Boolean) as ("admin" | "manager" | "training" | "volunteer")[],
+                        roles: (account.role || '').split(',').map(r => r.trim()).filter(Boolean),
                     },
                 });
 
@@ -396,9 +404,9 @@ export function UsersTable({data}: DataTableProps) {
                                                                         )}
                                                                     >
                                                                         {field.value && field.value.length > 0
-                                                                            ? roles
-                                                                                .filter((r) => (field.value as string[]).includes(r.value))
-                                                                                .map((r) => r.label)
+                                                                            ? availableRoles
+                                                                                .filter((r) => (field.value as string[]).includes(r.name))
+                                                                                .map((r) => r.name)
                                                                                 .join(', ')
                                                                             : "Sélectionner un ou plusieurs rôles"}
                                                                         <ChevronsUpDown className="opacity-50"/>
@@ -409,23 +417,23 @@ export function UsersTable({data}: DataTableProps) {
                                                                 <Command>
                                                                     <CommandList>
                                                                         <CommandGroup>
-                                                                            {roles.map((role) => {
-                                                                                const selected = ((field.value as string[]) || []).includes(role.value)
+                                                                            {availableRoles.map((role) => {
+                                                                                const selected = ((field.value as string[]) || []).includes(role.name)
                                                                                 return (
                                                                                     <CommandItem
-                                                                                        value={role.label}
-                                                                                        key={role.value}
+                                                                                        value={role.name}
+                                                                                        key={role.id}
                                                                                         onSelect={() => {
                                                                                             const current = new Set((field.value as string[]) || [])
-                                                                                            if (current.has(role.value)) {
-                                                                                                current.delete(role.value)
+                                                                                            if (current.has(role.name)) {
+                                                                                                current.delete(role.name)
                                                                                             } else {
-                                                                                                current.add(role.value)
+                                                                                                current.add(role.name)
                                                                                             }
                                                                                             form.setValue("roles", Array.from(current) as any, {shouldDirty: true})
                                                                                         }}
                                                                                     >
-                                                                                        {role.label}
+                                                                                        {role.name}
                                                                                         <Check
                                                                                             className={cn(
                                                                                                 "ml-auto",
@@ -917,9 +925,9 @@ export function UsersTable({data}: DataTableProps) {
                                                                     )}
                                                                 >
                                                                     {field.value && (field.value as string[]).length > 0
-                                                                        ? roles
-                                                                            .filter((r) => ((field.value as string[]) || []).includes(r.value))
-                                                                            .map((r) => r.label)
+                                                                        ? availableRoles
+                                                                            .filter((r) => ((field.value as string[]) || []).includes(r.name))
+                                                                            .map((r) => r.name)
                                                                             .join(', ')
                                                                         : "Sélectionner un ou plusieurs rôles"}
                                                                     <ChevronsUpDown className="opacity-50"/>
@@ -930,23 +938,23 @@ export function UsersTable({data}: DataTableProps) {
                                                             <Command>
                                                                 <CommandList>
                                                                     <CommandGroup>
-                                                                        {roles.map((role) => {
-                                                                            const selected = ((field.value as string[]) || []).includes(role.value)
+                                                                        {availableRoles.map((role) => {
+                                                                            const selected = ((field.value as string[]) || []).includes(role.name)
                                                                             return (
                                                                                 <CommandItem
-                                                                                    value={role.label}
-                                                                                    key={role.value}
+                                                                                    value={role.name}
+                                                                                    key={role.id}
                                                                                     onSelect={() => {
                                                                                         const current = new Set((field.value as string[]) || [])
-                                                                                        if (current.has(role.value)) {
-                                                                                            current.delete(role.value)
+                                                                                        if (current.has(role.name)) {
+                                                                                            current.delete(role.name)
                                                                                         } else {
-                                                                                            current.add(role.value)
+                                                                                            current.add(role.name)
                                                                                         }
                                                                                         form.setValue("roles", Array.from(current) as any, {shouldDirty: true})
                                                                                     }}
                                                                                 >
-                                                                                    {role.label}
+                                                                                    {role.name}
                                                                                     <Check
                                                                                         className={cn(
                                                                                             "ml-auto",
@@ -987,7 +995,7 @@ export function UsersTable({data}: DataTableProps) {
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {
                                     return (
-                                        <TableHead key={header.id}>
+                                        <TableHead key={header.id} className="text-center">
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(
@@ -1006,6 +1014,7 @@ export function UsersTable({data}: DataTableProps) {
                                 <TableRow
                                     key={row.id}
                                     data-state={row.getIsSelected() && "selected"}
+                                    className="hover:shadow-sm hover:-translate-y-[1px] transition-shadow"
                                 >
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell key={cell.id}>

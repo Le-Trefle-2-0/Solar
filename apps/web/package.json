@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "jspdf": "^3.0.4",
-    "jspdf-autotable": "^5.0.2"
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.7"
   }
 }

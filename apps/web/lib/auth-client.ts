@@ -1,12 +1,13 @@
 import {createAuthClient} from "better-auth/react";
 import {
     adminClient,
-    apiKeyClient,
     emailOTPClient,
     organizationClient,
     twoFactorClient,
     usernameClient
 } from "better-auth/client/plugins";
+import {passkeyClient} from "@better-auth/passkey/client";
+import {apiKeyClient} from "@better-auth/api-key/client";
 import {ac, admin, bot, manager, newsletterManager, training, volunteer} from "@/lib/permissions";
 
 
@@ -23,6 +24,7 @@ export const authClient = createAuthClient({
         }),
         organizationClient(),
         twoFactorClient(),
+        passkeyClient(),
         usernameClient(),
         apiKeyClient()
     ]

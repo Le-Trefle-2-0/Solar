@@ -1,4 +1,6 @@
-import 'dotenv/config';
+import {config} from 'dotenv';
+import path from 'path';
+import {fileURLToPath} from 'url';
 import {createServer, IncomingMessage, ServerResponse} from 'http';
 import {Server} from 'socket.io';
 import Redis from 'ioredis';
@@ -6,15 +8,21 @@ import {createAdapter} from '@socket.io/redis-adapter';
 import {createRemoteJWKSet, jwtVerify} from 'jose';
 import {createHmac} from 'crypto';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load .env from project root
+config({path: path.resolve(__dirname, '../../../.env')});
+
 const PORT = Number(process.env.WS_PORT || 5000);
 const HOST = process.env.WS_HOST || '0.0.0.0';
 // Better Auth JWKS lives on the web app; keep issuer public and JWKS fetch internal when available
 const AUTH_ISSUER = (process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/$/, '');
 if (!process.env.BETTER_AUTH_URL && !process.env.NEXT_PUBLIC_APP_URL) {
-    console.warn('BETTER_AUTH_URL or NEXT_PUBLIC_APP_URL is not set, falling back to http://localhost:3000');
+    console.warn('[ws] BETTER_AUTH_URL or NEXT_PUBLIC_APP_URL is not set, falling back to http://localhost:3000');
 }
 const INTERNAL_AUTH_URL = (process.env.INTERNAL_AUTH_URL || AUTH_ISSUER).replace(/\/$/, '');
-const CORS_ORIGIN = process.env.WS_CORS_ORIGIN || '*';
+const CORS_ORIGIN = process.env.WS_CORS_ORIGIN || process.env.NEXT_PUBLIC_APP_URL || '*';
 
 const httpServer = createServer();
 const io = new Server(httpServer, {

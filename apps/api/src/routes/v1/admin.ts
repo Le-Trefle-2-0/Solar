@@ -10,7 +10,8 @@ async function checkAdmin(req: any, reply: any) {
     }
 
     const user = await prisma.user.findUnique({where: {id: userId}});
-    const isAuthorized = (user?.role || "").split(",").some((r: string) => r === "admin" || r === "manager");
+    const userRoles = (user?.role || "").split(",");
+    const isAuthorized = userRoles.some((r: string) => r === "admin" || r === "manager");
 
     if (!user || !isAuthorized) {
         return reply.status(401).send('unauthorized');
@@ -19,6 +20,81 @@ async function checkAdmin(req: any, reply: any) {
 }
 
 export async function registerAdminRoutes(app: FastifyInstance) {
+    app.get('/v1/admin/roles', async (req, reply) => {
+        const admin = await checkAdmin(req, reply);
+        if (!admin) return;
+
+        const roles = await prisma.role.findMany({
+            orderBy: {weight: 'desc'}
+        });
+        return reply.send({roles});
+    });
+
+    app.post('/v1/admin/roles', async (req, reply) => {
+        const admin = await checkAdmin(req, reply);
+        if (!admin) return;
+
+        const {name, permissions, weight, icon} = req.body as {
+            name: string,
+            permissions: string,
+            weight: number,
+            icon?: string
+        };
+
+        // Hierarchy check: Non-admins can only manage roles with lower weight than their own highest role
+        const userRoles = (admin.role || "").split(",");
+        if (!userRoles.includes("admin")) {
+            const adminHighestRole = await prisma.role.findFirst({
+                where: {name: {in: userRoles}},
+                orderBy: {weight: 'desc'}
+            });
+
+            if (!adminHighestRole || weight >= adminHighestRole.weight) {
+                return reply.status(403).send('forbidden: cannot manage roles of equal or higher weight');
+            }
+
+            // Check permissions: cannot grant permissions the admin doesn't have
+            const adminPerms = JSON.parse(adminHighestRole.permissions || "[]") as string[];
+            const requestedPerms = JSON.parse(permissions || "[]") as string[];
+            if (requestedPerms.some(p => !adminPerms.includes(p))) {
+                return reply.status(403).send('forbidden: cannot grant permissions you do not have');
+            }
+        }
+
+        const role = await prisma.role.upsert({
+            where: {name},
+            update: {permissions, weight, icon},
+            create: {name, permissions, weight, icon}
+        });
+
+        return reply.send({role});
+    });
+
+    app.delete('/v1/admin/roles/:id', async (req, reply) => {
+        const admin = await checkAdmin(req, reply);
+        if (!admin) return;
+
+        const {id} = req.params as { id: string };
+
+        const roleToDelete = await prisma.role.findUnique({where: {id}});
+        if (!roleToDelete) return reply.status(404).send('role not found');
+
+        // Hierarchy check
+        const userRoles = (admin.role || "").split(",");
+        if (!userRoles.includes("admin")) {
+            const adminHighestRole = await prisma.role.findFirst({
+                where: {name: {in: userRoles}},
+                orderBy: {weight: 'desc'}
+            });
+
+            if (!adminHighestRole || roleToDelete.weight >= adminHighestRole.weight) {
+                return reply.status(403).send('forbidden: cannot delete roles of equal or higher weight');
+            }
+        }
+
+        await prisma.role.delete({where: {id}});
+        return reply.send({success: true});
+    });
     app.post('/v1/admin/users/:id/role', async (req, reply) => {
         const admin = await checkAdmin(req, reply);
         if (!admin) return;

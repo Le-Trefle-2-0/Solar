@@ -16,6 +16,8 @@ export const metadata = constructMetadata({
     description: "Rejoignez l'aventure Le Trèfle 2.0 et donnez de votre temps pour une cause qui a du sens. Découvrez nos opportunités de bénévolat.",
 });
 
+export const dynamic = "force-dynamic";
+
 export default async function BenevolesPage() {
     const recruitments = await getRecruitments();
     const session = await auth.api.getSession({

@@ -31,7 +31,7 @@ export async function initSocket(jwt: string): Promise<Socket | null> {
     } else if (typeof window !== 'undefined') {
         const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
         if (isLocal) {
-            base = 'http://localhost:5000';
+            base = 'http://localhost:3002';
         } else {
             // Attempt to derive a ws subdomain automatically (e.g., beta.example.com → ws.beta.example.com)
             const {protocol, hostname} = window.location;
@@ -40,7 +40,7 @@ export async function initSocket(jwt: string): Promise<Socket | null> {
             base = `${proto}${derivedHost}`;
         }
     }
-    if (!base) base = 'http://localhost:5000';
+    if (!base) base = 'http://localhost:3002';
 
     // socket.io expects http(s) origin; normalize ws(s) → http(s)
     if (base.startsWith('ws://')) base = 'http://' + base.slice('ws://'.length);
@@ -48,20 +48,28 @@ export async function initSocket(jwt: string): Promise<Socket | null> {
 
     // eslint-disable-next-line no-console
     console.log('[ws] connecting to', base);
-    const transportsEnv = (process.env.NEXT_PUBLIC_WS_TRANSPORTS || 'polling,websocket')
+    const transportsEnv = (process.env.NEXT_PUBLIC_WS_TRANSPORTS || 'websocket,polling')
         .split(',')
         .map(s => s.trim())
         .filter(Boolean);
+
+    // If we're on localhost and no explicit transport is set, prefer websocket
+    const finalTransports = transportsEnv.length > 0 ? transportsEnv : ['websocket', 'polling'];
+
     const rejectUnauth = (process.env.NEXT_PUBLIC_WS_REJECT_UNAUTHORIZED || '').toLowerCase();
-    const rejectUnauthorized = rejectUnauth ? rejectUnauth === 'true' : process.env.NODE_ENV === 'production';
+    const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+    const rejectUnauthorized = rejectUnauth ? rejectUnauth === 'true' : (process.env.NODE_ENV === 'production' && !isLocal);
     socket = io(base, {
         auth: {jwt},
-        transports: transportsEnv as any, // default to websocket only for stability
+        transports: finalTransports as any,
+        upgrade: true, // Allow upgrading from polling to websocket if it was downgraded
+        rememberUpgrade: true,
         withCredentials: true,
         reconnection: true,
         reconnectionAttempts: Infinity,
-        reconnectionDelay: 1000,
-        reconnectionDelayMax: 5000,
+        reconnectionDelay: 500,
+        reconnectionDelayMax: 3000,
+        randomizationFactor: 0.5,
         timeout: 20000,
         forceNew: false,
         rejectUnauthorized,
@@ -72,17 +80,24 @@ export async function initSocket(jwt: string): Promise<Socket | null> {
         // eslint-disable-next-line no-console
         console.log('[ws] connected', socket?.id);
     });
-    socket.on('connect_error', (err) => {
+    const onConnectError = (err: any) => {
         // eslint-disable-next-line no-console
-        console.error('[ws] connect_error', err?.message || err);
-    });
+        console.error('[ws] connect_error', err?.message || err, {
+            base,
+            transport: socket?.io?.engine?.transport?.name,
+            auth: !!jwt
+        });
+    };
+    socket.on('connect_error', onConnectError);
     socket.on('error', (err) => {
         // eslint-disable-next-line no-console
         console.error('[ws] error', err);
     });
     socket.io.on('reconnect_attempt', (attempt) => {
         // eslint-disable-next-line no-console
-        console.warn('[ws] reconnect_attempt', attempt);
+        console.warn('[ws] reconnect_attempt', attempt, {
+            transport: socket?.io?.engine?.transport?.name
+        });
     });
     socket.io.on('reconnect', (n) => {
         // eslint-disable-next-line no-console

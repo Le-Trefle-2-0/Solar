@@ -4,6 +4,7 @@ import {headers} from "next/headers";
 import {redirect} from "next/navigation";
 
 import {constructMetadata} from "@/lib/metadata";
+import {Page} from "@/components/ui";
 
 export const metadata = constructMetadata({
     title: "Historique du Salon",
@@ -29,6 +30,8 @@ export default async function HistoryDetailPage({
     const {channelId} = await params;
 
     return (
-        <HistoryChat channelId={channelId}/>
+        <Page title="Historique du Salon" description={`Canal: ${channelId}`} className="p-0">
+            <HistoryChat channelId={channelId}/>
+        </Page>
     );
 }

@@ -18,7 +18,12 @@ import {Button} from "@/components/ui/button";
 import {toast} from "sonner";
 import {submitDocumentsAction} from "@/app/actions/users";
 import {authClient} from "@/lib/auth-client";
-import {Check, Upload} from "lucide-react";
+import {CalendarIcon, Check, Upload} from "lucide-react";
+import {Calendar} from "@/components/ui/calendar";
+import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
+import {cn} from "@/lib/utils";
+import {format} from "date-fns";
+import {fr} from "date-fns/locale";
 
 const docSchema = z.object({
     firstName: z.string().min(1, "Prénom requis").optional().or(z.literal("")),
@@ -99,6 +104,17 @@ export function DocumentSubmissionDialog({
         if (!res.ok) throw new Error("Failed to upload file");
         const data = await res.json();
         return data.id;
+    };
+
+    const truncateFileName = (name: string, maxLength = 24) => {
+        if (name.length <= maxLength) return name;
+        const extension = name.split('.').pop();
+        const nameWithoutExtension = name.substring(0, name.lastIndexOf('.'));
+        const charsToShow = maxLength - (extension?.length || 0) - 5;
+        if (charsToShow <= 0) return name.substring(0, maxLength - 3) + '...';
+        const front = nameWithoutExtension.substring(0, Math.ceil(charsToShow / 2) + 2);
+        const back = nameWithoutExtension.substring(nameWithoutExtension.length - Math.floor(charsToShow / 2));
+        return `${front}...${back}.${extension}`;
     };
 
     async function onSubmit(values: z.infer<typeof docSchema>) {
@@ -205,11 +221,42 @@ export function DocumentSubmissionDialog({
                                     control={form.control}
                                     name="birthDate"
                                     render={({field}) => (
-                                        <FormItem>
+                                        <FormItem className="flex flex-col">
                                             <FormLabel>Date de naissance</FormLabel>
-                                            <FormControl>
-                                                <Input type="date" {...field} />
-                                            </FormControl>
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <FormControl>
+                                                        <Button
+                                                            variant={"outline"}
+                                                            className={cn(
+                                                                "w-full pl-3 text-left font-normal",
+                                                                !field.value && "text-muted-foreground"
+                                                            )}
+                                                        >
+                                                            {field.value ? (
+                                                                format(new Date(field.value), "PPP", {locale: fr})
+                                                            ) : (
+                                                                <span>Choisir une date</span>
+                                                            )}
+                                                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50"/>
+                                                        </Button>
+                                                    </FormControl>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-auto p-0" align="start">
+                                                    <Calendar
+                                                        mode="single"
+                                                        selected={field.value ? new Date(field.value) : undefined}
+                                                        onSelect={(date) => field.onChange(date?.toISOString().split('T')[0])}
+                                                        disabled={(date) =>
+                                                            date > new Date() || date < new Date("1900-01-01")
+                                                        }
+                                                        captionLayout="dropdown"
+                                                        fromYear={1900}
+                                                        toYear={new Date().getFullYear()}
+                                                        initialFocus
+                                                    />
+                                                </PopoverContent>
+                                            </Popover>
                                             <FormMessage/>
                                         </FormItem>
                                     )}
@@ -286,14 +333,16 @@ export function DocumentSubmissionDialog({
                                             className="w-full"
                                             onClick={() => document.getElementById('idCardInput')?.click()}
                                         >
-                                            <Upload className="mr-2 h-4 w-4"/>
-                                            {idCardFile ? idCardFile.name : "Choisir un fichier"}
+                                            <Upload className="mr-2 h-4 w-4 shrink-0"/>
+                                            <span className="truncate">
+                                                {idCardFile ? truncateFileName(idCardFile.name) : "Choisir un fichier"}
+                                            </span>
                                         </Button>
                                         <input
                                             id="idCardInput"
                                             type="file"
                                             className="hidden"
-                                            accept="image/*,.pdf"
+                                            accept=".pdf,image/png,image/jpeg,image/jpg"
                                             onChange={(e) => setIdCardFile(e.target.files?.[0] || null)}
                                         />
                                     </div>
@@ -316,14 +365,16 @@ export function DocumentSubmissionDialog({
                                             className="w-full"
                                             onClick={() => document.getElementById('casierInput')?.click()}
                                         >
-                                            <Upload className="mr-2 h-4 w-4"/>
-                                            {casierFile ? casierFile.name : "Choisir un fichier"}
+                                            <Upload className="mr-2 h-4 w-4 shrink-0"/>
+                                            <span className="truncate">
+                                                {casierFile ? truncateFileName(casierFile.name) : "Choisir un fichier"}
+                                            </span>
                                         </Button>
                                         <input
                                             id="casierInput"
                                             type="file"
                                             className="hidden"
-                                            accept="image/*,.pdf"
+                                            accept=".pdf,image/png,image/jpeg,image/jpg"
                                             onChange={(e) => setCasierFile(e.target.files?.[0] || null)}
                                         />
                                     </div>

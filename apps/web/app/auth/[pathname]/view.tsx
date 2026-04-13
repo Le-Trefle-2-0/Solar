@@ -1,6 +1,15 @@
 "use client"
 
-import {AuthCard} from "@daveyplate/better-auth-ui"
+import {useEffect, useState} from "react";
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
+import {authClient, signIn} from "@/lib/auth-client";
+import {toast} from "sonner";
+import {useRouter} from "next/navigation";
+import {Fingerprint, Loader2} from "lucide-react";
+import Link from "next/link";
 
 export const locale = {
     "SLUG_DOES_NOT_MATCH": "Le slug ne correspond pas",
@@ -368,10 +377,293 @@ export const locale = {
 }
 
 export function AuthView({pathname}: { pathname: string }) {
+    const isSignUp = pathname === "sign-up";
+    const router = useRouter();
+    const [loading, setLoading] = useState(false);
+    const [twoFactor, setTwoFactor] = useState(false);
+    const [otp, setOtp] = useState("");
+    const [form, setForm] = useState({
+        name: "",
+        email: "",
+        password: "",
+        confirmPassword: ""
+    });
+
+    useEffect(() => {
+        // Force refresh session state on auth page to avoid ghost sessions
+        authClient.getSession().then(({data}) => {
+            if (data && !isSignUp) {
+                // If we are on sign-in but have a session, redirect to app
+                router.push("/app");
+            }
+        });
+    }, [isSignUp, router]);
+
+    const handleSignUp = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (form.password !== form.confirmPassword) {
+            toast.error("Les mots de passe ne correspondent pas");
+            return;
+        }
+
+        setLoading(true);
+        const {error} = await authClient.signUp.email({
+            email: form.email,
+            password: form.password,
+            name: form.name,
+            callbackURL: "/app"
+        }, {
+            onRequest: () => setLoading(true),
+            onResponse: () => setLoading(false),
+            onError: (ctx) => {
+                toast.error(ctx.error.message || "Une erreur est survenue");
+            },
+            onSuccess: () => {
+                toast.success("Compte créé avec succès !");
+                router.push("/app");
+            }
+        });
+        setLoading(false);
+    };
+
+    const handleSignIn = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        const {error} = await signIn.email({
+            email: form.email,
+            password: form.password,
+            callbackURL: "/app"
+        }, {
+            onRequest: () => setLoading(true),
+            onResponse: () => setLoading(false),
+            onError: (ctx) => {
+                if (ctx.error.status === 403 && ctx.error.message?.includes("two-factor")) {
+                    setTwoFactor(true);
+                } else {
+                    toast.error(ctx.error.message || "Email ou mot de passe incorrect");
+                }
+            },
+            onSuccess: () => {
+                toast.success("Connecté avec succès !");
+                router.push("/app");
+            }
+        });
+        setLoading(false);
+    };
+
+    const handleTwoFactorVerify = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        const {error} = await authClient.twoFactor.verifyTotp({
+            code: otp,
+        }, {
+            onError: (ctx) => {
+                toast.error(ctx.error.message || "Code invalide");
+            },
+            onSuccess: () => {
+                toast.success("Connecté avec succès !");
+                router.push("/app");
+            }
+        });
+        setLoading(false);
+    };
+
+    const handlePasskeySignIn = async () => {
+        setLoading(true);
+        const {error} = await authClient.signIn.passkey();
+        setLoading(false);
+
+        if (error) {
+            toast.error(error.message || "Erreur lors de la connexion via clé de sécurité");
+        } else {
+            toast.success("Connecté avec succès !");
+            router.push("/app");
+        }
+    };
+
+    const handleDiscordSignIn = async () => {
+        await signIn.social({
+            provider: "discord",
+            callbackURL: "/app"
+        });
+    };
+
+    const cardTitle = twoFactor ? "Vérification A2F" : (isSignUp ? "Créer un compte" : "Se connecter");
+    const cardDescription = twoFactor
+        ? "Entrez le code de votre application d'authentification"
+        : (isSignUp
+            ? "Entrez vos informations pour créer votre compte Solar"
+            : "Entrez votre e-mail pour vous connecter à votre compte");
 
     return (
-        <main className="flex grow flex-col items-center justify-center gap-4 p-4">
-            <AuthCard pathname={pathname} redirectTo="/app" localization={locale}/>
+        <main className="flex grow flex-col items-center justify-center p-4 w-full">
+            <div className="w-full max-w-[400px]">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>{cardTitle}</CardTitle>
+                        <CardDescription>{cardDescription}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        {twoFactor ? (
+                            <form onSubmit={handleTwoFactorVerify} className="space-y-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="otp">Code de vérification</Label>
+                                    <Input
+                                        id="otp"
+                                        placeholder="000000"
+                                        required
+                                        value={otp}
+                                        onChange={(e) => setOtp(e.target.value)}
+                                        maxLength={6}
+                                        autoFocus
+                                    />
+                                </div>
+                                <Button type="submit" className="w-full" disabled={loading}>
+                                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
+                                    Vérifier
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    className="w-full"
+                                    onClick={() => setTwoFactor(false)}
+                                >
+                                    Retour
+                                </Button>
+                            </form>
+                        ) : (
+                            <>
+                                <form onSubmit={isSignUp ? handleSignUp : handleSignIn} className="space-y-4">
+                                    {isSignUp && (
+                                        <div className="space-y-2">
+                                            <Label htmlFor="name">Nom complet</Label>
+                                            <Input
+                                                id="name"
+                                                placeholder="Jean Dupont"
+                                                required
+                                                value={form.name}
+                                                onChange={(e) => setForm({...form, name: e.target.value})}
+                                            />
+                                        </div>
+                                    )}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="email">Email</Label>
+                                        <Input
+                                            id="email"
+                                            type="email"
+                                            placeholder="jean@exemple.fr"
+                                            required
+                                            value={form.email}
+                                            onChange={(e) => setForm({...form, email: e.target.value})}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <div className="flex items-center justify-between">
+                                            <Label htmlFor="password">Mot de passe</Label>
+                                            {!isSignUp && (
+                                                <Link
+                                                    href="/auth/forgot-password"
+                                                    className="text-xs text-primary hover:underline"
+                                                >
+                                                    Mot de passe oublié ?
+                                                </Link>
+                                            )}
+                                        </div>
+                                        <Input
+                                            id="password"
+                                            type="password"
+                                            placeholder="••••••••"
+                                            required
+                                            value={form.password}
+                                            onChange={(e) => setForm({...form, password: e.target.value})}
+                                        />
+                                    </div>
+                                    {isSignUp && (
+                                        <div className="space-y-2">
+                                            <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+                                            <Input
+                                                id="confirmPassword"
+                                                type="password"
+                                                placeholder="••••••••"
+                                                required
+                                                value={form.confirmPassword}
+                                                onChange={(e) => setForm({...form, confirmPassword: e.target.value})}
+                                            />
+                                        </div>
+                                    )}
+                                    <Button type="submit" className="w-full" disabled={loading}>
+                                        {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
+                                        {isSignUp ? "S'inscrire" : "Se connecter"}
+                                    </Button>
+                                </form>
+
+                                {!isSignUp && (
+                                    <div className="space-y-2">
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            className="w-full gap-2"
+                                            onClick={handlePasskeySignIn}
+                                            disabled={loading}
+                                        >
+                                            <Fingerprint className="h-4 w-4"/>
+                                            Clé de sécurité
+                                        </Button>
+                                    </div>
+                                )}
+
+                                <div className="relative">
+                                    <div className="absolute inset-0 flex items-center">
+                                        <span className="w-full border-t"/>
+                                    </div>
+                                    <div className="relative flex justify-center text-xs uppercase">
+                                        <span className="bg-background px-2 text-muted-foreground">
+                                            Ou continuer avec
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <Button
+                                    variant="outline"
+                                    type="button"
+                                    className="w-full"
+                                    onClick={handleDiscordSignIn}
+                                    disabled={loading}
+                                >
+                                    <svg className="mr-2 h-4 w-4" aria-hidden="true" focusable="false" data-prefix="fab"
+                                         data-icon="discord" role="img" xmlns="http://www.w3.org/2000/svg"
+                                         viewBox="0 0 640 512">
+                                        <path fill="currentColor"
+                                              d="M524.5 448c-51.5 0-93.7-45.4-93.7-101.2s41.3-101.2 93.7-101.2c52.4 0 93.7 45.4 93.7 101.2s-41.3 101.2-93.7 101.2zm-209.1 0c-51.5 0-93.7-45.4-93.7-101.2s41.3-101.2 93.7-101.2c52.4 0 93.7 45.4 93.7 101.2s-41.3 101.2-93.7 101.2zM615.7 38.8c-47.5-22.1-98.3-36.2-152.1-40.6-.6 1.1-1.3 2.7-2 4.4-60.4-9.2-122.3-9.2-182.7 0-.7-1.7-1.4-3.2-2-4.4-53.8 4.4-104.6 18.5-152.1 40.6-63.1 94.4-80.4 203.2-73.4 309.1 42.1 31.1 92.2 56.4 146 72.8 12.6-17.3 23.5-36 32.7-55.7-15.6-5.9-30.5-13.1-44.5-21.3 3.7-2.7 7.4-5.6 10.9-8.5 103.7 48 215.7 48 319.4 0 3.5 2.9 7.2 5.8 10.9 8.5-14 8.2-28.9 15.4-44.5 21.3 9.2 19.7 20.1 38.4 32.7 55.7 53.8-16.4 103.9-41.7 146-72.8 8.4-121.1-16.7-230.1-73.4-309.1z"></path>
+                                    </svg>
+                                    Discord
+                                </Button>
+                            </>
+                        )}
+                    </CardContent>
+                    {!twoFactor && (
+                        <CardFooter className="flex justify-center">
+                            <div className="text-center text-sm text-muted-foreground">
+                                {isSignUp ? (
+                                    <>
+                                        Déjà un compte ?{" "}
+                                        <Link href="/auth/sign-in" className="text-primary hover:underline font-medium">
+                                            Se connecter
+                                        </Link>
+                                    </>
+                                ) : (
+                                    <>
+                                        Vous n'avez pas de compte ?{" "}
+                                        <Link href="/auth/sign-up" className="text-primary hover:underline font-medium">
+                                            S'inscrire
+                                        </Link>
+                                    </>
+                                )}
+                            </div>
+                        </CardFooter>
+                    )}
+                </Card>
+            </div>
         </main>
-    )
+    );
 }

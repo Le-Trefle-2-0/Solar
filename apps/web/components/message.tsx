@@ -3,6 +3,9 @@ import type {Reaction} from "@prisma/client";
 import {apiFetch} from "@/lib/api";
 import React, {useEffect, useState} from "react";
 import {
+    Avatar,
+    AvatarFallback,
+    AvatarImage,
     Badge,
     Button,
     Dialog,
@@ -319,14 +322,12 @@ export function Message(props: {
                         </div>
                         <div className="w-12 flex-shrink-0 flex flex-col items-center justify-start pt-1">
                             {showAuthorInfo ? (
-                                <Image
-                                    src={profilePicture ? profilePicture : '/logo.svg'}
-                                    alt="Image de profil"
-                                    width={48}
-                                    height={48}
-                                    className="rounded-xl max-h-[48px]"
-                                    unoptimized
-                                />
+                                <Avatar className="h-12 w-12 rounded-xl border">
+                                    <AvatarImage src={profilePicture || ""} alt={authorName}/>
+                                    <AvatarFallback className="rounded-xl bg-primary text-primary-foreground font-bold">
+                                        {authorName?.slice(0, 2).toUpperCase() || "US"}
+                                    </AvatarFallback>
+                                </Avatar>
                             ) : (
                                 <span className="hidden group-hover:block text-xs text-gray-500">
                             {dateObj.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
@@ -343,14 +344,13 @@ export function Message(props: {
                                     }}
                                     title={`Aller au message #${replyOf.id}`}
                                 >
-                                    <Image
-                                        src={replyOf.image || '/logo.svg'}
-                                        alt="Avatar"
-                                        width={16}
-                                        height={16}
-                                        className="rounded-md flex-shrink-0"
-                                        unoptimized
-                                    />
+                                    <Avatar className="h-4 w-4 rounded-md flex-shrink-0">
+                                        <AvatarImage src={replyOf.image || ""} alt={replyOf.authorName}/>
+                                        <AvatarFallback
+                                            className="rounded-md bg-primary text-[8px] text-primary-foreground font-bold">
+                                            {replyOf.authorName?.slice(0, 2).toUpperCase() || "US"}
+                                        </AvatarFallback>
+                                    </Avatar>
                                     <span className="font-medium text-gray-700">{replyOf.authorName}</span>
                                     <span
                                         className="truncate">{replyOf.content.length > 60 ? `${replyOf.content.slice(0, 60)}…` : replyOf.content}</span>

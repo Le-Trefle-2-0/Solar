@@ -23,6 +23,7 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import ReactMarkdown from "react-markdown";
 import {FieldManager} from "./field-manager";
 import {Checkbox} from "@/components/ui/checkbox";
+import {IconPicker} from "@/components/ui";
 
 const DEFAULT_FIELDS: RecruitmentField[] = [
     {name: "firstName", label: "Prénom", type: "text", required: true},
@@ -130,10 +131,12 @@ export function RecruitmentDialog({open, onOpenChange, recruitment, onSave}: Rec
                                 name="icon"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>Icône (Nom Lucide)</FormLabel>
+                                        <FormLabel>Icône</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="Users, Heart, MessageSquare..." {...field}
-                                                   value={field.value || ""}/>
+                                            <IconPicker
+                                                value={field.value || ""}
+                                                onChange={field.onChange}
+                                            />
                                         </FormControl>
                                         <FormMessage/>
                                     </FormItem>

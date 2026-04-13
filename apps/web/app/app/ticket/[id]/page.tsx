@@ -2,6 +2,7 @@ import {Chat} from "@/components/chat";
 import prisma from "@/lib/prisma";
 
 import {constructMetadata} from "@/lib/metadata";
+import {Page} from "@/components/ui";
 
 export const metadata = constructMetadata({
     title: "Détails de l'écoute",
@@ -24,7 +25,9 @@ export default async function TicketChat({
     })
 
     return (
-
-        <Chat channelID={id as string} statusID={ticket?.status.id as number}/>
+        <Page title={`Ticket #${ticket?.id || id}`} description={`Suivi de l'écoute sur le canal ${id}`}
+              className="p-0" hideHeader>
+            <Chat channelID={id as string} statusID={ticket?.status.id as number}/>
+        </Page>
     );
 }

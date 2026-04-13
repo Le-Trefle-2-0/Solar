@@ -28,7 +28,7 @@ html, body {
     --secondary: #8cc088;
     --secondary-foreground: #202020;
     --muted: #f6f6f6;
-    --muted-foreground: oklch(0.556 0 0);
+    --muted-foreground: #202020 !important;
     --destructive: oklch(0.577 0.245 27.325);
     --border: oklch(0.922 0 0);
     --input: oklch(0.922 0 0);
@@ -107,7 +107,7 @@ html, body {
     --secondary: #8cc088;
     --secondary-foreground: #202020;
     --muted: #2a2a2a;
-    --muted-foreground: oklch(0.708 0 0);
+    --muted-foreground: #f6f6f6 !important;
     --accent: #8cc088;
     --accent-foreground: #202020;
     --destructive: oklch(0.704 0.191 22.216);
@@ -141,6 +141,28 @@ html, body {
     h1, h2, h3, h4, h5, h6 {
         font-family: var(--font-barlow);
         font-weight: 600 !important;
+    }
+
+    .text-muted-foreground {
+        color: var(--muted-foreground) !important;
+    }
+
+    /* Fix for auth card separator overflow */
+    [data-slot="separator"] {
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    [data-slot="separator"][data-orientation="horizontal"] {
+        width: 0 !important;
+        flex-grow: 1 !important;
+        min-width: 0 !important;
+    }
+
+    /* Target the container in the AuthCard */
+    .flex.items-center.gap-2:has(> [data-slot="separator"]) {
+        width: 100% !important;
+        justify-content: center !important;
     }
 }
 
