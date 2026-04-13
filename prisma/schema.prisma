@@ -209,7 +209,7 @@ model TwoFactor {
   userId      String
   user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("twoFactor")
+  @@map("two_factor")
 }
 
 model Channel {
@@ -221,6 +221,7 @@ model Channel {
   Event Event[]
 
   @@unique([id, name])
+  @@map("channel")
 }
 
 model Message {
@@ -237,7 +238,7 @@ model Message {
 
   Reaction Reaction[]
 
-  @@map("Message")
+  @@map("message")
 }
 
 model Reaction {
@@ -247,6 +248,8 @@ model Reaction {
   message   Message @relation(fields: [messageID], references: [id])
   userID    String
   user      User    @relation(fields: [userID], references: [id])
+
+  @@map("reaction")
 }
 
 model Event {
@@ -263,6 +266,8 @@ model Event {
   channel   Channel @relation(fields: [channelID], references: [id])
   roleSlots     RoleSlot[]
   registrations EventRegistration[]
+
+  @@map("event")
 }
 
 model RoleSlot {
@@ -273,6 +278,8 @@ model RoleSlot {
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
   eventId       String
   registrations EventRegistration[]
+
+  @@map("role_slot")
 }
 
 model EventRegistration {
@@ -287,6 +294,7 @@ model EventRegistration {
   eventId      String?
 
   @@unique([userId, roleSlotId])
+  @@map("event_registration")
 }
 
 model Ticket {
@@ -309,7 +317,7 @@ model Ticket {
   info         String?
   voice Boolean @default(false)
 
-  @@map("Ticket")
+  @@map("ticket")
 }
 
 model TicketStatus {
@@ -319,6 +327,7 @@ model TicketStatus {
   ticket Ticket[]
 
   @@unique([name, label])
+  @@map("ticket_status")
 }
 
 model Apikey {
@@ -365,7 +374,7 @@ model RouteProtection {
   isAuthenticatedProtected Boolean
 
   @@unique([route])
-  @@map("routeProtection")
+  @@map("route_protection")
 }
 
 model Passkey {
@@ -396,10 +405,12 @@ model Recruitment {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  @@map("Recruitment")
+  @@map("recruitment")
 }
 
 model Image {
   id   String @id @default(cuid())
   link String @db.LongText
+
+  @@map("image")
 }
