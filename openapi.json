@@ -59,6 +59,10 @@
           "displayUsername": {
             "type": "string",
             "nullable": true
+          },
+          "newsletterSubscription": {
+            "type": "boolean",
+            "default": false
           }
         }
       },
@@ -180,6 +184,60 @@
             "nullable": true
           }
         }
+      },
+      "Event": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "roleSlots": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoleSlot"
+            }
+          }
+        }
+      },
+      "RoleSlot": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "goalCount": {
+            "type": "integer"
+          },
+          "part": {
+            "type": "string",
+            "enum": [
+              "first",
+              "second"
+            ],
+            "nullable": true
+          }
+        }
       }
     }
   },
@@ -195,9 +253,118 @@
     }
   ],
   "paths": {
+    "/v1/image": {
+      "post": {
+        "summary": "Enregistrer le lien d'une image",
+        "tags": [
+          "Images"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "image"
+                ],
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "description": "URL de l'image"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Image enregistrée"
+          },
+          "401": {
+            "description": "Non autorisé"
+          }
+        }
+      }
+    },
+    "/v1/keys/check": {
+      "post": {
+        "summary": "Vérifier la validité d'une clé API",
+        "tags": [
+          "Keys"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "key"
+                ],
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Résultat de la vérification"
+          },
+          "400": {
+            "description": "Corps invalide"
+          }
+        }
+      }
+    },
+    "/check-key": {
+      "post": {
+        "summary": "Vérifier une clé API (alias compatible bot)",
+        "tags": [
+          "Keys"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "key"
+                ],
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Clé valide, utilisateur renvoyé"
+          },
+          "401": {
+            "description": "Clé invalide"
+          },
+          "404": {
+            "description": "Utilisateur non trouvé"
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "summary": "Vérification de l'état du serveur",
+        "tags": [
+          "System"
+        ],
         "responses": {
           "200": {
             "description": "Serveur opérationnel"
@@ -208,6 +375,9 @@
     "/v1/users/{id}": {
       "get": {
         "summary": "Récupérer un utilisateur par ID",
+        "tags": [
+          "Users"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -241,6 +411,9 @@
     "/v1/messages": {
       "post": {
         "summary": "Envoyer un nouveau message",
+        "tags": [
+          "Messages"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -284,6 +457,9 @@
     "/v1/messages/{channelId}": {
       "get": {
         "summary": "Récupérer l'historique des messages d'un salon",
+        "tags": [
+          "Messages"
+        ],
         "parameters": [
           {
             "name": "channelId",
@@ -330,6 +506,9 @@
     "/v1/message/{id}": {
       "put": {
         "summary": "Modifier un message",
+        "tags": [
+          "Messages"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -384,6 +563,9 @@
     "/v1/reaction": {
       "post": {
         "summary": "Ajouter ou supprimer une réaction",
+        "tags": [
+          "Messages"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -433,6 +615,9 @@
     "/v1/tickets": {
       "get": {
         "summary": "Lister les tickets (selon permissions)",
+        "tags": [
+          "Tickets"
+        ],
         "responses": {
           "200": {
             "description": "Liste des tickets",
@@ -461,9 +646,46 @@
     "/v1/tickets/history": {
       "get": {
         "summary": "Historique des tickets fermés/commentés",
+        "tags": [
+          "Tickets"
+        ],
         "responses": {
           "200": {
-            "description": "Historique des tickets"
+            "description": "Historique des tickets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "tickets": {
+                      "type": "array",
+                      "items": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/Ticket"
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "duration": {
+                                "type": "integer",
+                                "description": "Duration in seconds"
+                              },
+                              "user": {
+                                "$ref": "#/components/schemas/User"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -471,6 +693,9 @@
     "/v1/tickets/assign": {
       "post": {
         "summary": "Assigner un ticket à un utilisateur",
+        "tags": [
+          "Tickets"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -503,6 +728,9 @@
     "/v1/admin/roles": {
       "get": {
         "summary": "Lister tous les rôles",
+        "tags": [
+          "Admin"
+        ],
         "responses": {
           "200": {
             "description": "Liste des rôles",
@@ -565,6 +793,9 @@
     "/v1/admin/roles/{id}": {
       "delete": {
         "summary": "Supprimer un rôle",
+        "tags": [
+          "Admin"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -585,6 +816,9 @@
     "/v1/admin/users/{id}/role": {
       "post": {
         "summary": "Attribuer des rôles à un utilisateur",
+        "tags": [
+          "Admin"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -626,6 +860,9 @@
     "/v1/bot/status": {
       "get": {
         "summary": "Statut actuel du bot",
+        "tags": [
+          "Bot"
+        ],
         "responses": {
           "200": {
             "description": "Statut du bot renvoyé"
@@ -636,6 +873,9 @@
     "/v1/bot/setup": {
       "post": {
         "summary": "Configuration/Réinitialisation du bot",
+        "tags": [
+          "Bot"
+        ],
         "responses": {
           "200": {
             "description": "Bot configuré, clé API générée"
@@ -646,6 +886,9 @@
     "/v1/newsletters": {
       "get": {
         "summary": "Lister les newsletters",
+        "tags": [
+          "Newsletters"
+        ],
         "responses": {
           "200": {
             "description": "Liste des newsletters",
@@ -664,6 +907,9 @@
       },
       "post": {
         "summary": "Créer une newsletter",
+        "tags": [
+          "Newsletters"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -691,9 +937,37 @@
         }
       }
     },
+    "/v1/newsletters/volunteers/count": {
+      "get": {
+        "summary": "Nombre de bénévoles inscrits à la newsletter",
+        "tags": [
+          "Newsletters"
+        ],
+        "responses": {
+          "200": {
+            "description": "Nombre de bénévoles",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/newsletters/{id}": {
       "get": {
         "summary": "Récupérer une newsletter",
+        "tags": [
+          "Newsletters"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -712,6 +986,9 @@
       },
       "put": {
         "summary": "Mettre à jour une newsletter",
+        "tags": [
+          "Newsletters"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -761,6 +1038,9 @@
       },
       "delete": {
         "summary": "Supprimer une newsletter",
+        "tags": [
+          "Newsletters"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -778,9 +1058,35 @@
         }
       }
     },
+    "/v1/newsletters/{id}/unschedule": {
+      "post": {
+        "summary": "Annuler la planification d'une newsletter",
+        "tags": [
+          "Newsletters"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Planification annulée"
+          }
+        }
+      }
+    },
     "/v1/newsletters/{id}/send": {
       "post": {
         "summary": "Envoyer une newsletter immédiatement",
+        "tags": [
+          "Newsletters"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -801,6 +1107,9 @@
     "/v1/events": {
       "get": {
         "summary": "Lister tous les événements",
+        "tags": [
+          "Events"
+        ],
         "responses": {
           "200": {
             "description": "Liste des événements"
@@ -809,6 +1118,9 @@
       },
       "post": {
         "summary": "Créer un événement",
+        "tags": [
+          "Events"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -873,9 +1185,42 @@
         }
       }
     },
+    "/v1/events/getAvailable": {
+      "get": {
+        "summary": "Récupérer les utilisateurs éligibles pour un créneau",
+        "tags": [
+          "Events"
+        ],
+        "parameters": [
+          {
+            "name": "channelID",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lists",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Set to 'ineligible' for text/voice eligibility lists"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des utilisateurs ou listes d'inéligibilité"
+          }
+        }
+      }
+    },
     "/v1/auth/get-session": {
       "get": {
         "summary": "Récupérer la session utilisateur actuelle",
+        "tags": [
+          "Auth"
+        ],
         "responses": {
           "200": {
             "description": "Session active",
@@ -901,6 +1246,9 @@
     "/v1/widget/session": {
       "post": {
         "summary": "Initialiser ou récupérer une session de chat visiteur (Widget)",
+        "tags": [
+          "Widget"
+        ],
         "description": "Utilise les cookies pour maintenir la session du visiteur. Crée un nouveau ticket si aucun n'est actif.",
         "responses": {
           "200": {
@@ -944,6 +1292,9 @@
     "/v1/widget/close": {
       "post": {
         "summary": "Fermer la session du widget",
+        "tags": [
+          "Widget"
+        ],
         "responses": {
           "200": {
             "description": "Session fermée, cookies supprimés"
@@ -954,6 +1305,9 @@
     "/v1/ws/guest": {
       "post": {
         "summary": "Générer des identifiants d'invité pour le WebSocket",
+        "tags": [
+          "WebSocket"
+        ],
         "requestBody": {
           "required": true,
           "content": {
