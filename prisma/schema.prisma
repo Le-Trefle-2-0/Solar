@@ -270,7 +270,7 @@ model RoleSlot {
   role          String
   goalCount     Int
   part String?
-  event         Event               @relation(fields: [eventId], references: [id])
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
   eventId       String
   registrations EventRegistration[]
 }
@@ -279,11 +279,11 @@ model EventRegistration {
   id           String   @id @default(cuid())
   user         User     @relation(fields: [userId], references: [id])
   userId       String
-  roleSlot     RoleSlot @relation(fields: [roleSlotId], references: [id])
+  roleSlot RoleSlot @relation(fields: [roleSlotId], references: [id], onDelete: Cascade)
   roleSlotId   String
   registeredAt DateTime @default(now())
   status String @default("confirmed") // "confirmed", "pending"
-  Event        Event?   @relation(fields: [eventId], references: [id])
+  Event    Event?   @relation(fields: [eventId], references: [id], onDelete: Cascade)
   eventId      String?
 
   @@unique([userId, roleSlotId])
