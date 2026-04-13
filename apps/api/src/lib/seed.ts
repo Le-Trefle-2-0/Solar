@@ -1,4 +1,4 @@
-import {prisma} from './prisma.js';
+import {prisma} from '../prisma.js';
 
 export async function seedDefaultRoles() {
     console.log("[db] Ensuring default roles exist...");
