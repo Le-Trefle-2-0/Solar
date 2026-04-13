@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE `Message` MODIFY `content` LONGBLOB NOT NULL;
+ALTER TABLE `message` MODIFY `content` LONGBLOB NOT NULL;

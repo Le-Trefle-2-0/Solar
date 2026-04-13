@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE `routeProtection`
+CREATE TABLE `route_protection`
 (
     `id`                       VARCHAR(191) NOT NULL,
     `route`                    VARCHAR(191) NOT NULL,

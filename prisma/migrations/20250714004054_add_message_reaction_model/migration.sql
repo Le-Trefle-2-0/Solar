@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE `Reaction`
+CREATE TABLE `reaction`
 (
     `id`        VARCHAR(191) NOT NULL,
     `emoji`     VARCHAR(191) NOT NULL,
@@ -10,9 +10,9 @@ CREATE TABLE `Reaction`
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `Reaction`
-    ADD CONSTRAINT `Reaction_messageID_fkey` FOREIGN KEY (`messageID`) REFERENCES `Message` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `reaction`
+    ADD CONSTRAINT `Reaction_messageID_fkey` FOREIGN KEY (`messageID`) REFERENCES `message` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Reaction`
+ALTER TABLE `reaction`
     ADD CONSTRAINT `Reaction_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

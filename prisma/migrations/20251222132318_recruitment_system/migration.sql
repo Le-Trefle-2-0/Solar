@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE `Recruitment`
+CREATE TABLE `recruitment`
 (
     `id`          VARCHAR(191) NOT NULL,
     `title`       VARCHAR(191) NOT NULL,

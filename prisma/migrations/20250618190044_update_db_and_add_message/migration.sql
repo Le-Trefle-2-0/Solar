@@ -52,7 +52,7 @@ CREATE TABLE `invitation`
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `twoFactor`
+CREATE TABLE `two_factor`
 (
     `id`          VARCHAR(191) NOT NULL,
     `secret`      TEXT         NOT NULL,
@@ -63,7 +63,7 @@ CREATE TABLE `twoFactor`
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Message`
+CREATE TABLE `message`
 (
     `id`        VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL,
@@ -90,9 +90,9 @@ ALTER TABLE `invitation`
     ADD CONSTRAINT `invitation_inviterId_fkey` FOREIGN KEY (`inviterId`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `twoFactor`
+ALTER TABLE `two_factor`
     ADD CONSTRAINT `twoFactor_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Message`
-    ADD CONSTRAINT `Message_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `message`
+    ADD CONSTRAINT `message_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;

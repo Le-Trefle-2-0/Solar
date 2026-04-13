@@ -3,7 +3,7 @@
 -- Rationale: All DDL in this file duplicates changes already applied in
 -- previous or subsequent migrations and causes duplicate column/table errors
 -- (e.g., `activeOrganizationId` on `session`, org/member/twoFactor tables,
--- and `Message` table creation). The authoritative history is:
+-- and `message` table creation). The authoritative history is:
 --  - 20250618190044_update_db_and_add_message (session/user/org/member/invitation/twoFactor)
 --  - 20250618191300_update_msg (Message id → INT AUTO_INCREMENT)
 --  - 20250618201846_add_msg_content (Message.content add)
