@@ -382,6 +382,8 @@ export function AuthView({pathname}: { pathname: string }) {
     const [loading, setLoading] = useState(false);
     const [twoFactor, setTwoFactor] = useState(false);
     const [otp, setOtp] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [token, setToken] = useState("");
     const [form, setForm] = useState({
         name: "",
         email: "",
@@ -390,6 +392,13 @@ export function AuthView({pathname}: { pathname: string }) {
     });
 
     useEffect(() => {
+        // Capture token from URL if on reset-password
+        if (pathname === "reset-password") {
+            const urlParams = new URLSearchParams(window.location.search);
+            const t = urlParams.get("token");
+            if (t) setToken(t);
+        }
+
         // Force refresh session state on auth page to avoid ghost sessions
         authClient.getSession().then(({data}) => {
             if (data && !isSignUp) {
@@ -488,12 +497,75 @@ export function AuthView({pathname}: { pathname: string }) {
         });
     };
 
-    const cardTitle = twoFactor ? "Vérification A2F" : (isSignUp ? "Créer un compte" : "Se connecter");
+    const handleForgotPassword = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            const res = await fetch("/api/auth/forgot-password", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    email: form.email,
+                    redirectTo: `${window.location.origin}/auth/reset-password`,
+                })
+            });
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                throw new Error(data?.message || "Une erreur est survenue");
+            }
+            toast.success("E-mail de réinitialisation envoyé !");
+        } catch (err: any) {
+            toast.error(err?.message || "Une erreur est survenue");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleResetPassword = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (form.password !== form.confirmPassword) {
+            toast.error("Les mots de passe ne correspondent pas");
+            return;
+        }
+
+        if (!token) {
+            toast.error("Jeton de réinitialisation manquant ou invalide");
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const res = await fetch("/api/auth/reset-password", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    newPassword: form.password,
+                    token,
+                })
+            });
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                throw new Error(data?.message || "Échec de la réinitialisation");
+            }
+            toast.success("Mot de passe mis à jour avec succès !");
+            router.push("/auth/sign-in");
+        } catch (err: any) {
+            toast.error(err?.message || "Échec de la réinitialisation");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const cardTitle = twoFactor ? "Vérification A2F" : (isSignUp ? "Créer un compte" : (pathname === "forgot-password" ? "Mot de passe oublié" : (pathname === "reset-password" ? "Réinitialiser le mot de passe" : "Se connecter")));
     const cardDescription = twoFactor
         ? "Entrez le code de votre application d'authentification"
         : (isSignUp
             ? "Entrez vos informations pour créer votre compte Solar"
-            : "Entrez votre e-mail pour vous connecter à votre compte");
+            : (pathname === "forgot-password"
+                ? "Entrez votre e-mail pour recevoir un lien de réinitialisation"
+                : (pathname === "reset-password"
+                    ? "Entrez votre nouveau mot de passe ci-dessous"
+                    : "Entrez votre e-mail pour vous connecter à votre compte")));
 
     return (
         <main className="flex grow flex-col items-center justify-center p-4 w-full">
@@ -533,7 +605,9 @@ export function AuthView({pathname}: { pathname: string }) {
                             </form>
                         ) : (
                             <>
-                                <form onSubmit={isSignUp ? handleSignUp : handleSignIn} className="space-y-4">
+                                <form
+                                    onSubmit={isSignUp ? handleSignUp : (pathname === "forgot-password" ? handleForgotPassword : (pathname === "reset-password" ? handleResetPassword : handleSignIn))}
+                                    className="space-y-4">
                                     {isSignUp && (
                                         <div className="space-y-2">
                                             <Label htmlFor="name">Nom complet</Label>
@@ -546,41 +620,49 @@ export function AuthView({pathname}: { pathname: string }) {
                                             />
                                         </div>
                                     )}
-                                    <div className="space-y-2">
-                                        <Label htmlFor="email">Email</Label>
-                                        <Input
-                                            id="email"
-                                            type="email"
-                                            placeholder="jean@exemple.fr"
-                                            required
-                                            value={form.email}
-                                            onChange={(e) => setForm({...form, email: e.target.value})}
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <div className="flex items-center justify-between">
-                                            <Label htmlFor="password">Mot de passe</Label>
-                                            {!isSignUp && (
-                                                <Link
-                                                    href="/auth/forgot-password"
-                                                    className="text-xs text-primary hover:underline"
-                                                >
-                                                    Mot de passe oublié ?
-                                                </Link>
-                                            )}
-                                        </div>
-                                        <Input
-                                            id="password"
-                                            type="password"
-                                            placeholder="••••••••"
-                                            required
-                                            value={form.password}
-                                            onChange={(e) => setForm({...form, password: e.target.value})}
-                                        />
-                                    </div>
-                                    {isSignUp && (
+                                    {pathname !== "reset-password" && (
                                         <div className="space-y-2">
-                                            <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+                                            <Label htmlFor="email">Email</Label>
+                                            <Input
+                                                id="email"
+                                                type="email"
+                                                placeholder="jean@exemple.fr"
+                                                required
+                                                value={form.email}
+                                                onChange={(e) => setForm({...form, email: e.target.value})}
+                                            />
+                                        </div>
+                                    )}
+                                    {pathname !== "forgot-password" && (
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-between">
+                                                <Label htmlFor="password">
+                                                    {pathname === "reset-password" ? "Nouveau mot de passe" : "Mot de passe"}
+                                                </Label>
+                                                {!isSignUp && pathname === "sign-in" && (
+                                                    <Link
+                                                        href="/auth/forgot-password"
+                                                        className="text-xs text-primary hover:underline"
+                                                    >
+                                                        Mot de passe oublié ?
+                                                    </Link>
+                                                )}
+                                            </div>
+                                            <Input
+                                                id="password"
+                                                type="password"
+                                                placeholder="••••••••"
+                                                required
+                                                value={form.password}
+                                                onChange={(e) => setForm({...form, password: e.target.value})}
+                                            />
+                                        </div>
+                                    )}
+                                    {(isSignUp || pathname === "reset-password") && (
+                                        <div className="space-y-2">
+                                            <Label htmlFor="confirmPassword">
+                                                {pathname === "reset-password" ? "Confirmer le nouveau mot de passe" : "Confirmer le mot de passe"}
+                                            </Label>
                                             <Input
                                                 id="confirmPassword"
                                                 type="password"
@@ -593,11 +675,11 @@ export function AuthView({pathname}: { pathname: string }) {
                                     )}
                                     <Button type="submit" className="w-full" disabled={loading}>
                                         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
-                                        {isSignUp ? "S'inscrire" : "Se connecter"}
+                                        {isSignUp ? "S'inscrire" : (pathname === "forgot-password" ? "Envoyer le lien" : (pathname === "reset-password" ? "Réinitialiser" : "Se connecter"))}
                                     </Button>
                                 </form>
 
-                                {!isSignUp && (
+                                {pathname === "sign-in" && (
                                     <div className="space-y-2">
                                         <Button
                                             type="button"
@@ -612,32 +694,37 @@ export function AuthView({pathname}: { pathname: string }) {
                                     </div>
                                 )}
 
-                                <div className="relative">
-                                    <div className="absolute inset-0 flex items-center">
-                                        <span className="w-full border-t"/>
-                                    </div>
-                                    <div className="relative flex justify-center text-xs uppercase">
-                                        <span className="bg-background px-2 text-muted-foreground">
-                                            Ou continuer avec
-                                        </span>
-                                    </div>
-                                </div>
+                                {pathname === "sign-in" && (
+                                    <>
+                                        <div className="relative">
+                                            <div className="absolute inset-0 flex items-center">
+                                                <span className="w-full border-t"/>
+                                            </div>
+                                            <div className="relative flex justify-center text-xs uppercase">
+                                                <span className="bg-background px-2 text-muted-foreground">
+                                                    Ou continuer avec
+                                                </span>
+                                            </div>
+                                        </div>
 
-                                <Button
-                                    variant="outline"
-                                    type="button"
-                                    className="w-full"
-                                    onClick={handleDiscordSignIn}
-                                    disabled={loading}
-                                >
-                                    <svg className="mr-2 h-4 w-4" aria-hidden="true" focusable="false" data-prefix="fab"
-                                         data-icon="discord" role="img" xmlns="http://www.w3.org/2000/svg"
-                                         viewBox="0 0 640 512">
-                                        <path fill="currentColor"
-                                              d="M524.5 448c-51.5 0-93.7-45.4-93.7-101.2s41.3-101.2 93.7-101.2c52.4 0 93.7 45.4 93.7 101.2s-41.3 101.2-93.7 101.2zm-209.1 0c-51.5 0-93.7-45.4-93.7-101.2s41.3-101.2 93.7-101.2c52.4 0 93.7 45.4 93.7 101.2s-41.3 101.2-93.7 101.2zM615.7 38.8c-47.5-22.1-98.3-36.2-152.1-40.6-.6 1.1-1.3 2.7-2 4.4-60.4-9.2-122.3-9.2-182.7 0-.7-1.7-1.4-3.2-2-4.4-53.8 4.4-104.6 18.5-152.1 40.6-63.1 94.4-80.4 203.2-73.4 309.1 42.1 31.1 92.2 56.4 146 72.8 12.6-17.3 23.5-36 32.7-55.7-15.6-5.9-30.5-13.1-44.5-21.3 3.7-2.7 7.4-5.6 10.9-8.5 103.7 48 215.7 48 319.4 0 3.5 2.9 7.2 5.8 10.9 8.5-14 8.2-28.9 15.4-44.5 21.3 9.2 19.7 20.1 38.4 32.7 55.7 53.8-16.4 103.9-41.7 146-72.8 8.4-121.1-16.7-230.1-73.4-309.1z"></path>
-                                    </svg>
-                                    Discord
-                                </Button>
+                                        <Button
+                                            variant="outline"
+                                            type="button"
+                                            className="w-full"
+                                            onClick={handleDiscordSignIn}
+                                            disabled={loading}
+                                        >
+                                            <svg className="mr-2 h-4 w-4" aria-hidden="true" focusable="false"
+                                                 data-prefix="fab"
+                                                 data-icon="discord" role="img" xmlns="http://www.w3.org/2000/svg"
+                                                 viewBox="0 0 640 512">
+                                                <path fill="currentColor"
+                                                      d="M524.5 448c-51.5 0-93.7-45.4-93.7-101.2s41.3-101.2 93.7-101.2c52.4 0 93.7 45.4 93.7 101.2s-41.3 101.2-93.7 101.2zm-209.1 0c-51.5 0-93.7-45.4-93.7-101.2s41.3-101.2 93.7-101.2c52.4 0 93.7 45.4 93.7 101.2s-41.3 101.2-93.7 101.2zM615.7 38.8c-47.5-22.1-98.3-36.2-152.1-40.6-.6 1.1-1.3 2.7-2 4.4-60.4-9.2-122.3-9.2-182.7 0-.7-1.7-1.4-3.2-2-4.4-53.8 4.4-104.6 18.5-152.1 40.6-63.1 94.4-80.4 203.2-73.4 309.1 42.1 31.1 92.2 56.4 146 72.8 12.6-17.3 23.5-36 32.7-55.7-15.6-5.9-30.5-13.1-44.5-21.3 3.7-2.7 7.4-5.6 10.9-8.5 103.7 48 215.7 48 319.4 0 3.5 2.9 7.2 5.8 10.9 8.5-14 8.2-28.9 15.4-44.5 21.3 9.2 19.7 20.1 38.4 32.7 55.7 53.8-16.4 103.9-41.7 146-72.8 8.4-121.1-16.7-230.1-73.4-309.1z"></path>
+                                            </svg>
+                                            Discord
+                                        </Button>
+                                    </>
+                                )}
                             </>
                         )}
                     </CardContent>
@@ -651,6 +738,10 @@ export function AuthView({pathname}: { pathname: string }) {
                                             Se connecter
                                         </Link>
                                     </>
+                                ) : (pathname === "forgot-password" || pathname === "reset-password") ? (
+                                    <Link href="/auth/sign-in" className="text-primary hover:underline font-medium">
+                                        Retour à la connexion
+                                    </Link>
                                 ) : (
                                     <>
                                         Vous n'avez pas de compte ?{" "}

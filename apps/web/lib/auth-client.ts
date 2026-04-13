@@ -36,6 +36,4 @@ export const {
     signUp,
     useSession,
     emailOtp,
-    forgetPassword,
-    resetPassword,
 } = authClient;
