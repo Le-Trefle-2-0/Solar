@@ -124,6 +124,10 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
             if (isAdmin) return true;
             if (isManager && (item.name === "Historique" || item.name === "Recrutement" || item.name === "Utilisateurs")) return true;
             if (isNewsletterManager && (item as any).newsletterOnly) return true;
+
+            // Allow access to Roles if the user has a manager role (limited to lower weights)
+            if (isManager && item.name === "Rôles") return true;
+
             return false;
         });
     }, [session]);
