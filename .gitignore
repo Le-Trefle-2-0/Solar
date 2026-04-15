@@ -57,3 +57,6 @@ apps/ws/dist/
 confidentialite.html
 faq_content.html
 apps/api/dist/
+/apps/api/dist/
+/apps/voice/node_modules/
+/apps/api/node_modules/
