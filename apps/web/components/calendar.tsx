@@ -246,7 +246,7 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
             for (const payload of eventsToCreate) {
                 await apiFetch('/v1/events', {
                     method: 'POST',
-                    body: payload
+                    body: JSON.stringify(payload)
                 });
             }
 

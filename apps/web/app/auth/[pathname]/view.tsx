@@ -8,7 +8,7 @@ import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} f
 import {authClient, signIn} from "@/lib/auth-client";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
-import {Fingerprint, Loader2, ShieldCheck, Key} from "lucide-react";
+import {Fingerprint, Key, Loader2, ShieldCheck} from "lucide-react";
 import Link from "next/link";
 import {InputOTP, InputOTPGroup, InputOTPSlot} from "@/components/ui/input-otp";
 
@@ -463,7 +463,6 @@ export function AuthView({pathname}: { pathname: string }) {
             email: form.email,
             password: form.password,
             callbackURL: "/app",
-            dontRedirect: true
         }, {
             onRequest: () => setLoading(true),
             onResponse: () => setLoading(false),

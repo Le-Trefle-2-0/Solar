@@ -17,12 +17,7 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/compo
 import {authClient, useSession} from "@/lib/auth-client";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
-import {
-    InputOTP,
-    InputOTPGroup,
-    InputOTPSeparator,
-    InputOTPSlot,
-} from "@/components/ui/input-otp";
+import {InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot,} from "@/components/ui/input-otp";
 import {Button} from "@/components/ui/button";
 import {useEffect, useState} from "react";
 import {useRouter} from "next/navigation";
@@ -35,12 +30,10 @@ import {
     Fingerprint,
     Key,
     Loader2,
-    QrCode,
+    LogOut,
     Monitor,
     Smartphone,
-    Trash2,
-    LogOut,
-    Disc
+    Trash2
 } from "lucide-react";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 
@@ -326,7 +319,7 @@ export default function SettingsPage() {
         }
     };
 
-    const handleAddPasskey = async () => {
+    const handleAddPasskey = async (): Promise<void> => {
         setLoading(true);
         const {error} = await authClient.passkey.addPasskey({
             name: passkeyName || "Ma clé de sécurité",
@@ -335,12 +328,33 @@ export default function SettingsPage() {
 
         if (error) {
             if (error.status === 401 || error.message?.includes("fresh")) {
-                return withPassword(handleAddPasskey);
+                withPassword(handleAddPasskey);
+                return;
             }
             toast.error(error.message || "Erreur lors de l'ajout de la clé");
         } else {
             toast.success("Clé de sécurité ajoutée");
             setPasskeyName("");
+            fetchPasskeys();
+            setConfirmPassword("");
+        }
+    };
+
+    const handleDeletePasskey = async (id: string): Promise<void> => {
+        setLoading(true);
+        const {error} = await authClient.passkey.deletePasskey({
+            id,
+        });
+        setLoading(false);
+
+        if (error) {
+            if (error.status === 401 || error.message?.includes("fresh")) {
+                withPassword(() => handleDeletePasskey(id));
+                return;
+            }
+            toast.error(error.message || "Erreur lors de la suppression de la clé");
+        } else {
+            toast.success("Clé de sécurité supprimée");
             fetchPasskeys();
             setConfirmPassword("");
         }
@@ -377,7 +391,7 @@ export default function SettingsPage() {
     const handleUnlinkDiscord = async () => {
         setLoading(true);
         const {error} = await authClient.unlinkAccount({
-            provider: "discord",
+            providerId: "discord",
         });
         setLoading(false);
 

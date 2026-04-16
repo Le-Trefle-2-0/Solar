@@ -20,10 +20,10 @@ export default function AdminSettingsView({initialSettings}: { initialSettings: 
         try {
             await apiFetch("/v1/admin/settings", {
                 method: "POST",
-                body: {
+                body: JSON.stringify({
                     key: "widget_enabled",
                     value: checked ? "true" : "false",
-                },
+                }),
             });
             setSettings({...settings, widget_enabled: checked});
             toast.success("Paramètre mis à jour");
