@@ -23,6 +23,7 @@ export default function ChatWidget() {
     const pollRef = useRef<NodeJS.Timeout | null>(null);
     const [portalEl, setPortalEl] = useState<HTMLElement | null>(null);
     const [visitorUserId, setVisitorUserId] = useState<string | null>(null);
+    const [visitorCreds, setVisitorCreds] = useState<any>(null);
     const [visitorName, setVisitorName] = useState('');
     const [socket, setSocket] = useState<Socket | null>(null);
     const [wsConnected, setWsConnected] = useState(false);
@@ -84,25 +85,29 @@ export default function ChatWidget() {
     }, []);
 
     // Initialize a public chat session: ensures a ticket + sets cookies + returns WS guest credentials
-    const initSession = useCallback(async (name?: string): Promise<{
+    const initSession = useCallback(async (name?: string, forceNew = false): Promise<{
         channelId: string,
         creds: any,
+        status?: string,
         error?: string
     } | null> => {
         try {
             const res = await apiFetch('/v1/widget/session', {
                 method: 'POST',
-                body: JSON.stringify({name})
+                body: JSON.stringify({name, forceNew})
             });
             const cid = res?.channelId;
             const creds = res?.credentials;
+            const status = res?.status;
             if (cid) {
                 try {
                     localStorage.setItem('widget_channel_id', cid);
                 } catch {
                 }
+                loadMessages(cid);
+                loadTicketStatus(cid);
             }
-            return cid && creds ? {channelId: cid, creds} : {channelId: '', creds: null};
+            return cid && creds ? {channelId: cid, creds, status} : {channelId: '', creds: null};
         } catch (err: any) {
             if (err.message === 'session_expired') {
                 return {channelId: '', creds: null, error: 'session_expired'};
@@ -186,10 +191,20 @@ export default function ChatWidget() {
             }
             const cid = session.channelId;
             const creds = session.creds;
+            const status = session.status;
+            setVisitorCreds(creds);
+            if (status) setTicketStatus(status);
+            if (creds?.uid) {
+                setVisitorUserId(creds.uid);
+                try {
+                    localStorage.setItem('widget_user_id', creds.uid);
+                } catch {
+                }
+            }
             if (cid) {
                 setChannelId(cid);
                 await loadMessages(cid);
-                await loadTicketStatus(cid);
+                if (!status) await loadTicketStatus(cid);
 
                 // Establish WS guest connection if credentials provided
                 if (!socket) {
@@ -220,18 +235,19 @@ export default function ChatWidget() {
                             s.on('disconnect', () => setWsConnected(false));
                             s.on('ticketStatusUpdate', (data: any) => {
                                 if (data?.channelId === cid && data?.statusName) {
-                                    const oldStatus = ticketStatus;
                                     setTicketStatus(data.statusName);
                                     if (data.statusName === 'closed' || data.statusName === 'commented') {
-                                        clearLocalStorage();
-                                        if (oldStatus !== 'closed' && oldStatus !== 'commented') {
-                                            setMessages((prev) => [...prev, {
-                                                id: Math.floor(Math.random() * 1e9),
-                                                author: {id: 'system', name: 'Système', image: null, role: null},
+                                        setMessages((prev) => {
+                                            const sysId = Math.floor(Math.random() * 1e9);
+                                            // Check if this system message already exists (to avoid duplication if WS re-emits)
+                                            if (prev.some(m => (m.author?.id === 'système' || m.author?.id === 'system') && m.content === "L'écoute a été fermée par le bénévole.")) return prev;
+                                            return [...prev, {
+                                                id: sysId,
+                                                author: {id: 'système', name: 'Système', image: null, role: null},
                                                 content: "L'écoute a été fermée par le bénévole.",
                                                 timestamp: Date.now(),
-                                            }]);
-                                        }
+                                            }];
+                                        });
                                     }
                                 }
                             });
@@ -242,12 +258,20 @@ export default function ChatWidget() {
                                         const exists = prev.some((m) => m.id === data.id);
                                         if (exists) return prev;
                                     }
+
+                                    // Use local storage fallback if state hasn't updated yet
+                                    let uidToCompare = visitorUserId || creds?.uid;
+                                    if (!uidToCompare && typeof window !== 'undefined') {
+                                        uidToCompare = localStorage.getItem('widget_user_id');
+                                    }
+
+                                    const isMe = (uidToCompare && data.author?.id === uidToCompare) || data.author?.name === 'Moi' || data.author?.name === 'Utilisateur';
                                     return [...prev, {
                                         id: data.id ?? Math.floor(Math.random() * 1e9),
                                         author: data.author ? {
                                             ...data.author,
-                                            name: (data.author.id === visitorUserId || data.author.id === creds.uid) ? 'Moi' : 'Bénévole Écoutant',
-                                            image: (data.author.id === visitorUserId || data.author.id === creds.uid) ? data.author.image : null,
+                                            name: isMe ? 'Moi' : 'Bénévole Écoutant',
+                                            image: isMe ? data.author.image : null,
                                         } : data.author,
                                         content: data.content,
                                         timestamp: data.timestamp || Date.now(),
@@ -277,15 +301,12 @@ export default function ChatWidget() {
             });
             if (res.success) {
                 setTicketStatus('closed');
-                clearLocalStorage();
-                // Close and reset immediately for a clean exit after manual close
-                setOpen(false);
-                resetState();
+                // We keep it open so they can read
             }
         } catch (e) {
             console.error('[widget] Error closing ticket:', e);
         }
-    }, [channelId, clearLocalStorage, resetState]);
+    }, [channelId]);
 
     const handleSend = useCallback(async () => {
         if (!channelId || !input.trim() || ticketStatus === 'closed' || ticketStatus === 'commented') return;
@@ -309,32 +330,22 @@ export default function ChatWidget() {
                 if (mid && prev.some(m => m.id === mid)) return prev;
                 return [...prev, {
                     id: mid ?? Math.floor(Math.random() * 1e9),
-                    author: {id: uid || visitorUserId || 'guest', name: 'Moi', image: null, role: null},
+                    author: {
+                        id: uid || visitorUserId || visitorCreds?.uid || 'guest',
+                        name: 'Moi',
+                        image: null,
+                        role: null
+                    },
                     content: input.trim(),
                     timestamp: Date.now(),
                 }].sort((a, b) => a.timestamp - b.timestamp);
             });
-            // Also emit via WS to ensure volunteers get it instantly even if HTTP broadcast fails
-            try {
-                const payload = {
-                    id: data?.message?.id,
-                    author: {id: uid || visitorUserId || 'guest', image: null, name: 'Utilisateur', role: null},
-                    content: input.trim(),
-                    timestamp: Date.now(),
-                    channel: {id: channelId},
-                    reactions: [],
-                    replyID: null,
-                    edited: false,
-                };
-                socket?.emit('sendMessage', payload);
-            } catch {
-            }
             setInput('');
             // If WS is not connected, refresh via polling immediately
             if (!wsConnected) await loadMessages(channelId);
         } catch {
         }
-    }, [channelId, input, loadMessages, socket, wsConnected]);
+    }, [channelId, input, loadMessages, visitorUserId, visitorCreds, wsConnected]);
 
     const ui = (
         <>
@@ -460,23 +471,54 @@ export default function ChatWidget() {
                                         <div className="text-sm text-muted-foreground">Démarrez la conversation, un
                                             bénévole vous répondra.</div>
                                     )}
-                                    {messages.map((m) => {
-                                        const isMe = (visitorUserId && m.author?.id === visitorUserId) || m.author?.name === 'Moi';
-                                        const isSystem = m.author?.id === 'system';
+                                    {messages.map((m, idx) => {
+                                        // Use local storage fallback if state hasn't updated yet
+                                        let uidToCompare = visitorUserId || visitorCreds?.uid;
+                                        if (!uidToCompare && typeof window !== 'undefined') {
+                                            uidToCompare = localStorage.getItem('widget_user_id');
+                                        }
+
+                                        const isMe = (uidToCompare && m.author?.id === uidToCompare) || m.author?.name === 'Moi' || m.author?.name === 'Utilisateur';
+                                        const isSystem = m.author?.id === 'system' || m.author?.id === 'système';
+
+                                        const isLastSystem = isSystem && (idx === messages.length - 1 || !messages.slice(idx + 1).some(next => next.author?.id === 'system' || next.author?.id === 'système'));
 
                                         if (isSystem) {
                                             return (
-                                                <div key={m.id} className="flex justify-center my-2">
-                                                    <span
-                                                        className="text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full italic">
-                                                        {m.content}
-                                                    </span>
+                                                <div key={m.id || idx}
+                                                     className="flex flex-col items-center gap-2 my-4">
+                                                    <div className="flex justify-center">
+                                                        <span
+                                                            className="text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full italic">
+                                                            {m.content}
+                                                        </span>
+                                                    </div>
+                                                    {isLastSystem && (ticketStatus === 'closed' || ticketStatus === 'commented') && (
+                                                        <button
+                                                            onClick={async () => {
+                                                                setLoading(true);
+                                                                clearLocalStorage();
+                                                                resetState();
+                                                                const session = await initSession("Utilisateur", true);
+                                                                if (session?.channelId) {
+                                                                    setChannelId(session.channelId);
+                                                                    setVisitorCreds(session.creds);
+                                                                    setTicketStatus(session.status || 'waiting');
+                                                                    await loadMessages(session.channelId);
+                                                                }
+                                                                setLoading(false);
+                                                            }}
+                                                            className="text-xs font-medium text-primary hover:underline"
+                                                        >
+                                                            Ouvrir une nouvelle écoute
+                                                        </button>
+                                                    )}
                                                 </div>
                                             );
                                         }
 
                                         return (
-                                            <div key={m.id}
+                                            <div key={m.id || idx}
                                                  className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                                                 <div
                                                     className={`max-w-[78%] rounded-2xl px-4 py-2.5 shadow-md ${isMe ? 'bg-primary text-primary-foreground' : 'bg-white/80 dark:bg-white/10 backdrop-blur-md border border-white/40 dark:border-white/10'} `}>
