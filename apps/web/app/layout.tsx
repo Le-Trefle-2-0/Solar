@@ -8,6 +8,8 @@ import {config} from '@fortawesome/fontawesome-svg-core'
 import '@fortawesome/fontawesome-svg-core/styles.css'
 import {Providers} from "./providers"
 import {constructMetadata} from "@/lib/metadata"
+import ChatWidget from "@/components/chat-widget";
+import prisma from "@/lib/prisma";
 
 config.autoAddCss = false
 
@@ -39,11 +41,22 @@ export const viewport: Viewport = {
     ]
 }
 
-export default function RootLayout({
+export default async function RootLayout({
                                        children
                                    }: Readonly<{
     children: ReactNode
 }>) {
+    let widgetEnabled = true;
+    try {
+        // @ts-ignore
+        const widgetEnabledSetting = await prisma.settings.findUnique({
+            where: {key: "widget_enabled"}
+        });
+        widgetEnabled = widgetEnabledSetting ? widgetEnabledSetting.value === "true" : true;
+    } catch (e) {
+        console.error("[Settings] Failed to fetch widget_enabled setting:", e);
+    }
+
     return (
         <html lang="en" suppressHydrationWarning>
         <body className={`${geistSans.variable} ${geistMono.variable} ${barlowCondensed.variable} antialiased`}
@@ -52,6 +65,7 @@ export default function RootLayout({
             <div className="flex min-h-svh flex-col">
                 {children}
             </div>
+            {widgetEnabled && <ChatWidget/>}
         </Providers>
         </body>
         </html>

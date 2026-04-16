@@ -135,4 +135,39 @@ export async function registerAdminRoutes(app: FastifyInstance) {
 
         return reply.send({user});
     });
+
+    app.get('/v1/admin/settings', async (req, reply) => {
+        const admin = await checkAdmin(req, reply);
+        if (!admin) return;
+
+        try {
+            // @ts-ignore
+            const settings = await prisma.settings.findMany();
+            return reply.send({settings});
+        } catch (e) {
+            console.error("[Settings] Failed to fetch settings in API:", e);
+            return reply.send({settings: []});
+        }
+    });
+
+    app.post('/v1/admin/settings', async (req, reply) => {
+        const admin = await checkAdmin(req, reply);
+        if (!admin) return;
+
+        const {key, value} = req.body as { key: string, value: string };
+
+        try {
+            // @ts-ignore
+            const setting = await prisma.settings.upsert({
+                where: {key},
+                update: {value},
+                create: {key, value}
+            });
+
+            return reply.send({setting});
+        } catch (e) {
+            console.error("[Settings] Failed to upsert setting in API:", e);
+            return reply.status(500).send('failed to update setting');
+        }
+    });
 }

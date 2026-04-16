@@ -407,6 +407,11 @@ exports.Prisma.ImageScalarFieldEnum = {
   link: 'link'
 };
 
+exports.Prisma.SettingsScalarFieldEnum = {
+    key: 'key',
+    value: 'value'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -646,6 +651,11 @@ exports.Prisma.ImageOrderByRelevanceFieldEnum = {
   link: 'link'
 };
 
+exports.Prisma.SettingsOrderByRelevanceFieldEnum = {
+    key: 'key',
+    value: 'value'
+};
+
 
 exports.Prisma.ModelName = {
     Newsletter: 'Newsletter',
@@ -672,7 +682,8 @@ exports.Prisma.ModelName = {
   RouteProtection: 'RouteProtection',
   Passkey: 'Passkey',
     Recruitment: 'Recruitment',
-  Image: 'Image'
+    Image: 'Image',
+    Settings: 'Settings'
 };
 
 /**

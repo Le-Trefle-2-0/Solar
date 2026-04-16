@@ -2,7 +2,17 @@
 
 import React, {useEffect, useState} from 'react';
 import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
-import {AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger} from "@/components/ui/alert-dialog";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger
+} from "@/components/ui/alert-dialog";
 import {Badge} from "@/components/ui/badge";
 import {Button} from "@/components/ui/button";
 import {format, isAfter, setHours, setMinutes, setSeconds, startOfWeek} from 'date-fns';
@@ -60,11 +70,10 @@ export default function Event({event}: EventProps) {
             if (part) payload.part = part;
             if (roleSlotId) payload.roleSlotId = roleSlotId;
             if (useBypass) payload.adminBypass = true;
-            const body = JSON.stringify(payload);
 
             const res = await apiFetch(`/v1/events/${event.id}/register`, {
                 method: 'POST',
-                body,
+                body: payload,
             });
 
             if (res.success) {
@@ -95,11 +104,10 @@ export default function Event({event}: EventProps) {
             const payload: any = {};
             if (part) payload.part = part;
             if (roleSlotId) payload.roleSlotId = roleSlotId;
-            const body = JSON.stringify(payload);
 
             const res = await apiFetch(`/v1/events/${event.id}/unregister`, {
                 method: 'POST',
-                body,
+                body: payload,
             });
 
             if (res.success) {
@@ -128,11 +136,10 @@ export default function Event({event}: EventProps) {
             setLoading(true);
             const payload: any = { userId: targetUserId };
             if (roleSlotId) payload.roleSlotId = roleSlotId;
-            const body = JSON.stringify(payload);
 
             const res = await apiFetch(`/v1/events/${event.id}/remove-user`, {
                 method: 'POST',
-                body,
+                body: payload,
             });
 
             if (res.success) {

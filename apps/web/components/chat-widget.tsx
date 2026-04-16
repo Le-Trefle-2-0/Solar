@@ -220,9 +220,18 @@ export default function ChatWidget() {
                             s.on('disconnect', () => setWsConnected(false));
                             s.on('ticketStatusUpdate', (data: any) => {
                                 if (data?.channelId === cid && data?.statusName) {
+                                    const oldStatus = ticketStatus;
                                     setTicketStatus(data.statusName);
                                     if (data.statusName === 'closed' || data.statusName === 'commented') {
                                         clearLocalStorage();
+                                        if (oldStatus !== 'closed' && oldStatus !== 'commented') {
+                                            setMessages((prev) => [...prev, {
+                                                id: Math.floor(Math.random() * 1e9),
+                                                author: {id: 'system', name: 'Système', image: null, role: null},
+                                                content: "L'écoute a été fermée par le bénévole.",
+                                                timestamp: Date.now(),
+                                            }]);
+                                        }
                                     }
                                 }
                             });
@@ -398,11 +407,14 @@ export default function ChatWidget() {
                                         Avant d’ouvrir une écoute, veuillez noter que les échanges sont protégés par le
                                         secret professionnel.
                                     </p>
-                                    <p className="mb-4">
+                                    <p className="mb-3">
                                         Vos données sont traitées conformément à notre politique de confidentialité. En
                                         poursuivant, vous
                                         consentez à l’ouverture d’une écoute pour échanger avec notre équipe de soutien
                                         moral.
+                                    </p>
+                                    <p className="mb-4 font-medium text-red-500 dark:text-red-400">
+                                        Notez que tout abus de ce service de soutien moral sera sanctionné.
                                     </p>
                                     <a
                                         href="/confidentialite"
@@ -450,6 +462,19 @@ export default function ChatWidget() {
                                     )}
                                     {messages.map((m) => {
                                         const isMe = (visitorUserId && m.author?.id === visitorUserId) || m.author?.name === 'Moi';
+                                        const isSystem = m.author?.id === 'system';
+
+                                        if (isSystem) {
+                                            return (
+                                                <div key={m.id} className="flex justify-center my-2">
+                                                    <span
+                                                        className="text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full italic">
+                                                        {m.content}
+                                                    </span>
+                                                </div>
+                                            );
+                                        }
+
                                         return (
                                             <div key={m.id}
                                                  className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>

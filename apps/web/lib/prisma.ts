@@ -1,4 +1,9 @@
-import {PrismaClient} from '@prisma/client'
+import {PrismaClient} from '../../../generated/prisma'
+import {config} from 'dotenv'
+import path from 'path'
+
+// Load .env from monorepo root
+config({path: path.resolve(process.cwd(), '../../.env')})
 
 const globalForPrisma = global as unknown as {
     prisma: PrismaClient

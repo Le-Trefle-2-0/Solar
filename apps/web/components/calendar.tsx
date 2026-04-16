@@ -22,7 +22,6 @@ import Event from './event';
 import {EventData} from "@/lib/interface";
 import {
     Button,
-    Checkbox,
     Dialog,
     DialogClose,
     DialogContent,
@@ -38,7 +37,8 @@ import {
     SelectContent,
     SelectItem,
     SelectTrigger,
-    SelectValue
+    SelectValue,
+    Switch
 } from "@/components/ui";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
@@ -246,7 +246,7 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
             for (const payload of eventsToCreate) {
                 await apiFetch('/v1/events', {
                     method: 'POST',
-                    body: JSON.stringify(payload)
+                    body: payload
                 });
             }
 
@@ -426,7 +426,7 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
                                             render={({field}) => (
                                                 <FormItem className="flex flex-row items-center space-x-2 space-y-0">
                                                     <FormControl>
-                                                        <Checkbox
+                                                        <Switch
                                                             checked={field.value}
                                                             onCheckedChange={field.onChange}
                                                         />

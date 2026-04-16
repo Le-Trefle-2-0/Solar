@@ -6,7 +6,7 @@ import {Button} from "@/components/ui/button";
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import {Badge} from "@/components/ui/badge";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
-import {Activity, Bot, Calendar, Check, Copy, Key} from "lucide-react";
+import {Activity, Bot, Calendar, Check, Copy, Key, Loader2} from "lucide-react";
 import {format} from "date-fns";
 import {fr} from "date-fns/locale";
 
@@ -60,18 +60,15 @@ export function BotClient() {
 
     if (loading && !status) {
         return (
-            <div className="flex h-full items-center justify-center">
-                <p className="text-muted-foreground">Chargement du statut du bot...</p>
+            <div className="flex items-center justify-center p-12">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground"/>
+                <p className="ml-2 text-muted-foreground">Chargement du statut du bot...</p>
             </div>
         );
     }
 
     return (
-        <div className="container mx-auto py-10 px-6">
-            <h1 className="text-3xl font-bold mb-8 flex items-center gap-2">
-                <Bot className="h-8 w-8 text-primary"/>
-                Gestion du Bot
-            </h1>
+        <div className="space-y-6">
 
             {newKey && (
                 <Alert className="mb-8 border-green-500 bg-green-50">

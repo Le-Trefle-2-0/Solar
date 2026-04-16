@@ -2,7 +2,6 @@
 import * as React from "react"
 import {useEffect, useRef, useState} from "react"
 import {
-    Bot,
     CalendarDays,
     ChevronRight,
     Ear,
@@ -14,6 +13,7 @@ import {
     Mic,
     MicOff,
     PhoneOff,
+    Settings,
     Shield,
     ShieldUser,
     Signal,
@@ -72,12 +72,6 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
             adminOnly: true,
         },
         {
-            name: "Bot",
-            url: "/app/admin/bot",
-            icon: Bot,
-            adminOnly: true,
-        },
-        {
             name: "Historique",
             url: "/app/admin/history",
             icon: History,
@@ -93,6 +87,12 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
             name: "Rôles",
             url: "/app/admin/roles",
             icon: Shield,
+            adminOnly: true,
+        },
+        {
+            name: "Paramètres",
+            url: "/app/admin/settings",
+            icon: Settings,
             adminOnly: true,
         },
         {
@@ -122,7 +122,7 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
         return baseData.filter(item => {
             if (!(item as any).adminOnly && !(item as any).newsletterOnly) return true;
             if (isAdmin) return true;
-            if (isManager && (item.name === "Historique" || item.name === "Recrutement" || item.name === "Utilisateurs")) return true;
+            if (isManager && (item.name === "Historique" || item.name === "Recrutement" || item.name === "Utilisateurs" || item.name === "Paramètres")) return true;
             if (isNewsletterManager && (item as any).newsletterOnly) return true;
 
             // Allow access to Roles if the user has a manager role (limited to lower weights)

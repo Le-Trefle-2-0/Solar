@@ -54,7 +54,13 @@ export async function apiFetch(path: string, init: RequestInit = {}) {
     if (!headers.has('Content-Type') && init.body && !(init.body instanceof FormData)) {
         headers.set('Content-Type', 'application/json');
     }
-    let res = await fetch(url, {...init, headers, credentials: 'include'});
+
+    let body = init.body;
+    if (headers.get('Content-Type') === 'application/json' && body && typeof body === 'object' && !(body instanceof FormData)) {
+        body = JSON.stringify(body);
+    }
+
+    let res = await fetch(url, {...init, body, headers, credentials: 'include'});
 
     // If 401, maybe the JWT is stale, try clearing cache and retrying once
     if (res.status === 401) {

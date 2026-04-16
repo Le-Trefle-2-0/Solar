@@ -8,7 +8,6 @@ import {DiscordSection} from "@/components/landing/discord";
 import {OrganizationTree} from "@/components/landing/organization";
 import {PublicFooter} from "@/components/landing/footer";
 import {ScrollReveal} from "@/components/landing/scroll-reveal";
-import ChatWidget from "@/components/chat-widget";
 
 import {constructMetadata} from "@/lib/metadata";
 
@@ -46,8 +45,6 @@ export default async function Home() {
             <ScrollReveal animation="fade-in">
                 <PublicFooter/>
             </ScrollReveal>
-            {/* Floating public chat widget */}
-            <ChatWidget/>
         </div>
     );
 }

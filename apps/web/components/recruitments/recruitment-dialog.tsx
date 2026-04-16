@@ -22,7 +22,7 @@ import {toast} from "sonner";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import ReactMarkdown from "react-markdown";
 import {FieldManager} from "./field-manager";
-import {Checkbox} from "@/components/ui/checkbox";
+import {Switch} from "@/components/ui/switch";
 import {IconPicker} from "@/components/ui";
 
 const DEFAULT_FIELDS: RecruitmentField[] = [
@@ -169,7 +169,7 @@ export function RecruitmentDialog({open, onOpenChange, recruitment, onSave}: Rec
                                 <FormItem
                                     className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow-xs">
                                     <FormControl>
-                                        <Checkbox
+                                        <Switch
                                             checked={field.value}
                                             onCheckedChange={field.onChange}
                                         />

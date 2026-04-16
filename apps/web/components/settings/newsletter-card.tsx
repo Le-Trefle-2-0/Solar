@@ -2,7 +2,7 @@
 
 import {authClient} from "@/lib/auth-client";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
-import {Checkbox} from "@/components/ui/checkbox";
+import {Switch} from "@/components/ui/switch";
 import {useState} from "react";
 import {toast} from "sonner";
 import {Loader2} from "lucide-react";
@@ -41,10 +41,10 @@ export function NewsletterCard() {
                     {loading ? (
                         <Loader2 className="h-4 w-4 animate-spin"/>
                     ) : (
-                        <Checkbox
+                        <Switch
                             id="newsletter"
                             checked={newsletterSubscription}
-                            onCheckedChange={(checked) => handleToggle(checked as boolean)}
+                            onCheckedChange={(checked) => handleToggle(checked)}
                         />
                     )}
                     <label

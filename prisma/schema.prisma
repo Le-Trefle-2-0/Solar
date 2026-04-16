@@ -416,3 +416,10 @@ model Image {
 
   @@map("image")
 }
+
+model Settings {
+  key   String @id
+  value String @db.Text
+
+  @@map("settings")
+}

@@ -5,7 +5,7 @@ import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
-import {Checkbox} from "@/components/ui/checkbox";
+import {Switch} from "@/components/ui/switch";
 import * as Icons from "lucide-react";
 import {RecruitmentField} from "@/lib/recruitments";
 
@@ -147,10 +147,10 @@ export function FieldManager({fields, onChange}: FieldManagerProps) {
                             </div>
                             <div className="flex items-end gap-2 pb-1">
                                 <div className="flex items-center space-x-2">
-                                    <Checkbox
+                                    <Switch
                                         id={`req-${index}`}
                                         checked={field.required}
-                                        onCheckedChange={(checked) => updateField(index, {required: !!checked})}
+                                        onCheckedChange={(checked) => updateField(index, {required: checked})}
                                     />
                                     <Label htmlFor={`req-${index}`} className="text-xs">Obligatoire</Label>
                                 </div>
