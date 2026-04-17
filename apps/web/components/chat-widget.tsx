@@ -5,6 +5,7 @@ import {LogOut, MessageCircle, Send, X} from 'lucide-react';
 import {apiFetch} from '@/lib/api';
 import {io, Socket} from 'socket.io-client';
 import {usePathname} from "next/navigation";
+import {FeedbackForm} from "@/components/feedback-form";
 
 type Msg = {
     id: number;
@@ -30,6 +31,7 @@ export default function ChatWidget() {
     const [socket, setSocket] = useState<Socket | null>(null);
     const [wsConnected, setWsConnected] = useState(false);
     const [ticketStatus, setTicketStatus] = useState<string>('waiting');
+    const [ticketId, setTicketId] = useState<number | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const clearLocalStorage = useCallback(() => {
@@ -62,11 +64,11 @@ export default function ChatWidget() {
 
     // Ensure we render outside of any transformed/overflow-hidden containers
     useEffect(() => {
-        const el = document.createElement('div');
-        el.id = 'chat-widget-portal';
-        el.style.position = 'fixed'; // ensure it's its own stacking context
-        el.style.zIndex = '9999';
-        document.body.appendChild(el);
+        const el = document.getElementById('chat-widget-portal') || document.createElement('div');
+        if (!el.id) {
+            el.id = 'chat-widget-portal';
+            document.body.appendChild(el);
+        }
         setPortalEl(el);
         // Load any saved visitor id
         try {
@@ -89,6 +91,7 @@ export default function ChatWidget() {
     // Initialize a public chat session: ensures a ticket + sets cookies + returns WS guest credentials
     const initSession = useCallback(async (name?: string, forceNew = false): Promise<{
         channelId: string,
+        ticketId: number,
         creds: any,
         status?: string,
         error?: string
@@ -99,6 +102,7 @@ export default function ChatWidget() {
                 body: JSON.stringify({name, forceNew})
             });
             const cid = res?.channelId;
+            const tId = res?.ticketId;
             const creds = res?.credentials;
             const status = res?.status;
             if (cid) {
@@ -109,10 +113,14 @@ export default function ChatWidget() {
                 loadMessages(cid);
                 loadTicketStatus(cid);
             }
-            return cid && creds ? {channelId: cid, creds, status} : {channelId: '', creds: null};
+            return cid && creds ? {channelId: cid, ticketId: tId, creds, status} : {
+                channelId: '',
+                ticketId: 0,
+                creds: null
+            };
         } catch (err: any) {
             if (err.message === 'session_expired') {
-                return {channelId: '', creds: null, error: 'session_expired'};
+                return {channelId: '', ticketId: 0, creds: null, error: 'session_expired'};
             }
             return null;
         }
@@ -134,8 +142,9 @@ export default function ChatWidget() {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({channelID: cid}),
             });
-            if (data?.success && data?.ticket?.statusName) {
-                setTicketStatus(data.ticket.statusName);
+            if (data?.success && data?.ticket) {
+                if (data.ticket.statusName) setTicketStatus(data.ticket.statusName);
+                if (data.ticket.id) setTicketId(data.ticket.id);
             }
         } catch {
             // silent
@@ -194,8 +203,10 @@ export default function ChatWidget() {
             const cid = session.channelId;
             const creds = session.creds;
             const status = session.status;
+            const tId = session.ticketId;
             setVisitorCreds(creds);
             if (status) setTicketStatus(status);
+            if (tId) setTicketId(tId);
             if (creds?.uid) {
                 setVisitorUserId(creds.uid);
                 try {
@@ -354,7 +365,7 @@ export default function ChatWidget() {
             {/* Dimmed, blurred site overlay to improve readability when widget is open */}
             {open && (
                 <div
-                    className="fixed inset-0 z-40 bg-black/20 dark:bg-black/40 backdrop-blur-[8px]"
+                    className="fixed inset-0 z-[9998] bg-black/20 dark:bg-black/40 backdrop-blur-[8px] pointer-events-auto"
                     aria-hidden="true"
                     onClick={() => setOpen(false)}
                 />
@@ -364,7 +375,7 @@ export default function ChatWidget() {
                 <button
                     aria-label="Open support chat"
                     onClick={() => setOpen(true)}
-                    className="fixed bottom-5 right-5 z-50 h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:scale-110 transition-transform duration-200"
+                    className="fixed bottom-5 right-5 z-50 h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:scale-110 transition-transform duration-200 pointer-events-auto"
                 >
                     <MessageCircle className="h-7 w-7"/>
                 </button>
@@ -373,7 +384,7 @@ export default function ChatWidget() {
             {/* Panel */}
             {open && (
                 <div
-                    className="fixed inset-0 z-50 flex flex-col bg-background sm:bg-transparent sm:inset-auto sm:bottom-5 sm:right-5 sm:w-[500px] md:w-[600px] lg:w-[700px] sm:h-[80vh] sm:min-h-[600px] sm:rounded-2xl sm:shadow-2xl overflow-hidden"
+                    className="fixed inset-0 sm:inset-auto sm:bottom-5 sm:right-5 z-[9999] flex flex-col bg-background sm:bg-transparent sm:w-[500px] md:w-[600px] lg:w-[700px] sm:h-[80vh] sm:min-h-[600px] sm:rounded-2xl sm:shadow-2xl overflow-hidden pointer-events-auto"
                 >
                     {/* Glassmorphism background layer for stronger readability (desktop only) */}
                     <div
@@ -465,7 +476,7 @@ export default function ChatWidget() {
                             </div>
                         ) : (
                             <>
-                                <div className="flex-1 overflow-y-auto px-6 py-5 space-y-3">
+                                <div className="flex-1 overflow-y-auto px-6 py-5 space-y-3 relative z-20">
                                     {loading && (
                                         <div className="text-sm text-muted-foreground">Connexion…</div>
                                     )}
@@ -506,6 +517,7 @@ export default function ChatWidget() {
                                                                     setChannelId(session.channelId);
                                                                     setVisitorCreds(session.creds);
                                                                     setTicketStatus(session.status || 'waiting');
+                                                                    setTicketId(session.ticketId || null);
                                                                     await loadMessages(session.channelId);
                                                                 }
                                                                 setLoading(false);
@@ -539,6 +551,14 @@ export default function ChatWidget() {
                                             </div>
                                         );
                                     })}
+
+                                    {(ticketStatus === 'closed' || ticketStatus === 'commented') && ticketId && (
+                                        <div
+                                            className="pt-4 border-t border-dashed border-muted-foreground/20 pointer-events-auto">
+                                            <FeedbackForm ticketID={ticketId}/>
+                                        </div>
+                                    )}
+
                                     <div ref={messagesEndRef}/>
                                 </div>
 

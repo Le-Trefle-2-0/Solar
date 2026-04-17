@@ -199,10 +199,31 @@ export async function registerAdminRoutes(app: FastifyInstance) {
         const volume = tickets.length;
         let totalDuration = 0;
         const categoryCounts: Record<string, number> = {};
+        const feedbackStats: Record<string, Record<string, number>> = {
+            age: {},
+            feeling: {},
+            gender: {},
+            previouslyOpened: {},
+            previouslyAtTrefle: {},
+            location: {},
+            region: {},
+        };
 
-        tickets.forEach(ticket => {
-            // Duration
-            const duration = Math.floor((ticket.updatedAt.getTime() - ticket.createdAt.getTime()) / 1000);
+        for (const ticket of tickets) {
+            // Compute real duration based on messages
+            const messages = await prisma.message.findMany({
+                where: {channelId: ticket.channelId || ''},
+                orderBy: {createdAt: 'asc'},
+                select: {createdAt: true}
+            });
+
+            let duration = 0;
+            if (messages.length >= 2) {
+                duration = Math.floor((messages[messages.length - 1].createdAt.getTime() - messages[0].createdAt.getTime()) / 1000);
+            } else {
+                // Fallback to ticket timestamps if no messages (rare for closed tickets)
+                duration = Math.floor((ticket.updatedAt.getTime() - ticket.createdAt.getTime()) / 1000);
+            }
             totalDuration += duration;
 
             // Categories
@@ -210,7 +231,21 @@ export async function registerAdminRoutes(app: FastifyInstance) {
             categories.forEach(cat => {
                 categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
             });
-        });
+
+            // Feedback
+            const feedback = ticket.feedback as any;
+            if (feedback && typeof feedback === 'object') {
+                Object.keys(feedbackStats).forEach(key => {
+                    const value = feedback[key];
+                    if (value) {
+                        feedbackStats[key][value] = (feedbackStats[key][value] || 0) + 1;
+                    }
+                });
+            }
+
+            // For timeSeries calculation later, we'll need this duration per ticket
+            (ticket as any).calculatedDuration = duration;
+        }
 
         // 3. Planning stats (Volunteering time)
         const registrations = await prisma.eventRegistration.findMany({
@@ -278,7 +313,7 @@ export async function registerAdminRoutes(app: FastifyInstance) {
             const key = getGroupKey(ticket.createdAt);
             if (timeSeries[key]) {
                 timeSeries[key].volume += 1;
-                const duration = Math.floor((ticket.updatedAt.getTime() - ticket.createdAt.getTime()) / 1000);
+                const duration = (ticket as any).calculatedDuration || 0;
                 timeSeries[key].duration += duration;
             }
         });
@@ -299,6 +334,7 @@ export async function registerAdminRoutes(app: FastifyInstance) {
             totalDuration,
             totalVolunteerSeconds,
             categoryCounts,
+            feedbackStats,
             timeSeries: Object.values(timeSeries).sort((a, b) => a.date.localeCompare(b.date)),
             startDate,
             endDate

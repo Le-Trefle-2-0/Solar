@@ -97,7 +97,16 @@ export function HistoryChat({channelId}: HistoryChatProps) {
         const userName = session?.user?.displayUsername || session?.user?.name || "Anonyme";
         const title = `Transcript Écoute #${ticket.id}`;
         const dateStr = format(new Date(ticket.createdAt), "d MMMM yyyy HH:mm", {locale: fr});
-        const duration = Math.floor((new Date(ticket.updatedAt).getTime() - new Date(ticket.createdAt).getTime()) / 1000);
+
+        let durationSeconds = 0;
+        if (messages.length >= 2) {
+            const first = new Date(messages[0].timestamp || messages[0].createdAt);
+            const last = new Date(messages[messages.length - 1].timestamp || messages[messages.length - 1].createdAt);
+            durationSeconds = Math.floor((last.getTime() - first.getTime()) / 1000);
+        } else {
+            durationSeconds = Math.floor((new Date(ticket.updatedAt).getTime() - new Date(ticket.createdAt).getTime()) / 1000);
+        }
+        const duration = durationSeconds;
 
         // --- Page de garde (Front Page) ---
         doc.setFontSize(22);
@@ -328,6 +337,22 @@ export function HistoryChat({channelId}: HistoryChatProps) {
                                         Date de l'écoute
                                         : {ticket ? format(new Date(ticket.createdAt), "d MMMM yyyy", {locale: fr}) : ""}
                                     </p>
+                                    {ticket && (
+                                        <p className="text-muted-foreground">
+                                            Durée de l'échange
+                                            : {(() => {
+                                            let durationSeconds = 0;
+                                            if (messages.length >= 2) {
+                                                const first = new Date(messages[0].timestamp || messages[0].createdAt);
+                                                const last = new Date(messages[messages.length - 1].timestamp || messages[messages.length - 1].createdAt);
+                                                durationSeconds = Math.floor((last.getTime() - first.getTime()) / 1000);
+                                            } else {
+                                                durationSeconds = Math.floor((new Date(ticket.updatedAt).getTime() - new Date(ticket.createdAt).getTime()) / 1000);
+                                            }
+                                            return formatDuration(durationSeconds);
+                                        })()}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="space-y-6">

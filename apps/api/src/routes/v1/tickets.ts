@@ -372,5 +372,36 @@ export async function registerTicketsRoutes(app: FastifyInstance) {
             return reply.status(500).send({success: false, error: String(e)});
         }
     });
+
+    // POST /v1/tickets/submit-feedback
+    app.post('/v1/tickets/submit-feedback', async (req, reply) => {
+        const bodySchema = z.object({
+            ticketID: z.number(),
+            feedback: z.object({
+                age: z.string().optional(),
+                feeling: z.string().optional(),
+                gender: z.string().optional(),
+                previouslyOpened: z.string().optional(),
+                previouslyAtTrefle: z.string().optional(),
+                location: z.string().optional(),
+                region: z.string().optional(),
+            }),
+        });
+
+        try {
+            const {ticketID, feedback} = bodySchema.parse((req.body ?? {}) as any);
+            const update = await prisma.ticket.update({
+                where: {id: ticketID},
+                data: {
+                    feedback,
+                    updatedAt: new Date(),
+                },
+            });
+            return reply.send({success: true, update});
+        } catch (e) {
+            if (e instanceof z.ZodError) return reply.status(400).send({success: false, error: e.flatten()});
+            return reply.status(500).send({success: false, error: String(e)});
+        }
+    });
 }
 

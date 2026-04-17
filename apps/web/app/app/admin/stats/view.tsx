@@ -21,6 +21,15 @@ interface StatsData {
     totalDuration: number;
     totalVolunteerSeconds: number;
     categoryCounts: Record<string, number>;
+    feedbackStats: {
+        age: Record<string, number>;
+        feeling: Record<string, number>;
+        gender: Record<string, number>;
+        previouslyOpened: Record<string, number>;
+        previouslyAtTrefle: Record<string, number>;
+        location: Record<string, number>;
+        region: Record<string, number>;
+    };
     timeSeries: {
         date: string;
         volume: number;
@@ -142,6 +151,44 @@ export function StatsView() {
             volunteerHours: Math.round((day.volunteer / 3600) * 10) / 10
         };
     }) || [];
+
+    const renderPieChart = (title: string, stats: Record<string, number>) => {
+        const entries = Object.entries(stats).sort((a, b) => b[1] - a[1]);
+        if (entries.length === 0) return null;
+
+        const data = entries.map(([name, count]) => ({name, count}));
+
+        return (
+            <Card>
+                <CardHeader>
+                    <CardTitle className="text-sm font-semibold">{title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <ChartContainer config={chartConfig} className="h-[200px] w-full">
+                        <BarChart data={data} layout="vertical">
+                            <CartesianGrid horizontal={false} strokeDasharray="3 3"/>
+                            <XAxis type="number" hide/>
+                            <YAxis
+                                dataKey="name"
+                                type="category"
+                                tickLine={false}
+                                axisLine={false}
+                                width={100}
+                                className="text-[10px]"
+                            />
+                            <ChartTooltip content={<ChartTooltipContent hideLabel/>}/>
+                            <Bar
+                                dataKey="count"
+                                fill="var(--color-count)"
+                                radius={[0, 4, 4, 0]}
+                                barSize={15}
+                            />
+                        </BarChart>
+                    </ChartContainer>
+                </CardContent>
+            </Card>
+        );
+    };
 
     return (
         <div className="space-y-6">
@@ -373,6 +420,21 @@ export function StatsView() {
                     </CardContent>
                 </Card>
             </div>
+
+            {data?.feedbackStats && Object.values(data.feedbackStats).some(s => Object.keys(s).length > 0) && (
+                <div className="space-y-4">
+                    <h3 className="text-lg font-bold">Retours utilisateurs (Feedback)</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {renderPieChart("Tranches d'âge", data.feedbackStats.age)}
+                        {renderPieChart("Ressenti post-écoute", data.feedbackStats.feeling)}
+                        {renderPieChart("Genre", data.feedbackStats.gender)}
+                        {renderPieChart("Déjà écouté auparavant", data.feedbackStats.previouslyOpened)}
+                        {renderPieChart("Chez Le Trèfle 2.0", data.feedbackStats.previouslyAtTrefle)}
+                        {renderPieChart("Localisation", data.feedbackStats.location)}
+                        {renderPieChart("Région (France)", data.feedbackStats.region)}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

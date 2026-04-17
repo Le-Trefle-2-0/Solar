@@ -82,6 +82,7 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
                         return reply.send({
                             success: true,
                             channelId,
+                            ticketId: ticket.id,
                             credentials: {channelId, uid, exp, sig},
                             status: ticket.statusName
                         });
@@ -140,6 +141,7 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
                 return reply.send({
                     success: true,
                     channelId,
+                    ticketId: ticket.id,
                     credentials: {channelId, uid, exp, sig}
                 });
             }
@@ -163,6 +165,7 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
             return reply.send({
                 success: true,
                 channelId,
+                ticketId: ticket?.id,
                 credentials: {channelId, uid, exp, sig}
             });
         } catch (e) {

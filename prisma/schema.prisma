@@ -319,6 +319,7 @@ model Ticket {
   info         String?
   voice Boolean @default(false)
   categories Json?
+  feedback Json?
 
   @@map("ticket")
 }

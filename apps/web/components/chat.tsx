@@ -1415,6 +1415,8 @@ export function Chat(props: { channelID: string, statusID: number }) {
                 }
 
                 <div className="sticky bottom-0">
+                    {/* Feedback Form for closed tickets */}
+
                     {replyTo && (
                         <div
                             className="flex items-start justify-between gap-2 mb-2 p-2 rounded-md border border-blue-300 bg-blue-50 text-blue-900">
