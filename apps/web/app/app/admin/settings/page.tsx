@@ -24,15 +24,24 @@ export default async function AdminSettingsPage() {
     }
 
     let initialSettings = {
-        widget_enabled: true
+        widget_enabled: true,
+        monitoring_categories: [] as string[]
     };
 
     try {
-        // @ts-ignore
-        const widgetEnabledSetting = await prisma.settings.findUnique({
-            where: {key: "widget_enabled"}
-        });
+        const settings = await prisma.settings.findMany();
+
+        const widgetEnabledSetting = settings.find(s => s.key === "widget_enabled");
         initialSettings.widget_enabled = widgetEnabledSetting ? widgetEnabledSetting.value === "true" : true;
+
+        const monitoringCategoriesSetting = settings.find(s => s.key === "monitoring_categories");
+        if (monitoringCategoriesSetting) {
+            try {
+                initialSettings.monitoring_categories = JSON.parse(monitoringCategoriesSetting.value);
+            } catch (e) {
+                console.error("Failed to parse monitoring_categories", e);
+            }
+        }
     } catch (e) {
         console.error("[Settings] Failed to fetch settings in admin:", e);
     }

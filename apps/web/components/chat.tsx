@@ -33,6 +33,7 @@ import {
     Avatar,
     AvatarFallback,
     AvatarImage,
+    Badge,
     Button,
     Dialog,
     DialogContent,
@@ -92,6 +93,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
         timestamp: number
     } | null>(null);
     const [chat, setChat] = useState<MsgWithID[]>([])
+    const [availableCategories, setAvailableCategories] = useState<string[]>([]);
     const [loadingMessages, setLoadingMessages] = useState(true)
     const [retryMs, setRetryMs] = useState(1000)
     const [skeletonItems, setSkeletonItems] = useState<{ nameW: number; line1W: number; line2W: number }[]>([])
@@ -651,6 +653,20 @@ export function Chat(props: { channelID: string, statusID: number }) {
                     });
                 }
 
+                apiFetch(`/v1/admin/settings`)
+                    .then((data: { settings: { key: string, value: string }[] }) => {
+                        const catSetting = data.settings?.find(s => s.key === "monitoring_categories");
+                        if (catSetting && !cancelled) {
+                            try {
+                                setAvailableCategories(JSON.parse(catSetting.value));
+                            } catch (e) {
+                                console.error("Failed to parse categories", e);
+                            }
+                        }
+                    })
+                    .catch(() => {
+                    });
+
                 apiFetch(`/v1/events/getAvailable?channelID=${channelID}`)
                     .then((d) => {
                         if (cancelled) return;
@@ -890,13 +906,17 @@ export function Chat(props: { channelID: string, statusID: number }) {
     }
 
     const transmissionSchema = z.object({
-        problematic: z.string(),
-        observations: z.string(),
+        problematic: z.string().min(1, "Requis"),
+        observations: z.string().min(1, "Requis"),
         info: z.string().optional(),
+        categories: z.array(z.string()).min(1, "Choisissez au moins une catégorie"),
     });
 
     const transmissionForm = useForm<z.infer<typeof transmissionSchema>>({
         resolver: zodResolver(transmissionSchema),
+        defaultValues: {
+            categories: [],
+        }
     });
 
     function transmission(data: z.infer<typeof transmissionSchema>) {
@@ -907,6 +927,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                 problematic: data.problematic,
                 observations: data.observations,
                 info: data.info,
+                categories: data.categories,
             })
         }).then(res => {
             if (res.success) {
@@ -1007,6 +1028,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                             content: ref.content,
                                             image: ref.author.image
                                         } : undefined}
+                                        readOnly={status === 3 || status === 4}
                                     />
                                 );
                             })}
@@ -1230,6 +1252,83 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                                                 {...field}
                                                             />
                                                         </FormControl>
+                                                        <FormMessage/>
+                                                    </FormItem>
+                                                )}
+                                            />
+
+                                            <FormField
+                                                control={transmissionForm.control}
+                                                name="categories"
+                                                render={({field}) => (
+                                                    <FormItem className="flex flex-col">
+                                                        <FormLabel>Catégories de l'écoute* :</FormLabel>
+                                                        <Popover>
+                                                            <PopoverTrigger asChild>
+                                                                <FormControl>
+                                                                    <Button
+                                                                        variant="outline"
+                                                                        role="combobox"
+                                                                        className={cn(
+                                                                            "w-full justify-between h-auto min-h-10",
+                                                                            !field.value?.length && "text-muted-foreground"
+                                                                        )}
+                                                                    >
+                                                                        <div className="flex flex-wrap gap-1">
+                                                                            {field.value?.length > 0 ? (
+                                                                                field.value.map((val: string) => (
+                                                                                    <Badge key={val} variant="secondary"
+                                                                                           className="mr-1">
+                                                                                        {val}
+                                                                                    </Badge>
+                                                                                ))
+                                                                            ) : (
+                                                                                "Sélectionner les catégories..."
+                                                                            )}
+                                                                        </div>
+                                                                        <ChevronsUpDown
+                                                                            className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
+                                                                    </Button>
+                                                                </FormControl>
+                                                            </PopoverTrigger>
+                                                            <PopoverContent
+                                                                className="w-[--radix-popover-trigger-width] p-0">
+                                                                <Command>
+                                                                    <CommandInput
+                                                                        placeholder="Rechercher une catégorie..."/>
+                                                                    <CommandList>
+                                                                        <CommandEmpty>Aucune catégorie
+                                                                            trouvée.</CommandEmpty>
+                                                                        <CommandGroup>
+                                                                            {availableCategories.map((item) => (
+                                                                                <CommandItem
+                                                                                    key={item}
+                                                                                    value={item}
+                                                                                    onSelect={() => {
+                                                                                        const newValue = field.value?.includes(item)
+                                                                                            ? field.value.filter((v: string) => v !== item)
+                                                                                            : [...(field.value || []), item];
+                                                                                        field.onChange(newValue);
+                                                                                    }}
+                                                                                >
+                                                                                    <Check
+                                                                                        className={cn(
+                                                                                            "mr-2 h-4 w-4",
+                                                                                            field.value?.includes(item) ? "opacity-100" : "opacity-0"
+                                                                                        )}
+                                                                                    />
+                                                                                    {item}
+                                                                                </CommandItem>
+                                                                            ))}
+                                                                        </CommandGroup>
+                                                                    </CommandList>
+                                                                </Command>
+                                                            </PopoverContent>
+                                                        </Popover>
+                                                        <FormDescription>
+                                                            Sélectionnez une ou plusieurs catégories correspondant à
+                                                            l'échange.
+                                                        </FormDescription>
                                                         <FormMessage/>
                                                     </FormItem>
                                                 )}

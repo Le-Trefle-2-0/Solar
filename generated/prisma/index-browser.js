@@ -328,7 +328,8 @@ exports.Prisma.TicketScalarFieldEnum = {
   problematic: 'problematic',
   observations: 'observations',
     info: 'info',
-    voice: 'voice'
+    voice: 'voice',
+    categories: 'categories'
 };
 
 exports.Prisma.TicketStatusScalarFieldEnum = {

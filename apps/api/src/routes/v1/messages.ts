@@ -14,12 +14,27 @@ export async function registerMessagesRoutes(app: FastifyInstance) {
         const before = beforeStr ? new Date(parseInt(String(beforeStr), 10)) : undefined;
 
         const where: any = before ? {channelId, createdAt: {lt: before}} : {channelId};
-
-        const raw = await prisma.message.findMany({
+        let raw = await prisma.message.findMany({
             where,
             orderBy: {createdAt: 'desc'},
             take: limit,
         });
+
+        // Fallback for cases where channelId might be stored as numeric ID in some contexts (legacy or error)
+        if (raw.length === 0 && /^\d+$/.test(channelId)) {
+            const ticket = await prisma.ticket.findUnique({where: {id: parseInt(channelId, 10)}});
+            if (ticket && ticket.channelId && ticket.channelId !== channelId) {
+                console.log('[API] Falling back to real channelId for messages:', ticket.channelId);
+                raw = await prisma.message.findMany({
+                    where: before ? {
+                        channelId: ticket.channelId,
+                        createdAt: {lt: before}
+                    } : {channelId: ticket.channelId},
+                    orderBy: {createdAt: 'desc'},
+                    take: limit,
+                });
+            }
+        }
 
         const out: any[] = [];
         for (const msg of raw) {
@@ -30,9 +45,16 @@ export async function registerMessagesRoutes(app: FastifyInstance) {
             const reactions = await prisma.reaction.findMany({where: {messageID: msg.id}});
 
             const contentBuffer: any = (msg as any).content as any;
-            const content = Buffer.isBuffer(contentBuffer)
-                ? contentBuffer.toString('utf8')
-                : Buffer.from(new Uint8Array(Object.values(contentBuffer ?? {}))).toString('utf8');
+            let content = "";
+            if (contentBuffer) {
+                if (Buffer.isBuffer(contentBuffer)) {
+                    content = contentBuffer.toString('utf8');
+                } else if (typeof contentBuffer === 'object') {
+                    content = Buffer.from(new Uint8Array(Object.values(contentBuffer))).toString('utf8');
+                } else {
+                    content = String(contentBuffer);
+                }
+            }
 
             out.push({
                 id: msg.id,

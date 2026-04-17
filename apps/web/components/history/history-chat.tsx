@@ -3,13 +3,33 @@
 import React, {useEffect, useRef, useState} from "react";
 import {format} from "date-fns";
 import {fr} from "date-fns/locale";
-import {FileText, NotebookTabs} from "lucide-react";
+import {Check, ChevronsUpDown, FileText, NotebookTabs} from "lucide-react";
 import {apiFetch} from "@/lib/api";
-import {Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Skeleton} from "@/components/ui";
+import {
+    Badge,
+    Button,
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+    Skeleton
+} from "@/components/ui";
 import {Message} from "@/components/message";
 import {useSession} from "@/lib/auth-client";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import {cn} from "@/lib/utils";
+import {toast} from "sonner";
 
 interface HistoryChatProps {
     channelId: string;
@@ -21,25 +41,34 @@ export function HistoryChat({channelId}: HistoryChatProps) {
     const [messages, setMessages] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [showTransmission, setShowTransmission] = useState(false);
+    const [availableCategories, setAvailableCategories] = useState<string[]>([]);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [ticketRes, messagesRes] = await Promise.all([
+                const [ticketRes, messagesRes, settingsRes] = await Promise.all([
                     apiFetch(`/v1/tickets/findBy/channelID`, {
                         method: 'POST',
                         body: JSON.stringify({channelID: channelId})
                     }),
-                    apiFetch(`/v1/messages/${channelId}?limit=1000`)
+                    apiFetch(`/v1/messages/${channelId}?limit=1000`),
+                    apiFetch('/v1/admin/settings')
                 ]);
 
                 if (ticketRes.success) {
                     setTicket(ticketRes.ticket);
                 }
                 setMessages(messagesRes);
-            } catch (e) {
+                if (settingsRes.settings) {
+                    const monitoringCategories = settingsRes.settings.find((s: any) => s.key === 'monitoring_categories');
+                    if (monitoringCategories) {
+                        setAvailableCategories(JSON.parse(monitoringCategories.value));
+                    }
+                }
+            } catch (e: any) {
                 console.error("Failed to fetch history data", e);
+                toast.error(`Erreur de chargement: ${e.message}`);
             } finally {
                 setLoading(false);
             }
@@ -199,6 +228,7 @@ export function HistoryChat({channelId}: HistoryChatProps) {
                                     id={id}
                                     channelId={channelId}
                                     canManageMessages={false}
+                                    readOnly={true}
                                     edited={edited}
                                     replyOf={ref ? {
                                         id: ref.id,
@@ -218,6 +248,69 @@ export function HistoryChat({channelId}: HistoryChatProps) {
                 </div>
 
                 <div className="absolute top-6 right-6 flex flex-row gap-2">
+                    {ticket && (
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button variant="outline" className="h-auto min-h-10 max-w-[300px] justify-between">
+                                    <div className="flex flex-wrap gap-1 items-center">
+                                        {ticket.categories && (ticket.categories as string[]).length > 0 ? (
+                                            (ticket.categories as string[]).map((val: string) => (
+                                                <Badge key={val} variant="secondary">
+                                                    {val}
+                                                </Badge>
+                                            ))
+                                        ) : (
+                                            <span className="text-muted-foreground">Aucune catégorie</span>
+                                        )}
+                                    </div>
+                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[300px] p-0">
+                                <Command>
+                                    <CommandInput placeholder="Modifier les catégories..."/>
+                                    <CommandList>
+                                        <CommandEmpty>Aucune catégorie trouvée.</CommandEmpty>
+                                        <CommandGroup>
+                                            {availableCategories.map((item) => (
+                                                <CommandItem
+                                                    key={item}
+                                                    value={item}
+                                                    onSelect={() => {
+                                                        const currentCats = (ticket.categories as string[]) || [];
+                                                        const newCats = currentCats.includes(item)
+                                                            ? currentCats.filter((v: string) => v !== item)
+                                                            : [...currentCats, item];
+
+                                                        apiFetch('/v1/tickets/update-categories', {
+                                                            method: 'POST',
+                                                            body: JSON.stringify({
+                                                                ticketID: ticket.id,
+                                                                categories: newCats
+                                                            })
+                                                        }).then(res => {
+                                                            if (res.success) {
+                                                                setTicket(res.update);
+                                                                toast.success("Catégories mises à jour");
+                                                            }
+                                                        }).catch(() => toast.error("Erreur lors de la mise à jour"));
+                                                    }}
+                                                >
+                                                    <Check
+                                                        className={cn(
+                                                            "mr-2 h-4 w-4",
+                                                            ((ticket.categories as string[]) || []).includes(item) ? "opacity-100" : "opacity-0"
+                                                        )}
+                                                    />
+                                                    {item}
+                                                </CommandItem>
+                                            ))}
+                                        </CommandGroup>
+                                    </CommandList>
+                                </Command>
+                            </PopoverContent>
+                        </Popover>
+                    )}
                     <Dialog>
                         <DialogTrigger asChild>
                             <Button variant="outline">

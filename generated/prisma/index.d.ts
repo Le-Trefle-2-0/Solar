@@ -139,7 +139,7 @@ export type Recruitment = $Result.DefaultSelection<Prisma.$RecruitmentPayload>
 export type Image = $Result.DefaultSelection<Prisma.$ImagePayload>
 /**
  * Model Settings
- *
+ * 
  */
 export type Settings = $Result.DefaultSelection<Prisma.$SettingsPayload>
 
@@ -20471,6 +20471,7 @@ export namespace Prisma {
       observations: number
       info: number
       voice: number
+      categories: number
     _all: number
   }
 
@@ -20533,6 +20534,7 @@ export namespace Prisma {
       observations?: true
       info?: true
       voice?: true
+      categories?: true
     _all?: true
   }
 
@@ -20636,6 +20638,7 @@ export namespace Prisma {
       observations: string | null
       info: string | null
       voice: boolean
+      categories: JsonValue | null
     _count: TicketCountAggregateOutputType | null
     _avg: TicketAvgAggregateOutputType | null
     _sum: TicketSumAggregateOutputType | null
@@ -20673,6 +20676,7 @@ export namespace Prisma {
       observations?: boolean
       info?: boolean
       voice?: boolean
+      categories?: boolean
     channel?: boolean | Ticket$channelArgs<ExtArgs>
     user?: boolean | Ticket$userArgs<ExtArgs>
       status?: boolean | TicketStatusDefaultArgs<ExtArgs>
@@ -20696,9 +20700,10 @@ export namespace Prisma {
       observations?: boolean
       info?: boolean
       voice?: boolean
+      categories?: boolean
   }
 
-    export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "discordUserID" | "source" | "metadata" | "channelId" | "channelName" | "createdAt" | "updatedAt" | "assignedUserId" | "statusName" | "statusLabel" | "problematic" | "observations" | "info" | "voice", ExtArgs["result"]["ticket"]>
+    export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "discordUserID" | "source" | "metadata" | "channelId" | "channelName" | "createdAt" | "updatedAt" | "assignedUserId" | "statusName" | "statusLabel" | "problematic" | "observations" | "info" | "voice" | "categories", ExtArgs["result"]["ticket"]>
   export type TicketInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     channel?: boolean | Ticket$channelArgs<ExtArgs>
     user?: boolean | Ticket$userArgs<ExtArgs>
@@ -20728,6 +20733,7 @@ export namespace Prisma {
         observations: string | null
         info: string | null
         voice: boolean
+        categories: Prisma.JsonValue | null
     }, ExtArgs["result"]["ticket"]>
     composites: {}
   }
@@ -21115,6 +21121,7 @@ export namespace Prisma {
         readonly observations: FieldRef<"Ticket", 'String'>
         readonly info: FieldRef<"Ticket", 'String'>
         readonly voice: FieldRef<"Ticket", 'Boolean'>
+        readonly categories: FieldRef<"Ticket", 'Json'>
   }
 
 
@@ -29304,7 +29311,8 @@ export namespace Prisma {
       problematic: 'problematic',
       observations: 'observations',
       info: 'info',
-      voice: 'voice'
+      voice: 'voice',
+      categories: 'categories'
   };
 
   export type TicketScalarFieldEnum = (typeof TicketScalarFieldEnum)[keyof typeof TicketScalarFieldEnum]
@@ -31149,6 +31157,7 @@ export namespace Prisma {
       observations?: StringNullableFilter<"Ticket"> | string | null
       info?: StringNullableFilter<"Ticket"> | string | null
       voice?: BoolFilter<"Ticket"> | boolean
+      categories?: JsonNullableFilter<"Ticket">
     channel?: XOR<ChannelNullableScalarRelationFilter, ChannelWhereInput> | null
     user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
       status?: XOR<TicketStatusScalarRelationFilter, TicketStatusWhereInput>
@@ -31170,6 +31179,7 @@ export namespace Prisma {
       observations?: SortOrderInput | SortOrder
       info?: SortOrderInput | SortOrder
       voice?: SortOrder
+      categories?: SortOrderInput | SortOrder
     channel?: ChannelOrderByWithRelationInput
     user?: UserOrderByWithRelationInput
       status?: TicketStatusOrderByWithRelationInput
@@ -31195,6 +31205,7 @@ export namespace Prisma {
       observations?: StringNullableFilter<"Ticket"> | string | null
       info?: StringNullableFilter<"Ticket"> | string | null
       voice?: BoolFilter<"Ticket"> | boolean
+      categories?: JsonNullableFilter<"Ticket">
     channel?: XOR<ChannelNullableScalarRelationFilter, ChannelWhereInput> | null
     user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
       status?: XOR<TicketStatusScalarRelationFilter, TicketStatusWhereInput>
@@ -31216,6 +31227,7 @@ export namespace Prisma {
       observations?: SortOrderInput | SortOrder
       info?: SortOrderInput | SortOrder
       voice?: SortOrder
+      categories?: SortOrderInput | SortOrder
     _count?: TicketCountOrderByAggregateInput
     _avg?: TicketAvgOrderByAggregateInput
     _max?: TicketMaxOrderByAggregateInput
@@ -31242,6 +31254,7 @@ export namespace Prisma {
       observations?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
       info?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
       voice?: BoolWithAggregatesFilter<"Ticket"> | boolean
+      categories?: JsonNullableWithAggregatesFilter<"Ticket">
   }
 
     export type TicketStatusWhereInput = {
@@ -33197,6 +33210,7 @@ export namespace Prisma {
       observations?: string | null
       info?: string | null
       voice?: boolean
+      categories?: NullableJsonNullValueInput | InputJsonValue
     channel?: ChannelCreateNestedOneWithoutTicketInput
     user?: UserCreateNestedOneWithoutTicketInput
       status: TicketStatusCreateNestedOneWithoutTicketInput
@@ -33218,6 +33232,7 @@ export namespace Prisma {
       observations?: string | null
       info?: string | null
       voice?: boolean
+      categories?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type TicketUpdateInput = {
@@ -33230,6 +33245,7 @@ export namespace Prisma {
       observations?: NullableStringFieldUpdateOperationsInput | string | null
       info?: NullableStringFieldUpdateOperationsInput | string | null
       voice?: BoolFieldUpdateOperationsInput | boolean
+      categories?: NullableJsonNullValueInput | InputJsonValue
     channel?: ChannelUpdateOneWithoutTicketNestedInput
     user?: UserUpdateOneWithoutTicketNestedInput
       status?: TicketStatusUpdateOneRequiredWithoutTicketNestedInput
@@ -33251,6 +33267,7 @@ export namespace Prisma {
       observations?: NullableStringFieldUpdateOperationsInput | string | null
       info?: NullableStringFieldUpdateOperationsInput | string | null
       voice?: BoolFieldUpdateOperationsInput | boolean
+      categories?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type TicketCreateManyInput = {
@@ -33269,6 +33286,7 @@ export namespace Prisma {
       observations?: string | null
       info?: string | null
       voice?: boolean
+      categories?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type TicketUpdateManyMutationInput = {
@@ -33281,6 +33299,7 @@ export namespace Prisma {
       observations?: NullableStringFieldUpdateOperationsInput | string | null
       info?: NullableStringFieldUpdateOperationsInput | string | null
       voice?: BoolFieldUpdateOperationsInput | boolean
+      categories?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type TicketUncheckedUpdateManyInput = {
@@ -33299,6 +33318,7 @@ export namespace Prisma {
       observations?: NullableStringFieldUpdateOperationsInput | string | null
       info?: NullableStringFieldUpdateOperationsInput | string | null
       voice?: BoolFieldUpdateOperationsInput | boolean
+      categories?: NullableJsonNullValueInput | InputJsonValue
   }
 
     export type TicketStatusCreateInput = {
@@ -35070,6 +35090,7 @@ export namespace Prisma {
       observations?: SortOrder
       info?: SortOrder
       voice?: SortOrder
+      categories?: SortOrder
   }
 
   export type TicketAvgOrderByAggregateInput = {
@@ -37620,6 +37641,7 @@ export namespace Prisma {
       observations?: string | null
       info?: string | null
       voice?: boolean
+      categories?: NullableJsonNullValueInput | InputJsonValue
     channel?: ChannelCreateNestedOneWithoutTicketInput
       status: TicketStatusCreateNestedOneWithoutTicketInput
   }
@@ -37639,6 +37661,7 @@ export namespace Prisma {
       observations?: string | null
       info?: string | null
       voice?: boolean
+      categories?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type TicketCreateOrConnectWithoutUserInput = {
@@ -38073,6 +38096,7 @@ export namespace Prisma {
       observations?: StringNullableFilter<"Ticket"> | string | null
       info?: StringNullableFilter<"Ticket"> | string | null
       voice?: BoolFilter<"Ticket"> | boolean
+      categories?: JsonNullableFilter<"Ticket">
   }
 
   export type ApikeyUpsertWithWhereUniqueWithoutUserInput = {
@@ -39486,6 +39510,7 @@ export namespace Prisma {
       observations?: string | null
       info?: string | null
       voice?: boolean
+      categories?: NullableJsonNullValueInput | InputJsonValue
     user?: UserCreateNestedOneWithoutTicketInput
       status: TicketStatusCreateNestedOneWithoutTicketInput
   }
@@ -39504,6 +39529,7 @@ export namespace Prisma {
       observations?: string | null
       info?: string | null
       voice?: boolean
+      categories?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type TicketCreateOrConnectWithoutChannelInput = {
@@ -41237,6 +41263,7 @@ export namespace Prisma {
         observations?: string | null
         info?: string | null
         voice?: boolean
+        categories?: NullableJsonNullValueInput | InputJsonValue
         channel?: ChannelCreateNestedOneWithoutTicketInput
         user?: UserCreateNestedOneWithoutTicketInput
     }
@@ -41255,6 +41282,7 @@ export namespace Prisma {
         observations?: string | null
         info?: string | null
         voice?: boolean
+        categories?: NullableJsonNullValueInput | InputJsonValue
     }
 
     export type TicketCreateOrConnectWithoutStatusInput = {
@@ -41793,6 +41821,7 @@ export namespace Prisma {
       observations?: string | null
       info?: string | null
       voice?: boolean
+      categories?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type ApikeyCreateManyUserInput = {
@@ -42101,6 +42130,7 @@ export namespace Prisma {
       observations?: NullableStringFieldUpdateOperationsInput | string | null
       info?: NullableStringFieldUpdateOperationsInput | string | null
       voice?: BoolFieldUpdateOperationsInput | boolean
+      categories?: NullableJsonNullValueInput | InputJsonValue
     channel?: ChannelUpdateOneWithoutTicketNestedInput
       status?: TicketStatusUpdateOneRequiredWithoutTicketNestedInput
   }
@@ -42120,6 +42150,7 @@ export namespace Prisma {
       observations?: NullableStringFieldUpdateOperationsInput | string | null
       info?: NullableStringFieldUpdateOperationsInput | string | null
       voice?: BoolFieldUpdateOperationsInput | boolean
+      categories?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type TicketUncheckedUpdateManyWithoutUserInput = {
@@ -42137,6 +42168,7 @@ export namespace Prisma {
       observations?: NullableStringFieldUpdateOperationsInput | string | null
       info?: NullableStringFieldUpdateOperationsInput | string | null
       voice?: BoolFieldUpdateOperationsInput | boolean
+      categories?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type ApikeyUpdateWithoutUserInput = {
@@ -42389,6 +42421,7 @@ export namespace Prisma {
       observations?: string | null
       info?: string | null
       voice?: boolean
+      categories?: NullableJsonNullValueInput | InputJsonValue
   }
 
     export type EventCreateManyChannelInput = {
@@ -42443,6 +42476,7 @@ export namespace Prisma {
       observations?: NullableStringFieldUpdateOperationsInput | string | null
       info?: NullableStringFieldUpdateOperationsInput | string | null
       voice?: BoolFieldUpdateOperationsInput | boolean
+      categories?: NullableJsonNullValueInput | InputJsonValue
     user?: UserUpdateOneWithoutTicketNestedInput
       status?: TicketStatusUpdateOneRequiredWithoutTicketNestedInput
   }
@@ -42461,6 +42495,7 @@ export namespace Prisma {
       observations?: NullableStringFieldUpdateOperationsInput | string | null
       info?: NullableStringFieldUpdateOperationsInput | string | null
       voice?: BoolFieldUpdateOperationsInput | boolean
+      categories?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type TicketUncheckedUpdateManyWithoutChannelInput = {
@@ -42477,6 +42512,7 @@ export namespace Prisma {
       observations?: NullableStringFieldUpdateOperationsInput | string | null
       info?: NullableStringFieldUpdateOperationsInput | string | null
       voice?: BoolFieldUpdateOperationsInput | boolean
+      categories?: NullableJsonNullValueInput | InputJsonValue
   }
 
     export type EventUpdateWithoutChannelInput = {
@@ -42648,6 +42684,7 @@ export namespace Prisma {
         observations?: string | null
         info?: string | null
         voice?: boolean
+        categories?: NullableJsonNullValueInput | InputJsonValue
     }
 
     export type TicketUpdateWithoutStatusInput = {
@@ -42660,6 +42697,7 @@ export namespace Prisma {
         observations?: NullableStringFieldUpdateOperationsInput | string | null
         info?: NullableStringFieldUpdateOperationsInput | string | null
         voice?: BoolFieldUpdateOperationsInput | boolean
+        categories?: NullableJsonNullValueInput | InputJsonValue
         channel?: ChannelUpdateOneWithoutTicketNestedInput
         user?: UserUpdateOneWithoutTicketNestedInput
     }
@@ -42678,6 +42716,7 @@ export namespace Prisma {
         observations?: NullableStringFieldUpdateOperationsInput | string | null
         info?: NullableStringFieldUpdateOperationsInput | string | null
         voice?: BoolFieldUpdateOperationsInput | boolean
+        categories?: NullableJsonNullValueInput | InputJsonValue
     }
 
     export type TicketUncheckedUpdateManyWithoutStatusInput = {
@@ -42694,6 +42733,7 @@ export namespace Prisma {
         observations?: NullableStringFieldUpdateOperationsInput | string | null
         info?: NullableStringFieldUpdateOperationsInput | string | null
         voice?: BoolFieldUpdateOperationsInput | boolean
+        categories?: NullableJsonNullValueInput | InputJsonValue
     }
 
 

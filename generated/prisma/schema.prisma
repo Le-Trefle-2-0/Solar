@@ -318,6 +318,7 @@ model Ticket {
   observations String?
   info         String?
   voice        Boolean      @default(false)
+  categories   Json?
 
   @@map("ticket")
 }

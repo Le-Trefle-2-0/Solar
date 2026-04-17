@@ -27,6 +27,7 @@ import {Bot, Ellipsis, IdCardLanyard, Pencil, Reply, SmilePlus, Trash2} from "lu
 import Image from "next/image";
 import {toast} from "sonner";
 import {useSocket} from "@/context/Socket";
+import {cn} from "@/lib/utils";
 import {
     ContextMenu,
     ContextMenuContent,
@@ -55,6 +56,7 @@ export function Message(props: {
     replyTargetId?: number,
     replyOf?: { id: number; authorName: string; content: string; image?: string | null } | undefined,
     edited?: boolean,
+    readOnly?: boolean,
 }) {
     const {
         prevDate,
@@ -76,6 +78,7 @@ export function Message(props: {
         replyOf,
         canManageMessages,
         edited: wasEdited,
+        readOnly,
     } = props;
     const {socket} = useSocket();
 
@@ -228,6 +231,257 @@ export function Message(props: {
             });
     }
 
+    const MessageContent = () => (
+        <div
+            id={`message-${id}`}
+            className={`relative group w-full flex flex-row gap-2 ${isLastInBlock ? 'mb-6' : 'mb-1'} hover:bg-gray-100 rounded-lg px-2 ${replyTargetId === id ? 'border-2 border-blue-400 bg-blue-50' : ''}`}>
+            <div
+                className={cn(
+                    "absolute -top-4 right-2 flex gap-1 opacity-0 transition-opacity",
+                    !readOnly && "group-hover:opacity-100"
+                )}>
+                {!readOnly && (
+                    <>
+                        <Popover onOpenChange={setIsOpen} open={isOpen}>
+                            <PopoverTrigger asChild>
+                                <Button variant="outline">
+                                    <SmilePlus/>
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-fit p-0">
+                                <EmojiPicker
+                                    className="h-[342px]"
+                                    onEmojiSelect={({emoji}) => {
+                                        setIsOpen(false);
+                                        sendReaction(emoji);
+                                    }}
+                                    locale="fr"
+                                >
+                                    <EmojiPickerSearch/>
+                                    <EmojiPickerContent/>
+                                    <EmojiPickerFooter/>
+                                </EmojiPicker>
+                            </PopoverContent>
+                        </Popover>
+                        <Button variant="outline" onClick={() => onReply ? onReply({
+                            id,
+                            authorName,
+                            content,
+                            timestamp
+                        }) : toast("Fonctionnalité encore non disponible")}>
+                            <Reply/>
+                        </Button>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline">
+                                    <Ellipsis/>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <DropdownMenuItem onClick={() => onReply ? onReply({
+                                    id,
+                                    authorName,
+                                    content,
+                                    timestamp
+                                }) : toast("Fonctionnalité encore non disponible")}>
+                                    <Reply/> Répondre
+                                </DropdownMenuItem>
+                                {
+                                    isAuthor ?
+
+                                        <DropdownMenuItem onClick={() => {
+                                            setIsEditing(true);
+                                            setEditContent(content);
+                                        }}>
+                                            <Pencil/> Modifier
+                                        </DropdownMenuItem>
+                                        : null
+                                }
+                                {(isAuthor || canManageMessages) ? (
+                                    <DropdownMenuItem className="text-red-500"
+                                                      onClick={() => setConfirmOpen(true)}>
+                                        <Trash2/> Supprimer
+                                    </DropdownMenuItem>
+                                ) : null}
+                                <DropdownMenuSeparator/>
+                                <DropdownMenuItem
+                                    onClick={() => navigator.clipboard.writeText(id.toString())}>
+                                    <IdCardLanyard/> Copier l'identifiant
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </>
+                )}
+            </div>
+            <div className="w-12 flex-shrink-0 flex flex-col items-center justify-start pt-1">
+                {showAuthorInfo ? (
+                    <Avatar className="h-12 w-12 rounded-xl border">
+                        <AvatarImage src={profilePicture || ""} alt={authorName}/>
+                        <AvatarFallback className="rounded-xl bg-primary text-primary-foreground font-bold">
+                            {authorName?.slice(0, 2).toUpperCase() || "US"}
+                        </AvatarFallback>
+                    </Avatar>
+                ) : (
+                    <span className="hidden group-hover:block text-xs text-gray-500">
+                {dateObj.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
+            </span>
+                )}
+            </div>
+            <div>
+                {replyOf && (
+                    <div
+                        className="mb-1 text-xs text-gray-600 hover:text-blue-700 cursor-pointer flex items-center gap-2 border-l-2 border-gray-300 pl-2 max-w-[70vw]"
+                        onClick={() => {
+                            const el = document.getElementById(`message-${replyOf.id}`);
+                            el?.scrollIntoView({behavior: 'smooth', block: 'center'});
+                        }}
+                        title={`Aller au message #${replyOf.id}`}
+                    >
+                        <Avatar className="h-4 w-4 rounded-md flex-shrink-0">
+                            <AvatarImage src={replyOf.image || ""} alt={replyOf.authorName}/>
+                            <AvatarFallback
+                                className="rounded-md bg-primary text-[8px] text-primary-foreground font-bold">
+                                {replyOf.authorName?.slice(0, 2).toUpperCase() || "US"}
+                            </AvatarFallback>
+                        </Avatar>
+                        <span className="font-medium text-gray-700">{replyOf.authorName}</span>
+                        <span
+                            className="truncate">{replyOf.content.length > 60 ? `${replyOf.content.slice(0, 60)}…` : replyOf.content}</span>
+                    </div>
+                )}
+                {showAuthorInfo && (
+                    <div className="flex flex-row items-center gap-4 mb-1">
+                <span
+                    className={
+                        authorRole === 'bot'
+                            ? 'font-semibold text-sm text-blue-800 flex flex-row gap-3'
+                            : 'font-semibold text-sm text-gray-900 flex flex-row gap-3'
+                    }
+                >
+                  {authorName}
+                    {authorRole === 'bot' &&
+                        <Badge
+                            variant="secondary"
+                            className="bg-blue-600 text-white dark:bg-blue-800"
+                        >
+                            <Bot/>
+                            BOT
+                        </Badge>}
+                </span>
+                        <span className="font-light text-sm text-gray-900">{formattedDate}</span>
+                    </div>
+                )}
+                {isEditing ? (
+                    <div className="flex flex-col gap-2">
+                        <textarea
+                            value={editContent}
+                            onChange={(e) => setEditContent(e.target.value)}
+                            rows={3}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Escape') {
+                                    e.preventDefault();
+                                    setIsEditing(false);
+                                    setEditContent(content);
+                                } else if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault();
+                                    handleSaveEdit();
+                                }
+                            }}
+                            className="w-full p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                        />
+                        <div className="flex gap-2">
+                            <Button size="sm" variant="outline" onClick={() => {
+                                setIsEditing(false);
+                                setEditContent(content);
+                            }}>
+                                Annuler
+                            </Button>
+                        </div>
+                    </div>
+                ) : (
+                    <h3 className="text-lg text-gray-900 whitespace-pre-wrap break-words max-w-full">
+                        {mediaTenorGifRegex.test(content) || resolvedTenorGif ? (
+                            <Image
+                                src={resolvedTenorGif || content}
+                                alt="gif"
+                                height={256}
+                                width={256}
+                                unoptimized
+                                className="rounded-xl p-2"
+                            />
+                        ) : (
+                            content.split(/(https?:\/\/[^\s]+)/g).map((part, i) => {
+                                if (/https?:\/\/[^\s]+/.test(part)) {
+                                    return (
+                                        <a
+                                            key={`link-${i}`}
+                                            href={part}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-blue-600 underline"
+                                        >
+                                            {part}
+                                        </a>
+                                    );
+                                } else {
+                                    const markdownRegex = /(\*\*([^*]+)\*\*|\*([^*]+)\*|__(.+?)__)/g;
+                                    const elements: any[] = [];
+                                    let lastIndex = 0;
+                                    let match;
+                                    while ((match = markdownRegex.exec(part)) !== null) {
+                                        if (match.index > lastIndex) {
+                                            elements.push(part.slice(lastIndex, match.index));
+                                        }
+                                        const [fullMatch, , boldText, italicText, underlineText] = match;
+                                        if (boldText) {
+                                            elements.push(<strong
+                                                key={`bold-${i}-${match.index}`}>{boldText}</strong>);
+                                        } else if (italicText) {
+                                            elements.push(<em
+                                                key={`italic-${i}-${match.index}`}>{italicText}</em>);
+                                        } else if (underlineText) {
+                                            elements.push(<u
+                                                key={`underline-${i}-${match.index}`}>{underlineText}</u>);
+                                        }
+                                        lastIndex = match.index + fullMatch.length;
+                                    }
+                                    if (lastIndex < part.length) {
+                                        elements.push(part.slice(lastIndex));
+                                    }
+                                    return <React.Fragment key={i}>{elements}</React.Fragment>;
+                                }
+                            })
+                        )}
+                        {wasEdited ? (
+                            <span className="ml-2 text-xs text-gray-500 italic">Modifié</span>) : null}
+                    </h3>
+                )}
+
+                {Object.entries(reactionMap ?? {}).length > 0 && (
+                    <div className="flex flex-row gap-2 mt-2">
+                        {Object.entries(reactionMap ?? {}).map(([emoji, list]) => (
+                            <Badge
+                                key={emoji}
+                                variant={list.some(r => r.userID === userID) ? "secondary" : "outline"}
+                                className={list.some(r => r.userID === userID) ? "text-base bg-blue-300 dark:bg-blue-800 cursor-pointer" : "text-base cursor-pointer"}
+                                onClick={() => {
+                                    if (readOnly) return;
+                                    if (list.some(r => r.userID === userID)) {
+                                        const reaction = list.find(r => r.userID === userID);
+                                        if (!reaction) return;
+                                        removeReaction(reaction.id, emoji)
+                                    } else sendReaction(emoji);
+                                }}
+                            >
+                                {emoji} {list.length}
+                            </Badge>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+
     return (
         <div className="contents">
             {showDateSeparator && (
@@ -244,281 +498,46 @@ export function Message(props: {
                     <div className="flex-grow border-t border-gray-300"></div>
                 </div>
             )}
-            <ContextMenu>
-                <ContextMenuTrigger>
-                    <div
-                        id={`message-${id}`}
-                        className={`relative group w-full flex flex-row gap-2 ${isLastInBlock ? 'mb-6' : 'mb-1'} hover:bg-gray-100 rounded-lg px-2 ${replyTargetId === id ? 'border-2 border-blue-400 bg-blue-50' : ''}`}>
-                        <div
-                            className="absolute -top-4 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Popover onOpenChange={setIsOpen} open={isOpen}>
-                                <PopoverTrigger asChild>
-                                    <Button variant="outline">
-                                        <SmilePlus/>
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-fit p-0">
-                                    <EmojiPicker
-                                        className="h-[342px]"
-                                        onEmojiSelect={({emoji}) => {
-                                            setIsOpen(false);
-                                            sendReaction(emoji);
-                                        }}
-                                        locale="fr"
-                                    >
-                                        <EmojiPickerSearch/>
-                                        <EmojiPickerContent/>
-                                        <EmojiPickerFooter/>
-                                    </EmojiPicker>
-                                </PopoverContent>
-                            </Popover>
-                            <Button variant="outline" onClick={() => onReply ? onReply({
-                                id,
-                                authorName,
-                                content,
-                                timestamp
-                            }) : toast("Fonctionnalité encore non disponible")}>
-                                <Reply/>
-                            </Button>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="outline">
-                                        <Ellipsis/>
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent>
-                                    <DropdownMenuItem onClick={() => onReply ? onReply({
-                                        id,
-                                        authorName,
-                                        content,
-                                        timestamp
-                                    }) : toast("Fonctionnalité encore non disponible")}>
-                                        <Reply/> Répondre
-                                    </DropdownMenuItem>
-                                    {
-                                        isAuthor ?
-
-                                            <DropdownMenuItem onClick={() => {
-                                                setIsEditing(true);
-                                                setEditContent(content);
-                                            }}>
-                                                <Pencil/> Modifier
-                                            </DropdownMenuItem>
-                                            : null
-                                    }
-                                    {(isAuthor || canManageMessages) ? (
-                                        <DropdownMenuItem className="text-red-500"
-                                                          onClick={() => setConfirmOpen(true)}>
-                                            <Trash2/> Supprimer
-                                        </DropdownMenuItem>
-                                    ) : null}
-                                    <DropdownMenuSeparator/>
-                                    <DropdownMenuItem
-                                        onClick={() => navigator.clipboard.writeText(id.toString())}>
-                                        <IdCardLanyard/> Copier l'identifiant
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
-                        <div className="w-12 flex-shrink-0 flex flex-col items-center justify-start pt-1">
-                            {showAuthorInfo ? (
-                                <Avatar className="h-12 w-12 rounded-xl border">
-                                    <AvatarImage src={profilePicture || ""} alt={authorName}/>
-                                    <AvatarFallback className="rounded-xl bg-primary text-primary-foreground font-bold">
-                                        {authorName?.slice(0, 2).toUpperCase() || "US"}
-                                    </AvatarFallback>
-                                </Avatar>
-                            ) : (
-                                <span className="hidden group-hover:block text-xs text-gray-500">
-                            {dateObj.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
-                        </span>
-                            )}
-                        </div>
-                        <div>
-                            {replyOf && (
-                                <div
-                                    className="mb-1 text-xs text-gray-600 hover:text-blue-700 cursor-pointer flex items-center gap-2 border-l-2 border-gray-300 pl-2 max-w-[70vw]"
-                                    onClick={() => {
-                                        const el = document.getElementById(`message-${replyOf.id}`);
-                                        el?.scrollIntoView({behavior: 'smooth', block: 'center'});
-                                    }}
-                                    title={`Aller au message #${replyOf.id}`}
-                                >
-                                    <Avatar className="h-4 w-4 rounded-md flex-shrink-0">
-                                        <AvatarImage src={replyOf.image || ""} alt={replyOf.authorName}/>
-                                        <AvatarFallback
-                                            className="rounded-md bg-primary text-[8px] text-primary-foreground font-bold">
-                                            {replyOf.authorName?.slice(0, 2).toUpperCase() || "US"}
-                                        </AvatarFallback>
-                                    </Avatar>
-                                    <span className="font-medium text-gray-700">{replyOf.authorName}</span>
-                                    <span
-                                        className="truncate">{replyOf.content.length > 60 ? `${replyOf.content.slice(0, 60)}…` : replyOf.content}</span>
-                                </div>
-                            )}
-                            {showAuthorInfo && (
-                                <div className="flex flex-row items-center gap-4 mb-1">
-                            <span
-                                className={
-                                    authorRole === 'bot'
-                                        ? 'font-semibold text-sm text-blue-800 flex flex-row gap-3'
-                                        : 'font-semibold text-sm text-gray-900 flex flex-row gap-3'
-                                }
-                            >
-                              {authorName}
-                                {authorRole === 'bot' &&
-                                    <Badge
-                                        variant="secondary"
-                                        className="bg-blue-600 text-white dark:bg-blue-800"
-                                    >
-                                        <Bot/>
-                                        BOT
-                                    </Badge>}
-                            </span>
-                                    <span className="font-light text-sm text-gray-900">{formattedDate}</span>
-                                </div>
-                            )}
-                            {isEditing ? (
-                                <div className="flex flex-col gap-2">
-                                    <textarea
-                                        value={editContent}
-                                        onChange={(e) => setEditContent(e.target.value)}
-                                        rows={3}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Escape') {
-                                                e.preventDefault();
-                                                setIsEditing(false);
-                                                setEditContent(content);
-                                            } else if (e.key === 'Enter' && !e.shiftKey) {
-                                                e.preventDefault();
-                                                handleSaveEdit();
-                                            }
-                                        }}
-                                        className="w-full p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
-                                    />
-                                    <div className="flex gap-2">
-                                        <Button size="sm" variant="outline" onClick={() => {
-                                            setIsEditing(false);
-                                            setEditContent(content);
-                                        }}>
-                                            Annuler
-                                        </Button>
-                                    </div>
-                                </div>
-                            ) : (
-                                <h3 className="text-lg text-gray-900 whitespace-pre-wrap break-words max-w-full">
-                                    {mediaTenorGifRegex.test(content) || resolvedTenorGif ? (
-                                        <Image
-                                            src={resolvedTenorGif || content}
-                                            alt="gif"
-                                            height={256}
-                                            width={256}
-                                            unoptimized
-                                            className="rounded-xl p-2"
-                                        />
-                                    ) : (
-                                        content.split(/(https?:\/\/[^\s]+)/g).map((part, i) => {
-                                            if (/https?:\/\/[^\s]+/.test(part)) {
-                                                return (
-                                                    <a
-                                                        key={`link-${i}`}
-                                                        href={part}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="text-blue-600 underline"
-                                                    >
-                                                        {part}
-                                                    </a>
-                                                );
-                                            } else {
-                                                const markdownRegex = /(\*\*([^*]+)\*\*|\*([^*]+)\*|__(.+?)__)/g;
-                                                const elements: any[] = [];
-                                                let lastIndex = 0;
-                                                let match;
-                                                while ((match = markdownRegex.exec(part)) !== null) {
-                                                    if (match.index > lastIndex) {
-                                                        elements.push(part.slice(lastIndex, match.index));
-                                                    }
-                                                    const [fullMatch, , boldText, italicText, underlineText] = match;
-                                                    if (boldText) {
-                                                        elements.push(<strong
-                                                            key={`bold-${i}-${match.index}`}>{boldText}</strong>);
-                                                    } else if (italicText) {
-                                                        elements.push(<em
-                                                            key={`italic-${i}-${match.index}`}>{italicText}</em>);
-                                                    } else if (underlineText) {
-                                                        elements.push(<u
-                                                            key={`underline-${i}-${match.index}`}>{underlineText}</u>);
-                                                    }
-                                                    lastIndex = match.index + fullMatch.length;
-                                                }
-                                                if (lastIndex < part.length) {
-                                                    elements.push(part.slice(lastIndex));
-                                                }
-                                                return <React.Fragment key={i}>{elements}</React.Fragment>;
-                                            }
-                                        })
-                                    )}
-                                    {wasEdited ? (
-                                        <span className="ml-2 text-xs text-gray-500 italic">Modifié</span>) : null}
-                                </h3>
-                            )}
-
-                            {Object.entries(reactionMap ?? {}).length > 0 && (
-                                <div className="flex flex-row gap-2 mt-2">
-                                    {Object.entries(reactionMap ?? {}).map(([emoji, list]) => (
-                                        <Badge
-                                            key={emoji}
-                                            variant={list.some(r => r.userID === userID) ? "secondary" : "outline"}
-                                            className={list.some(r => r.userID === userID) ? "text-base bg-blue-300 dark:bg-blue-800 cursor-pointer" : "text-base cursor-pointer"}
-                                            onClick={() => {
-                                                if (list.some(r => r.userID === userID)) {
-                                                    const reaction = list.find(r => r.userID === userID);
-                                                    if (!reaction) return;
-                                                    removeReaction(reaction.id, emoji)
-                                                } else sendReaction(emoji);
-                                            }}
-                                        >
-                                            {emoji} {list.length}
-                                        </Badge>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </ContextMenuTrigger>
-                <ContextMenuContent>
-                    <ContextMenuItem onClick={() => onReply ? onReply({
-                        id,
-                        authorName,
-                        content,
-                        timestamp
-                    }) : toast("Fonctionnalité encore non disponible")}>
-                        <Reply/> Répondre
-                    </ContextMenuItem>
-                    {
-                        isAuthor ?
-
-                            <ContextMenuItem onClick={() => {
-                                setIsEditing(true);
-                                setEditContent(content);
-                            }}>
-                                <Pencil/> Modifier
-                            </ContextMenuItem>
-                            : null
-                    }
-                    {(isAuthor || canManageMessages) ? (
-                        <ContextMenuItem className="text-red-500"
-                                         onClick={() => setConfirmOpen(true)}>
-                            <Trash2/> Supprimer
+            {!readOnly ? (
+                <ContextMenu>
+                    <ContextMenuTrigger>
+                        <MessageContent/>
+                    </ContextMenuTrigger>
+                    <ContextMenuContent>
+                        <ContextMenuItem onClick={() => onReply ? onReply({
+                            id,
+                            authorName,
+                            content,
+                            timestamp
+                        }) : toast("Fonctionnalité encore non disponible")}>
+                            <Reply/> Répondre
                         </ContextMenuItem>
-                    ) : null}
-                    <ContextMenuSeparator/>
-                    <ContextMenuItem onClick={() => navigator.clipboard.writeText(id.toString())}>
-                        <IdCardLanyard/> Copier l'identifiant
-                    </ContextMenuItem>
-                </ContextMenuContent>
-            </ContextMenu>
+                        {
+                            isAuthor ?
+
+                                <ContextMenuItem onClick={() => {
+                                    setIsEditing(true);
+                                    setEditContent(content);
+                                }}>
+                                    <Pencil/> Modifier
+                                </ContextMenuItem>
+                                : null
+                        }
+                        {(isAuthor || canManageMessages) ? (
+                            <ContextMenuItem className="text-red-500"
+                                             onClick={() => setConfirmOpen(true)}>
+                                <Trash2/> Supprimer
+                            </ContextMenuItem>
+                        ) : null}
+                        <ContextMenuSeparator/>
+                        <ContextMenuItem onClick={() => navigator.clipboard.writeText(id.toString())}>
+                            <IdCardLanyard/> Copier l'identifiant
+                        </ContextMenuItem>
+                    </ContextMenuContent>
+                </ContextMenu>
+            ) : (
+                <MessageContent/>
+            )}
 
             <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
                 <DialogContent>
