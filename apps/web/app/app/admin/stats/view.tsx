@@ -13,8 +13,8 @@ import {Calendar} from "@/components/ui/calendar";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {cn} from "@/lib/utils";
 import {DateRange} from "react-day-picker";
-import {Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis, YAxis} from "recharts";
-import {ChartContainer, ChartTooltip, ChartTooltipContent,} from "@/components/ui/chart";
+import {Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, LabelList, Pie, PieChart, XAxis, YAxis} from "recharts";
+import {ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent,} from "@/components/ui/chart";
 
 interface StatsData {
     volume: number;
@@ -40,24 +40,69 @@ interface StatsData {
     endDate: string;
 }
 
-const chartConfig = {
+const chartConfig: ChartConfig = {
     volume: {
         label: "Volume d'écoutes",
-        color: "hsl(var(--primary))",
+        theme: {
+            light: "#8cc088",
+            dark: "#8cc088",
+        },
     },
-    duration: {
+    durationMin: {
         label: "Temps d'écoute (min)",
-        color: "hsl(var(--chart-2))",
+        theme: {
+            light: "#4ade80",
+            dark: "#4ade80",
+        },
     },
-    volunteer: {
+    volunteerHours: {
         label: "Bénévolat (heures)",
-        color: "hsl(var(--chart-3))",
+        theme: {
+            light: "#22c55e",
+            dark: "#22c55e",
+        },
     },
+    // Category colors
     count: {
-        label: "Nombre d'écoutes",
-        color: "hsl(var(--primary))",
-    }
+        label: "Nombre",
+        theme: {
+            light: "#8cc088",
+            dark: "#8cc088",
+        },
+    },
+    // Feeling colors
+    feeling_1: {
+        label: "Pas du tout",
+        theme: {light: "#7f1d1d", dark: "#7f1d1d"}
+    },
+    feeling_2: {
+        label: "Pas vraiment",
+        theme: {light: "#f87171", dark: "#f87171"}
+    },
+    feeling_3: {
+        label: "Moyennement",
+        theme: {light: "#facc15", dark: "#facc15"}
+    },
+    feeling_4: {
+        label: "Un peu",
+        theme: {light: "#86efac", dark: "#86efac"}
+    },
+    feeling_5: {
+        label: "Oui vraiment",
+        theme: {light: "#14532d", dark: "#14532d"}
+    },
 };
+
+const PIE_COLORS = [
+    "#bbf7d0", // Green 200 (Pastel)
+    "#bfdbfe", // Blue 200 (Pastel)
+    "#fef08a", // Yellow 200 (Pastel)
+    "#fbcfe8", // Pink 200 (Pastel)
+    "#ddd6fe", // Violet 200 (Pastel)
+    "#99f6e4", // Teal 200 (Pastel)
+    "#fed7aa", // Orange 200 (Pastel)
+    "#a5f3fc", // Cyan 200 (Pastel)
+];
 
 export function StatsView() {
     const [date, setDate] = useState<DateRange | undefined>({
@@ -114,7 +159,7 @@ export function StatsView() {
 
     if (loading && !data) {
         return (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {[1, 2, 3, 4].map((i) => (
                     <Card key={i}>
                         <CardHeader className="pb-2">
@@ -159,30 +204,91 @@ export function StatsView() {
         const data = entries.map(([name, count]) => ({name, count}));
 
         return (
-            <Card>
+            <Card className="flex flex-col">
+                <CardHeader className="items-center pb-0 px-2 text-center">
+                    <CardTitle className="text-xs font-semibold leading-tight h-8 flex items-center">{title}</CardTitle>
+                </CardHeader>
+                <CardContent className="flex-1 pb-2">
+                    <ChartContainer
+                        config={chartConfig}
+                        className="mx-auto aspect-square max-h-[180px]"
+                    >
+                        <PieChart>
+                            <ChartTooltip
+                                cursor={false}
+                                content={<ChartTooltipContent hideLabel/>}
+                            />
+                            <Pie
+                                data={data}
+                                dataKey="count"
+                                nameKey="name"
+                                innerRadius={40}
+                                strokeWidth={2}
+                            >
+                                {data.map((_, index) => (
+                                    <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]}/>
+                                ))}
+                            </Pie>
+                        </PieChart>
+                    </ChartContainer>
+                </CardContent>
+            </Card>
+        );
+    };
+
+    const renderFeelingChart = (stats: Record<string, number>) => {
+        const order = ["pas du tout", "pas vraiment", "moyennement", "un peu", "oui vraiment"];
+        const keysMap: Record<string, string> = {
+            "pas du tout": "feeling_1",
+            "pas vraiment": "feeling_2",
+            "moyennement": "feeling_3",
+            "un peu": "feeling_4",
+            "oui vraiment": "feeling_5"
+        };
+
+        const data = order.map((label) => ({
+            name: label.charAt(0).toUpperCase() + label.slice(1),
+            count: stats[label] || 0,
+            feeling: keysMap[label]
+        }));
+
+        if (Object.keys(stats).length === 0) return null;
+
+        return (
+            <Card className="lg:col-span-1">
                 <CardHeader>
-                    <CardTitle className="text-sm font-semibold">{title}</CardTitle>
+                    <CardTitle className="text-sm font-semibold">Ressenti post-écoute</CardTitle>
+                    <CardDescription>Impact émotionnel suite à l'échange</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <ChartContainer config={chartConfig} className="h-[200px] w-full">
-                        <BarChart data={data} layout="vertical">
-                            <CartesianGrid horizontal={false} strokeDasharray="3 3"/>
-                            <XAxis type="number" hide/>
-                            <YAxis
+                    <ChartContainer config={chartConfig} className="h-[300px] w-full">
+                        <BarChart data={data} margin={{top: 20, right: 30, left: 20, bottom: 5}}>
+                            <CartesianGrid vertical={false} strokeDasharray="3 3"/>
+                            <XAxis
                                 dataKey="name"
-                                type="category"
                                 tickLine={false}
+                                tickMargin={10}
                                 axisLine={false}
-                                width={100}
-                                className="text-[10px]"
                             />
+                            <YAxis tickLine={false} axisLine={false} tickMargin={8}/>
                             <ChartTooltip content={<ChartTooltipContent hideLabel/>}/>
                             <Bar
                                 dataKey="count"
-                                fill="var(--color-count)"
-                                radius={[0, 4, 4, 0]}
-                                barSize={15}
-                            />
+                                radius={[4, 4, 0, 0]}
+                                barSize={40}
+                            >
+                                {data.map((entry, index) => (
+                                    <Cell key={`cell-${index}`}
+                                          fill={chartConfig[entry.feeling as keyof typeof chartConfig]?.theme?.light as string}/>
+                                ))}
+                                <LabelList
+                                    dataKey="count"
+                                    position="top"
+                                    offset={12}
+                                    className="fill-foreground"
+                                    fontSize={12}
+                                />
+                            </Bar>
                         </BarChart>
                     </ChartContainer>
                 </CardContent>
@@ -268,7 +374,7 @@ export function StatsView() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Volume d'écoutes</CardTitle>
@@ -331,13 +437,13 @@ export function StatsView() {
                                     axisLine={false}
                                     tickMargin={8}
                                 />
-                                <YAxis hide/>
+                                <YAxis tickLine={false} axisLine={false} tickMargin={8}/>
                                 <ChartTooltip content={<ChartTooltipContent/>}/>
                                 <Area
                                     type="monotone"
                                     dataKey="volume"
-                                    stroke="var(--color-volume)"
-                                    fill="var(--color-volume)"
+                                    stroke={chartConfig.volume.theme?.light as string}
+                                    fill={chartConfig.volume.theme?.light as string}
                                     fillOpacity={0.1}
                                     strokeWidth={2}
                                 />
@@ -361,21 +467,21 @@ export function StatsView() {
                                     axisLine={false}
                                     tickMargin={8}
                                 />
-                                <YAxis hide/>
+                                <YAxis tickLine={false} axisLine={false} tickMargin={8}/>
                                 <ChartTooltip content={<ChartTooltipContent/>}/>
                                 <Area
                                     type="monotone"
                                     dataKey="durationMin"
-                                    stroke="var(--color-duration)"
-                                    fill="var(--color-duration)"
+                                    stroke={chartConfig.durationMin.theme?.light as string}
+                                    fill={chartConfig.durationMin.theme?.light as string}
                                     fillOpacity={0.1}
                                     strokeWidth={2}
                                 />
                                 <Area
                                     type="monotone"
                                     dataKey="volunteerHours"
-                                    stroke="var(--color-volunteer)"
-                                    fill="var(--color-volunteer)"
+                                    stroke={chartConfig.volunteerHours.theme?.light as string}
+                                    fill={chartConfig.volunteerHours.theme?.light as string}
                                     fillOpacity={0.1}
                                     strokeWidth={2}
                                 />
@@ -394,7 +500,6 @@ export function StatsView() {
                             <ChartContainer config={chartConfig} className="h-[300px] w-full">
                                 <BarChart data={barData} layout="vertical" margin={{left: 30}}>
                                     <CartesianGrid horizontal={false} strokeDasharray="3 3"/>
-                                    <XAxis type="number" hide/>
                                     <YAxis
                                         dataKey="name"
                                         type="category"
@@ -403,10 +508,11 @@ export function StatsView() {
                                         width={100}
                                         className="text-[10px]"
                                     />
+                                    <XAxis type="number" tickLine={false} axisLine={false} tickMargin={8}/>
                                     <ChartTooltip content={<ChartTooltipContent hideLabel/>}/>
                                     <Bar
                                         dataKey="count"
-                                        fill="var(--color-count)"
+                                        fill={chartConfig.count.theme?.light as string}
                                         radius={[0, 4, 4, 0]}
                                         barSize={20}
                                     />
@@ -419,14 +525,15 @@ export function StatsView() {
                         )}
                     </CardContent>
                 </Card>
+
+                {data?.feedbackStats?.feeling && Object.keys(data.feedbackStats.feeling).length > 0 && renderFeelingChart(data.feedbackStats.feeling)}
             </div>
 
             {data?.feedbackStats && Object.values(data.feedbackStats).some(s => Object.keys(s).length > 0) && (
                 <div className="space-y-4">
                     <h3 className="text-lg font-bold">Retours utilisateurs (Feedback)</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {renderPieChart("Tranches d'âge", data.feedbackStats.age)}
-                        {renderPieChart("Ressenti post-écoute", data.feedbackStats.feeling)}
                         {renderPieChart("Genre", data.feedbackStats.gender)}
                         {renderPieChart("Déjà écouté auparavant", data.feedbackStats.previouslyOpened)}
                         {renderPieChart("Chez Le Trèfle 2.0", data.feedbackStats.previouslyAtTrefle)}

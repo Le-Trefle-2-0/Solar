@@ -209,13 +209,39 @@ export async function registerAdminRoutes(app: FastifyInstance) {
             region: {},
         };
 
+        const ticketIds = tickets.map(t => t.id);
+        const allMessages = await prisma.message.findMany({
+            where: {
+                OR: [
+                    {ticketId: {in: ticketIds}},
+                    {channelId: {in: tickets.map(t => t.channelId).filter(Boolean) as string[]}}
+                ]
+            },
+            orderBy: {createdAt: 'asc'},
+            select: {ticketId: true, channelId: true, createdAt: true}
+        });
+
+        const messagesByTicket: Record<number, { createdAt: Date }[]> = {};
+        const messagesByChannel: Record<string, { createdAt: Date }[]> = {};
+
+        allMessages.forEach(m => {
+            if (m.ticketId) {
+                if (!messagesByTicket[m.ticketId]) messagesByTicket[m.ticketId] = [];
+                messagesByTicket[m.ticketId].push({createdAt: m.createdAt});
+            }
+            if (m.channelId) {
+                if (!messagesByChannel[m.channelId]) messagesByChannel[m.channelId] = [];
+                messagesByChannel[m.channelId].push({createdAt: m.createdAt});
+            }
+        });
+
         for (const ticket of tickets) {
             // Compute real duration based on messages
-            const messages = await prisma.message.findMany({
-                where: {channelId: ticket.channelId || ''},
-                orderBy: {createdAt: 'asc'},
-                select: {createdAt: true}
-            });
+            let messages = messagesByTicket[ticket.id];
+            if (!messages && ticket.channelId) {
+                messages = messagesByChannel[ticket.channelId];
+            }
+            if (!messages) messages = [];
 
             let duration = 0;
             if (messages.length >= 2) {
@@ -233,7 +259,13 @@ export async function registerAdminRoutes(app: FastifyInstance) {
             });
 
             // Feedback
-            const feedback = ticket.feedback as any;
+            let feedback = ticket.feedback as any;
+            if (feedback && typeof feedback === 'string') {
+                try {
+                    feedback = JSON.parse(feedback);
+                } catch (e) {
+                }
+            }
             if (feedback && typeof feedback === 'object') {
                 Object.keys(feedbackStats).forEach(key => {
                     const value = feedback[key];

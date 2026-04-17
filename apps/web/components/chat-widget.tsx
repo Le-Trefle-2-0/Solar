@@ -67,6 +67,8 @@ export default function ChatWidget() {
         const el = document.getElementById('chat-widget-portal') || document.createElement('div');
         if (!el.id) {
             el.id = 'chat-widget-portal';
+            el.style.position = 'relative';
+            el.style.zIndex = '99999';
             document.body.appendChild(el);
         }
         setPortalEl(el);

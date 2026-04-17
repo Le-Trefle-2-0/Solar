@@ -238,6 +238,9 @@ model Message {
   replyID Int?
   edited  Boolean @default(false)
 
+  ticketId Int?
+  ticket   Ticket? @relation(fields: [ticketId], references: [id])
+
   Reaction Reaction[]
 
   @@map("message")
@@ -320,6 +323,8 @@ model Ticket {
   voice        Boolean      @default(false)
   categories   Json?
   feedback     Json?
+
+  Message Message[]
 
   @@map("ticket")
 }

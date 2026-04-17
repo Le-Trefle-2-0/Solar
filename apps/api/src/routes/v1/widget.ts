@@ -303,10 +303,15 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
                 return reply.status(400).send({success: false, error: 'invalid_content'});
             }
 
+            const ticket = await prisma.ticket.findFirst({
+                where: {channelId}
+            });
+
             const message = await prisma.message.create({
                 data: {
                     userId: null,
                     channelId: channelId,
+                    ticketId: ticket?.id,
                     content: Buffer.from(content, 'utf8'),
                     createdAt: new Date(),
                 }
