@@ -4,6 +4,7 @@ import {createPortal} from 'react-dom';
 import {LogOut, MessageCircle, Send, X} from 'lucide-react';
 import {apiFetch} from '@/lib/api';
 import {io, Socket} from 'socket.io-client';
+import {usePathname} from "next/navigation";
 
 type Msg = {
     id: number;
@@ -13,6 +14,7 @@ type Msg = {
 };
 
 export default function ChatWidget() {
+    const pathname = usePathname();
     const [open, setOpen] = useState(false);
     const [consented, setConsented] = useState<boolean>(false);
     const [channelId, setChannelId] = useState<string | null>(null);
@@ -577,6 +579,6 @@ export default function ChatWidget() {
         </>
     );
 
-    if (!portalEl) return null;
+    if (!portalEl || pathname?.startsWith('/app')) return null;
     return createPortal(ui, portalEl);
 }
