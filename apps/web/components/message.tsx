@@ -231,7 +231,13 @@ export function Message(props: {
     const MessageContent = () => (
         <div
             id={`message-${id}`}
-            className={`relative group w-full flex flex-row gap-2 ${isLastInBlock ? 'mb-6' : 'mb-1'} hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors duration-200 rounded-lg px-2 ${replyTargetId === id ? 'ring-2 ring-blue-400 bg-blue-50/50' : ''}`}>
+            className={cn(
+                "relative group w-full flex flex-row gap-2 transition-colors duration-200 rounded-lg px-2",
+                isLastInBlock ? 'mb-6' : 'mb-1',
+                "hover:bg-neutral-200 dark:hover:bg-neutral-800",
+                replyTargetId === id ? 'ring-2 ring-blue-400 bg-blue-50/50' : ''
+            )}
+        >
             <div
                 className={cn(
                     "absolute -top-4 right-2 flex gap-1 opacity-0 transition-opacity z-10",
@@ -396,7 +402,7 @@ export function Message(props: {
                         </div>
                     </div>
                 ) : (
-                    <h3 className="text-lg text-gray-900 whitespace-pre-wrap break-words max-w-full">
+                    <h3 className="text-base font-normal text-gray-900 whitespace-pre-wrap break-words max-w-full">
                         {mediaTenorGifRegex.test(content) || resolvedTenorGif ? (
                             <Image
                                 src={resolvedTenorGif || content}
@@ -497,8 +503,10 @@ export function Message(props: {
             )}
             {!readOnly ? (
                 <ContextMenu>
-                    <ContextMenuTrigger>
-                        <MessageContent/>
+                    <ContextMenuTrigger asChild>
+                        <div>
+                            <MessageContent/>
+                        </div>
                     </ContextMenuTrigger>
                     <ContextMenuContent>
                         <ContextMenuItem onClick={() => onReply ? onReply({

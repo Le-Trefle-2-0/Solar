@@ -975,7 +975,8 @@ export function Chat(props: { channelID: string, statusID: number }) {
         <div className="flex flex-row items-center justify-center w-full">
             <div className="flex flex-col relative h-svh p-3 gap-4 w-full" tabIndex={0} ref={rootDivRef}>
                 {/*<video className='w-0 h-0' playsInline ref={callingVideoRef} autoPlay/>*/}
-                <div className="flex flex-col flex-grow overflow-y-auto pt-28" ref={messagesContainerRef}>
+                <div className="flex flex-col flex-grow overflow-y-auto" ref={messagesContainerRef}>
+                    <div className="h-28 shrink-0"/>
                     {loadingMessages ? (
                         <div className="flex flex-col gap-4 px-2 py-2">
                             {skeletonItems.map((item, i) => (
