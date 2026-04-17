@@ -162,6 +162,8 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
             setWidgetCookie(reply, 'widget_sig', sig);
             setWidgetCookie(reply, 'widget_public', '1');
 
+            const ticket = channelId ? await prisma.ticket.findUnique({where: {channelId}}) : null;
+
             return reply.send({
                 success: true,
                 channelId,

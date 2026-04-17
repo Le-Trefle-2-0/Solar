@@ -12,7 +12,7 @@
     "db": "prisma migrate reset -y",
     "start": "npm run start -w apps/web",
     "lint": "npm run lint -w apps/web",
-    "postinstall": "flowbite-react patch && prisma generate --schema=prisma/schema.prisma",
+    "postinstall": "flowbite-react patch && prisma generate --schema=prisma/schema.prisma && (cd apps/web && ln -sf ../../.env .env)",
     "generate": "prisma generate --schema=prisma/schema.prisma",
     "dev:api": "npm run dev -w apps/api",
     "dev:ws": "npm run dev -w websocket-service",

@@ -1,8 +1,16 @@
-import 'dotenv/config';
+import {config} from 'dotenv';
+import path from 'path';
+import {fileURLToPath} from 'url';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import {createRemoteJWKSet, jwtVerify} from 'jose';
 import * as mediasoup from 'mediasoup';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load .env from project root
+config({path: path.resolve(__dirname, '../../../.env')});
 
 const app = Fastify({logger: true});
 

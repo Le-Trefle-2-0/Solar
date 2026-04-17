@@ -1,8 +1,6 @@
 import {betterAuth} from "better-auth";
 import {prismaAdapter} from "better-auth/adapters/prisma";
 import prisma from "@/lib/prisma";
-import {config} from 'dotenv'
-import path from 'path'
 import {getResendClient} from "@/lib/resend";
 import {renderEmailTemplate} from "@/lib/email-template";
 import {ac, admin, bot, manager, newsletterManager, training, volunteer} from "./permissions";
@@ -19,9 +17,6 @@ import {
 } from "better-auth/plugins";
 import {apiKey} from "@better-auth/api-key";
 import {passkey} from "@better-auth/passkey";
-
-// Load .env from monorepo root
-config({path: path.resolve(process.cwd(), '../../.env')})
 
 const pluginList: any[] = [
     emailOTP({
