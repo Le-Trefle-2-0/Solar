@@ -38,7 +38,8 @@ export async function registerAdminRoutes(app: FastifyInstance) {
         const admin = await checkAdmin(req, reply);
         if (!admin) return;
 
-        const {name, permissions, weight, icon} = req.body as {
+        const {id, name, permissions, weight, icon} = req.body as {
+            id?: string,
             name: string,
             permissions: string,
             weight: number,
@@ -66,8 +67,8 @@ export async function registerAdminRoutes(app: FastifyInstance) {
         }
 
         const role = await prisma.role.upsert({
-            where: {name},
-            update: {permissions, weight, icon},
+            where: id ? {id} : {name},
+            update: {name, permissions, weight, icon},
             create: {name, permissions, weight, icon}
         });
 
