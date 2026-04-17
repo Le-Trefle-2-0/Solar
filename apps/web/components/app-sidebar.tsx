@@ -3,6 +3,7 @@ import * as React from "react"
 import {useEffect, useRef, useState} from "react"
 import {
     CalendarDays,
+    ChartLine,
     ChevronRight,
     Ear,
     History,
@@ -84,6 +85,12 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
             adminOnly: true,
         },
         {
+            name: "Statistiques",
+            url: "/app/admin/stats",
+            icon: ChartLine,
+            adminOnly: true,
+        },
+        {
             name: "Rôles",
             url: "/app/admin/roles",
             icon: Shield,
@@ -122,7 +129,7 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
         return baseData.filter(item => {
             if (!(item as any).adminOnly && !(item as any).newsletterOnly) return true;
             if (isAdmin) return true;
-            if (isManager && (item.name === "Historique" || item.name === "Recrutement" || item.name === "Utilisateurs" || item.name === "Paramètres")) return true;
+            if (isManager && (item.name === "Historique" || item.name === "Recrutement" || item.name === "Utilisateurs" || item.name === "Paramètres" || item.name === "Statistiques")) return true;
             if (isNewsletterManager && (item as any).newsletterOnly) return true;
 
             // Allow access to Roles if the user has a manager role (limited to lower weights)

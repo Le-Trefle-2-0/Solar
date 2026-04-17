@@ -171,4 +171,137 @@ export async function registerAdminRoutes(app: FastifyInstance) {
             return reply.status(500).send('failed to update setting');
         }
     });
+
+    app.get('/v1/admin/stats', async (req, reply) => {
+        const admin = await checkAdmin(req, reply);
+        if (!admin) return;
+
+        const {start, end, interval = 'day'} = req.query as {
+            start?: string,
+            end?: string,
+            interval?: 'day' | 'week' | 'month'
+        };
+        const startDate = start ? new Date(start) : new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+        const endDate = end ? new Date(end) : new Date();
+
+        // 1. Tickets within range
+        const tickets = await prisma.ticket.findMany({
+            where: {
+                createdAt: {
+                    gte: startDate,
+                    lte: endDate
+                },
+                statusName: {in: ['closed', 'commented']}
+            }
+        });
+
+        // 2. Aggregate metrics
+        const volume = tickets.length;
+        let totalDuration = 0;
+        const categoryCounts: Record<string, number> = {};
+
+        tickets.forEach(ticket => {
+            // Duration
+            const duration = Math.floor((ticket.updatedAt.getTime() - ticket.createdAt.getTime()) / 1000);
+            totalDuration += duration;
+
+            // Categories
+            const categories = ticket.categories as string[] || [];
+            categories.forEach(cat => {
+                categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+            });
+        });
+
+        // 3. Planning stats (Volunteering time)
+        const registrations = await prisma.eventRegistration.findMany({
+            where: {
+                Event: {
+                    start: {
+                        gte: startDate,
+                        lte: endDate
+                    }
+                },
+                status: 'confirmed'
+            },
+            include: {
+                Event: true
+            }
+        });
+
+        let totalVolunteerSeconds = 0;
+        registrations.forEach(reg => {
+            if (reg.Event) {
+                const duration = Math.floor((reg.Event.end.getTime() - reg.Event.start.getTime()) / 1000);
+                totalVolunteerSeconds += duration;
+            }
+        });
+
+        // 4. Time-series data
+        const timeSeries: Record<string, { date: string, volume: number, duration: number, volunteer: number }> = {};
+
+        // Helper to get group key
+        const getGroupKey = (date: Date) => {
+            if (interval === 'month') {
+                return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-01`;
+            } else if (interval === 'week') {
+                const d = new Date(date);
+                const day = d.getDay();
+                const diff = d.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+                const firstDay = new Date(d.setDate(diff));
+                return firstDay.toISOString().split('T')[0];
+            }
+            return date.toISOString().split('T')[0];
+        };
+
+        // Initialize points
+        const current = new Date(startDate);
+        // Reset to start of day
+        current.setHours(0, 0, 0, 0);
+
+        while (current <= endDate) {
+            const key = getGroupKey(current);
+            if (!timeSeries[key]) {
+                timeSeries[key] = {date: key, volume: 0, duration: 0, volunteer: 0};
+            }
+
+            if (interval === 'month') {
+                current.setMonth(current.getMonth() + 1);
+            } else if (interval === 'week') {
+                current.setDate(current.getDate() + 7);
+            } else {
+                current.setDate(current.getDate() + 1);
+            }
+        }
+
+        // Fill ticket data
+        tickets.forEach(ticket => {
+            const key = getGroupKey(ticket.createdAt);
+            if (timeSeries[key]) {
+                timeSeries[key].volume += 1;
+                const duration = Math.floor((ticket.updatedAt.getTime() - ticket.createdAt.getTime()) / 1000);
+                timeSeries[key].duration += duration;
+            }
+        });
+
+        // Fill volunteer data
+        registrations.forEach(reg => {
+            if (reg.Event) {
+                const key = getGroupKey(reg.Event.start);
+                if (timeSeries[key]) {
+                    const duration = Math.floor((reg.Event.end.getTime() - reg.Event.start.getTime()) / 1000);
+                    timeSeries[key].volunteer += duration;
+                }
+            }
+        });
+
+        return reply.send({
+            volume,
+            totalDuration,
+            totalVolunteerSeconds,
+            categoryCounts,
+            timeSeries: Object.values(timeSeries).sort((a, b) => a.date.localeCompare(b.date)),
+            startDate,
+            endDate
+        });
+    });
 }
