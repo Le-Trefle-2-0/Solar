@@ -19,6 +19,7 @@ interface Person {
     role: string;
     icon: any;
     image?: string; // optional photo URL
+    bio?: string;
 }
 
 const board: Person[] = [
@@ -32,7 +33,8 @@ const board: Person[] = [
         name: "Paul PERON REDON",
         role: "Administrateur",
         icon: Shield,
-        image: "https://cdn.discordapp.com/avatars/369564132770578432/d9059864986d2b943ab7d1e61c35b74e.jpeg?size=1024"
+        image: "https://cdn.discordapp.com/avatars/369564132770578432/d9059864986d2b943ab7d1e61c35b74e.jpeg?size=1024",
+        bio: "Étudiant en physique et passionné par le numérique, j'ai rejoint l'association en 2021 avec l'envie concrète d'être utile. Fort d'une expérience en cybersécurité, j'ai accompagné la transformation digitale de l'association en l'aidant à se doter des outils adaptés à ses besoins. Au-delà de la technique, c'est l'engagement pour la santé mentale qui me tient à cœur et qui guide mon investissement au sein du conseil d'administration."
     },
     {
         name: "Océane DUPONT",
@@ -175,9 +177,7 @@ function PersonCard({person}: { person: Person }) {
                     </div>
                 </DialogHeader>
                 <DialogDescription className="text-base leading-relaxed mt-4">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore
-                    et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-                    aliquip ex ea commodo consequat.
+                    {person.bio ? person.bio : "Aucune biographie disponible."}
                 </DialogDescription>
             </DialogContent>
         </Dialog>
