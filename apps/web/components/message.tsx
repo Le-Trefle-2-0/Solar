@@ -180,14 +180,12 @@ export function Message(props: {
             body: JSON.stringify({
                 emoji,
                 messageID: id,
-                authorID: userID,
-                reaction: emoji,
                 option: "add"
             }),
         }).then(res => {
             if (!res.success) return toast("Erreur lors de l'ajout de la réaction")
             socket?.emit("reaction", {channelId, reaction: res.reaction});
-            setReactionList((reactions) => [...reactions, res.reaction]);
+            // setReactionList((reactions) => [...reactions, res.reaction]);
         });
     }
 
@@ -208,22 +206,21 @@ export function Message(props: {
         }
     }
 
-    const removeReaction = (reactionID: string, reaction: string) => {
+    const removeReaction = (reactionID: string, emoji: string) => {
         apiFetch('/v1/reaction', {
             method: "POST",
             body: JSON.stringify({
                 id: reactionID,
                 messageID: id,
-                reaction,
-                authorID: userID,
+                emoji,
                 option: "remove"
             })
         }).then(res => {
             if (res.success) {
                 socket?.emit("reactionRemove", {channelId, reaction: res.reaction});
-                setReactionList(prev =>
+                /* setReactionList(prev =>
                     (prev ?? []).filter(r => r.id !== reactionID)
-                );
+                ); */
             }
         })
             .catch(err => {
@@ -234,10 +231,10 @@ export function Message(props: {
     const MessageContent = () => (
         <div
             id={`message-${id}`}
-            className={`relative group w-full flex flex-row gap-2 ${isLastInBlock ? 'mb-6' : 'mb-1'} hover:bg-gray-100 rounded-lg px-2 ${replyTargetId === id ? 'border-2 border-blue-400 bg-blue-50' : ''}`}>
+            className={`relative group w-full flex flex-row gap-2 ${isLastInBlock ? 'mb-6' : 'mb-1'} hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors duration-200 rounded-lg px-2 ${replyTargetId === id ? 'border-2 border-blue-400 bg-blue-50' : ''}`}>
             <div
                 className={cn(
-                    "absolute -top-4 right-2 flex gap-1 opacity-0 transition-opacity",
+                    "absolute -top-4 right-2 flex gap-1 opacity-0 transition-opacity z-10",
                     !readOnly && "group-hover:opacity-100"
                 )}>
                 {!readOnly && (
@@ -313,9 +310,9 @@ export function Message(props: {
                     </>
                 )}
             </div>
-            <div className="w-12 flex-shrink-0 flex flex-col items-center justify-start pt-1">
+            <div className="w-12 flex-shrink-0 flex flex-col items-center justify-start pt-2">
                 {showAuthorInfo ? (
-                    <Avatar className="h-12 w-12 rounded-xl border">
+                    <Avatar className="h-10 w-10 rounded-xl border">
                         <AvatarImage src={profilePicture || ""} alt={authorName}/>
                         <AvatarFallback className="rounded-xl bg-primary text-primary-foreground font-bold">
                             {authorName?.slice(0, 2).toUpperCase() || "US"}

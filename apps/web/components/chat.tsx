@@ -522,18 +522,19 @@ export function Chat(props: { channelID: string, statusID: number }) {
             setChat(prev =>
                 prev.map(message => {
                     if (message.id === data.messageID) {
+                        const reaction = data.reaction;
                         const existingReactions = message.reactions ?? [];
-                        const existsById = existingReactions.some(r => r.id === data.id);
+                        const existsById = existingReactions.some(r => r.id === reaction.id);
                         if (existsById) {
-                            const updated = existingReactions.map(r => r.id === data.id ? data : r);
+                            const updated = existingReactions.map(r => r.id === reaction.id ? reaction : r);
                             return {...message, reactions: updated};
                         }
-                        const existsByUserEmoji = existingReactions.some(r => r.userID === data.userID && r.emoji === data.emoji);
+                        const existsByUserEmoji = existingReactions.some(r => r.userID === reaction.userID && r.emoji === reaction.emoji);
                         if (existsByUserEmoji) {
-                            const updated = existingReactions.map(r => (r.userID === data.userID && r.emoji === data.emoji) ? data : r);
+                            const updated = existingReactions.map(r => (r.userID === reaction.userID && r.emoji === reaction.emoji) ? reaction : r);
                             return {...message, reactions: updated};
                         }
-                        return {...message, reactions: [...existingReactions, data]};
+                        return {...message, reactions: [...existingReactions, reaction]};
                     }
                     return message;
                 })
@@ -558,13 +559,13 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
         const onReactionRemove = (data: any) => {
             console.log("REACTION REMOVE", data);
-            const {messageID, id: reactionId} = data;
+            const {messageID, reactionID} = data;
 
             setChat(prev =>
                 prev.map(message => {
                     if (message.id === messageID) {
                         const filteredReactions = (message.reactions ?? []).filter(
-                            r => r.id !== reactionId
+                            r => r.id !== reactionID
                         );
 
                         return {
@@ -745,7 +746,9 @@ export function Chat(props: { channelID: string, statusID: number }) {
         }
 
         if (isAtBottomRef.current) {
-            messagesListRef.current?.scrollIntoView({behavior: 'smooth', block: 'end'});
+            setTimeout(() => {
+                messagesListRef.current?.scrollIntoView({behavior: 'smooth', block: 'end'});
+            }, 0);
         }
     }, [chat, loadingOlder]);
 
@@ -793,15 +796,15 @@ export function Chat(props: { channelID: string, statusID: number }) {
                 if (initialAutoScrollPending.current) return;
                 // update bottom state
                 const distanceFromBottom = el.scrollHeight - (el.scrollTop + el.clientHeight);
-                isAtBottomRef.current = distanceFromBottom <= 50;
-                if (el.scrollTop < 150) {
+                isAtBottomRef.current = distanceFromBottom <= 100;
+                if (el.scrollTop < 250) {
                     loadOlder();
                 }
             });
         };
         // initialize at-bottom state when attaching
         const initDistance = el.scrollHeight - (el.scrollTop + el.clientHeight);
-        isAtBottomRef.current = initDistance <= 50;
+        isAtBottomRef.current = initDistance <= 100;
         el.addEventListener('scroll', onScroll);
         return () => {
             el.removeEventListener('scroll', onScroll);
@@ -961,9 +964,10 @@ export function Chat(props: { channelID: string, statusID: number }) {
         <div className="flex flex-row items-center justify-center w-full">
             <div className="flex flex-col relative h-svh p-3 gap-4 w-full" tabIndex={0} ref={rootDivRef}>
                 {/*<video className='w-0 h-0' playsInline ref={callingVideoRef} autoPlay/>*/}
-                <div className="flex flex-col flex-grow overflow-y-auto mt-10" ref={messagesContainerRef}>
+                <div className="flex flex-col flex-grow overflow-y-auto" ref={messagesContainerRef}>
                     {loadingMessages ? (
                         <div className="flex flex-col gap-4 px-2 py-2">
+                            <div className="h-28 flex-shrink-0"/>
                             {skeletonItems.map((item, i) => (
                                 <div key={i} className="flex items-start gap-3">
                                     <Skeleton className="h-9 w-9 rounded-lg shrink-0"/>
@@ -977,6 +981,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                         </div>
                     ) : (
                         <React.Fragment key="messages-list">
+                            <div className={cn("h-28 flex-shrink-0", hasMore && "hidden")}/>
                             {loadingOlder && (
                                 <div className="flex justify-center py-2">
                                     <Skeleton className="h-4 w-1/3"/>
@@ -1034,13 +1039,14 @@ export function Chat(props: { channelID: string, statusID: number }) {
                             })}
                         </React.Fragment>
                     )}
+                    <div className="pb-4"/>
                     <div ref={messagesListRef} className="h-px"/>
                 </div>
 
 
                 {
                     status === 0 ? null :
-                        <div className="absolute top-6 right-6 flex flex-row gap-2">
+                        <div className="absolute top-6 right-6 flex flex-row gap-2 z-20">
                             <AlertDialog>
                                 <AlertDialogTrigger asChild>
                                     <Button
