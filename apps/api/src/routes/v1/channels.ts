@@ -56,4 +56,104 @@ export async function registerChannelsRoutes(app: FastifyInstance) {
         if (!channel) return reply.status(404).send({error: 'not_found'});
         return channel;
     });
+
+    // GET /v1/channel/:id/members – list all members having access to the channel
+    app.get('/v1/channel/:id/members', async (req, reply) => {
+        try {
+            const {id: channelID} = req.params as any;
+            const userId = await authenticate(req);
+            if (!userId) return reply.status(401).send('unauthorized');
+
+            const channel = await prisma.channel.findUnique({where: {id: channelID}});
+            if (!channel) return reply.status(404).send({error: 'not_found'});
+
+            const user = await prisma.user.findUnique({where: {id: userId}});
+            const canReadAll = roleHasTicketsReadAll(user?.role ?? null);
+
+            let allMembers: any[] = [];
+
+            if (channelID === '1') {
+                // Public channel: all users are members
+                allMembers = await prisma.user.findMany({
+                    select: {
+                        id: true,
+                        name: true,
+                        username: true,
+                        displayUsername: true,
+                        image: true,
+                        role: true,
+                    }
+                });
+            } else {
+                // Ticket channel: assigned user + all volunteers with read access
+                const ticket = await prisma.ticket.findUnique({
+                    where: {channelId: channelID},
+                });
+
+                if (!ticket) return reply.send({success: true, members: []});
+
+                // Check access
+                if (!canReadAll && ticket.assignedUserId !== userId) {
+                    return reply.status(403).send('forbidden');
+                }
+
+                // Get assigned user
+                if (ticket.assignedUserId) {
+                    const assigned = await prisma.user.findUnique({
+                        where: {id: ticket.assignedUserId},
+                        select: {
+                            id: true,
+                            name: true,
+                            username: true,
+                            displayUsername: true,
+                            image: true,
+                            role: true,
+                        }
+                    });
+                    if (assigned) allMembers.push(assigned);
+                }
+
+                const staff = await prisma.user.findMany({
+                    where: {
+                        OR: [
+                            {role: {contains: 'admin'}},
+                            {role: {contains: 'manager'}},
+                            {role: {contains: 'volunteer'}},
+                            {role: {contains: 'training'}},
+                            {role: {contains: 'bot'}},
+                        ]
+                    },
+                    select: {
+                        id: true,
+                        name: true,
+                        username: true,
+                        displayUsername: true,
+                        image: true,
+                        role: true,
+                    }
+                });
+
+                // Merge and deduplicate
+                const staffIds = new Set(allMembers.map(m => m.id));
+                for (const s of staff) {
+                    if (!staffIds.has(s.id)) {
+                        allMembers.push(s);
+                    }
+                }
+            }
+
+            // Normalize for frontend
+            const members = allMembers.map(u => ({
+                id: u.id,
+                username: u.displayUsername || u.name || u.username || 'User',
+                image: u.image,
+                role: u.role,
+            }));
+
+            return reply.send({success: true, members});
+        } catch (e) {
+            console.error(e);
+            return reply.status(500).send({success: false, error: 'internal_error'});
+        }
+    });
 }
