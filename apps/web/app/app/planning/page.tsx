@@ -30,6 +30,7 @@ export default function PlanningPage() {
             <PlanningCalendar
                 events={events}
                 userId={session?.user?.id}
+                onRefresh={fetchEvents}
             />
         </Page>
     );
