@@ -19,7 +19,7 @@ export function AboutSection() {
                     </ScrollReveal>
                     <ScrollReveal animation="slide-left" className="order-1 lg:order-2">
                         <h2 className="text-3xl font-semibold tracking-tighter sm:text-4xl md:text-5xl mb-6 font-barlow">
-                            De quoi s'agit l'association ?
+                            Qui sommes-nous ?
                         </h2>
                         <div className="space-y-4 text-muted-foreground md:text-lg">
                             <p>

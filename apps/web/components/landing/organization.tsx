@@ -1,7 +1,7 @@
 "use client";
 
 import {Card, CardContent} from "@/components/ui/card";
-import {Shield, Users} from "lucide-react";
+import {Quote, Shield, Users} from "lucide-react";
 import {cn} from "@/lib/utils";
 import {ScrollReveal} from "./scroll-reveal";
 import Image from "next/image";
@@ -46,16 +46,85 @@ const board: Person[] = [
 
 const managers: Person[] = [
     {
-        name: "Julie ROMANET",
-        role: "Responsable Pôle Écoute",
-        icon: Users,
-        image: "https://cdn.discordapp.com/avatars/869076177686523954/b6549e8d4c6a96e7423f731dc5563d7b.jpeg?size=1024"
-    },
-    {
         name: "Louise BURTÉ",
         role: "Coordinatrice des Équipes",
         icon: Users,
         image: "https://cdn.discordapp.com/avatars/967058591494316033/fab79946a1d207f42fb220f9ed3d6e76.jpeg?size=1024"
+    },
+];
+
+const teamLeaders: Person[] = [
+    {
+        name: "Arthur",
+        role: "Référent Bénévoles Écoutants",
+        icon: Users,
+        image: "https://cdn.discordapp.com/avatars/407961565166305301/54df661e844710e25de237077de6bbdd.png?size=4096"
+    },
+    {
+        name: "Berry",
+        role: "Référent Bénévoles Écoutants",
+        icon: Users,
+        image: "https://cdn.discordapp.com/avatars/720741419400036452/d74c37142c98c44c404650e17b061c6a.png?size=4096"
+    },
+    {
+        name: "Clem",
+        role: "Référent Bénévoles Écoutants",
+        icon: Users,
+        image: "https://cdn.discordapp.com/avatars/1125820510236856372/94f320bf98e6231c32941864baefdd4f.png?size=4096"
+    },
+    {
+        name: "Darius",
+        role: "Référent Bénévoles Écoutants",
+        icon: Users,
+        image: "https://cdn.discordapp.com/avatars/1305103533246255198/4b3c20d885ad7a09e995977aedb594ec.png?size=4096"
+    },
+    {
+        name: "David",
+        role: "Référent Bénévoles Écoutants",
+        icon: Users,
+        image: "https://cdn.discordapp.com/avatars/1124382428149076048/2a54d355601ec2060cc3dd79efac15b2.png?size=4096"
+    },
+    {
+        name: "Guillaume",
+        role: "Référent Bénévoles Écoutants",
+        icon: Users,
+        image: "https://cdn.discordapp.com/avatars/264842960187686912/35d5e06438b98f5bd44db81785407a2c.png?size=4096"
+    },
+    {
+        name: "Jérôme",
+        role: "Référent Bénévoles Écoutants",
+        icon: Users,
+        image: "https://cdn.discordapp.com/avatars/130352922935427072/1890454f4e70f2dd8c02211f4ce40830.png?size=4096"
+    },
+    {
+        name: "Léana",
+        role: "Référent Bénévoles Écoutants",
+        icon: Users,
+        image: "https://cdn.discordapp.com/avatars/550408743154745344/12e9b0db3e16d0f2958f5dbf5e0f327b.png?size=4096"
+    },
+    {
+        name: "Lisa",
+        role: "Référent Bénévoles Écoutants",
+        icon: Users,
+        image: "https://cdn.discordapp.com/avatars/827257471847759872/068d63207e4ef42356805e8ec27416f5.png?size=4096"
+    },
+    {
+        name: "Rémy",
+        role: "Référent Bénévoles Écoutants",
+        icon: Users,
+        image: "https://cdn.discordapp.com/avatars/181083128746475520/5b8522209bf18eaee89b7e407ba980ca.png?size=4096"
+    },
+    {
+        name: "Shoam",
+        role: "Référent Bénévoles Écoutants",
+        icon: Users,
+        image: "https://cdn.discordapp.com/avatars/344919009130446859/26e576ed86976c3e37788899aa1855a4.png?size=4096"
+    },
+    {
+        name: "Sarah",
+        role: "Référent Bénévoles Écoutants",
+        icon: Users,
+        image: "https://cdn.discordapp.com/avatars/692026167469015091/9712232709bf0005e882ad5dcfdf8328.png?size=4096"
     },
 ];
 
@@ -92,9 +161,10 @@ export function OrganizationTree() {
                                 Conseil
                                 d'Administration</h3>
                         </ScrollReveal>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                        <div className="flex flex-wrap justify-center gap-6 max-w-4xl mx-auto">
                             {board.map((person, i) => (
-                                <ScrollReveal key={i} delay={i * 100} animation="slide-up">
+                                <ScrollReveal key={i} delay={i * 100} animation="slide-up"
+                                              className="w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.33%-16px)] max-w-sm">
                                     <PersonCard person={person}/>
                                 </ScrollReveal>
                             ))}
@@ -106,17 +176,40 @@ export function OrganizationTree() {
                         <ScrollReveal animation="fade-in"
                                       className="flex items-center gap-4 justify-center bg-background/80 backdrop-blur-sm w-fit mx-auto px-4 py-1 rounded-full border border-primary/20">
                             <Users className="h-5 w-5 text-primary"/>
-                            <h3 className="text-xl font-semibold uppercase tracking-widest text-primary font-barlow">Les
-                                Responsables</h3>
+                            <h3 className="text-xl font-semibold uppercase tracking-widest text-primary font-barlow">
+                                Responsables de pôle
+                            </h3>
                         </ScrollReveal>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                        <div className="flex flex-wrap justify-center gap-6 max-w-4xl mx-auto">
                             {managers.map((person, i) => (
-                                <ScrollReveal key={i} delay={i * 100} animation="slide-up">
+                                <ScrollReveal key={i} delay={i * 100} animation="slide-up"
+                                              className="w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.33%-16px)] max-w-sm">
                                     <PersonCard person={person}/>
                                 </ScrollReveal>
                             ))}
                         </div>
                     </div>
+
+                    {/* Team Leaders Section */}
+                    {teamLeaders.length > 0 && (
+                        <div className="relative z-10 space-y-8">
+                            <ScrollReveal animation="fade-in"
+                                          className="flex items-center gap-4 justify-center bg-background/80 backdrop-blur-sm w-fit mx-auto px-4 py-1 rounded-full border border-primary/20">
+                                <Users className="h-5 w-5 text-primary"/>
+                                <h3 className="text-xl font-semibold uppercase tracking-widest text-primary font-barlow">
+                                    Responsable d'équipe
+                                </h3>
+                            </ScrollReveal>
+                            <div className="flex flex-wrap justify-center gap-6 max-w-4xl mx-auto">
+                                {teamLeaders.map((person, i) => (
+                                    <ScrollReveal key={i} delay={i * 100} animation="slide-up"
+                                                  className="w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.33%-16px)] max-w-sm">
+                                        <PersonCard person={person}/>
+                                    </ScrollReveal>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </section>
@@ -157,7 +250,7 @@ function PersonCard({person}: { person: Person }) {
                     </CardContent>
                 </Card>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="sm:max-w-[600px]">
                 <DialogHeader>
                     <div className="flex items-center gap-4">
                         <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-primary/20">
@@ -176,9 +269,14 @@ function PersonCard({person}: { person: Person }) {
                         </div>
                     </div>
                 </DialogHeader>
-                <DialogDescription className="text-base leading-relaxed mt-4">
-                    {person.bio ? person.bio : "Aucune biographie disponible."}
-                </DialogDescription>
+                <div className="relative mt-6">
+                    {person.bio && (
+                        <Quote className="absolute -top-4 -left-2 h-16 w-16 text-primary/20 -z-10"/>
+                    )}
+                    <DialogDescription className="text-base leading-relaxed italic relative z-10 px-2">
+                        {person.bio ? person.bio : "Aucune biographie disponible."}
+                    </DialogDescription>
+                </div>
             </DialogContent>
         </Dialog>
     );
