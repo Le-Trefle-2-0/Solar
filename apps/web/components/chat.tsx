@@ -23,7 +23,7 @@ import {
     X
 } from "lucide-react";
 import React, {FormEvent, useEffect, useLayoutEffect, useRef, useState} from "react";
-import {EventData, Msg, MsgWithID, ticketInfo} from "@/lib/interface";
+import {EventData, formVolunteer, Msg, MsgWithID, ticketInfo} from "@/lib/interface";
 import {z, ZodError} from "zod";
 import {toast} from "sonner";
 import {saveMessage} from "@/lib/messageManager";
