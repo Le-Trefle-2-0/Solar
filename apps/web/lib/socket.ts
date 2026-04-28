@@ -46,6 +46,13 @@ export async function initSocket(jwt: string): Promise<Socket | null> {
     if (base.startsWith('ws://')) base = 'http://' + base.slice('ws://'.length);
     if (base.startsWith('wss://')) base = 'https://' + base.slice('wss://'.length);
 
+    // In production with Traefik/Load Balancer, ensure we use the correct protocol
+    // if the provided URL doesn't have one
+    if (!base.startsWith('http')) {
+        const proto = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'https://' : 'http://';
+        base = `${proto}${base}`;
+    }
+
     // eslint-disable-next-line no-console
     console.log('[ws] connecting to', base);
     const transportsEnv = (process.env.NEXT_PUBLIC_WS_TRANSPORTS || 'websocket,polling')

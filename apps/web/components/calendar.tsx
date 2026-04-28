@@ -77,11 +77,7 @@ export default function PlanningCalendar({events, userId, onRefresh}: {
     onRefresh?: () => void
 }) {
     type RoleSlotForm = { role: string; goalCount: number; part?: 'first' | 'second' };
-    const [defaultSlots, setDefaultSlots] = useState<RoleSlotForm[]>([
-        {role: 'manager', goalCount: 1},
-        {role: 'volunteer', goalCount: 1, part: 'first'},
-        {role: 'volunteer', goalCount: 3, part: 'second'},
-    ]);
+    const [defaultSlots, setDefaultSlots] = useState<RoleSlotForm[]>([]);
     const [availableRoles, setAvailableRoles] = useState<{ id: string, name: string }[]>([]);
     const [isOpen, setIsOpen] = useState(false);
 
@@ -201,6 +197,13 @@ export default function PlanningCalendar({events, userId, onRefresh}: {
     };
 
     async function createEvent(data: z.infer<typeof permSchema>) {
+        if (roleSlots.length === 0) {
+            toast.error("Erreur", {
+                description: "Vous devez ajouter au moins un créneau pour créer une permanence.",
+            });
+            return;
+        }
+
         try {
             const sanitizedSlots = roleSlots
                 .map(s => ({

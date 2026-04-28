@@ -168,7 +168,7 @@ io.on('connection', (socket) => {
         console.log(`[ws] ${socket.id} joined room ${room} (size=${size})`);
 
         if ((socket.data as any).user) {
-            socket.to(room).emit('userJoined', {
+            io.to(room).emit('userJoined', {
                 channelId: room,
                 user: (socket.data as any).user
             });
@@ -185,7 +185,7 @@ io.on('connection', (socket) => {
         console.log(`[ws] ${socket.id} left room ${room} (size=${size})`);
 
         if ((socket.data as any).user) {
-            socket.to(room).emit('userLeft', {
+            io.to(room).emit('userLeft', {
                 channelId: room,
                 user: (socket.data as any).user
             });
@@ -241,7 +241,7 @@ io.on('connection', (socket) => {
         if ((socket.data as any).user) {
             for (const room of socket.rooms) {
                 if (room !== socket.id) {
-                    socket.to(room).emit('userLeft', {
+                    io.to(room).emit('userLeft', {
                         channelId: room,
                         user: (socket.data as any).user
                     });

@@ -5,12 +5,13 @@ import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
 import {
     findEvent,
+    findEventByChannel,
     getEvents,
     registerUserToEvent,
+    removeUserFromEvent,
     saveEvent,
     unregisterUserToEvent,
-    updateRegistrationStatus,
-    removeUserFromEvent
+    updateRegistrationStatus
 } from '../../lib/eventManager.js';
 
 const EventSchema = z.object({
@@ -25,7 +26,7 @@ const EventSchema = z.object({
             goalCount: z.number().int().nonnegative(),
             part: z.enum(["first", "second"]).optional()
         })
-    ),
+    ).min(1, "Au moins un créneau est requis"),
 });
 
 async function checkAuth(req: any, reply: any) {
@@ -162,6 +163,23 @@ export async function registerEventsRoutes(app: FastifyInstance) {
         } catch (e) {
             console.error("Failed to compute available users:", e);
             return reply.status(500).send({success: false, error: "Failed to compute available users"});
+        }
+    });
+
+    app.get('/v1/events/channel/:channelId', async (req, reply) => {
+        const userId = await checkAuth(req, reply);
+        if (!userId) return;
+
+        const {channelId} = req.params as { channelId: string };
+        try {
+            const event = await findEventByChannel(channelId);
+
+            if (!event) return reply.status(404).send({success: false, message: "Event not found for this channel"});
+
+            return reply.send({success: true, event});
+        } catch (err) {
+            console.error("Failed to fetch event by channel:", err);
+            return reply.status(500).send({success: false, message: "Internal server error"});
         }
     });
 

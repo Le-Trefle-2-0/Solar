@@ -67,7 +67,12 @@ export default function ChatWidget() {
         const el = document.getElementById('chat-widget-portal') || document.createElement('div');
         if (!el.id) {
             el.id = 'chat-widget-portal';
-            el.style.position = 'relative';
+            el.style.position = 'fixed';
+            el.style.top = '0';
+            el.style.left = '0';
+            el.style.width = '100%';
+            el.style.height = '100%';
+            el.style.pointerEvents = 'none';
             el.style.zIndex = '99999';
             document.body.appendChild(el);
         }
@@ -386,7 +391,7 @@ export default function ChatWidget() {
             {/* Panel */}
             {open && (
                 <div
-                    className="fixed inset-0 sm:inset-auto sm:bottom-5 sm:right-5 z-[9999] flex flex-col bg-background sm:bg-transparent sm:w-[500px] md:w-[600px] lg:w-[700px] sm:h-[80vh] sm:min-h-[600px] sm:rounded-2xl sm:shadow-2xl overflow-hidden pointer-events-auto"
+                    className="fixed inset-0 sm:inset-auto sm:bottom-5 sm:right-5 z-[10000] flex flex-col bg-background sm:bg-transparent sm:w-[500px] md:w-[600px] lg:w-[700px] sm:h-[80vh] sm:min-h-[600px] sm:rounded-2xl sm:shadow-2xl overflow-hidden pointer-events-auto"
                 >
                     {/* Glassmorphism background layer for stronger readability (desktop only) */}
                     <div
@@ -478,7 +483,8 @@ export default function ChatWidget() {
                             </div>
                         ) : (
                             <>
-                                <div className="flex-1 overflow-y-auto px-6 py-5 space-y-3 relative z-20">
+                                <div
+                                    className="flex-1 overflow-y-auto px-6 py-5 space-y-3 relative z-20 pointer-events-auto">
                                     {loading && (
                                         <div className="text-sm text-muted-foreground">Connexion…</div>
                                     )}

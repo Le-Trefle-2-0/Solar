@@ -93,7 +93,65 @@ export async function findEvent(eventId: string) {
             part: slot.part,
             goalCount: slot.goalCount,
             registrationsCount: slot.registrations.filter(r => r.status === 'confirmed').length,
-            registrations: slot.registrations,
+            registrations: slot.registrations.map(r => ({
+                ...r,
+                user: {
+                    ...r.user,
+                    hasActiveTicket: (r.user as any).Ticket?.length > 0
+                }
+            })),
+        }))
+    };
+}
+
+export async function findEventByChannel(channelId: string) {
+    const event = await prisma.event.findFirst({
+        where: {channelID: channelId},
+        include: {
+            roleSlots: {
+                include: {
+                    registrations: {
+                        include: {
+                            user: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    image: true,
+                                    role: true,
+                                    Ticket: {
+                                        where: {
+                                            status: {
+                                                name: {not: 'closed'}
+                                            }
+                                        },
+                                        select: {id: true}
+                                    }
+                                }
+                            }
+                        }
+                    },
+                },
+            },
+        },
+    });
+
+    if (!event) return null;
+
+    return {
+        ...event,
+        roleSlots: event.roleSlots.map((slot) => ({
+            id: slot.id,
+            role: slot.role,
+            part: slot.part,
+            goalCount: slot.goalCount,
+            registrationsCount: slot.registrations.filter(r => r.status === 'confirmed').length,
+            registrations: slot.registrations.map(r => ({
+                ...r,
+                user: {
+                    ...r.user,
+                    hasActiveTicket: (r.user as any).Ticket?.length > 0
+                }
+            })),
         }))
     };
 }
