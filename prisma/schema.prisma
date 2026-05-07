@@ -409,8 +409,9 @@ model Recruitment {
   description  String   @db.LongText
   icon         String?
   contactEmail String?
-  fields       Json
-  enabled      Boolean  @default(true)
+  fields         Json
+  discordWebhook String? @db.Text
+  enabled        Boolean @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 

@@ -33,7 +33,8 @@
     "start:web": "npm run start -w apps/web",
     "compose:up": "docker compose up",
     "compose:down": "docker compose down -v",
-    "setup:admin": "tsx scripts/setup-admin.ts"
+    "setup:admin": "tsx scripts/setup-admin.ts",
+    "generate:data": "tsx scripts/generate-historical-data.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

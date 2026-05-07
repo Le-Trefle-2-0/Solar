@@ -51,6 +51,7 @@ export function RecruitmentDialog({open, onOpenChange, recruitment, onSave}: Rec
             description: "",
             icon: "Users",
             contactEmail: "",
+            discordWebhook: "",
             enabled: true,
             fields: DEFAULT_FIELDS,
         },
@@ -63,6 +64,7 @@ export function RecruitmentDialog({open, onOpenChange, recruitment, onSave}: Rec
                 description: recruitment.description,
                 icon: recruitment.icon,
                 contactEmail: recruitment.contactEmail || "",
+                discordWebhook: recruitment.discordWebhook || "",
                 enabled: recruitment.enabled,
                 fields: (recruitment.fields as unknown as RecruitmentField[]) || DEFAULT_FIELDS,
             });
@@ -72,6 +74,7 @@ export function RecruitmentDialog({open, onOpenChange, recruitment, onSave}: Rec
                 description: "",
                 icon: "Users",
                 contactEmail: "",
+                discordWebhook: "",
                 enabled: true,
                 fields: DEFAULT_FIELDS,
             });
@@ -155,6 +158,23 @@ export function RecruitmentDialog({open, onOpenChange, recruitment, onSave}: Rec
                                         <DialogDescription>
                                             Les candidatures seront envoyées à cet email. Par défaut :
                                             contact@letrefle.org
+                                        </DialogDescription>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="discordWebhook"
+                                render={({field}) => (
+                                    <FormItem className="sm:col-span-2">
+                                        <FormLabel>Webhook Discord (optionnel)</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="https://discord.com/api/webhooks/..." {...field}
+                                                   value={field.value || ""}/>
+                                        </FormControl>
+                                        <DialogDescription>
+                                            Une copie de la candidature sera envoyée à ce salon Discord.
                                         </DialogDescription>
                                         <FormMessage/>
                                     </FormItem>

@@ -24,20 +24,20 @@ interface Person {
 
 const board: Person[] = [
     {
-        name: "Anthony J.",
+        name: "Anthony",
         role: "Président",
         icon: Shield,
         image: "https://cdn.discordapp.com/avatars/512409112231936021/19636aa5f20d108c2161fa7c58d94591.jpeg?size=1024"
     },
     {
-        name: "Paul PERON REDON",
+        name: "Paul",
         role: "Administrateur",
         icon: Shield,
         image: "https://cdn.discordapp.com/avatars/369564132770578432/d9059864986d2b943ab7d1e61c35b74e.jpeg?size=1024",
         bio: "Étudiant en physique et passionné par le numérique, j'ai rejoint l'association en 2021 avec l'envie concrète d'être utile. Fort d'une expérience en cybersécurité, j'ai accompagné la transformation digitale de l'association en l'aidant à se doter des outils adaptés à ses besoins. Au-delà de la technique, c'est l'engagement pour la santé mentale qui me tient à cœur et qui guide mon investissement au sein du conseil d'administration."
     },
     {
-        name: "Océane DUPONT",
+        name: "Océane",
         role: "Trésorière",
         icon: Shield,
         image: "https://cdn.discordapp.com/avatars/372806343108591617/518b38f6cb377b207d54b0de30a6220d.jpeg?size=1024"
@@ -46,7 +46,7 @@ const board: Person[] = [
 
 const managers: Person[] = [
     {
-        name: "Louise BURTÉ",
+        name: "Louise",
         role: "Coordinatrice des Équipes",
         icon: Users,
         image: "https://cdn.discordapp.com/avatars/967058591494316033/fab79946a1d207f42fb220f9ed3d6e76.jpeg?size=1024"
@@ -76,13 +76,7 @@ const teamLeaders: Person[] = [
         name: "Darius",
         role: "Référent Bénévoles Écoutants",
         icon: Users,
-        image: "https://cdn.discordapp.com/avatars/1305103533246255198/4b3c20d885ad7a09e995977aedb594ec.png?size=4096"
-    },
-    {
-        name: "David",
-        role: "Référent Bénévoles Écoutants",
-        icon: Users,
-        image: "https://cdn.discordapp.com/avatars/1124382428149076048/2a54d355601ec2060cc3dd79efac15b2.png?size=4096"
+        image: "https://cdn.discordapp.com/avatars/1305103533246255198/95045c6b26739a3f64ea1610c0a37d91.png?size=4096"
     },
     {
         name: "Guillaume",

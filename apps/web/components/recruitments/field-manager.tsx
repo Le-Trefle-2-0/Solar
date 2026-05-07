@@ -30,7 +30,14 @@ export function FieldManager({fields, onChange}: FieldManagerProps) {
     const addField = () => {
         onChange([
             ...fields,
-            {name: `field_${fields.length + 1}`, label: "Nouveau champ", type: "text", required: false},
+            {
+                name: `field_${fields.length + 1}`,
+                label: "Nouveau champ",
+                type: "text",
+                required: false,
+                min: null,
+                minUnit: "chars"
+            },
         ]);
     };
 
@@ -114,55 +121,103 @@ export function FieldManager({fields, onChange}: FieldManagerProps) {
                         >
                             <Icons.GripVertical className="h-5 w-5 pointer-events-none"/>
                         </div>
-                        <div className="grid flex-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
-                            <div className="space-y-1">
-                                <Label className="text-xs">Label</Label>
-                                <Input
-                                    value={field.label}
-                                    onChange={(e) => {
-                                        const newLabel = e.target.value;
-                                        const newName = generateId(newLabel);
-                                        updateField(index, {label: newLabel, name: newName || field.name});
-                                    }}
-                                    placeholder="Label affiché"
-                                    className="h-8 text-xs"
-                                />
-                            </div>
-                            <div className="space-y-1">
-                                <Label className="text-xs">Type</Label>
-                                <Select
-                                    value={field.type}
-                                    onValueChange={(value) => updateField(index, {type: value})}
-                                >
-                                    <SelectTrigger className="h-8 text-xs">
-                                        <SelectValue/>
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="text">Texte court</SelectItem>
-                                        <SelectItem value="email">Email</SelectItem>
-                                        <SelectItem value="textarea">Texte long</SelectItem>
-                                        <SelectItem value="number">Nombre</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="flex items-end gap-2 pb-1">
-                                <div className="flex items-center space-x-2">
-                                    <Switch
-                                        id={`req-${index}`}
-                                        checked={field.required}
-                                        onCheckedChange={(checked) => updateField(index, {required: checked})}
+                        <div className="flex-1 flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-4 flex-1">
+                                <div className="flex flex-col gap-1.5 w-[300px]">
+                                    <Label
+                                        className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Label</Label>
+                                    <Input
+                                        value={field.label}
+                                        onChange={(e) => {
+                                            const newLabel = e.target.value;
+                                            const newName = generateId(newLabel);
+                                            updateField(index, {label: newLabel, name: newName || field.name});
+                                        }}
+                                        placeholder="Label affiché"
+                                        className="h-9 text-sm"
                                     />
-                                    <Label htmlFor={`req-${index}`} className="text-xs">Obligatoire</Label>
                                 </div>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => removeField(index)}
-                                    className="ml-auto h-8 w-8 text-destructive"
-                                >
-                                    <Icons.Trash2 className="h-4 w-4"/>
-                                </Button>
+                                <div className="flex flex-col gap-1.5 w-[160px]">
+                                    <Label
+                                        className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Type</Label>
+                                    <Select
+                                        value={field.type}
+                                        onValueChange={(value) => updateField(index, {type: value})}
+                                    >
+                                        <SelectTrigger className="h-9 text-sm">
+                                            <SelectValue/>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="text">Texte court</SelectItem>
+                                            <SelectItem value="email">Email</SelectItem>
+                                            <SelectItem value="textarea">Texte long</SelectItem>
+                                            <SelectItem value="number">Nombre</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                <div className="flex flex-col gap-1.5 w-[220px]">
+                                    <Label
+                                        className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Minimum</Label>
+                                    <div className="flex items-center gap-1">
+                                        {(() => {
+                                            const isMinSupported = field.type === 'text' || field.type === 'textarea';
+                                            return (
+                                                <>
+                                                    <Input
+                                                        type="number"
+                                                        value={field.min || ""}
+                                                        onChange={(e) => updateField(index, {min: e.target.value ? parseInt(e.target.value) : null})}
+                                                        placeholder="0"
+                                                        className="h-9 w-16 text-sm"
+                                                        disabled={!isMinSupported}
+                                                    />
+                                                    <Select
+                                                        value={field.minUnit || "chars"}
+                                                        onValueChange={(value: any) => updateField(index, {minUnit: value})}
+                                                        disabled={!isMinSupported}
+                                                    >
+                                                        <SelectTrigger className="h-9 flex-1 text-sm">
+                                                            <SelectValue/>
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="chars">caractères</SelectItem>
+                                                            <SelectItem value="words">mots</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </>
+                                            );
+                                        })()}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-4">
+                                <div className="flex flex-col gap-1.5 items-center w-[80px]">
+                                    <Label
+                                        className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Obligatoire</Label>
+                                    <div className="flex items-center justify-center h-9">
+                                        <Switch
+                                            id={`req-${index}`}
+                                            checked={field.required}
+                                            onCheckedChange={(checked) => updateField(index, {required: checked})}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-col gap-1.5 items-center w-[50px]">
+                                    <Label
+                                        className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Action</Label>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => removeField(index)}
+                                        className="h-9 w-9 text-destructive hover:bg-destructive/10"
+                                    >
+                                        <Icons.Trash2 className="h-4 w-4"/>
+                                    </Button>
+                                </div>
                             </div>
                         </div>
                     </div>
