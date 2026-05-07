@@ -26,10 +26,10 @@ import {Switch} from "@/components/ui/switch";
 import {IconPicker} from "@/components/ui";
 
 const DEFAULT_FIELDS: RecruitmentField[] = [
-    {name: "firstName", label: "Prénom", type: "text", required: true},
-    {name: "lastName", label: "Nom", type: "text", required: true},
-    {name: "email", label: "Email", type: "email", required: true},
-    {name: "message", label: "Message", type: "textarea", required: true},
+    {name: "firstName", label: "Prénom", type: "text", required: true, minUnit: "chars"},
+    {name: "lastName", label: "Nom", type: "text", required: true, minUnit: "chars"},
+    {name: "email", label: "Email", type: "email", required: true, minUnit: "chars"},
+    {name: "message", label: "Message", type: "textarea", required: true, minUnit: "chars"},
 ];
 
 type RecruitmentFormValues = RecruitmentValues;
@@ -64,7 +64,7 @@ export function RecruitmentDialog({open, onOpenChange, recruitment, onSave}: Rec
                 description: recruitment.description,
                 icon: recruitment.icon,
                 contactEmail: recruitment.contactEmail || "",
-                discordWebhook: recruitment.discordWebhook || "",
+                discordWebhook: (recruitment as any).discordWebhook || "",
                 enabled: recruitment.enabled,
                 fields: (recruitment.fields as unknown as RecruitmentField[]) || DEFAULT_FIELDS,
             });

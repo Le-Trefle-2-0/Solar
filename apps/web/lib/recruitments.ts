@@ -6,7 +6,7 @@ export const fieldSchema = z.object({
     type: z.string(), // "text" | "email" | "textarea" | "number"
     required: z.boolean(),
     min: z.number().optional().nullable(),
-    minUnit: z.enum(["chars", "words"]).optional().default("chars"),
+    minUnit: z.enum(["chars", "words"]),
 });
 
 export const recruitmentSchema = z.object({
