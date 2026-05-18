@@ -4,6 +4,8 @@ import {authenticate} from '../../auth.js';
 import {broadcast} from '../../lib/broadcast.js';
 import {z} from "zod";
 
+import {getUserPermissions, hasPermission} from '../../lib/permissions.js';
+
 async function checkAuth(req: any, reply: any) {
     const userId = await authenticate(req);
     if (!userId) {
@@ -14,10 +16,8 @@ async function checkAuth(req: any, reply: any) {
 }
 
 async function hasManagePermission(userId: string) {
-    const user = await prisma.user.findUnique({where: {id: userId}});
-    if (!user) return false;
-    const roles = (user.role || '').toLowerCase().split(',').map(r => r.trim());
-    return roles.some(role => role === 'admin' || role === 'moderator' || role === 'owner' || role === 'manager');
+    const perms = await getUserPermissions(userId);
+    return hasPermission(perms, 'messages.manage');
 }
 
 export async function registerMessageRoutes(app: FastifyInstance) {

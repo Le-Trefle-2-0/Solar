@@ -266,6 +266,11 @@ export async function updateRecruitment(id: string, data: z.infer<typeof recruit
 
     const validated = recruitmentSchema.parse(data);
 
+    const oldRecruitment = await prisma.recruitment.findUnique({
+        where: {id},
+        select: {enabled: true, title: true},
+    });
+
     const recruitment = await prisma.recruitment.update({
         where: {id},
         data: {
@@ -279,7 +284,65 @@ export async function updateRecruitment(id: string, data: z.infer<typeof recruit
         },
     });
 
+    // If reopening, notify waitlist
+    if (oldRecruitment && !oldRecruitment.enabled && validated.enabled) {
+        const waitlist = await prisma.recruitmentWaitlist.findMany({
+            where: {recruitmentId: id},
+        });
+
+        if (waitlist.length > 0) {
+            const {getResendClient} = await import("@/lib/resend");
+            const resend = getResendClient();
+
+            const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://solar.letrefle.org";
+            const recruitmentUrl = `${baseUrl}/benevoles/${id}`;
+
+            const {html} = renderEmailTemplate({
+                title: `Recrutement réouvert : ${recruitment.title}`,
+                content: `
+                    <div style="margin-bottom: 20px;">
+                        <p>Bonjour,</p>
+                        <p>Le recrutement pour le poste "<strong>${recruitment.title}</strong>" vient d'être réouvert !</p>
+                        <p>Vous aviez demandé à être prévenu de cette réouverture. Vous pouvez maintenant postuler en cliquant sur le bouton ci-dessous :</p>
+                        <div style="text-align: center; margin: 30px 0;">
+                            <a href="${recruitmentUrl}" style="background-color: #0070f3; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">Postuler maintenant</a>
+                        </div>
+                    </div>
+                `,
+                footer: `Vous recevez cet email car vous vous êtes inscrit sur la liste d'attente pour ce recrutement.`
+            });
+
+            // Send notifications (Resend handles batching/rate limiting better via multiple calls or their batch API)
+            // For now, we'll send them individually as waitlists are usually small
+            const notifiedEmails: string[] = [];
+            for (const entry of waitlist) {
+                try {
+                    await resend.emails.send({
+                        from: "Le Trèfle 2.0 <noreply@solar.letrefle.org>",
+                        to: entry.email,
+                        subject: `[Réouverture] ${recruitment.title} - Solar`,
+                        html,
+                    });
+                    notifiedEmails.push(entry.email);
+                } catch (err) {
+                    console.error(`Failed to send waitlist notification to ${entry.email}:`, err);
+                }
+            }
+
+            // Clear notified emails from waitlist
+            if (notifiedEmails.length > 0) {
+                await prisma.recruitmentWaitlist.deleteMany({
+                    where: {
+                        recruitmentId: id,
+                        email: {in: notifiedEmails}
+                    },
+                });
+            }
+        }
+    }
+
     revalidatePath("/app/recruitments");
+    revalidatePath(`/benevoles/${id}`);
     return recruitment;
 }
 
@@ -301,4 +364,46 @@ export async function deleteRecruitment(id: string) {
 
     revalidatePath("/app/recruitments");
     return {success: true};
+}
+
+export async function joinWaitlist(recruitmentId: string, email: string) {
+    const recruitment = await prisma.recruitment.findUnique({
+        where: {id: recruitmentId},
+    });
+
+    if (!recruitment) {
+        return {error: "Recrutement introuvable."};
+    }
+
+    if (recruitment.enabled) {
+        return {error: "Ce recrutement est ouvert, vous pouvez postuler directement."};
+    }
+
+    const emailSchema = z.string().email("Email invalide");
+    const validatedEmail = emailSchema.safeParse(email);
+
+    if (!validatedEmail.success) {
+        return {error: validatedEmail.error.errors[0].message};
+    }
+
+    try {
+        await prisma.recruitmentWaitlist.upsert({
+            where: {
+                email_recruitmentId: {
+                    email: validatedEmail.data,
+                    recruitmentId,
+                },
+            },
+            create: {
+                email: validatedEmail.data,
+                recruitmentId,
+            },
+            update: {},
+        });
+
+        return {success: true};
+    } catch (err) {
+        console.error("Failed to join waitlist:", err);
+        return {error: "Une erreur est survenue lors de l'inscription à la liste d'attente."};
+    }
 }

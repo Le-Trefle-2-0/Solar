@@ -2,6 +2,7 @@ import {Prisma, prisma} from '../prisma.js';
 import {createChannel} from './channelsManager.js';
 import {format, isAfter, setHours, setMinutes, setSeconds, startOfWeek} from 'date-fns';
 import {EventInput} from './types.js';
+import {getUserPermissions, hasPermission} from './permissions.js';
 
 export async function saveEvent(eventData: EventInput) {
     const {title, description, start, end, userId, roleSlots} = eventData;
@@ -242,7 +243,8 @@ export async function registerUserToEvent(eventId: string, userId: string, part?
     const eventDate = new Date(event.start);
     const deadline = setSeconds(setMinutes(setHours(startOfWeek(eventDate, {weekStartsOn: 1}), 12), 0), 0);
     const now = new Date();
-    const isAdmin = userRoles.includes('admin') || userRoles.includes('manager');
+    const perms = await getUserPermissions(userId);
+    const isAdmin = hasPermission(perms, 'permanence.register_other_user');
     // Admin/manager bypass deadline and register directly as confirmed, others follow normal deadline logic
     const status = (adminBypass && isAdmin) ? 'confirmed' : (isAfter(now, deadline) ? 'pending' : 'confirmed');
 

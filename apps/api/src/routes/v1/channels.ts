@@ -3,11 +3,11 @@ import {z} from 'zod';
 import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
 
-function roleHasTicketsReadAll(role?: string | null): boolean {
-    if (!role) return false;
-    const allowed = new Set(['admin', 'manager', 'training', 'bot']);
-    const roles = role.split(',').map(r => r.trim().toLowerCase());
-    return roles.some(r => allowed.has(r));
+import {getUserPermissions, hasPermission} from '../../lib/permissions.js';
+
+async function canReadTicketsAll(userId: string): Promise<boolean> {
+    const perms = await getUserPermissions(userId);
+    return hasPermission(perms, 'tickets.read_all');
 }
 
 export async function registerChannelsRoutes(app: FastifyInstance) {
@@ -20,8 +20,7 @@ export async function registerChannelsRoutes(app: FastifyInstance) {
             if (!userId) return reply.status(401).send('unauthorized');
 
             const channels = await prisma.channel.findMany();
-            const user = await prisma.user.findUnique({where: {id: userId}});
-            const canReadAll = roleHasTicketsReadAll(user?.role ?? null);
+            const canReadAll = await canReadTicketsAll(userId);
 
             const accessed: any[] = [];
             for (const channel of channels) {
@@ -67,8 +66,7 @@ export async function registerChannelsRoutes(app: FastifyInstance) {
             const channel = await prisma.channel.findUnique({where: {id: channelID}});
             if (!channel) return reply.status(404).send({error: 'not_found'});
 
-            const user = await prisma.user.findUnique({where: {id: userId}});
-            const canReadAll = roleHasTicketsReadAll(user?.role ?? null);
+            const canReadAll = await canReadTicketsAll(userId);
 
             let allMembers: any[] = [];
 

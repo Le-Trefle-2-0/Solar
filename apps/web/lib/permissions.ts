@@ -7,7 +7,8 @@ export const statement = {
     management: ['create_account', 'delete_account', 'ticket_history', 'view_transmission', 'view_stats', 'reset_password'],
     permanence: ['open', 'close', 'register', 'unregister', 'unregister_other_all', 'unregister_other_user', 'register_other_all', 'register_other_user'],
     messages: ['manage'],
-    newsletters: ['manage']
+    newsletters: ['manage'],
+    admin: ['sudo']
 } as const;
 
 export interface PermissionInfo {
@@ -52,13 +53,13 @@ export const PERMISSION_METADATA: Record<string, PermissionInfo> = {
     'tickets.send_message_all': {
         id: 'tickets.send_message_all',
         label: 'Envoyer messages à tous',
-        description: 'Permet d\'envoyer un message visible par tous les intervenants',
+        description: 'Permet d\'écrire dans toutes les écoutes',
         category: 'Tickets'
     },
     'tickets.send_message': {
         id: 'tickets.send_message',
         label: 'Envoyer des messages',
-        description: 'Permet de répondre au bénéficiaire dans le chat',
+        description: 'Permet d\'écrire dans une écoute',
         category: 'Tickets'
     },
     'tickets.transmission': {
@@ -170,6 +171,14 @@ export const PERMISSION_METADATA: Record<string, PermissionInfo> = {
         category: 'Communication'
     },
 
+    // Admin
+    'admin.sudo': {
+        id: 'admin.sudo',
+        label: 'Super-administrateur (Sudo)',
+        description: 'Outrepasse toutes les restrictions de permissions',
+        category: 'Administration'
+    },
+
     // Système (Better Auth default)
     'user.create': {
         id: 'user.create',
@@ -217,6 +226,14 @@ export const PERMISSION_METADATA: Record<string, PermissionInfo> = {
 
 export const ac = createAccessControl(statement);
 
+/**
+ * Enhanced permission check that honors admin.sudo
+ */
+export function hasPermission(userPermissions: string[], permission: string): boolean {
+    if (userPermissions.includes('admin.sudo')) return true;
+    return userPermissions.includes(permission);
+}
+
 export const newsletterManager = ac.newRole({
     newsletters: ['manage']
 });
@@ -249,5 +266,6 @@ export const admin = ac.newRole({
     tickets: ['open', 'close', 'read_all', 'attribute', 'launch_voice', 'send_message_all', 'send_message', 'transmission'],
     management: ['create_account', 'delete_account', 'ticket_history', 'view_transmission', 'view_stats', 'reset_password'],
     permanence: ['open', 'close', 'register', 'unregister', 'unregister_other_all', 'unregister_other_user', 'register_other_all', 'register_other_user'],
-    messages: ['manage']
+    messages: ['manage'],
+    admin: ['sudo']
 });

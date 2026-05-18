@@ -4,12 +4,11 @@ import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
 import {broadcast} from '../../lib/broadcast.js';
 import {createHash} from 'crypto';
+import {getUserPermissions, hasPermission} from '../../lib/permissions.js';
 
-function roleHasTicketsReadAll(role?: string | null): boolean {
-    if (!role) return false;
-    const allowed = new Set(['admin', 'manager', 'training', 'bot']);
-    const roles = role.split(',').map(r => r.trim().toLowerCase());
-    return roles.some(r => allowed.has(r));
+async function canReadTicketsAll(userId: string): Promise<boolean> {
+    const perms = await getUserPermissions(userId);
+    return hasPermission(perms, 'tickets.read_all');
 }
 
 async function broadcastStatusUpdate(channelId: string, statusId: number, statusName: string) {
@@ -26,10 +25,7 @@ export async function registerTicketsRoutes(app: FastifyInstance) {
         const userId = await authenticate(req);
         if (!userId) return reply.status(401).send('unauthorized');
 
-        const user = await prisma.user.findUnique({where: {id: userId}});
-        const canReadAll = roleHasTicketsReadAll(user?.role ?? null);
-
-        if (!canReadAll && !userId) return reply.status(401).send('unauthorized');
+        const canReadAll = await canReadTicketsAll(userId);
 
         if (!canReadAll) {
             const tickets = await prisma.ticket.findMany({
@@ -52,8 +48,7 @@ export async function registerTicketsRoutes(app: FastifyInstance) {
         const userId = await authenticate(req);
         if (!userId) return reply.status(401).send('unauthorized');
 
-        const user = await prisma.user.findUnique({where: {id: userId}});
-        const canReadAll = roleHasTicketsReadAll(user?.role ?? null);
+        const canReadAll = await canReadTicketsAll(userId);
 
         if (!canReadAll) return reply.status(403).send('forbidden');
 

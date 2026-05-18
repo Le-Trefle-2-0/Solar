@@ -3,6 +3,7 @@ import {z} from 'zod';
 import {createHash} from 'crypto';
 import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
+import {getUserPermissions, hasPermission} from '../../lib/permissions.js';
 import {
     findEvent,
     findEventByChannel,
@@ -56,11 +57,13 @@ export async function registerEventsRoutes(app: FastifyInstance) {
         const userId = await checkAuth(req, reply);
         if (!userId) return;
 
-        // Only allow users with admin or manager roles to create events
-        const user = await prisma.user.findUnique({where: {id: userId}, select: {role: true}});
-        const userRoles = (user?.role || '').split(',').map(r => r.trim());
-        if (!userRoles.includes('admin') && !userRoles.includes('manager')) {
-            return reply.status(403).send({success: false, message: "Accès refusé : rôle admin ou manager requis"});
+        // Only allow users with permanence.open permission to create events (sessions)
+        const perms = await getUserPermissions(userId);
+        if (!hasPermission(perms, 'permanence.open')) {
+            return reply.status(403).send({
+                success: false,
+                message: "Accès refusé : permission permanence.open requise"
+            });
         }
 
         try {
@@ -227,11 +230,13 @@ export async function registerEventsRoutes(app: FastifyInstance) {
         const userId = await checkAuth(req, reply);
         if (!userId) return;
 
-        // Check if user is admin
-        const user = await prisma.user.findUnique({where: {id: userId}, select: {role: true}});
-        const userRoles = (user?.role || '').split(',').map(r => r.trim());
-        if (!userRoles.includes('admin')) {
-            return reply.status(403).send({success: false, message: "Forbidden: Admin role required"});
+        // Check if user has permission to close/delete sessions
+        const perms = await getUserPermissions(userId);
+        if (!hasPermission(perms, 'permanence.close')) {
+            return reply.status(403).send({
+                success: false,
+                message: "Accès refusé : permission permanence.close requise"
+            });
         }
 
         const {id} = req.params as { id: string };
@@ -250,11 +255,10 @@ export async function registerEventsRoutes(app: FastifyInstance) {
         const {id} = req.params as { id: string };
         const {part, roleSlotId, adminBypass} = (req.body ?? {}) as { part?: 'first' | 'second', roleSlotId?: string, adminBypass?: boolean };
 
-        // If admin bypass is requested, verify user has admin/manager role
+        // If admin bypass is requested, verify user has permission
         if (adminBypass) {
-            const user = await prisma.user.findUnique({where: {id: userId}, select: {role: true}});
-            const userRoles = (user?.role || '').split(',').map(r => r.trim());
-            if (!userRoles.includes('admin') && !userRoles.includes('manager')) {
+            const perms = await getUserPermissions(userId);
+            if (!hasPermission(perms, 'permanence.register_other_user')) {
                 return reply.status(403).send({success: false, message: "Permissions insuffisantes pour utiliser le bypass administrateur"});
             }
         }
@@ -286,10 +290,9 @@ export async function registerEventsRoutes(app: FastifyInstance) {
         const userId = await checkAuth(req, reply);
         if (!userId) return;
 
-        // Check if user is manager or admin
-        const user = await prisma.user.findUnique({where: {id: userId}, select: {role: true}});
-        const userRoles = (user?.role || '').split(',').map(r => r.trim());
-        if (!userRoles.includes('manager') && !userRoles.includes('admin')) {
+        // Check if user has management permissions
+        const perms = await getUserPermissions(userId);
+        if (!hasPermission(perms, 'permanence.register_other_user')) {
             return reply.status(403).send({success: false, message: "Forbidden"});
         }
 
