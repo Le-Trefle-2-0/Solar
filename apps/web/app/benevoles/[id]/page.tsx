@@ -8,6 +8,7 @@ import * as Icons from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import {Badge} from "@/components/ui/badge";
 import {ApplicationDialog} from "@/components/recruitments/application-dialog";
+import {WaitlistForm} from "@/components/recruitments/waitlist-form";
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import Link from "next/link";
 import {Button} from "@/components/ui/button";
@@ -88,16 +89,24 @@ export default async function RecruitmentDetailPage({params}: { params: Promise<
                                             />
                                         </>
                                     ) : (
-                                        <div className="bg-muted/50 p-8 rounded-2xl w-full space-y-4">
-                                            <Icons.Lock className="mx-auto h-12 w-12 text-muted-foreground opacity-50"/>
-                                            <div className="space-y-2">
-                                                <h3 className="text-xl font-semibold">Recrutement clôturé</h3>
-                                                <p className="text-muted-foreground max-w-md mx-auto">
-                                                    Ce recrutement est actuellement clôturé. Vous pouvez toujours
-                                                    consulter les détails de la mission,
-                                                    mais les candidatures ne sont plus acceptées.
-                                                </p>
+                                        <div className="bg-muted/50 p-8 rounded-2xl w-full space-y-8">
+                                            <div className="space-y-4">
+                                                <Icons.Lock
+                                                    className="mx-auto h-12 w-12 text-muted-foreground opacity-50"/>
+                                                <div className="space-y-2">
+                                                    <h3 className="text-xl font-semibold">Recrutement clôturé</h3>
+                                                    <p className="text-muted-foreground max-w-md mx-auto">
+                                                        Ce recrutement est actuellement clôturé. Vous pouvez toujours
+                                                        consulter les détails de la mission,
+                                                        mais les candidatures ne sont plus acceptées.
+                                                    </p>
+                                                </div>
                                             </div>
+
+                                            <div className="pt-8 border-t border-muted">
+                                                <WaitlistForm recruitmentId={recruitment.id}/>
+                                            </div>
+
                                             <Button asChild variant="outline" className="mt-4">
                                                 <Link href="/benevoles">Découvrir d'autres missions</Link>
                                             </Button>

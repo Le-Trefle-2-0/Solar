@@ -4,10 +4,11 @@
 **/
 
 import * as runtime from './runtime/library.js';
-import $Public = runtime.Types.Public;
-import $Utils = runtime.Types.Utils;
-import $Extensions = runtime.Types.Extensions;
-import $Result = runtime.Types.Result;
+import $Types = runtime.Types // general types
+import $Public = runtime.Types.Public
+import $Utils = runtime.Types.Utils
+import $Extensions = runtime.Types.Extensions
+import $Result = runtime.Types.Result
 
 export type PrismaPromise<T> = $Public.PrismaPromise<T>
 
@@ -133,13 +134,18 @@ export type Passkey = $Result.DefaultSelection<Prisma.$PasskeyPayload>
  */
 export type Recruitment = $Result.DefaultSelection<Prisma.$RecruitmentPayload>
 /**
+ * Model RecruitmentWaitlist
+ *
+ */
+export type RecruitmentWaitlist = $Result.DefaultSelection<Prisma.$RecruitmentWaitlistPayload>
+/**
  * Model Image
- * 
+ *
  */
 export type Image = $Result.DefaultSelection<Prisma.$ImagePayload>
 /**
  * Model Settings
- * 
+ *
  */
 export type Settings = $Result.DefaultSelection<Prisma.$SettingsPayload>
 
@@ -509,6 +515,16 @@ export class PrismaClient<
     get recruitment(): Prisma.RecruitmentDelegate<ExtArgs, ClientOptions>;
 
     /**
+     * `prisma.recruitmentWaitlist`: Exposes CRUD operations for the **RecruitmentWaitlist** model.
+     * Example usage:
+     * ```ts
+     * // Fetch zero or more RecruitmentWaitlists
+     * const recruitmentWaitlists = await prisma.recruitmentWaitlist.findMany()
+     * ```
+     */
+    get recruitmentWaitlist(): Prisma.RecruitmentWaitlistDelegate<ExtArgs, ClientOptions>;
+
+    /**
      * `prisma.image`: Exposes CRUD operations for the **Image** model.
      * Example usage:
      * ```ts
@@ -530,48 +546,38 @@ export class PrismaClient<
 }
 
 export namespace Prisma {
-    export import DMMF = runtime.DMMF;
+    export import DMMF = runtime.DMMF
+
+    export type PrismaPromise<T> = $Public.PrismaPromise<T>
+
     /**
      * Validator
      */
-    export import validator = runtime.Public.validator;
+    export import validator = runtime.Public.validator
+
     /**
      * Prisma Errors
      */
-    export import PrismaClientKnownRequestError = runtime.PrismaClientKnownRequestError;
-    export import PrismaClientUnknownRequestError = runtime.PrismaClientUnknownRequestError;
-    export import PrismaClientRustPanicError = runtime.PrismaClientRustPanicError;
-    export import PrismaClientInitializationError = runtime.PrismaClientInitializationError;
-    export import PrismaClientValidationError = runtime.PrismaClientValidationError;
+    export import PrismaClientKnownRequestError = runtime.PrismaClientKnownRequestError
+    export import PrismaClientUnknownRequestError = runtime.PrismaClientUnknownRequestError
+    export import PrismaClientRustPanicError = runtime.PrismaClientRustPanicError
+    export import PrismaClientInitializationError = runtime.PrismaClientInitializationError
+    export import PrismaClientValidationError = runtime.PrismaClientValidationError
+
     /**
      * Re-export of sql-template-tag
      */
-    export import sql = runtime.sqltag;
-    export import empty = runtime.empty;
-    export import join = runtime.join;
-    export import raw = runtime.raw;
-    export import Sql = runtime.Sql;
+    export import sql = runtime.sqltag
+    export import empty = runtime.empty
+    export import join = runtime.join
+    export import raw = runtime.raw
+    export import Sql = runtime.Sql
+
+
     /**
      * Decimal.js
      */
-    export import Decimal = runtime.Decimal;
-    /**
-     * Extensions
-     */
-    export import Extension = $Extensions.UserArgs;
-    export import getExtensionContext = runtime.Extensions.getExtensionContext;
-    export import Args = $Public.Args;
-    export import Payload = $Public.Payload;
-    export import Result = $Public.Result;
-    export import Exact = $Public.Exact;
-    export import JsonObject = runtime.JsonObject;
-    export import JsonArray = runtime.JsonArray;
-    export import JsonValue = runtime.JsonValue;
-    export import InputJsonObject = runtime.InputJsonObject;
-    export import InputJsonArray = runtime.InputJsonArray;
-    export import InputJsonValue = runtime.InputJsonValue;
-
-    export type PrismaPromise<T> = $Public.PrismaPromise<T>
+    export import Decimal = runtime.Decimal
 
     export type DecimalJsLike = runtime.DecimalJsLike
 
@@ -583,6 +589,15 @@ export namespace Prisma {
   export type MetricHistogram = runtime.MetricHistogram
   export type MetricHistogramBucket = runtime.MetricHistogramBucket
 
+    /**
+     * Extensions
+     */
+    export import Extension = $Extensions.UserArgs
+    export import getExtensionContext = runtime.Extensions.getExtensionContext
+    export import Args = $Public.Args
+    export import Payload = $Public.Payload
+    export import Result = $Public.Result
+    export import Exact = $Public.Exact
 
     /**
      * Prisma Client JS version: 6.12.0
@@ -594,6 +609,17 @@ export namespace Prisma {
 
   export const prismaVersion: PrismaVersion
 
+    /**
+     * Utility Types
+     */
+
+
+    export import JsonObject = runtime.JsonObject
+    export import JsonArray = runtime.JsonArray
+    export import JsonValue = runtime.JsonValue
+    export import InputJsonObject = runtime.InputJsonObject
+    export import InputJsonArray = runtime.InputJsonArray
+    export import InputJsonValue = runtime.InputJsonValue
 
     /**
    * Types of the values used to represent different kinds of `null` values when working with JSON fields.
@@ -980,6 +1006,7 @@ export namespace Prisma {
     RouteProtection: 'RouteProtection',
       Passkey: 'Passkey',
       Recruitment: 'Recruitment',
+      RecruitmentWaitlist: 'RecruitmentWaitlist',
       Image: 'Image',
       Settings: 'Settings'
   };
@@ -1000,7 +1027,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-        modelProps: "newsletter" | "user" | "role" | "file" | "session" | "account" | "verification" | "organization" | "member" | "invitation" | "twoFactor" | "channel" | "message" | "reaction" | "event" | "roleSlot" | "eventRegistration" | "ticket" | "ticketStatus" | "apikey" | "jwks" | "routeProtection" | "passkey" | "recruitment" | "image" | "settings"
+        modelProps: "newsletter" | "user" | "role" | "file" | "session" | "account" | "verification" | "organization" | "member" | "invitation" | "twoFactor" | "channel" | "message" | "reaction" | "event" | "roleSlot" | "eventRegistration" | "ticket" | "ticketStatus" | "apikey" | "jwks" | "routeProtection" | "passkey" | "recruitment" | "recruitmentWaitlist" | "image" | "settings"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2588,6 +2615,72 @@ export namespace Prisma {
                 }
             }
         }
+        RecruitmentWaitlist: {
+            payload: Prisma.$RecruitmentWaitlistPayload<ExtArgs>
+            fields: Prisma.RecruitmentWaitlistFieldRefs
+            operations: {
+                findUnique: {
+                    args: Prisma.RecruitmentWaitlistFindUniqueArgs<ExtArgs>
+                    result: $Utils.PayloadToResult<Prisma.$RecruitmentWaitlistPayload> | null
+                }
+                findUniqueOrThrow: {
+                    args: Prisma.RecruitmentWaitlistFindUniqueOrThrowArgs<ExtArgs>
+                    result: $Utils.PayloadToResult<Prisma.$RecruitmentWaitlistPayload>
+                }
+                findFirst: {
+                    args: Prisma.RecruitmentWaitlistFindFirstArgs<ExtArgs>
+                    result: $Utils.PayloadToResult<Prisma.$RecruitmentWaitlistPayload> | null
+                }
+                findFirstOrThrow: {
+                    args: Prisma.RecruitmentWaitlistFindFirstOrThrowArgs<ExtArgs>
+                    result: $Utils.PayloadToResult<Prisma.$RecruitmentWaitlistPayload>
+                }
+                findMany: {
+                    args: Prisma.RecruitmentWaitlistFindManyArgs<ExtArgs>
+                    result: $Utils.PayloadToResult<Prisma.$RecruitmentWaitlistPayload>[]
+                }
+                create: {
+                    args: Prisma.RecruitmentWaitlistCreateArgs<ExtArgs>
+                    result: $Utils.PayloadToResult<Prisma.$RecruitmentWaitlistPayload>
+                }
+                createMany: {
+                    args: Prisma.RecruitmentWaitlistCreateManyArgs<ExtArgs>
+                    result: BatchPayload
+                }
+                delete: {
+                    args: Prisma.RecruitmentWaitlistDeleteArgs<ExtArgs>
+                    result: $Utils.PayloadToResult<Prisma.$RecruitmentWaitlistPayload>
+                }
+                update: {
+                    args: Prisma.RecruitmentWaitlistUpdateArgs<ExtArgs>
+                    result: $Utils.PayloadToResult<Prisma.$RecruitmentWaitlistPayload>
+                }
+                deleteMany: {
+                    args: Prisma.RecruitmentWaitlistDeleteManyArgs<ExtArgs>
+                    result: BatchPayload
+                }
+                updateMany: {
+                    args: Prisma.RecruitmentWaitlistUpdateManyArgs<ExtArgs>
+                    result: BatchPayload
+                }
+                upsert: {
+                    args: Prisma.RecruitmentWaitlistUpsertArgs<ExtArgs>
+                    result: $Utils.PayloadToResult<Prisma.$RecruitmentWaitlistPayload>
+                }
+                aggregate: {
+                    args: Prisma.RecruitmentWaitlistAggregateArgs<ExtArgs>
+                    result: $Utils.Optional<AggregateRecruitmentWaitlist>
+                }
+                groupBy: {
+                    args: Prisma.RecruitmentWaitlistGroupByArgs<ExtArgs>
+                    result: $Utils.Optional<RecruitmentWaitlistGroupByOutputType>[]
+                }
+                count: {
+                    args: Prisma.RecruitmentWaitlistCountArgs<ExtArgs>
+                    result: $Utils.Optional<RecruitmentWaitlistCountAggregateOutputType> | number
+                }
+            }
+        }
         Image: {
             payload: Prisma.$ImagePayload<ExtArgs>
             fields: Prisma.ImageFieldRefs
@@ -2828,6 +2921,7 @@ export namespace Prisma {
     routeProtection?: RouteProtectionOmit
     passkey?: PasskeyOmit
       recruitment?: RecruitmentOmit
+      recruitmentWaitlist?: RecruitmentWaitlistOmit
       image?: ImageOmit
       settings?: SettingsOmit
   }
@@ -3308,6 +3402,37 @@ export namespace Prisma {
      */
     export type TicketStatusCountOutputTypeCountTicketArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
         where?: TicketWhereInput
+    }
+
+
+    /**
+     * Count Type RecruitmentCountOutputType
+     */
+
+    export type RecruitmentCountOutputType = {
+        waitlist: number
+    }
+
+    export type RecruitmentCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        waitlist?: boolean | RecruitmentCountOutputTypeCountWaitlistArgs
+    }
+
+    // Custom InputTypes
+    /**
+     * RecruitmentCountOutputType without action
+     */
+    export type RecruitmentCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the RecruitmentCountOutputType
+         */
+        select?: RecruitmentCountOutputTypeSelect<ExtArgs> | null
+    }
+
+    /**
+     * RecruitmentCountOutputType without action
+     */
+    export type RecruitmentCountOutputTypeCountWaitlistArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        where?: RecruitmentWaitlistWhereInput
     }
 
 
@@ -26542,6 +26667,7 @@ export namespace Prisma {
         description: string | null
         icon: string | null
         contactEmail: string | null
+        discordWebhook: string | null
         enabled: boolean | null
         createdAt: Date | null
         updatedAt: Date | null
@@ -26553,6 +26679,7 @@ export namespace Prisma {
         description: string | null
         icon: string | null
         contactEmail: string | null
+        discordWebhook: string | null
         enabled: boolean | null
         createdAt: Date | null
         updatedAt: Date | null
@@ -26565,6 +26692,7 @@ export namespace Prisma {
         icon: number
         contactEmail: number
         fields: number
+        discordWebhook: number
         enabled: number
         createdAt: number
         updatedAt: number
@@ -26578,6 +26706,7 @@ export namespace Prisma {
         description?: true
         icon?: true
         contactEmail?: true
+        discordWebhook?: true
         enabled?: true
         createdAt?: true
         updatedAt?: true
@@ -26589,6 +26718,7 @@ export namespace Prisma {
         description?: true
         icon?: true
         contactEmail?: true
+        discordWebhook?: true
         enabled?: true
         createdAt?: true
         updatedAt?: true
@@ -26601,6 +26731,7 @@ export namespace Prisma {
         icon?: true
         contactEmail?: true
         fields?: true
+        discordWebhook?: true
         enabled?: true
         createdAt?: true
         updatedAt?: true
@@ -26684,6 +26815,7 @@ export namespace Prisma {
         icon: string | null
         contactEmail: string | null
         fields: JsonValue
+        discordWebhook: string | null
         enabled: boolean
         createdAt: Date
         updatedAt: Date
@@ -26713,9 +26845,12 @@ export namespace Prisma {
         icon?: boolean
         contactEmail?: boolean
         fields?: boolean
+        discordWebhook?: boolean
         enabled?: boolean
         createdAt?: boolean
         updatedAt?: boolean
+        waitlist?: boolean | Recruitment$waitlistArgs<ExtArgs>
+        _count?: boolean | RecruitmentCountOutputTypeDefaultArgs<ExtArgs>
     }, ExtArgs["result"]["recruitment"]>
 
 
@@ -26726,16 +26861,23 @@ export namespace Prisma {
         icon?: boolean
         contactEmail?: boolean
         fields?: boolean
+        discordWebhook?: boolean
         enabled?: boolean
         createdAt?: boolean
         updatedAt?: boolean
     }
 
-    export type RecruitmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "icon" | "contactEmail" | "fields" | "enabled" | "createdAt" | "updatedAt", ExtArgs["result"]["recruitment"]>
+    export type RecruitmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "icon" | "contactEmail" | "fields" | "discordWebhook" | "enabled" | "createdAt" | "updatedAt", ExtArgs["result"]["recruitment"]>
+    export type RecruitmentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        waitlist?: boolean | Recruitment$waitlistArgs<ExtArgs>
+        _count?: boolean | RecruitmentCountOutputTypeDefaultArgs<ExtArgs>
+    }
 
     export type $RecruitmentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
         name: "Recruitment"
-        objects: {}
+        objects: {
+            waitlist: Prisma.$RecruitmentWaitlistPayload<ExtArgs>[]
+        }
         scalars: $Extensions.GetPayloadResult<{
             id: string
             title: string
@@ -26743,6 +26885,7 @@ export namespace Prisma {
             icon: string | null
             contactEmail: string | null
             fields: Prisma.JsonValue
+            discordWebhook: string | null
             enabled: boolean
             createdAt: Date
             updatedAt: Date
@@ -27089,6 +27232,8 @@ export namespace Prisma {
     export interface Prisma__RecruitmentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
         readonly [Symbol.toStringTag]: "PrismaPromise"
 
+        waitlist<T extends Recruitment$waitlistArgs<ExtArgs> = {}>(args?: Subset<T, Recruitment$waitlistArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RecruitmentWaitlistPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+
         /**
          * Attaches callbacks for the resolution and/or rejection of the Promise.
          * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -27124,6 +27269,7 @@ export namespace Prisma {
         readonly icon: FieldRef<"Recruitment", 'String'>
         readonly contactEmail: FieldRef<"Recruitment", 'String'>
         readonly fields: FieldRef<"Recruitment", 'Json'>
+        readonly discordWebhook: FieldRef<"Recruitment", 'String'>
         readonly enabled: FieldRef<"Recruitment", 'Boolean'>
         readonly createdAt: FieldRef<"Recruitment", 'DateTime'>
         readonly updatedAt: FieldRef<"Recruitment", 'DateTime'>
@@ -27144,6 +27290,10 @@ export namespace Prisma {
          */
         omit?: RecruitmentOmit<ExtArgs> | null
         /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: RecruitmentInclude<ExtArgs> | null
+        /**
          * Filter, which Recruitment to fetch.
          */
         where: RecruitmentWhereUniqueInput
@@ -27162,6 +27312,10 @@ export namespace Prisma {
          */
         omit?: RecruitmentOmit<ExtArgs> | null
         /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: RecruitmentInclude<ExtArgs> | null
+        /**
          * Filter, which Recruitment to fetch.
          */
         where: RecruitmentWhereUniqueInput
@@ -27179,6 +27333,10 @@ export namespace Prisma {
          * Omit specific fields from the Recruitment
          */
         omit?: RecruitmentOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: RecruitmentInclude<ExtArgs> | null
         /**
          * Filter, which Recruitment to fetch.
          */
@@ -27228,6 +27386,10 @@ export namespace Prisma {
          */
         omit?: RecruitmentOmit<ExtArgs> | null
         /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: RecruitmentInclude<ExtArgs> | null
+        /**
          * Filter, which Recruitment to fetch.
          */
         where?: RecruitmentWhereInput
@@ -27276,6 +27438,10 @@ export namespace Prisma {
          */
         omit?: RecruitmentOmit<ExtArgs> | null
         /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: RecruitmentInclude<ExtArgs> | null
+        /**
          * Filter, which Recruitments to fetch.
          */
         where?: RecruitmentWhereInput
@@ -27319,6 +27485,10 @@ export namespace Prisma {
          */
         omit?: RecruitmentOmit<ExtArgs> | null
         /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: RecruitmentInclude<ExtArgs> | null
+        /**
          * The data needed to create a Recruitment.
          */
         data: XOR<RecruitmentCreateInput, RecruitmentUncheckedCreateInput>
@@ -27347,6 +27517,10 @@ export namespace Prisma {
          * Omit specific fields from the Recruitment
          */
         omit?: RecruitmentOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: RecruitmentInclude<ExtArgs> | null
         /**
          * The data needed to update a Recruitment.
          */
@@ -27388,6 +27562,10 @@ export namespace Prisma {
          */
         omit?: RecruitmentOmit<ExtArgs> | null
         /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: RecruitmentInclude<ExtArgs> | null
+        /**
          * The filter to search for the Recruitment to update in case it exists.
          */
         where: RecruitmentWhereUniqueInput
@@ -27414,6 +27592,10 @@ export namespace Prisma {
          */
         omit?: RecruitmentOmit<ExtArgs> | null
         /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: RecruitmentInclude<ExtArgs> | null
+        /**
          * Filter which Recruitment to delete.
          */
         where: RecruitmentWhereUniqueInput
@@ -27434,6 +27616,30 @@ export namespace Prisma {
     }
 
     /**
+     * Recruitment.waitlist
+     */
+    export type Recruitment$waitlistArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the RecruitmentWaitlist
+         */
+        select?: RecruitmentWaitlistSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the RecruitmentWaitlist
+         */
+        omit?: RecruitmentWaitlistOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: RecruitmentWaitlistInclude<ExtArgs> | null
+        where?: RecruitmentWaitlistWhereInput
+        orderBy?: RecruitmentWaitlistOrderByWithRelationInput | RecruitmentWaitlistOrderByWithRelationInput[]
+        cursor?: RecruitmentWaitlistWhereUniqueInput
+        take?: number
+        skip?: number
+        distinct?: RecruitmentWaitlistScalarFieldEnum | RecruitmentWaitlistScalarFieldEnum[]
+    }
+
+    /**
      * Recruitment without action
      */
     export type RecruitmentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -27445,6 +27651,932 @@ export namespace Prisma {
          * Omit specific fields from the Recruitment
          */
         omit?: RecruitmentOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: RecruitmentInclude<ExtArgs> | null
+    }
+
+
+    /**
+     * Model RecruitmentWaitlist
+     */
+
+    export type AggregateRecruitmentWaitlist = {
+        _count: RecruitmentWaitlistCountAggregateOutputType | null
+        _min: RecruitmentWaitlistMinAggregateOutputType | null
+        _max: RecruitmentWaitlistMaxAggregateOutputType | null
+    }
+
+    export type RecruitmentWaitlistMinAggregateOutputType = {
+        id: string | null
+        email: string | null
+        recruitmentId: string | null
+        createdAt: Date | null
+    }
+
+    export type RecruitmentWaitlistMaxAggregateOutputType = {
+        id: string | null
+        email: string | null
+        recruitmentId: string | null
+        createdAt: Date | null
+    }
+
+    export type RecruitmentWaitlistCountAggregateOutputType = {
+        id: number
+        email: number
+        recruitmentId: number
+        createdAt: number
+        _all: number
+    }
+
+
+    export type RecruitmentWaitlistMinAggregateInputType = {
+        id?: true
+        email?: true
+        recruitmentId?: true
+        createdAt?: true
+    }
+
+    export type RecruitmentWaitlistMaxAggregateInputType = {
+        id?: true
+        email?: true
+        recruitmentId?: true
+        createdAt?: true
+    }
+
+    export type RecruitmentWaitlistCountAggregateInputType = {
+        id?: true
+        email?: true
+        recruitmentId?: true
+        createdAt?: true
+        _all?: true
+    }
+
+    export type RecruitmentWaitlistAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Filter which RecruitmentWaitlist to aggregate.
+         */
+        where?: RecruitmentWaitlistWhereInput
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+         *
+         * Determine the order of RecruitmentWaitlists to fetch.
+         */
+        orderBy?: RecruitmentWaitlistOrderByWithRelationInput | RecruitmentWaitlistOrderByWithRelationInput[]
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+         *
+         * Sets the start position
+         */
+        cursor?: RecruitmentWaitlistWhereUniqueInput
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+         *
+         * Take `±n` RecruitmentWaitlists from the position of the cursor.
+         */
+        take?: number
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+         *
+         * Skip the first `n` RecruitmentWaitlists.
+         */
+        skip?: number
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+         *
+         * Count returned RecruitmentWaitlists
+         **/
+        _count?: true | RecruitmentWaitlistCountAggregateInputType
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+         *
+         * Select which fields to find the minimum value
+         **/
+        _min?: RecruitmentWaitlistMinAggregateInputType
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+         *
+         * Select which fields to find the maximum value
+         **/
+        _max?: RecruitmentWaitlistMaxAggregateInputType
+    }
+
+    export type GetRecruitmentWaitlistAggregateType<T extends RecruitmentWaitlistAggregateArgs> = {
+        [P in keyof T & keyof AggregateRecruitmentWaitlist]: P extends '_count' | 'count'
+            ? T[P] extends true
+                ? number
+                : GetScalarType<T[P], AggregateRecruitmentWaitlist[P]>
+            : GetScalarType<T[P], AggregateRecruitmentWaitlist[P]>
+    }
+
+
+    export type RecruitmentWaitlistGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        where?: RecruitmentWaitlistWhereInput
+        orderBy?: RecruitmentWaitlistOrderByWithAggregationInput | RecruitmentWaitlistOrderByWithAggregationInput[]
+        by: RecruitmentWaitlistScalarFieldEnum[] | RecruitmentWaitlistScalarFieldEnum
+        having?: RecruitmentWaitlistScalarWhereWithAggregatesInput
+        take?: number
+        skip?: number
+        _count?: RecruitmentWaitlistCountAggregateInputType | true
+        _min?: RecruitmentWaitlistMinAggregateInputType
+        _max?: RecruitmentWaitlistMaxAggregateInputType
+    }
+
+    export type RecruitmentWaitlistGroupByOutputType = {
+        id: string
+        email: string
+        recruitmentId: string
+        createdAt: Date
+        _count: RecruitmentWaitlistCountAggregateOutputType | null
+        _min: RecruitmentWaitlistMinAggregateOutputType | null
+        _max: RecruitmentWaitlistMaxAggregateOutputType | null
+    }
+
+    type GetRecruitmentWaitlistGroupByPayload<T extends RecruitmentWaitlistGroupByArgs> = Prisma.PrismaPromise<
+        Array<
+            PickEnumerable<RecruitmentWaitlistGroupByOutputType, T['by']> &
+            {
+                [P in ((keyof T) & (keyof RecruitmentWaitlistGroupByOutputType))]: P extends '_count'
+                ? T[P] extends boolean
+                    ? number
+                    : GetScalarType<T[P], RecruitmentWaitlistGroupByOutputType[P]>
+                : GetScalarType<T[P], RecruitmentWaitlistGroupByOutputType[P]>
+            }
+        >
+    >
+
+
+    export type RecruitmentWaitlistSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+        id?: boolean
+        email?: boolean
+        recruitmentId?: boolean
+        createdAt?: boolean
+        recruitment?: boolean | RecruitmentDefaultArgs<ExtArgs>
+    }, ExtArgs["result"]["recruitmentWaitlist"]>
+
+
+    export type RecruitmentWaitlistSelectScalar = {
+        id?: boolean
+        email?: boolean
+        recruitmentId?: boolean
+        createdAt?: boolean
+    }
+
+    export type RecruitmentWaitlistOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "recruitmentId" | "createdAt", ExtArgs["result"]["recruitmentWaitlist"]>
+    export type RecruitmentWaitlistInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        recruitment?: boolean | RecruitmentDefaultArgs<ExtArgs>
+    }
+
+    export type $RecruitmentWaitlistPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        name: "RecruitmentWaitlist"
+        objects: {
+            recruitment: Prisma.$RecruitmentPayload<ExtArgs>
+        }
+        scalars: $Extensions.GetPayloadResult<{
+            id: string
+            email: string
+            recruitmentId: string
+            createdAt: Date
+        }, ExtArgs["result"]["recruitmentWaitlist"]>
+        composites: {}
+    }
+
+    type RecruitmentWaitlistGetPayload<S extends boolean | null | undefined | RecruitmentWaitlistDefaultArgs> = $Result.GetResult<Prisma.$RecruitmentWaitlistPayload, S>
+
+    type RecruitmentWaitlistCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+        Omit<RecruitmentWaitlistFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+        select?: RecruitmentWaitlistCountAggregateInputType | true
+    }
+
+    export interface RecruitmentWaitlistDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+        [K: symbol]: {
+            types: Prisma.TypeMap<ExtArgs>['model']['RecruitmentWaitlist'],
+            meta: { name: 'RecruitmentWaitlist' }
+        }
+
+        /**
+         * Find zero or one RecruitmentWaitlist that matches the filter.
+         * @param {RecruitmentWaitlistFindUniqueArgs} args - Arguments to find a RecruitmentWaitlist
+         * @example
+         * // Get one RecruitmentWaitlist
+         * const recruitmentWaitlist = await prisma.recruitmentWaitlist.findUnique({
+         *   where: {
+         *     // ... provide filter here
+         *   }
+         * })
+         */
+        findUnique<T extends RecruitmentWaitlistFindUniqueArgs>(args: SelectSubset<T, RecruitmentWaitlistFindUniqueArgs<ExtArgs>>): Prisma__RecruitmentWaitlistClient<$Result.GetResult<Prisma.$RecruitmentWaitlistPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+        /**
+         * Find one RecruitmentWaitlist that matches the filter or throw an error with `error.code='P2025'`
+         * if no matches were found.
+         * @param {RecruitmentWaitlistFindUniqueOrThrowArgs} args - Arguments to find a RecruitmentWaitlist
+         * @example
+         * // Get one RecruitmentWaitlist
+         * const recruitmentWaitlist = await prisma.recruitmentWaitlist.findUniqueOrThrow({
+         *   where: {
+         *     // ... provide filter here
+         *   }
+         * })
+         */
+        findUniqueOrThrow<T extends RecruitmentWaitlistFindUniqueOrThrowArgs>(args: SelectSubset<T, RecruitmentWaitlistFindUniqueOrThrowArgs<ExtArgs>>): Prisma__RecruitmentWaitlistClient<$Result.GetResult<Prisma.$RecruitmentWaitlistPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+        /**
+         * Find the first RecruitmentWaitlist that matches the filter.
+         * Note, that providing `undefined` is treated as the value not being there.
+         * Read more here: https://pris.ly/d/null-undefined
+         * @param {RecruitmentWaitlistFindFirstArgs} args - Arguments to find a RecruitmentWaitlist
+         * @example
+         * // Get one RecruitmentWaitlist
+         * const recruitmentWaitlist = await prisma.recruitmentWaitlist.findFirst({
+         *   where: {
+         *     // ... provide filter here
+         *   }
+         * })
+         */
+        findFirst<T extends RecruitmentWaitlistFindFirstArgs>(args?: SelectSubset<T, RecruitmentWaitlistFindFirstArgs<ExtArgs>>): Prisma__RecruitmentWaitlistClient<$Result.GetResult<Prisma.$RecruitmentWaitlistPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+        /**
+         * Find the first RecruitmentWaitlist that matches the filter or
+         * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+         * Note, that providing `undefined` is treated as the value not being there.
+         * Read more here: https://pris.ly/d/null-undefined
+         * @param {RecruitmentWaitlistFindFirstOrThrowArgs} args - Arguments to find a RecruitmentWaitlist
+         * @example
+         * // Get one RecruitmentWaitlist
+         * const recruitmentWaitlist = await prisma.recruitmentWaitlist.findFirstOrThrow({
+         *   where: {
+         *     // ... provide filter here
+         *   }
+         * })
+         */
+        findFirstOrThrow<T extends RecruitmentWaitlistFindFirstOrThrowArgs>(args?: SelectSubset<T, RecruitmentWaitlistFindFirstOrThrowArgs<ExtArgs>>): Prisma__RecruitmentWaitlistClient<$Result.GetResult<Prisma.$RecruitmentWaitlistPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+        /**
+         * Find zero or more RecruitmentWaitlists that matches the filter.
+         * Note, that providing `undefined` is treated as the value not being there.
+         * Read more here: https://pris.ly/d/null-undefined
+         * @param {RecruitmentWaitlistFindManyArgs} args - Arguments to filter and select certain fields only.
+         * @example
+         * // Get all RecruitmentWaitlists
+         * const recruitmentWaitlists = await prisma.recruitmentWaitlist.findMany()
+         *
+         * // Get first 10 RecruitmentWaitlists
+         * const recruitmentWaitlists = await prisma.recruitmentWaitlist.findMany({ take: 10 })
+         *
+         * // Only select the `id`
+         * const recruitmentWaitlistWithIdOnly = await prisma.recruitmentWaitlist.findMany({ select: { id: true } })
+         *
+         */
+        findMany<T extends RecruitmentWaitlistFindManyArgs>(args?: SelectSubset<T, RecruitmentWaitlistFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RecruitmentWaitlistPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+        /**
+         * Create a RecruitmentWaitlist.
+         * @param {RecruitmentWaitlistCreateArgs} args - Arguments to create a RecruitmentWaitlist.
+         * @example
+         * // Create one RecruitmentWaitlist
+         * const RecruitmentWaitlist = await prisma.recruitmentWaitlist.create({
+         *   data: {
+         *     // ... data to create a RecruitmentWaitlist
+         *   }
+         * })
+         *
+         */
+        create<T extends RecruitmentWaitlistCreateArgs>(args: SelectSubset<T, RecruitmentWaitlistCreateArgs<ExtArgs>>): Prisma__RecruitmentWaitlistClient<$Result.GetResult<Prisma.$RecruitmentWaitlistPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+        /**
+         * Create many RecruitmentWaitlists.
+         * @param {RecruitmentWaitlistCreateManyArgs} args - Arguments to create many RecruitmentWaitlists.
+         * @example
+         * // Create many RecruitmentWaitlists
+         * const recruitmentWaitlist = await prisma.recruitmentWaitlist.createMany({
+         *   data: [
+         *     // ... provide data here
+         *   ]
+         * })
+         *
+         */
+        createMany<T extends RecruitmentWaitlistCreateManyArgs>(args?: SelectSubset<T, RecruitmentWaitlistCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+        /**
+         * Delete a RecruitmentWaitlist.
+         * @param {RecruitmentWaitlistDeleteArgs} args - Arguments to delete one RecruitmentWaitlist.
+         * @example
+         * // Delete one RecruitmentWaitlist
+         * const RecruitmentWaitlist = await prisma.recruitmentWaitlist.delete({
+         *   where: {
+         *     // ... filter to delete one RecruitmentWaitlist
+         *   }
+         * })
+         *
+         */
+        delete<T extends RecruitmentWaitlistDeleteArgs>(args: SelectSubset<T, RecruitmentWaitlistDeleteArgs<ExtArgs>>): Prisma__RecruitmentWaitlistClient<$Result.GetResult<Prisma.$RecruitmentWaitlistPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+        /**
+         * Update one RecruitmentWaitlist.
+         * @param {RecruitmentWaitlistUpdateArgs} args - Arguments to update one RecruitmentWaitlist.
+         * @example
+         * // Update one RecruitmentWaitlist
+         * const recruitmentWaitlist = await prisma.recruitmentWaitlist.update({
+         *   where: {
+         *     // ... provide filter here
+         *   },
+         *   data: {
+         *     // ... provide data here
+         *   }
+         * })
+         *
+         */
+        update<T extends RecruitmentWaitlistUpdateArgs>(args: SelectSubset<T, RecruitmentWaitlistUpdateArgs<ExtArgs>>): Prisma__RecruitmentWaitlistClient<$Result.GetResult<Prisma.$RecruitmentWaitlistPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+        /**
+         * Delete zero or more RecruitmentWaitlists.
+         * @param {RecruitmentWaitlistDeleteManyArgs} args - Arguments to filter RecruitmentWaitlists to delete.
+         * @example
+         * // Delete a few RecruitmentWaitlists
+         * const { count } = await prisma.recruitmentWaitlist.deleteMany({
+         *   where: {
+         *     // ... provide filter here
+         *   }
+         * })
+         *
+         */
+        deleteMany<T extends RecruitmentWaitlistDeleteManyArgs>(args?: SelectSubset<T, RecruitmentWaitlistDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+        /**
+         * Update zero or more RecruitmentWaitlists.
+         * Note, that providing `undefined` is treated as the value not being there.
+         * Read more here: https://pris.ly/d/null-undefined
+         * @param {RecruitmentWaitlistUpdateManyArgs} args - Arguments to update one or more rows.
+         * @example
+         * // Update many RecruitmentWaitlists
+         * const recruitmentWaitlist = await prisma.recruitmentWaitlist.updateMany({
+         *   where: {
+         *     // ... provide filter here
+         *   },
+         *   data: {
+         *     // ... provide data here
+         *   }
+         * })
+         *
+         */
+        updateMany<T extends RecruitmentWaitlistUpdateManyArgs>(args: SelectSubset<T, RecruitmentWaitlistUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+        /**
+         * Create or update one RecruitmentWaitlist.
+         * @param {RecruitmentWaitlistUpsertArgs} args - Arguments to update or create a RecruitmentWaitlist.
+         * @example
+         * // Update or create a RecruitmentWaitlist
+         * const recruitmentWaitlist = await prisma.recruitmentWaitlist.upsert({
+         *   create: {
+         *     // ... data to create a RecruitmentWaitlist
+         *   },
+         *   update: {
+         *     // ... in case it already exists, update
+         *   },
+         *   where: {
+         *     // ... the filter for the RecruitmentWaitlist we want to update
+         *   }
+         * })
+         */
+        upsert<T extends RecruitmentWaitlistUpsertArgs>(args: SelectSubset<T, RecruitmentWaitlistUpsertArgs<ExtArgs>>): Prisma__RecruitmentWaitlistClient<$Result.GetResult<Prisma.$RecruitmentWaitlistPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+        /**
+         * Count the number of RecruitmentWaitlists.
+         * Note, that providing `undefined` is treated as the value not being there.
+         * Read more here: https://pris.ly/d/null-undefined
+         * @param {RecruitmentWaitlistCountArgs} args - Arguments to filter RecruitmentWaitlists to count.
+         * @example
+         * // Count the number of RecruitmentWaitlists
+         * const count = await prisma.recruitmentWaitlist.count({
+         *   where: {
+         *     // ... the filter for the RecruitmentWaitlists we want to count
+         *   }
+         * })
+         **/
+        count<T extends RecruitmentWaitlistCountArgs>(
+            args?: Subset<T, RecruitmentWaitlistCountArgs>,
+        ): Prisma.PrismaPromise<
+            T extends $Utils.Record<'select', any>
+                ? T['select'] extends true
+                    ? number
+                    : GetScalarType<T['select'], RecruitmentWaitlistCountAggregateOutputType>
+                : number
+        >
+
+        /**
+         * Allows you to perform aggregations operations on a RecruitmentWaitlist.
+         * Note, that providing `undefined` is treated as the value not being there.
+         * Read more here: https://pris.ly/d/null-undefined
+         * @param {RecruitmentWaitlistAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+         * @example
+         * // Ordered by age ascending
+         * // Where email contains prisma.io
+         * // Limited to the 10 users
+         * const aggregations = await prisma.user.aggregate({
+         *   _avg: {
+         *     age: true,
+         *   },
+         *   where: {
+         *     email: {
+         *       contains: "prisma.io",
+         *     },
+         *   },
+         *   orderBy: {
+         *     age: "asc",
+         *   },
+         *   take: 10,
+         * })
+         **/
+        aggregate<T extends RecruitmentWaitlistAggregateArgs>(args: Subset<T, RecruitmentWaitlistAggregateArgs>): Prisma.PrismaPromise<GetRecruitmentWaitlistAggregateType<T>>
+
+        /**
+         * Group by RecruitmentWaitlist.
+         * Note, that providing `undefined` is treated as the value not being there.
+         * Read more here: https://pris.ly/d/null-undefined
+         * @param {RecruitmentWaitlistGroupByArgs} args - Group by arguments.
+         * @example
+         * // Group by city, order by createdAt, get count
+         * const result = await prisma.user.groupBy({
+         *   by: ['city', 'createdAt'],
+         *   orderBy: {
+         *     createdAt: true
+         *   },
+         *   _count: {
+         *     _all: true
+         *   },
+         * })
+         *
+         **/
+        groupBy<
+            T extends RecruitmentWaitlistGroupByArgs,
+            HasSelectOrTake extends Or<
+                Extends<'skip', Keys<T>>,
+                Extends<'take', Keys<T>>
+            >,
+            OrderByArg extends True extends HasSelectOrTake
+                ? { orderBy: RecruitmentWaitlistGroupByArgs['orderBy'] }
+                : { orderBy?: RecruitmentWaitlistGroupByArgs['orderBy'] },
+            OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+            ByFields extends MaybeTupleToUnion<T['by']>,
+            ByValid extends Has<ByFields, OrderFields>,
+            HavingFields extends GetHavingFields<T['having']>,
+            HavingValid extends Has<ByFields, HavingFields>,
+            ByEmpty extends T['by'] extends never[] ? True : False,
+            InputErrors extends ByEmpty extends True
+                ? `Error: "by" must not be empty.`
+                : HavingValid extends False
+                    ? {
+                        [P in HavingFields]: P extends ByFields
+                            ? never
+                            : P extends string
+                                ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+                                : [
+                                    Error,
+                                    'Field ',
+                                    P,
+                                    ` in "having" needs to be provided in "by"`,
+                                ]
+                    }[HavingFields]
+                    : 'take' extends Keys<T>
+                        ? 'orderBy' extends Keys<T>
+                            ? ByValid extends True
+                                ? {}
+                                : {
+                                    [P in OrderFields]: P extends ByFields
+                                        ? never
+                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                }[OrderFields]
+                            : 'Error: If you provide "take", you also need to provide "orderBy"'
+                        : 'skip' extends Keys<T>
+                            ? 'orderBy' extends Keys<T>
+                                ? ByValid extends True
+                                    ? {}
+                                    : {
+                                        [P in OrderFields]: P extends ByFields
+                                            ? never
+                                            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                    }[OrderFields]
+                                : 'Error: If you provide "skip", you also need to provide "orderBy"'
+                            : ByValid extends True
+                                ? {}
+                                : {
+                                    [P in OrderFields]: P extends ByFields
+                                        ? never
+                                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+                                }[OrderFields]
+        >(args: SubsetIntersection<T, RecruitmentWaitlistGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetRecruitmentWaitlistGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+
+        /**
+         * Fields of the RecruitmentWaitlist model
+         */
+        readonly fields: RecruitmentWaitlistFieldRefs;
+    }
+
+    /**
+     * The delegate class that acts as a "Promise-like" for RecruitmentWaitlist.
+     * Why is this prefixed with `Prisma__`?
+     * Because we want to prevent naming conflicts as mentioned in
+     * https://github.com/prisma/prisma-client-js/issues/707
+     */
+    export interface Prisma__RecruitmentWaitlistClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+        readonly [Symbol.toStringTag]: "PrismaPromise"
+
+        recruitment<T extends RecruitmentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, RecruitmentDefaultArgs<ExtArgs>>): Prisma__RecruitmentClient<$Result.GetResult<Prisma.$RecruitmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+
+        /**
+         * Attaches callbacks for the resolution and/or rejection of the Promise.
+         * @param onfulfilled The callback to execute when the Promise is resolved.
+         * @param onrejected The callback to execute when the Promise is rejected.
+         * @returns A Promise for the completion of which ever callback is executed.
+         */
+        then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+
+        /**
+         * Attaches a callback for only the rejection of the Promise.
+         * @param onrejected The callback to execute when the Promise is rejected.
+         * @returns A Promise for the completion of the callback.
+         */
+        catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+
+        /**
+         * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+         * resolved value cannot be modified from the callback.
+         * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+         * @returns A Promise for the completion of the callback.
+         */
+        finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+    }
+
+
+    /**
+     * Fields of the RecruitmentWaitlist model
+     */
+    interface RecruitmentWaitlistFieldRefs {
+        readonly id: FieldRef<"RecruitmentWaitlist", 'String'>
+        readonly email: FieldRef<"RecruitmentWaitlist", 'String'>
+        readonly recruitmentId: FieldRef<"RecruitmentWaitlist", 'String'>
+        readonly createdAt: FieldRef<"RecruitmentWaitlist", 'DateTime'>
+    }
+
+
+    // Custom InputTypes
+    /**
+     * RecruitmentWaitlist findUnique
+     */
+    export type RecruitmentWaitlistFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the RecruitmentWaitlist
+         */
+        select?: RecruitmentWaitlistSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the RecruitmentWaitlist
+         */
+        omit?: RecruitmentWaitlistOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: RecruitmentWaitlistInclude<ExtArgs> | null
+        /**
+         * Filter, which RecruitmentWaitlist to fetch.
+         */
+        where: RecruitmentWaitlistWhereUniqueInput
+    }
+
+    /**
+     * RecruitmentWaitlist findUniqueOrThrow
+     */
+    export type RecruitmentWaitlistFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the RecruitmentWaitlist
+         */
+        select?: RecruitmentWaitlistSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the RecruitmentWaitlist
+         */
+        omit?: RecruitmentWaitlistOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: RecruitmentWaitlistInclude<ExtArgs> | null
+        /**
+         * Filter, which RecruitmentWaitlist to fetch.
+         */
+        where: RecruitmentWaitlistWhereUniqueInput
+    }
+
+    /**
+     * RecruitmentWaitlist findFirst
+     */
+    export type RecruitmentWaitlistFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the RecruitmentWaitlist
+         */
+        select?: RecruitmentWaitlistSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the RecruitmentWaitlist
+         */
+        omit?: RecruitmentWaitlistOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: RecruitmentWaitlistInclude<ExtArgs> | null
+        /**
+         * Filter, which RecruitmentWaitlist to fetch.
+         */
+        where?: RecruitmentWaitlistWhereInput
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+         *
+         * Determine the order of RecruitmentWaitlists to fetch.
+         */
+        orderBy?: RecruitmentWaitlistOrderByWithRelationInput | RecruitmentWaitlistOrderByWithRelationInput[]
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+         *
+         * Sets the position for searching for RecruitmentWaitlists.
+         */
+        cursor?: RecruitmentWaitlistWhereUniqueInput
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+         *
+         * Take `±n` RecruitmentWaitlists from the position of the cursor.
+         */
+        take?: number
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+         *
+         * Skip the first `n` RecruitmentWaitlists.
+         */
+        skip?: number
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+         *
+         * Filter by unique combinations of RecruitmentWaitlists.
+         */
+        distinct?: RecruitmentWaitlistScalarFieldEnum | RecruitmentWaitlistScalarFieldEnum[]
+    }
+
+    /**
+     * RecruitmentWaitlist findFirstOrThrow
+     */
+    export type RecruitmentWaitlistFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the RecruitmentWaitlist
+         */
+        select?: RecruitmentWaitlistSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the RecruitmentWaitlist
+         */
+        omit?: RecruitmentWaitlistOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: RecruitmentWaitlistInclude<ExtArgs> | null
+        /**
+         * Filter, which RecruitmentWaitlist to fetch.
+         */
+        where?: RecruitmentWaitlistWhereInput
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+         *
+         * Determine the order of RecruitmentWaitlists to fetch.
+         */
+        orderBy?: RecruitmentWaitlistOrderByWithRelationInput | RecruitmentWaitlistOrderByWithRelationInput[]
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+         *
+         * Sets the position for searching for RecruitmentWaitlists.
+         */
+        cursor?: RecruitmentWaitlistWhereUniqueInput
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+         *
+         * Take `±n` RecruitmentWaitlists from the position of the cursor.
+         */
+        take?: number
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+         *
+         * Skip the first `n` RecruitmentWaitlists.
+         */
+        skip?: number
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+         *
+         * Filter by unique combinations of RecruitmentWaitlists.
+         */
+        distinct?: RecruitmentWaitlistScalarFieldEnum | RecruitmentWaitlistScalarFieldEnum[]
+    }
+
+    /**
+     * RecruitmentWaitlist findMany
+     */
+    export type RecruitmentWaitlistFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the RecruitmentWaitlist
+         */
+        select?: RecruitmentWaitlistSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the RecruitmentWaitlist
+         */
+        omit?: RecruitmentWaitlistOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: RecruitmentWaitlistInclude<ExtArgs> | null
+        /**
+         * Filter, which RecruitmentWaitlists to fetch.
+         */
+        where?: RecruitmentWaitlistWhereInput
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+         *
+         * Determine the order of RecruitmentWaitlists to fetch.
+         */
+        orderBy?: RecruitmentWaitlistOrderByWithRelationInput | RecruitmentWaitlistOrderByWithRelationInput[]
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+         *
+         * Sets the position for listing RecruitmentWaitlists.
+         */
+        cursor?: RecruitmentWaitlistWhereUniqueInput
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+         *
+         * Take `±n` RecruitmentWaitlists from the position of the cursor.
+         */
+        take?: number
+        /**
+         * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+         *
+         * Skip the first `n` RecruitmentWaitlists.
+         */
+        skip?: number
+        distinct?: RecruitmentWaitlistScalarFieldEnum | RecruitmentWaitlistScalarFieldEnum[]
+    }
+
+    /**
+     * RecruitmentWaitlist create
+     */
+    export type RecruitmentWaitlistCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the RecruitmentWaitlist
+         */
+        select?: RecruitmentWaitlistSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the RecruitmentWaitlist
+         */
+        omit?: RecruitmentWaitlistOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: RecruitmentWaitlistInclude<ExtArgs> | null
+        /**
+         * The data needed to create a RecruitmentWaitlist.
+         */
+        data: XOR<RecruitmentWaitlistCreateInput, RecruitmentWaitlistUncheckedCreateInput>
+    }
+
+    /**
+     * RecruitmentWaitlist createMany
+     */
+    export type RecruitmentWaitlistCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * The data used to create many RecruitmentWaitlists.
+         */
+        data: RecruitmentWaitlistCreateManyInput | RecruitmentWaitlistCreateManyInput[]
+        skipDuplicates?: boolean
+    }
+
+    /**
+     * RecruitmentWaitlist update
+     */
+    export type RecruitmentWaitlistUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the RecruitmentWaitlist
+         */
+        select?: RecruitmentWaitlistSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the RecruitmentWaitlist
+         */
+        omit?: RecruitmentWaitlistOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: RecruitmentWaitlistInclude<ExtArgs> | null
+        /**
+         * The data needed to update a RecruitmentWaitlist.
+         */
+        data: XOR<RecruitmentWaitlistUpdateInput, RecruitmentWaitlistUncheckedUpdateInput>
+        /**
+         * Choose, which RecruitmentWaitlist to update.
+         */
+        where: RecruitmentWaitlistWhereUniqueInput
+    }
+
+    /**
+     * RecruitmentWaitlist updateMany
+     */
+    export type RecruitmentWaitlistUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * The data used to update RecruitmentWaitlists.
+         */
+        data: XOR<RecruitmentWaitlistUpdateManyMutationInput, RecruitmentWaitlistUncheckedUpdateManyInput>
+        /**
+         * Filter which RecruitmentWaitlists to update
+         */
+        where?: RecruitmentWaitlistWhereInput
+        /**
+         * Limit how many RecruitmentWaitlists to update.
+         */
+        limit?: number
+    }
+
+    /**
+     * RecruitmentWaitlist upsert
+     */
+    export type RecruitmentWaitlistUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the RecruitmentWaitlist
+         */
+        select?: RecruitmentWaitlistSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the RecruitmentWaitlist
+         */
+        omit?: RecruitmentWaitlistOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: RecruitmentWaitlistInclude<ExtArgs> | null
+        /**
+         * The filter to search for the RecruitmentWaitlist to update in case it exists.
+         */
+        where: RecruitmentWaitlistWhereUniqueInput
+        /**
+         * In case the RecruitmentWaitlist found by the `where` argument doesn't exist, create a new RecruitmentWaitlist with this data.
+         */
+        create: XOR<RecruitmentWaitlistCreateInput, RecruitmentWaitlistUncheckedCreateInput>
+        /**
+         * In case the RecruitmentWaitlist was found with the provided `where` argument, update it with this data.
+         */
+        update: XOR<RecruitmentWaitlistUpdateInput, RecruitmentWaitlistUncheckedUpdateInput>
+    }
+
+    /**
+     * RecruitmentWaitlist delete
+     */
+    export type RecruitmentWaitlistDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the RecruitmentWaitlist
+         */
+        select?: RecruitmentWaitlistSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the RecruitmentWaitlist
+         */
+        omit?: RecruitmentWaitlistOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: RecruitmentWaitlistInclude<ExtArgs> | null
+        /**
+         * Filter which RecruitmentWaitlist to delete.
+         */
+        where: RecruitmentWaitlistWhereUniqueInput
+    }
+
+    /**
+     * RecruitmentWaitlist deleteMany
+     */
+    export type RecruitmentWaitlistDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Filter which RecruitmentWaitlists to delete
+         */
+        where?: RecruitmentWaitlistWhereInput
+        /**
+         * Limit how many RecruitmentWaitlists to delete.
+         */
+        limit?: number
+    }
+
+    /**
+     * RecruitmentWaitlist without action
+     */
+    export type RecruitmentWaitlistDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+        /**
+         * Select specific fields to fetch from the RecruitmentWaitlist
+         */
+        select?: RecruitmentWaitlistSelect<ExtArgs> | null
+        /**
+         * Omit specific fields from the RecruitmentWaitlist
+         */
+        omit?: RecruitmentWaitlistOmit<ExtArgs> | null
+        /**
+         * Choose, which related nodes to fetch as well
+         */
+        include?: RecruitmentWaitlistInclude<ExtArgs> | null
     }
 
 
@@ -29509,12 +30641,23 @@ export namespace Prisma {
         icon: 'icon',
         contactEmail: 'contactEmail',
         fields: 'fields',
+        discordWebhook: 'discordWebhook',
         enabled: 'enabled',
         createdAt: 'createdAt',
         updatedAt: 'updatedAt'
     };
 
     export type RecruitmentScalarFieldEnum = (typeof RecruitmentScalarFieldEnum)[keyof typeof RecruitmentScalarFieldEnum]
+
+
+    export const RecruitmentWaitlistScalarFieldEnum: {
+        id: 'id',
+        email: 'email',
+        recruitmentId: 'recruitmentId',
+        createdAt: 'createdAt'
+    };
+
+    export type RecruitmentWaitlistScalarFieldEnum = (typeof RecruitmentWaitlistScalarFieldEnum)[keyof typeof RecruitmentWaitlistScalarFieldEnum]
 
 
     export const ImageScalarFieldEnum: {
@@ -29851,10 +30994,20 @@ export namespace Prisma {
         title: 'title',
         description: 'description',
         icon: 'icon',
-        contactEmail: 'contactEmail'
+        contactEmail: 'contactEmail',
+        discordWebhook: 'discordWebhook'
     };
 
     export type RecruitmentOrderByRelevanceFieldEnum = (typeof RecruitmentOrderByRelevanceFieldEnum)[keyof typeof RecruitmentOrderByRelevanceFieldEnum]
+
+
+    export const RecruitmentWaitlistOrderByRelevanceFieldEnum: {
+        id: 'id',
+        email: 'email',
+        recruitmentId: 'recruitmentId'
+    };
+
+    export type RecruitmentWaitlistOrderByRelevanceFieldEnum = (typeof RecruitmentWaitlistOrderByRelevanceFieldEnum)[keyof typeof RecruitmentWaitlistOrderByRelevanceFieldEnum]
 
 
     export const ImageOrderByRelevanceFieldEnum: {
@@ -31769,9 +32922,11 @@ export namespace Prisma {
         icon?: StringNullableFilter<"Recruitment"> | string | null
         contactEmail?: StringNullableFilter<"Recruitment"> | string | null
         fields?: JsonFilter<"Recruitment">
+        discordWebhook?: StringNullableFilter<"Recruitment"> | string | null
         enabled?: BoolFilter<"Recruitment"> | boolean
         createdAt?: DateTimeFilter<"Recruitment"> | Date | string
         updatedAt?: DateTimeFilter<"Recruitment"> | Date | string
+        waitlist?: RecruitmentWaitlistListRelationFilter
     }
 
     export type RecruitmentOrderByWithRelationInput = {
@@ -31781,9 +32936,11 @@ export namespace Prisma {
         icon?: SortOrderInput | SortOrder
         contactEmail?: SortOrderInput | SortOrder
         fields?: SortOrder
+        discordWebhook?: SortOrderInput | SortOrder
         enabled?: SortOrder
         createdAt?: SortOrder
         updatedAt?: SortOrder
+        waitlist?: RecruitmentWaitlistOrderByRelationAggregateInput
         _relevance?: RecruitmentOrderByRelevanceInput
     }
 
@@ -31797,9 +32954,11 @@ export namespace Prisma {
         icon?: StringNullableFilter<"Recruitment"> | string | null
         contactEmail?: StringNullableFilter<"Recruitment"> | string | null
         fields?: JsonFilter<"Recruitment">
+        discordWebhook?: StringNullableFilter<"Recruitment"> | string | null
         enabled?: BoolFilter<"Recruitment"> | boolean
         createdAt?: DateTimeFilter<"Recruitment"> | Date | string
         updatedAt?: DateTimeFilter<"Recruitment"> | Date | string
+        waitlist?: RecruitmentWaitlistListRelationFilter
     }, "id">
 
     export type RecruitmentOrderByWithAggregationInput = {
@@ -31809,6 +32968,7 @@ export namespace Prisma {
         icon?: SortOrderInput | SortOrder
         contactEmail?: SortOrderInput | SortOrder
         fields?: SortOrder
+        discordWebhook?: SortOrderInput | SortOrder
         enabled?: SortOrder
         createdAt?: SortOrder
         updatedAt?: SortOrder
@@ -31827,9 +32987,62 @@ export namespace Prisma {
         icon?: StringNullableWithAggregatesFilter<"Recruitment"> | string | null
         contactEmail?: StringNullableWithAggregatesFilter<"Recruitment"> | string | null
         fields?: JsonWithAggregatesFilter<"Recruitment">
+        discordWebhook?: StringNullableWithAggregatesFilter<"Recruitment"> | string | null
         enabled?: BoolWithAggregatesFilter<"Recruitment"> | boolean
         createdAt?: DateTimeWithAggregatesFilter<"Recruitment"> | Date | string
         updatedAt?: DateTimeWithAggregatesFilter<"Recruitment"> | Date | string
+    }
+
+    export type RecruitmentWaitlistWhereInput = {
+        AND?: RecruitmentWaitlistWhereInput | RecruitmentWaitlistWhereInput[]
+        OR?: RecruitmentWaitlistWhereInput[]
+        NOT?: RecruitmentWaitlistWhereInput | RecruitmentWaitlistWhereInput[]
+        id?: StringFilter<"RecruitmentWaitlist"> | string
+        email?: StringFilter<"RecruitmentWaitlist"> | string
+        recruitmentId?: StringFilter<"RecruitmentWaitlist"> | string
+        createdAt?: DateTimeFilter<"RecruitmentWaitlist"> | Date | string
+        recruitment?: XOR<RecruitmentScalarRelationFilter, RecruitmentWhereInput>
+    }
+
+    export type RecruitmentWaitlistOrderByWithRelationInput = {
+        id?: SortOrder
+        email?: SortOrder
+        recruitmentId?: SortOrder
+        createdAt?: SortOrder
+        recruitment?: RecruitmentOrderByWithRelationInput
+        _relevance?: RecruitmentWaitlistOrderByRelevanceInput
+    }
+
+    export type RecruitmentWaitlistWhereUniqueInput = Prisma.AtLeast<{
+        id?: string
+        email_recruitmentId?: RecruitmentWaitlistEmailRecruitmentIdCompoundUniqueInput
+        AND?: RecruitmentWaitlistWhereInput | RecruitmentWaitlistWhereInput[]
+        OR?: RecruitmentWaitlistWhereInput[]
+        NOT?: RecruitmentWaitlistWhereInput | RecruitmentWaitlistWhereInput[]
+        email?: StringFilter<"RecruitmentWaitlist"> | string
+        recruitmentId?: StringFilter<"RecruitmentWaitlist"> | string
+        createdAt?: DateTimeFilter<"RecruitmentWaitlist"> | Date | string
+        recruitment?: XOR<RecruitmentScalarRelationFilter, RecruitmentWhereInput>
+    }, "id" | "email_recruitmentId">
+
+    export type RecruitmentWaitlistOrderByWithAggregationInput = {
+        id?: SortOrder
+        email?: SortOrder
+        recruitmentId?: SortOrder
+        createdAt?: SortOrder
+        _count?: RecruitmentWaitlistCountOrderByAggregateInput
+        _max?: RecruitmentWaitlistMaxOrderByAggregateInput
+        _min?: RecruitmentWaitlistMinOrderByAggregateInput
+    }
+
+    export type RecruitmentWaitlistScalarWhereWithAggregatesInput = {
+        AND?: RecruitmentWaitlistScalarWhereWithAggregatesInput | RecruitmentWaitlistScalarWhereWithAggregatesInput[]
+        OR?: RecruitmentWaitlistScalarWhereWithAggregatesInput[]
+        NOT?: RecruitmentWaitlistScalarWhereWithAggregatesInput | RecruitmentWaitlistScalarWhereWithAggregatesInput[]
+        id?: StringWithAggregatesFilter<"RecruitmentWaitlist"> | string
+        email?: StringWithAggregatesFilter<"RecruitmentWaitlist"> | string
+        recruitmentId?: StringWithAggregatesFilter<"RecruitmentWaitlist"> | string
+        createdAt?: DateTimeWithAggregatesFilter<"RecruitmentWaitlist"> | Date | string
     }
 
     export type ImageWhereInput = {
@@ -33883,9 +35096,11 @@ export namespace Prisma {
         icon?: string | null
         contactEmail?: string | null
         fields: JsonNullValueInput | InputJsonValue
+        discordWebhook?: string | null
         enabled?: boolean
         createdAt?: Date | string
         updatedAt?: Date | string
+        waitlist?: RecruitmentWaitlistCreateNestedManyWithoutRecruitmentInput
     }
 
     export type RecruitmentUncheckedCreateInput = {
@@ -33895,9 +35110,11 @@ export namespace Prisma {
         icon?: string | null
         contactEmail?: string | null
         fields: JsonNullValueInput | InputJsonValue
+        discordWebhook?: string | null
         enabled?: boolean
         createdAt?: Date | string
         updatedAt?: Date | string
+        waitlist?: RecruitmentWaitlistUncheckedCreateNestedManyWithoutRecruitmentInput
     }
 
     export type RecruitmentUpdateInput = {
@@ -33907,9 +35124,11 @@ export namespace Prisma {
         icon?: NullableStringFieldUpdateOperationsInput | string | null
         contactEmail?: NullableStringFieldUpdateOperationsInput | string | null
         fields?: JsonNullValueInput | InputJsonValue
+        discordWebhook?: NullableStringFieldUpdateOperationsInput | string | null
         enabled?: BoolFieldUpdateOperationsInput | boolean
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
         updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        waitlist?: RecruitmentWaitlistUpdateManyWithoutRecruitmentNestedInput
     }
 
     export type RecruitmentUncheckedUpdateInput = {
@@ -33919,9 +35138,11 @@ export namespace Prisma {
         icon?: NullableStringFieldUpdateOperationsInput | string | null
         contactEmail?: NullableStringFieldUpdateOperationsInput | string | null
         fields?: JsonNullValueInput | InputJsonValue
+        discordWebhook?: NullableStringFieldUpdateOperationsInput | string | null
         enabled?: BoolFieldUpdateOperationsInput | boolean
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
         updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        waitlist?: RecruitmentWaitlistUncheckedUpdateManyWithoutRecruitmentNestedInput
     }
 
     export type RecruitmentCreateManyInput = {
@@ -33931,6 +35152,7 @@ export namespace Prisma {
         icon?: string | null
         contactEmail?: string | null
         fields: JsonNullValueInput | InputJsonValue
+        discordWebhook?: string | null
         enabled?: boolean
         createdAt?: Date | string
         updatedAt?: Date | string
@@ -33943,6 +35165,7 @@ export namespace Prisma {
         icon?: NullableStringFieldUpdateOperationsInput | string | null
         contactEmail?: NullableStringFieldUpdateOperationsInput | string | null
         fields?: JsonNullValueInput | InputJsonValue
+        discordWebhook?: NullableStringFieldUpdateOperationsInput | string | null
         enabled?: BoolFieldUpdateOperationsInput | boolean
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
         updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33955,9 +35178,58 @@ export namespace Prisma {
         icon?: NullableStringFieldUpdateOperationsInput | string | null
         contactEmail?: NullableStringFieldUpdateOperationsInput | string | null
         fields?: JsonNullValueInput | InputJsonValue
+        discordWebhook?: NullableStringFieldUpdateOperationsInput | string | null
         enabled?: BoolFieldUpdateOperationsInput | boolean
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
         updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    }
+
+    export type RecruitmentWaitlistCreateInput = {
+        id?: string
+        email: string
+        createdAt?: Date | string
+        recruitment: RecruitmentCreateNestedOneWithoutWaitlistInput
+    }
+
+    export type RecruitmentWaitlistUncheckedCreateInput = {
+        id?: string
+        email: string
+        recruitmentId: string
+        createdAt?: Date | string
+    }
+
+    export type RecruitmentWaitlistUpdateInput = {
+        id?: StringFieldUpdateOperationsInput | string
+        email?: StringFieldUpdateOperationsInput | string
+        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        recruitment?: RecruitmentUpdateOneRequiredWithoutWaitlistNestedInput
+    }
+
+    export type RecruitmentWaitlistUncheckedUpdateInput = {
+        id?: StringFieldUpdateOperationsInput | string
+        email?: StringFieldUpdateOperationsInput | string
+        recruitmentId?: StringFieldUpdateOperationsInput | string
+        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    }
+
+    export type RecruitmentWaitlistCreateManyInput = {
+        id?: string
+        email: string
+        recruitmentId: string
+        createdAt?: Date | string
+    }
+
+    export type RecruitmentWaitlistUpdateManyMutationInput = {
+        id?: StringFieldUpdateOperationsInput | string
+        email?: StringFieldUpdateOperationsInput | string
+        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    }
+
+    export type RecruitmentWaitlistUncheckedUpdateManyInput = {
+        id?: StringFieldUpdateOperationsInput | string
+        email?: StringFieldUpdateOperationsInput | string
+        recruitmentId?: StringFieldUpdateOperationsInput | string
+        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     }
 
     export type ImageCreateInput = {
@@ -35584,6 +36856,16 @@ export namespace Prisma {
         not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
     }
 
+    export type RecruitmentWaitlistListRelationFilter = {
+        every?: RecruitmentWaitlistWhereInput
+        some?: RecruitmentWaitlistWhereInput
+        none?: RecruitmentWaitlistWhereInput
+    }
+
+    export type RecruitmentWaitlistOrderByRelationAggregateInput = {
+        _count?: SortOrder
+    }
+
     export type RecruitmentOrderByRelevanceInput = {
         fields: RecruitmentOrderByRelevanceFieldEnum | RecruitmentOrderByRelevanceFieldEnum[]
         sort: SortOrder
@@ -35597,6 +36879,7 @@ export namespace Prisma {
         icon?: SortOrder
         contactEmail?: SortOrder
         fields?: SortOrder
+        discordWebhook?: SortOrder
         enabled?: SortOrder
         createdAt?: SortOrder
         updatedAt?: SortOrder
@@ -35608,6 +36891,7 @@ export namespace Prisma {
         description?: SortOrder
         icon?: SortOrder
         contactEmail?: SortOrder
+        discordWebhook?: SortOrder
         enabled?: SortOrder
         createdAt?: SortOrder
         updatedAt?: SortOrder
@@ -35619,6 +36903,7 @@ export namespace Prisma {
         description?: SortOrder
         icon?: SortOrder
         contactEmail?: SortOrder
+        discordWebhook?: SortOrder
         enabled?: SortOrder
         createdAt?: SortOrder
         updatedAt?: SortOrder
@@ -35648,6 +36933,43 @@ export namespace Prisma {
         _count?: NestedIntFilter<$PrismaModel>
         _min?: NestedJsonFilter<$PrismaModel>
         _max?: NestedJsonFilter<$PrismaModel>
+    }
+
+    export type RecruitmentScalarRelationFilter = {
+        is?: RecruitmentWhereInput
+        isNot?: RecruitmentWhereInput
+    }
+
+    export type RecruitmentWaitlistOrderByRelevanceInput = {
+        fields: RecruitmentWaitlistOrderByRelevanceFieldEnum | RecruitmentWaitlistOrderByRelevanceFieldEnum[]
+        sort: SortOrder
+        search: string
+    }
+
+    export type RecruitmentWaitlistEmailRecruitmentIdCompoundUniqueInput = {
+        email: string
+        recruitmentId: string
+    }
+
+    export type RecruitmentWaitlistCountOrderByAggregateInput = {
+        id?: SortOrder
+        email?: SortOrder
+        recruitmentId?: SortOrder
+        createdAt?: SortOrder
+    }
+
+    export type RecruitmentWaitlistMaxOrderByAggregateInput = {
+        id?: SortOrder
+        email?: SortOrder
+        recruitmentId?: SortOrder
+        createdAt?: SortOrder
+    }
+
+    export type RecruitmentWaitlistMinOrderByAggregateInput = {
+        id?: SortOrder
+        email?: SortOrder
+        recruitmentId?: SortOrder
+        createdAt?: SortOrder
     }
 
     export type ImageOrderByRelevanceInput = {
@@ -37093,6 +38415,62 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutPasskeysInput, UserUpdateWithoutPasskeysInput>, UserUncheckedUpdateWithoutPasskeysInput>
   }
+
+    export type RecruitmentWaitlistCreateNestedManyWithoutRecruitmentInput = {
+        create?: XOR<RecruitmentWaitlistCreateWithoutRecruitmentInput, RecruitmentWaitlistUncheckedCreateWithoutRecruitmentInput> | RecruitmentWaitlistCreateWithoutRecruitmentInput[] | RecruitmentWaitlistUncheckedCreateWithoutRecruitmentInput[]
+        connectOrCreate?: RecruitmentWaitlistCreateOrConnectWithoutRecruitmentInput | RecruitmentWaitlistCreateOrConnectWithoutRecruitmentInput[]
+        createMany?: RecruitmentWaitlistCreateManyRecruitmentInputEnvelope
+        connect?: RecruitmentWaitlistWhereUniqueInput | RecruitmentWaitlistWhereUniqueInput[]
+    }
+
+    export type RecruitmentWaitlistUncheckedCreateNestedManyWithoutRecruitmentInput = {
+        create?: XOR<RecruitmentWaitlistCreateWithoutRecruitmentInput, RecruitmentWaitlistUncheckedCreateWithoutRecruitmentInput> | RecruitmentWaitlistCreateWithoutRecruitmentInput[] | RecruitmentWaitlistUncheckedCreateWithoutRecruitmentInput[]
+        connectOrCreate?: RecruitmentWaitlistCreateOrConnectWithoutRecruitmentInput | RecruitmentWaitlistCreateOrConnectWithoutRecruitmentInput[]
+        createMany?: RecruitmentWaitlistCreateManyRecruitmentInputEnvelope
+        connect?: RecruitmentWaitlistWhereUniqueInput | RecruitmentWaitlistWhereUniqueInput[]
+    }
+
+    export type RecruitmentWaitlistUpdateManyWithoutRecruitmentNestedInput = {
+        create?: XOR<RecruitmentWaitlistCreateWithoutRecruitmentInput, RecruitmentWaitlistUncheckedCreateWithoutRecruitmentInput> | RecruitmentWaitlistCreateWithoutRecruitmentInput[] | RecruitmentWaitlistUncheckedCreateWithoutRecruitmentInput[]
+        connectOrCreate?: RecruitmentWaitlistCreateOrConnectWithoutRecruitmentInput | RecruitmentWaitlistCreateOrConnectWithoutRecruitmentInput[]
+        upsert?: RecruitmentWaitlistUpsertWithWhereUniqueWithoutRecruitmentInput | RecruitmentWaitlistUpsertWithWhereUniqueWithoutRecruitmentInput[]
+        createMany?: RecruitmentWaitlistCreateManyRecruitmentInputEnvelope
+        set?: RecruitmentWaitlistWhereUniqueInput | RecruitmentWaitlistWhereUniqueInput[]
+        disconnect?: RecruitmentWaitlistWhereUniqueInput | RecruitmentWaitlistWhereUniqueInput[]
+        delete?: RecruitmentWaitlistWhereUniqueInput | RecruitmentWaitlistWhereUniqueInput[]
+        connect?: RecruitmentWaitlistWhereUniqueInput | RecruitmentWaitlistWhereUniqueInput[]
+        update?: RecruitmentWaitlistUpdateWithWhereUniqueWithoutRecruitmentInput | RecruitmentWaitlistUpdateWithWhereUniqueWithoutRecruitmentInput[]
+        updateMany?: RecruitmentWaitlistUpdateManyWithWhereWithoutRecruitmentInput | RecruitmentWaitlistUpdateManyWithWhereWithoutRecruitmentInput[]
+        deleteMany?: RecruitmentWaitlistScalarWhereInput | RecruitmentWaitlistScalarWhereInput[]
+    }
+
+    export type RecruitmentWaitlistUncheckedUpdateManyWithoutRecruitmentNestedInput = {
+        create?: XOR<RecruitmentWaitlistCreateWithoutRecruitmentInput, RecruitmentWaitlistUncheckedCreateWithoutRecruitmentInput> | RecruitmentWaitlistCreateWithoutRecruitmentInput[] | RecruitmentWaitlistUncheckedCreateWithoutRecruitmentInput[]
+        connectOrCreate?: RecruitmentWaitlistCreateOrConnectWithoutRecruitmentInput | RecruitmentWaitlistCreateOrConnectWithoutRecruitmentInput[]
+        upsert?: RecruitmentWaitlistUpsertWithWhereUniqueWithoutRecruitmentInput | RecruitmentWaitlistUpsertWithWhereUniqueWithoutRecruitmentInput[]
+        createMany?: RecruitmentWaitlistCreateManyRecruitmentInputEnvelope
+        set?: RecruitmentWaitlistWhereUniqueInput | RecruitmentWaitlistWhereUniqueInput[]
+        disconnect?: RecruitmentWaitlistWhereUniqueInput | RecruitmentWaitlistWhereUniqueInput[]
+        delete?: RecruitmentWaitlistWhereUniqueInput | RecruitmentWaitlistWhereUniqueInput[]
+        connect?: RecruitmentWaitlistWhereUniqueInput | RecruitmentWaitlistWhereUniqueInput[]
+        update?: RecruitmentWaitlistUpdateWithWhereUniqueWithoutRecruitmentInput | RecruitmentWaitlistUpdateWithWhereUniqueWithoutRecruitmentInput[]
+        updateMany?: RecruitmentWaitlistUpdateManyWithWhereWithoutRecruitmentInput | RecruitmentWaitlistUpdateManyWithWhereWithoutRecruitmentInput[]
+        deleteMany?: RecruitmentWaitlistScalarWhereInput | RecruitmentWaitlistScalarWhereInput[]
+    }
+
+    export type RecruitmentCreateNestedOneWithoutWaitlistInput = {
+        create?: XOR<RecruitmentCreateWithoutWaitlistInput, RecruitmentUncheckedCreateWithoutWaitlistInput>
+        connectOrCreate?: RecruitmentCreateOrConnectWithoutWaitlistInput
+        connect?: RecruitmentWhereUniqueInput
+    }
+
+    export type RecruitmentUpdateOneRequiredWithoutWaitlistNestedInput = {
+        create?: XOR<RecruitmentCreateWithoutWaitlistInput, RecruitmentUncheckedCreateWithoutWaitlistInput>
+        connectOrCreate?: RecruitmentCreateOrConnectWithoutWaitlistInput
+        upsert?: RecruitmentUpsertWithoutWaitlistInput
+        connect?: RecruitmentWhereUniqueInput
+        update?: XOR<XOR<RecruitmentUpdateToOneWithWhereWithoutWaitlistInput, RecruitmentUpdateWithoutWaitlistInput>, RecruitmentUncheckedUpdateWithoutWaitlistInput>
+    }
 
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
@@ -42100,6 +43478,122 @@ export namespace Prisma {
       newsletters?: NewsletterUncheckedUpdateManyWithoutAuthorNestedInput
   }
 
+    export type RecruitmentWaitlistCreateWithoutRecruitmentInput = {
+        id?: string
+        email: string
+        createdAt?: Date | string
+    }
+
+    export type RecruitmentWaitlistUncheckedCreateWithoutRecruitmentInput = {
+        id?: string
+        email: string
+        createdAt?: Date | string
+    }
+
+    export type RecruitmentWaitlistCreateOrConnectWithoutRecruitmentInput = {
+        where: RecruitmentWaitlistWhereUniqueInput
+        create: XOR<RecruitmentWaitlistCreateWithoutRecruitmentInput, RecruitmentWaitlistUncheckedCreateWithoutRecruitmentInput>
+    }
+
+    export type RecruitmentWaitlistCreateManyRecruitmentInputEnvelope = {
+        data: RecruitmentWaitlistCreateManyRecruitmentInput | RecruitmentWaitlistCreateManyRecruitmentInput[]
+        skipDuplicates?: boolean
+    }
+
+    export type RecruitmentWaitlistUpsertWithWhereUniqueWithoutRecruitmentInput = {
+        where: RecruitmentWaitlistWhereUniqueInput
+        update: XOR<RecruitmentWaitlistUpdateWithoutRecruitmentInput, RecruitmentWaitlistUncheckedUpdateWithoutRecruitmentInput>
+        create: XOR<RecruitmentWaitlistCreateWithoutRecruitmentInput, RecruitmentWaitlistUncheckedCreateWithoutRecruitmentInput>
+    }
+
+    export type RecruitmentWaitlistUpdateWithWhereUniqueWithoutRecruitmentInput = {
+        where: RecruitmentWaitlistWhereUniqueInput
+        data: XOR<RecruitmentWaitlistUpdateWithoutRecruitmentInput, RecruitmentWaitlistUncheckedUpdateWithoutRecruitmentInput>
+    }
+
+    export type RecruitmentWaitlistUpdateManyWithWhereWithoutRecruitmentInput = {
+        where: RecruitmentWaitlistScalarWhereInput
+        data: XOR<RecruitmentWaitlistUpdateManyMutationInput, RecruitmentWaitlistUncheckedUpdateManyWithoutRecruitmentInput>
+    }
+
+    export type RecruitmentWaitlistScalarWhereInput = {
+        AND?: RecruitmentWaitlistScalarWhereInput | RecruitmentWaitlistScalarWhereInput[]
+        OR?: RecruitmentWaitlistScalarWhereInput[]
+        NOT?: RecruitmentWaitlistScalarWhereInput | RecruitmentWaitlistScalarWhereInput[]
+        id?: StringFilter<"RecruitmentWaitlist"> | string
+        email?: StringFilter<"RecruitmentWaitlist"> | string
+        recruitmentId?: StringFilter<"RecruitmentWaitlist"> | string
+        createdAt?: DateTimeFilter<"RecruitmentWaitlist"> | Date | string
+    }
+
+    export type RecruitmentCreateWithoutWaitlistInput = {
+        id?: string
+        title: string
+        description: string
+        icon?: string | null
+        contactEmail?: string | null
+        fields: JsonNullValueInput | InputJsonValue
+        discordWebhook?: string | null
+        enabled?: boolean
+        createdAt?: Date | string
+        updatedAt?: Date | string
+    }
+
+    export type RecruitmentUncheckedCreateWithoutWaitlistInput = {
+        id?: string
+        title: string
+        description: string
+        icon?: string | null
+        contactEmail?: string | null
+        fields: JsonNullValueInput | InputJsonValue
+        discordWebhook?: string | null
+        enabled?: boolean
+        createdAt?: Date | string
+        updatedAt?: Date | string
+    }
+
+    export type RecruitmentCreateOrConnectWithoutWaitlistInput = {
+        where: RecruitmentWhereUniqueInput
+        create: XOR<RecruitmentCreateWithoutWaitlistInput, RecruitmentUncheckedCreateWithoutWaitlistInput>
+    }
+
+    export type RecruitmentUpsertWithoutWaitlistInput = {
+        update: XOR<RecruitmentUpdateWithoutWaitlistInput, RecruitmentUncheckedUpdateWithoutWaitlistInput>
+        create: XOR<RecruitmentCreateWithoutWaitlistInput, RecruitmentUncheckedCreateWithoutWaitlistInput>
+        where?: RecruitmentWhereInput
+    }
+
+    export type RecruitmentUpdateToOneWithWhereWithoutWaitlistInput = {
+        where?: RecruitmentWhereInput
+        data: XOR<RecruitmentUpdateWithoutWaitlistInput, RecruitmentUncheckedUpdateWithoutWaitlistInput>
+    }
+
+    export type RecruitmentUpdateWithoutWaitlistInput = {
+        id?: StringFieldUpdateOperationsInput | string
+        title?: StringFieldUpdateOperationsInput | string
+        description?: StringFieldUpdateOperationsInput | string
+        icon?: NullableStringFieldUpdateOperationsInput | string | null
+        contactEmail?: NullableStringFieldUpdateOperationsInput | string | null
+        fields?: JsonNullValueInput | InputJsonValue
+        discordWebhook?: NullableStringFieldUpdateOperationsInput | string | null
+        enabled?: BoolFieldUpdateOperationsInput | boolean
+        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    }
+
+    export type RecruitmentUncheckedUpdateWithoutWaitlistInput = {
+        id?: StringFieldUpdateOperationsInput | string
+        title?: StringFieldUpdateOperationsInput | string
+        description?: StringFieldUpdateOperationsInput | string
+        icon?: NullableStringFieldUpdateOperationsInput | string | null
+        contactEmail?: NullableStringFieldUpdateOperationsInput | string | null
+        fields?: JsonNullValueInput | InputJsonValue
+        discordWebhook?: NullableStringFieldUpdateOperationsInput | string | null
+        enabled?: BoolFieldUpdateOperationsInput | boolean
+        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+        updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    }
+
   export type AccountCreateManyUserInput = {
     id: string
     accountId: string
@@ -43178,6 +44672,30 @@ export namespace Prisma {
         voice?: BoolFieldUpdateOperationsInput | boolean
         categories?: NullableJsonNullValueInput | InputJsonValue
         feedback?: NullableJsonNullValueInput | InputJsonValue
+    }
+
+    export type RecruitmentWaitlistCreateManyRecruitmentInput = {
+        id?: string
+        email: string
+        createdAt?: Date | string
+    }
+
+    export type RecruitmentWaitlistUpdateWithoutRecruitmentInput = {
+        id?: StringFieldUpdateOperationsInput | string
+        email?: StringFieldUpdateOperationsInput | string
+        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    }
+
+    export type RecruitmentWaitlistUncheckedUpdateWithoutRecruitmentInput = {
+        id?: StringFieldUpdateOperationsInput | string
+        email?: StringFieldUpdateOperationsInput | string
+        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    }
+
+    export type RecruitmentWaitlistUncheckedUpdateManyWithoutRecruitmentInput = {
+        id?: StringFieldUpdateOperationsInput | string
+        email?: StringFieldUpdateOperationsInput | string
+        createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     }
 
 

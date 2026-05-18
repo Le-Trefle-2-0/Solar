@@ -400,9 +400,17 @@ exports.Prisma.RecruitmentScalarFieldEnum = {
   icon: 'icon',
   contactEmail: 'contactEmail',
   fields: 'fields',
+    discordWebhook: 'discordWebhook',
   enabled: 'enabled',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RecruitmentWaitlistScalarFieldEnum = {
+    id: 'id',
+    email: 'email',
+    recruitmentId: 'recruitmentId',
+    createdAt: 'createdAt'
 };
 
 exports.Prisma.ImageScalarFieldEnum = {
@@ -646,7 +654,14 @@ exports.Prisma.RecruitmentOrderByRelevanceFieldEnum = {
   title: 'title',
   description: 'description',
   icon: 'icon',
-  contactEmail: 'contactEmail'
+    contactEmail: 'contactEmail',
+    discordWebhook: 'discordWebhook'
+};
+
+exports.Prisma.RecruitmentWaitlistOrderByRelevanceFieldEnum = {
+    id: 'id',
+    email: 'email',
+    recruitmentId: 'recruitmentId'
 };
 
 exports.Prisma.ImageOrderByRelevanceFieldEnum = {
@@ -685,6 +700,7 @@ exports.Prisma.ModelName = {
   RouteProtection: 'RouteProtection',
   Passkey: 'Passkey',
   Recruitment: 'Recruitment',
+    RecruitmentWaitlist: 'RecruitmentWaitlist',
   Image: 'Image',
   Settings: 'Settings'
 };

@@ -415,7 +415,20 @@ model Recruitment {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
+  waitlist RecruitmentWaitlist[]
+
   @@map("recruitment")
+}
+
+model RecruitmentWaitlist {
+  id            String      @id @default(cuid())
+  email         String
+  recruitmentId String
+  recruitment   Recruitment @relation(fields: [recruitmentId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+
+  @@unique([email, recruitmentId])
+  @@map("recruitment_waitlist")
 }
 
 model Image {

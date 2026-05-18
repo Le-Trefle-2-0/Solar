@@ -56,8 +56,13 @@ export default async function ConfidentialitePage() {
                             <ul className="list-disc pl-6 mb-6 space-y-2">
                                 <li>Discord : identifiant utilisateur et contenu des messages ;</li>
                                 <li>Chat public sur le site internet : identifiants anonymes, messages, et informations
-                                    techniques nécessaires au bon fonctionnement du service.
+                                    techniques nécessaires au bon fonctionnement du service ;
                                 </li>
+                                <li>Formulaire de recrutement : coordonnées (nom, prénom, email, téléphone), parcours,
+                                    motivations et autres informations demandées dans le cadre du processus de sélection
+                                    ;
+                                </li>
+                                <li>Liste d'attente de recrutement : adresse email.</li>
                             </ul>
 
                             <h3 className="text-xl font-semibold mb-3">2.2 Types de données collectées</h3>
@@ -77,6 +82,10 @@ export default async function ConfidentialitePage() {
                             <ul className="list-disc pl-6 mb-6 space-y-2">
                                 <li>Fournir un service d’écoute et de soutien moral ;</li>
                                 <li>Assurer le fonctionnement technique du chat en temps réel ;</li>
+                                <li>Gérer les candidatures aux postes de bénévoles ;</li>
+                                <li>Notifier les personnes intéressées de la réouverture d'un recrutement via la liste
+                                    d'attente ;
+                                </li>
                                 <li>Réaliser des analyses statistiques anonymisées (nombre de sessions, durée moyenne,
                                     etc.).
                                 </li>
@@ -94,6 +103,12 @@ export default async function ConfidentialitePage() {
                             <h3 className="text-xl font-semibold mb-3">2.5 Durée de conservation</h3>
                             <ul className="list-disc pl-6 mb-8 space-y-2">
                                 <li>Les transcriptions des messages sont conservées 1 an ;</li>
+                                <li>Les candidatures aux recrutements sont conservées pendant toute la durée du
+                                    processus de sélection et jusqu'à 2 ans après le dernier contact ;
+                                </li>
+                                <li>Les adresses emails de la liste d'attente de recrutement sont supprimées
+                                    immédiatement après l'envoi de la notification de réouverture ;
+                                </li>
                                 <li>Les identifiants anonymes sont conservées 2 ans sous forme hachée ;</li>
                                 <li>Les données techniques temporaires (comme les cookies de session) sont supprimées
                                     après 24 heures ;
@@ -150,7 +165,7 @@ export default async function ConfidentialitePage() {
                             <p className="">
                                 Toute modification significative sera portée à la connaissance des utilisateurs via une
                                 annonce sur le site et dans l’application.<br/>
-                                La présente politique, éditée le 1er mars 2025, a été mise à jour le 29 décembre 2025.
+                                La présente politique, éditée le 1er mars 2025, a été mise à jour le 18 mai 2026.
                             </p>
                         </div>
                     </div>
