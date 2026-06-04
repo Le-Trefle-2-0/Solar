@@ -10,6 +10,7 @@ import {Providers} from "./providers"
 import {constructMetadata} from "@/lib/metadata"
 import ChatWidget from "@/components/chat-widget";
 import prisma from "@/lib/prisma";
+import CounterDevTracker from "@/components/counter-dev-tracker";
 
 config.autoAddCss = false
 
@@ -62,6 +63,7 @@ export default async function RootLayout({
         <body className={`${geistSans.variable} ${geistMono.variable} ${barlowCondensed.variable} antialiased`}
               suppressHydrationWarning>
         <Providers>
+            <CounterDevTracker />
             <div className="flex min-h-svh flex-col">
                 {children}
             </div>
