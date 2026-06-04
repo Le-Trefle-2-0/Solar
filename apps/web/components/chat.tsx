@@ -23,7 +23,7 @@ import {
     X
 } from "lucide-react";
 import React, {FormEvent, useEffect, useLayoutEffect, useRef, useState} from "react";
-import {formVolunteer, Msg, MsgWithID, ticketInfo} from "@/lib/interface";
+import {EventData, formVolunteer, Msg, MsgWithID, ticketInfo} from "@/lib/interface";
 import {z, ZodError} from "zod";
 import {toast} from "sonner";
 import {saveMessage} from "@/lib/messageManager";
@@ -33,6 +33,7 @@ import {
     Avatar,
     AvatarFallback,
     AvatarImage,
+    Badge,
     Button,
     Dialog,
     DialogContent,
@@ -92,6 +93,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
         timestamp: number
     } | null>(null);
     const [chat, setChat] = useState<MsgWithID[]>([])
+    const [availableCategories, setAvailableCategories] = useState<string[]>([]);
     const [loadingMessages, setLoadingMessages] = useState(true)
     const [retryMs, setRetryMs] = useState(1000)
     const [skeletonItems, setSkeletonItems] = useState<{ nameW: number; line1W: number; line2W: number }[]>([])
@@ -114,6 +116,27 @@ export function Chat(props: { channelID: string, statusID: number }) {
     const [ineligibleVoice, setIneligibleVoice] = useState<string[]>([]);
     const {toggleSidebar} = useSidebar();
     const [canManageMessages, setCanManageMessages] = useState(false);
+    const [eventInfo, setEventInfo] = useState<EventData | null>(null);
+    const [loadingEvent, setLoadingEvent] = useState(false);
+    const [eventDialogOpen, setEventDialogOpen] = useState(false);
+
+    const fetchEventInfo = async () => {
+        setLoadingEvent(true);
+        try {
+            const res = await apiFetch(`/v1/events/channel/${channelID}`);
+            if (res.success && res.event) {
+                setEventInfo(res.event);
+            } else {
+                setEventInfo(null);
+            }
+        } catch (e) {
+            console.error("Failed to fetch event info:", e);
+            setEventInfo(null);
+        } finally {
+            setLoadingEvent(false);
+        }
+    };
+
     const myAudioRef = useRef<HTMLAudioElement>(null);
 
     // LanguageTool (French) spellcheck state for chat input
@@ -397,6 +420,27 @@ export function Chat(props: { channelID: string, statusID: number }) {
     };
 
     const [onlineUsers, setOnlineUsers] = useState<UserFromList[]>([]);
+    const [allMembers, setAllMembers] = useState<UserFromList[]>([]);
+
+    const roleOrder = ['admin', 'bot', 'manager', 'volunteer', 'training'] as const;
+    const getHighestRole = (role: string | string[] | undefined | null): string => {
+        const toKey = (r: string) => (r || '').toLowerCase();
+        if (!role) return 'training';
+        if (Array.isArray(role)) {
+            // pick the role with the LOWEST index (admin highest rank)
+            const normalized = role.map(r => toKey(r as any)).filter(r => (roleOrder as readonly string[]).includes(r));
+            if (normalized.length === 0) return 'training';
+            let best = normalized[0];
+            for (const r of normalized) {
+                if ((roleOrder as readonly string[]).indexOf(r) < (roleOrder as readonly string[]).indexOf(best)) {
+                    best = r;
+                }
+            }
+            return best;
+        }
+        const r = toKey(role as string);
+        return (roleOrder as readonly string[]).includes(r) ? r : 'training';
+    };
 
 
     useEffect(() => {
@@ -404,26 +448,6 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
         let timer: NodeJS.Timeout;
         let pollId: NodeJS.Timeout | null = null;
-
-        const roleOrder = ['admin', 'bot', 'manager', 'volunteer', 'training'] as const;
-        const getHighestRole = (role: string | string[] | undefined | null): string => {
-            const toKey = (r: string) => (r || '').toLowerCase();
-            if (!role) return 'training';
-            if (Array.isArray(role)) {
-                // pick the role with the LOWEST index (admin highest rank)
-                const normalized = role.map(r => toKey(r as any)).filter(r => (roleOrder as readonly string[]).includes(r));
-                if (normalized.length === 0) return 'training';
-                let best = normalized[0];
-                for (const r of normalized) {
-                    if ((roleOrder as readonly string[]).indexOf(r) < (roleOrder as readonly string[]).indexOf(best)) {
-                        best = r;
-                    }
-                }
-                return best;
-            }
-            const r = toKey(role as string);
-            return (roleOrder as readonly string[]).includes(r) ? r : 'training';
-        };
 
         const ensureSelfIncluded = (users: UserFromList[]): UserFromList[] => {
             if (!session?.user) return users;
@@ -444,9 +468,17 @@ export function Chat(props: { channelID: string, statusID: number }) {
             });
         };
 
-        function handleConnect() {
+        const handleConnect = () => {
             if (!socket) return;
             requestSnapshot();
+            // Also refresh members list to ensure consistency
+            apiFetch(`/v1/channel/${channelID}/members`)
+                .then((res: any) => {
+                    if (res.success && res.members) {
+                        setAllMembers(res.members.map((u: any) => ({...u, role: getHighestRole(u.role)})));
+                    }
+                }).catch(() => {
+            });
         }
 
         // initial snapshot
@@ -464,7 +496,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                 const normalizedUser = {...payload.user, role: getHighestRole(payload.user.role as any)};
                 setOnlineUsers(prev => {
                     const exists = prev.some(u => u.id === normalizedUser.id);
-                    return exists ? prev : ensureSelfIncluded([...prev, normalizedUser]);
+                    return exists ? prev : [...prev, normalizedUser];
                 });
             }
         };
@@ -473,6 +505,9 @@ export function Chat(props: { channelID: string, statusID: number }) {
                 setOnlineUsers(prev => prev.filter(u => u.id !== payload.user.id));
             }
         };
+
+        socket.on("userJoined", handleJoined);
+        socket.on("userLeft", handleLeft);
 
         const onMessage = (data: Msg) => {
             if (data.channel.id === channelID) {
@@ -520,18 +555,19 @@ export function Chat(props: { channelID: string, statusID: number }) {
             setChat(prev =>
                 prev.map(message => {
                     if (message.id === data.messageID) {
+                        const reaction = data.reaction;
                         const existingReactions = message.reactions ?? [];
-                        const existsById = existingReactions.some(r => r.id === data.id);
+                        const existsById = existingReactions.some(r => r.id === reaction.id);
                         if (existsById) {
-                            const updated = existingReactions.map(r => r.id === data.id ? data : r);
+                            const updated = existingReactions.map(r => r.id === reaction.id ? reaction : r);
                             return {...message, reactions: updated};
                         }
-                        const existsByUserEmoji = existingReactions.some(r => r.userID === data.userID && r.emoji === data.emoji);
+                        const existsByUserEmoji = existingReactions.some(r => r.userID === reaction.userID && r.emoji === reaction.emoji);
                         if (existsByUserEmoji) {
-                            const updated = existingReactions.map(r => (r.userID === data.userID && r.emoji === data.emoji) ? data : r);
+                            const updated = existingReactions.map(r => (r.userID === reaction.userID && r.emoji === reaction.emoji) ? reaction : r);
                             return {...message, reactions: updated};
                         }
-                        return {...message, reactions: [...existingReactions, data]};
+                        return {...message, reactions: [...existingReactions, reaction]};
                     }
                     return message;
                 })
@@ -556,13 +592,13 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
         const onReactionRemove = (data: any) => {
             console.log("REACTION REMOVE", data);
-            const {messageID, id: reactionId} = data;
+            const {messageID, reactionID} = data;
 
             setChat(prev =>
                 prev.map(message => {
                     if (message.id === messageID) {
                         const filteredReactions = (message.reactions ?? []).filter(
-                            r => r.id !== reactionId
+                            r => r.id !== reactionID
                         );
 
                         return {
@@ -599,8 +635,8 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
         return () => {
             socket.off('userList', handleUserList);
-            socket.off('joined', handleJoined);
-            socket.off('left', handleLeft);
+            socket.off('userJoined', handleJoined);
+            socket.off('userLeft', handleLeft);
             socket.off('connect', handleConnect);
             socket.off('reconnect', handleConnect as any);
             socket.off('reconnect_attempt', requestSnapshot as any);
@@ -626,6 +662,13 @@ export function Chat(props: { channelID: string, statusID: number }) {
             setLoadingOlder(false);
             initialAutoScrollPending.current = true;
             try {
+                apiFetch(`/v1/channel/${channelID}/members`)
+                    .then((res: any) => {
+                        if (res.success && res.members) {
+                            setAllMembers(res.members.map((u: any) => ({...u, role: getHighestRole(u.role)})));
+                        }
+                    });
+
                 const data: MsgWithID[] = await apiFetch(`/v1/messages/${channelID}?limit=${INITIAL_LIMIT}`);
                 if (cancelled) return;
                 setChat(data);
@@ -650,6 +693,20 @@ export function Chat(props: { channelID: string, statusID: number }) {
                     }).catch(() => {
                     });
                 }
+
+                apiFetch(`/v1/admin/settings`)
+                    .then((data: { settings: { key: string, value: string }[] }) => {
+                        const catSetting = data.settings?.find(s => s.key === "monitoring_categories");
+                        if (catSetting && !cancelled) {
+                            try {
+                                setAvailableCategories(JSON.parse(catSetting.value));
+                            } catch (e) {
+                                console.error("Failed to parse categories", e);
+                            }
+                        }
+                    })
+                    .catch(() => {
+                    });
 
                 apiFetch(`/v1/events/getAvailable?channelID=${channelID}`)
                     .then((d) => {
@@ -729,7 +786,9 @@ export function Chat(props: { channelID: string, statusID: number }) {
         }
 
         if (isAtBottomRef.current) {
-            messagesListRef.current?.scrollIntoView({behavior: 'smooth', block: 'end'});
+            setTimeout(() => {
+                messagesListRef.current?.scrollIntoView({behavior: 'smooth', block: 'end'});
+            }, 0);
         }
     }, [chat, loadingOlder]);
 
@@ -777,15 +836,15 @@ export function Chat(props: { channelID: string, statusID: number }) {
                 if (initialAutoScrollPending.current) return;
                 // update bottom state
                 const distanceFromBottom = el.scrollHeight - (el.scrollTop + el.clientHeight);
-                isAtBottomRef.current = distanceFromBottom <= 50;
-                if (el.scrollTop < 150) {
+                isAtBottomRef.current = distanceFromBottom <= 100;
+                if (el.scrollTop < 250) {
                     loadOlder();
                 }
             });
         };
         // initialize at-bottom state when attaching
         const initDistance = el.scrollHeight - (el.scrollTop + el.clientHeight);
-        isAtBottomRef.current = initDistance <= 50;
+        isAtBottomRef.current = initDistance <= 100;
         el.addEventListener('scroll', onScroll);
         return () => {
             el.removeEventListener('scroll', onScroll);
@@ -890,13 +949,17 @@ export function Chat(props: { channelID: string, statusID: number }) {
     }
 
     const transmissionSchema = z.object({
-        problematic: z.string(),
-        observations: z.string(),
+        problematic: z.string().min(1, "Requis"),
+        observations: z.string().min(1, "Requis"),
         info: z.string().optional(),
+        categories: z.array(z.string()).min(1, "Choisissez au moins une catégorie"),
     });
 
     const transmissionForm = useForm<z.infer<typeof transmissionSchema>>({
         resolver: zodResolver(transmissionSchema),
+        defaultValues: {
+            categories: [],
+        }
     });
 
     function transmission(data: z.infer<typeof transmissionSchema>) {
@@ -907,6 +970,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                 problematic: data.problematic,
                 observations: data.observations,
                 info: data.info,
+                categories: data.categories,
             })
         }).then(res => {
             if (res.success) {
@@ -940,7 +1004,8 @@ export function Chat(props: { channelID: string, statusID: number }) {
         <div className="flex flex-row items-center justify-center w-full">
             <div className="flex flex-col relative h-svh p-3 gap-4 w-full" tabIndex={0} ref={rootDivRef}>
                 {/*<video className='w-0 h-0' playsInline ref={callingVideoRef} autoPlay/>*/}
-                <div className="flex flex-col flex-grow overflow-y-auto mt-10" ref={messagesContainerRef}>
+                <div className="flex flex-col flex-grow overflow-y-auto" ref={messagesContainerRef}>
+                    <div className="h-28 shrink-0"/>
                     {loadingMessages ? (
                         <div className="flex flex-col gap-4 px-2 py-2">
                             {skeletonItems.map((item, i) => (
@@ -1007,18 +1072,20 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                             content: ref.content,
                                             image: ref.author.image
                                         } : undefined}
+                                        readOnly={status === 3 || status === 4}
                                     />
                                 );
                             })}
                         </React.Fragment>
                     )}
+                    <div className="pb-4"/>
                     <div ref={messagesListRef} className="h-px"/>
                 </div>
 
 
                 {
                     status === 0 ? null :
-                        <div className="absolute top-6 right-6 flex flex-row gap-2">
+                        <div className="absolute top-6 right-6 flex flex-row gap-2 z-20">
                             <AlertDialog>
                                 <AlertDialogTrigger asChild>
                                     <Button
@@ -1235,6 +1302,83 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                                 )}
                                             />
 
+                                            <FormField
+                                                control={transmissionForm.control}
+                                                name="categories"
+                                                render={({field}) => (
+                                                    <FormItem className="flex flex-col">
+                                                        <FormLabel>Catégories de l'écoute* :</FormLabel>
+                                                        <Popover>
+                                                            <PopoverTrigger asChild>
+                                                                <FormControl>
+                                                                    <Button
+                                                                        variant="outline"
+                                                                        role="combobox"
+                                                                        className={cn(
+                                                                            "w-full justify-between h-auto min-h-10",
+                                                                            !field.value?.length && "text-muted-foreground"
+                                                                        )}
+                                                                    >
+                                                                        <div className="flex flex-wrap gap-1">
+                                                                            {field.value?.length > 0 ? (
+                                                                                field.value.map((val: string) => (
+                                                                                    <Badge key={val} variant="secondary"
+                                                                                           className="mr-1">
+                                                                                        {val}
+                                                                                    </Badge>
+                                                                                ))
+                                                                            ) : (
+                                                                                "Sélectionner les catégories..."
+                                                                            )}
+                                                                        </div>
+                                                                        <ChevronsUpDown
+                                                                            className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
+                                                                    </Button>
+                                                                </FormControl>
+                                                            </PopoverTrigger>
+                                                            <PopoverContent
+                                                                className="w-[--radix-popover-trigger-width] p-0">
+                                                                <Command>
+                                                                    <CommandInput
+                                                                        placeholder="Rechercher une catégorie..."/>
+                                                                    <CommandList>
+                                                                        <CommandEmpty>Aucune catégorie
+                                                                            trouvée.</CommandEmpty>
+                                                                        <CommandGroup>
+                                                                            {availableCategories.map((item) => (
+                                                                                <CommandItem
+                                                                                    key={item}
+                                                                                    value={item}
+                                                                                    onSelect={() => {
+                                                                                        const newValue = field.value?.includes(item)
+                                                                                            ? field.value.filter((v: string) => v !== item)
+                                                                                            : [...(field.value || []), item];
+                                                                                        field.onChange(newValue);
+                                                                                    }}
+                                                                                >
+                                                                                    <Check
+                                                                                        className={cn(
+                                                                                            "mr-2 h-4 w-4",
+                                                                                            field.value?.includes(item) ? "opacity-100" : "opacity-0"
+                                                                                        )}
+                                                                                    />
+                                                                                    {item}
+                                                                                </CommandItem>
+                                                                            ))}
+                                                                        </CommandGroup>
+                                                                    </CommandList>
+                                                                </Command>
+                                                            </PopoverContent>
+                                                        </Popover>
+                                                        <FormDescription>
+                                                            Sélectionnez une ou plusieurs catégories correspondant à
+                                                            l'échange.
+                                                        </FormDescription>
+                                                        <FormMessage/>
+                                                    </FormItem>
+                                                )}
+                                            />
+
                                             <AlertDialogFooter>
                                                 <AlertDialogCancel>Annuler</AlertDialogCancel>
                                                 <AlertDialogAction asChild>
@@ -1316,6 +1460,8 @@ export function Chat(props: { channelID: string, statusID: number }) {
                 }
 
                 <div className="sticky bottom-0">
+                    {/* Feedback Form for closed tickets */}
+
                     {replyTo && (
                         <div
                             className="flex items-start justify-between gap-2 mb-2 p-2 rounded-md border border-blue-300 bg-blue-50 text-blue-900">
@@ -1522,48 +1668,176 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
             <div className="hidden lg:flex flex-col justify-start h-svh w-80 p-6 gap-3 border-l-main border-l">
                 <div>
-                    <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">{channelName}</h3>
+                    <div className="flex items-center justify-between gap-2">
+                        <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight truncate">{channelName}</h3>
+                        <Dialog open={eventDialogOpen} onOpenChange={(open) => {
+                            setEventDialogOpen(open);
+                            if (open) fetchEventInfo();
+                        }}>
+                            <DialogTrigger asChild>
+                                <Button variant="ghost" size="icon" className="shrink-0 h-8 w-8">
+                                    <Info className="h-4 w-4"/>
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                                <DialogHeader>
+                                    <DialogTitle>Planning de l'événement</DialogTitle>
+                                </DialogHeader>
+                                {loadingEvent ? (
+                                    <div className="flex flex-col gap-2">
+                                        <Skeleton className="h-20 w-full"/>
+                                        <Skeleton className="h-20 w-full"/>
+                                    </div>
+                                ) : eventInfo ? (
+                                    <div className="space-y-6">
+                                        <div>
+                                            <h4 className="text-lg font-bold">{eventInfo.title}</h4>
+                                            <p className="text-sm text-muted-foreground">{eventInfo.description}</p>
+                                        </div>
+
+                                        <div className="space-y-4">
+                                            {eventInfo.roleSlots.map((slot) => (
+                                                <div key={slot.id} className="border rounded-lg p-4">
+                                                    <div className="flex justify-between items-center mb-3">
+                                                        <h5 className="font-semibold capitalize">
+                                                            {roleOrderAndLabels[slot.role] || slot.role}
+                                                            {slot.part && ` — ${slot.part === 'first' ? '1ère partie' : '2ème partie'}`}
+                                                        </h5>
+                                                        <Badge variant="outline">
+                                                            {slot.registrationsCount} / {slot.goalCount}
+                                                        </Badge>
+                                                    </div>
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                        {slot.registrations.map((reg) => {
+                                                            const user = reg.user;
+                                                            if (!user) return null;
+                                                            const isOnline = onlineUsers.some(u => u.id === user.id);
+                                                            const isAvailableForListening = !user.hasActiveTicket;
+
+                                                            return (
+                                                                <div key={reg.id}
+                                                                     className="flex items-center gap-2 p-2 rounded-md bg-muted/50">
+                                                                    <Avatar className="h-8 w-8">
+                                                                        <AvatarImage src={user.image || ""}/>
+                                                                        <AvatarFallback>
+                                                                            {user.name?.slice(0, 2).toUpperCase()}
+                                                                        </AvatarFallback>
+                                                                    </Avatar>
+                                                                    <div className="flex flex-col min-w-0">
+                                                                        <span
+                                                                            className="text-sm font-medium truncate">{user.name}</span>
+                                                                        <div className="flex gap-1.5 items-center">
+                                                                            <span className={cn(
+                                                                                "w-2 h-2 rounded-full",
+                                                                                isOnline ? "bg-green-500" : "bg-gray-400"
+                                                                            )}/>
+                                                                            <span
+                                                                                className="text-[10px] text-muted-foreground uppercase">
+                                                                                {isOnline ? "En ligne" : "Hors ligne"}
+                                                                            </span>
+                                                                            <span
+                                                                                className="text-muted-foreground">·</span>
+                                                                            <Badge
+                                                                                variant={isAvailableForListening ? "default" : "secondary"}
+                                                                                className={cn("px-1 py-0 text-[9px] h-3.5 leading-none", isAvailableForListening && "bg-green-600 hover:bg-green-700 text-white border-transparent")}>
+                                                                                {isAvailableForListening ? "Disponible" : "En écoute"}
+                                                                            </Badge>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                        {slot.registrations.length === 0 && (
+                                                            <p className="text-xs text-muted-foreground italic col-span-full">
+                                                                Aucun inscrit pour ce créneau
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <p className="text-center py-8 text-muted-foreground">
+                                        Aucun événement de planning n'est associé à ce salon.
+                                    </p>
+                                )}
+                            </DialogContent>
+                        </Dialog>
+                    </div>
                     <small className="text-sm leading-none font-medium">
-                        {onlineUsers.length} utilisateur{onlineUsers.length >= 2 ? "s" : null} connecté{onlineUsers.length >= 2 ? "s" : null}
+                        {onlineUsers.length} utilisateur{onlineUsers.length >= 2 ? "s" : ""} connecté{onlineUsers.length >= 2 ? "s" : ""}
                     </small>
                 </div>
-                <div className="flex flex-col">
+                <div className="flex flex-col overflow-y-auto">
                     {Object.entries(
-                        onlineUsers.reduce((acc, user) => {
-                            const roleKey = Array.isArray(user.role) ? (user.role[0] as string) : (user.role as string);
-                            (acc[roleKey] ||= []).push(user);
-                            return acc;
-                        }, {} as Record<string, UserFromList[]>)
+                        (() => {
+                            // Merge allMembers and onlineUsers
+                            const memberMap = new Map<string, UserFromList & { isOnline: boolean }>();
+                            allMembers.forEach(m => memberMap.set(m.id, {...m, isOnline: false}));
+                            onlineUsers.forEach(u => {
+                                memberMap.set(u.id, {...(memberMap.get(u.id) || u), isOnline: true});
+                            });
+
+                            const merged = Array.from(memberMap.values());
+
+                            const online = merged.filter(m => m.isOnline);
+                            const offline = merged.filter(m => !m.isOnline);
+
+                            const grouped = online.reduce((acc, user) => {
+                                const roleKey = Array.isArray(user.role) ? (user.role[0] as string) : (user.role as string);
+                                (acc[roleKey] ||= []).push(user);
+                                return acc;
+                            }, {} as Record<string, (UserFromList & { isOnline?: boolean })[]>);
+
+                            if (offline.length > 0) {
+                                grouped['offline'] = offline;
+                            }
+
+                            return grouped;
+                        })()
                     ).sort(
-                        ([roleA], [roleB]) =>
-                            (displayRoleOrder as readonly string[]).indexOf(roleA) -
-                            (displayRoleOrder as readonly string[]).indexOf(roleB)
-                    ).map(([role, users]) => (
-                        <div key={role} className="mb-4">
-                            <h4 className="text-md font-semibold text-gray-700 mb-2 capitalize">
-                                {roleOrderAndLabels[role] || role}
-                            </h4>
-                            <div className="flex flex-col gap-2">
-                                {users.map(user => (
-                                    <div
-                                        key={user.id}
-                                        className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-                                    >
-                                        <Avatar className="h-8 w-8 rounded-lg border">
-                                            <AvatarImage src={user.image || ""} alt={user.username}/>
-                                            <AvatarFallback
-                                                className="rounded-lg bg-primary text-primary-foreground font-bold">
-                                                {user.username?.slice(0, 2).toUpperCase() || "US"}
-                                            </AvatarFallback>
-                                        </Avatar>
-                                        <span className="text-sm text-gray-900 dark:text-gray-100 truncate">
-                                        {user.username}
-                                      </span>
-                                    </div>
-                                ))}
+                        ([roleA], [roleB]) => {
+                            if (roleA === 'offline') return 1;
+                            if (roleB === 'offline') return -1;
+                            return (displayRoleOrder as readonly string[]).indexOf(roleA) -
+                                (displayRoleOrder as readonly string[]).indexOf(roleB);
+                        }
+                    ).map(([role, users]) => {
+                        const sortedUsers = [...users].sort((a, b) => a.username.localeCompare(b.username));
+
+                        return (
+                            <div key={role} className="mb-4">
+                                <h4 className="text-md font-semibold text-gray-700 mb-2 capitalize">
+                                    {role === 'offline' ? 'Hors ligne' : (roleOrderAndLabels[role] || role)} — {users.length}
+                                </h4>
+                                <div className="flex flex-col gap-2">
+                                    {sortedUsers.map(user => (
+                                        <div
+                                            key={user.id}
+                                            className={cn(
+                                                "flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-opacity",
+                                                !user.isOnline && "opacity-50"
+                                            )}
+                                        >
+                                            <div className="relative">
+                                                <Avatar className="h-8 w-8 rounded-lg border">
+                                                    <AvatarImage src={user.image || ""} alt={user.username}/>
+                                                    <AvatarFallback
+                                                        className="rounded-lg bg-primary text-primary-foreground font-bold">
+                                                        {user.username?.slice(0, 2).toUpperCase() || "US"}
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                            </div>
+                                            <span className="text-sm text-gray-900 dark:text-gray-100 truncate">
+                                                {user.username}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
         </div>

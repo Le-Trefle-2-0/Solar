@@ -227,7 +227,8 @@ export const auth = betterAuth({
     plugins: pluginList as any,
     account: {
         accountLinking: {
-            enabled: true
+            enabled: true,
+            allowDifferentEmails: true
         }
     },
     socialProviders: {

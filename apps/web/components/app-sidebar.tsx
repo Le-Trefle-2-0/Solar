@@ -2,8 +2,8 @@
 import * as React from "react"
 import {useEffect, useRef, useState} from "react"
 import {
-    Bot,
     CalendarDays,
+    ChartLine,
     ChevronRight,
     Ear,
     History,
@@ -14,6 +14,7 @@ import {
     Mic,
     MicOff,
     PhoneOff,
+    Settings,
     Shield,
     ShieldUser,
     Signal,
@@ -72,12 +73,6 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
             adminOnly: true,
         },
         {
-            name: "Bot",
-            url: "/app/admin/bot",
-            icon: Bot,
-            adminOnly: true,
-        },
-        {
             name: "Historique",
             url: "/app/admin/history",
             icon: History,
@@ -90,9 +85,21 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
             adminOnly: true,
         },
         {
+            name: "Statistiques",
+            url: "/app/admin/stats",
+            icon: ChartLine,
+            adminOnly: true,
+        },
+        {
             name: "Rôles",
             url: "/app/admin/roles",
             icon: Shield,
+            adminOnly: true,
+        },
+        {
+            name: "Paramètres",
+            url: "/app/admin/settings",
+            icon: Settings,
             adminOnly: true,
         },
         {
@@ -109,21 +116,39 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
     const [session, setSession] = useState<any>(null);
 
     useEffect(() => {
-        apiFetch('/v1/auth/get-session').then(res => setSession(res));
-    }, []);
+        const updateSession = () => apiFetch('/v1/auth/get-session').then(res => setSession(res));
+        updateSession();
+
+        if (!socket) return;
+        socket.on('permissionsUpdate', updateSession);
+        return () => {
+            socket.off('permissionsUpdate', updateSession);
+        };
+    }, [socket]);
 
     const filteredBaseData = React.useMemo(() => {
         if (!session) return baseData.filter(item => !(item as any).adminOnly);
         const roles = (session.user.role || "").split(",").map((r: string) => r.trim());
-        const isAdmin = roles.includes("admin");
+        const permissions = (session.user as any).permissions || [];
+
+        const isAdmin = roles.includes("admin") || permissions.includes("admin.sudo");
         const isManager = roles.includes("manager");
-        const isNewsletterManager = roles.includes("newsletterManager");
+        const isNewsletterManager = roles.includes("newsletterManager") || permissions.includes("newsletters.manage");
 
         return baseData.filter(item => {
             if (!(item as any).adminOnly && !(item as any).newsletterOnly) return true;
             if (isAdmin) return true;
-            if (isManager && (item.name === "Historique" || item.name === "Recrutement" || item.name === "Utilisateurs")) return true;
+
+            if (item.name === "Utilisateurs") {
+                return permissions.includes("management.manage_accounts") || isManager;
+            }
+
+            if (isManager && (item.name === "Historique" || item.name === "Recrutement" || item.name === "Paramètres" || item.name === "Statistiques")) return true;
             if (isNewsletterManager && (item as any).newsletterOnly) return true;
+
+            // Allow access to Roles if the user has a manager role (limited to lower weights)
+            if (isManager && item.name === "Rôles") return true;
+
             return false;
         });
     }, [session]);

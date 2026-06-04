@@ -6,6 +6,7 @@ import swaggerUi from '@fastify/swagger-ui';
 import {registerV1Routes} from './routes/v1/index.js';
 import {API_HOST, API_PORT} from './env.js';
 import {startNewsletterScheduler} from './lib/scheduler.js';
+import {seedDefaultRoles} from './lib/seed.js';
 
 const app = Fastify({
     logger: true,
@@ -71,6 +72,9 @@ app.get('/health', async () => ({status: 'ok'}));
 
 // v1 routes (modular)
 await registerV1Routes(app);
+
+// Seed default roles
+await seedDefaultRoles();
 
 // Start background tasks
 startNewsletterScheduler();

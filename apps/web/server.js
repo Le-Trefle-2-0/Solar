@@ -1,10 +1,18 @@
 import fs from 'fs';
-import 'dotenv/config';
+import {config} from 'dotenv';
+import path from 'path';
+import {fileURLToPath} from 'url';
 import {createServer as createHttpServer} from 'http';
 import {createServer as createHttpsServer} from 'https';
 import next from 'next';
 import {Server} from 'socket.io';
 import {createRemoteJWKSet, jwtVerify} from 'jose';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load .env from project root
+config({path: path.resolve(__dirname, '../../.env')});
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = process.env.NEXT_PUBLIC_HOST || '0.0.0.0';

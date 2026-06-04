@@ -4,56 +4,179 @@ import {adminAc, defaultStatements} from "better-auth/plugins/admin/access";
 export const statement = {
     ...defaultStatements,
     tickets: ['open', 'close', 'read_all', 'attribute', 'launch_voice', 'send_message_all', 'send_message', 'transmission'],
-    management: ['create_account', 'delete_account', 'ticket_history', 'view_transmission', 'view_stats', 'reset_password'],
+    management: ['manage_accounts', 'ticket_history', 'view_transmission', 'view_stats'],
     permanence: ['open', 'close', 'register', 'unregister', 'unregister_other_all', 'unregister_other_user', 'register_other_all', 'register_other_user'],
     messages: ['manage'],
-    newsletters: ['manage']
+    newsletters: ['manage'],
+    admin: ['sudo']
 } as const;
 
-export const PERMISSION_METADATA: Record<string, { label: string, category: string }> = {
+export interface PermissionInfo {
+    id: string;
+    label: string;
+    description: string;
+    category: string;
+}
+
+export const PERMISSION_METADATA: Record<string, PermissionInfo> = {
     // Tickets
-    'tickets.open': {label: 'Ouvrir des tickets', category: 'Tickets'},
-    'tickets.close': {label: 'Fermer des tickets', category: 'Tickets'},
-    'tickets.read_all': {label: 'Voir tous les tickets', category: 'Tickets'},
-    'tickets.attribute': {label: 'Attribuer des tickets', category: 'Tickets'},
-    'tickets.launch_voice': {label: 'Lancer des appels voix', category: 'Tickets'},
-    'tickets.send_message_all': {label: 'Envoyer messages à tous', category: 'Tickets'},
-    'tickets.send_message': {label: 'Envoyer des messages', category: 'Tickets'},
-    'tickets.transmission': {label: 'Faire des transmissions', category: 'Tickets'},
+    'tickets.open': {
+        id: 'tickets.open',
+        label: 'Ouvrir des tickets',
+        description: 'Permet de créer de nouveaux tickets d\'écoute',
+        category: 'Tickets'
+    },
+    'tickets.close': {
+        id: 'tickets.close',
+        label: 'Fermer des tickets',
+        description: 'Permet de clôturer une session d\'écoute terminée',
+        category: 'Tickets'
+    },
+    'tickets.read_all': {
+        id: 'tickets.read_all',
+        label: 'Voir tous les tickets',
+        description: 'Accès en lecture à l\'ensemble des tickets de l\'organisation',
+        category: 'Tickets'
+    },
+    'tickets.attribute': {
+        id: 'tickets.attribute',
+        label: 'Attribuer des tickets',
+        description: 'Permet d\'assigner un ticket à un membre spécifique',
+        category: 'Tickets'
+    },
+    'tickets.launch_voice': {
+        id: 'tickets.launch_voice',
+        label: 'Lancer des appels voix',
+        description: 'Permet d\'initier une communication vocale via le widget',
+        category: 'Tickets'
+    },
+    'tickets.send_message_all': {
+        id: 'tickets.send_message_all',
+        label: 'Envoyer messages à tous',
+        description: 'Permet d\'écrire dans toutes les écoutes',
+        category: 'Tickets'
+    },
+    'tickets.send_message': {
+        id: 'tickets.send_message',
+        label: 'Envoyer des messages',
+        description: 'Permet d\'écrire dans une écoute',
+        category: 'Tickets'
+    },
+    'tickets.transmission': {
+        id: 'tickets.transmission',
+        label: 'Faire des transmissions',
+        description: 'Permet de rédiger le compte-rendu final de l\'écoute',
+        category: 'Tickets'
+    },
 
     // Management
-    'management.create_account': {label: 'Créer des comptes', category: 'Gestion'},
-    'management.delete_account': {label: 'Supprimer des comptes', category: 'Gestion'},
-    'management.ticket_history': {label: 'Historique des tickets', category: 'Gestion'},
-    'management.view_transmission': {label: 'Voir les transmissions', category: 'Gestion'},
-    'management.view_stats': {label: 'Voir les statistiques', category: 'Gestion'},
-    'management.reset_password': {label: 'Réinitialiser les mots de passe', category: 'Gestion'},
+    'management.manage_accounts': {
+        id: 'management.manage_accounts',
+        label: 'Gérer les comptes',
+        description: 'Permet d\'inviter, de modifier, de réinitialiser les mots de passe et de révoquer l\'accès des membres',
+        category: 'Gestion'
+    },
+    'management.ticket_history': {
+        id: 'management.ticket_history',
+        label: 'Historique des tickets',
+        description: 'Accès aux archives et transcriptions des anciennes écoutes',
+        category: 'Gestion'
+    },
+    'management.view_transmission': {
+        id: 'management.view_transmission',
+        label: 'Voir les transmissions',
+        description: 'Permet de consulter les comptes-rendus d\'écoute',
+        category: 'Gestion'
+    },
+    'management.view_stats': {
+        id: 'management.view_stats',
+        label: 'Voir les statistiques',
+        description: 'Accès au tableau de bord d\'activité et indicateurs',
+        category: 'Gestion'
+    },
 
     // Permanence
-    'permanence.open': {label: 'Ouvrir la permanence', category: 'Permanence'},
-    'permanence.close': {label: 'Fermer la permanence', category: 'Permanence'},
-    'permanence.register': {label: 'S\'inscrire au planning', category: 'Permanence'},
-    'permanence.unregister': {label: 'Se désinscrire du planning', category: 'Permanence'},
-    'permanence.unregister_other_all': {label: 'Désinscrire n\'importe qui', category: 'Permanence'},
-    'permanence.unregister_other_user': {label: 'Désinscrire d\'autres utilisateurs', category: 'Permanence'},
-    'permanence.register_other_all': {label: 'Inscrire n\'importe qui', category: 'Permanence'},
-    'permanence.register_other_user': {label: 'Inscrire d\'autres utilisateurs', category: 'Permanence'},
+    'permanence.open': {
+        id: 'permanence.open',
+        label: 'Ouvrir la permanence',
+        description: 'Permet d\'activer la réception de nouveaux tickets',
+        category: 'Permanence'
+    },
+    'permanence.close': {
+        id: 'permanence.close',
+        label: 'Fermer la permanence',
+        description: 'Permet de désactiver le widget de contact',
+        category: 'Permanence'
+    },
+    'permanence.register': {
+        id: 'permanence.register',
+        label: 'S\'inscrire au planning',
+        description: 'Permet de se positionner sur un créneau de garde',
+        category: 'Permanence'
+    },
+    'permanence.unregister': {
+        id: 'permanence.unregister',
+        label: 'Se désinscrire du planning',
+        description: 'Permet de retirer sa présence d\'un créneau',
+        category: 'Permanence'
+    },
+    'permanence.unregister_other_all': {
+        id: 'permanence.unregister_other_all',
+        label: 'Désinscrire n\'importe qui',
+        description: 'Permet de retirer n\'importe quel membre du planning',
+        category: 'Permanence'
+    },
+    'permanence.unregister_other_user': {
+        id: 'permanence.unregister_other_user',
+        label: 'Désinscrire d\'autres utilisateurs',
+        description: 'Permet de gérer les inscriptions des pairs',
+        category: 'Permanence'
+    },
+    'permanence.register_other_all': {
+        id: 'permanence.register_other_all',
+        label: 'Inscrire n\'importe qui',
+        description: 'Permet d\'ajouter n\'importe quel membre au planning',
+        category: 'Permanence'
+    },
+    'permanence.register_other_user': {
+        id: 'permanence.register_other_user',
+        label: 'Inscrire d\'autres utilisateurs',
+        description: 'Permet d\'aider les pairs à s\'inscrire',
+        category: 'Permanence'
+    },
 
-    // Messages & Newsletters
-    'messages.manage': {label: 'Gérer les messages système', category: 'Communication'},
-    'newsletters.manage': {label: 'Gérer les newsletters', category: 'Communication'},
+    // Communication
+    'messages.manage': {
+        id: 'messages.manage',
+        label: 'Gérer les messages système',
+        description: 'Configuration des messages automatiques et d\'accueil',
+        category: 'Communication'
+    },
+    'newsletters.manage': {
+        id: 'newsletters.manage',
+        label: 'Gérer les newsletters',
+        description: 'Création et envoi de communications aux bénéficiaires',
+        category: 'Communication'
+    },
 
-    // Admin (Better Auth default)
-    'user.create': {label: 'Créer des utilisateurs', category: 'Système'},
-    'user.update': {label: 'Modifier des utilisateurs', category: 'Système'},
-    'user.delete': {label: 'Supprimer des utilisateurs', category: 'Système'},
-    'user.read': {label: 'Voir les utilisateurs', category: 'Système'},
-    'session.delete': {label: 'Révoquer des sessions', category: 'Système'},
-    'session.read': {label: 'Voir les sessions', category: 'Système'},
-    'impersonate.create': {label: 'Incarner un utilisateur', category: 'Système'},
+    // Admin
+    'admin.sudo': {
+        id: 'admin.sudo',
+        label: 'Super-administrateur (Sudo)',
+        description: 'Outrepasse toutes les restrictions de permissions',
+        category: 'Administration'
+    },
 };
 
 export const ac = createAccessControl(statement);
+
+/**
+ * Enhanced permission check that honors admin.sudo
+ */
+export function hasPermission(userPermissions: string[], permission: string): boolean {
+    if (userPermissions.includes('admin.sudo')) return true;
+    return userPermissions.includes(permission);
+}
 
 export const newsletterManager = ac.newRole({
     newsletters: ['manage']
@@ -73,7 +196,7 @@ export const volunteer = ac.newRole({
 
 export const manager = ac.newRole({
     tickets: ['close', 'read_all', 'attribute', 'launch_voice', 'send_message_all'],
-    management: ['create_account', 'ticket_history', 'view_transmission', 'view_stats', 'reset_password'],
+    management: ['manage_accounts', 'ticket_history', 'view_transmission', 'view_stats'],
     permanence: ['open', 'close', 'register', 'unregister', 'register_other_user', 'unregister_other_user'],
     messages: ['manage']
 });
@@ -85,7 +208,8 @@ export const bot = ac.newRole({
 export const admin = ac.newRole({
     ...adminAc.statements,
     tickets: ['open', 'close', 'read_all', 'attribute', 'launch_voice', 'send_message_all', 'send_message', 'transmission'],
-    management: ['create_account', 'delete_account', 'ticket_history', 'view_transmission', 'view_stats', 'reset_password'],
+    management: ['manage_accounts', 'ticket_history', 'view_transmission', 'view_stats'],
     permanence: ['open', 'close', 'register', 'unregister', 'unregister_other_all', 'unregister_other_user', 'register_other_all', 'register_other_user'],
-    messages: ['manage']
+    messages: ['manage'],
+    admin: ['sudo']
 });

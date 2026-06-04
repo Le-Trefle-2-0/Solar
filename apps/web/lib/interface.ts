@@ -100,6 +100,7 @@ export type EventRoleSlot = {
             name: string;
             image: string | null;
             role: string | null;
+            hasActiveTicket?: boolean;
         }
     }[];
 };

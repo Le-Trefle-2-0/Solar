@@ -12,8 +12,7 @@ export async function registerReactionsRoutes(app: FastifyInstance) {
         const reactionSchema = z.object({
             id: z.string().optional(),
             messageID: z.number(),
-            authorID: z.string(),
-            reaction: z.string(),
+            emoji: z.string(),
             option: z.string(),
         });
 
@@ -23,8 +22,8 @@ export async function registerReactionsRoutes(app: FastifyInstance) {
                 const reaction = await prisma.reaction.create({
                     data: {
                         messageID: body.messageID,
-                        userID: body.authorID,
-                        emoji: body.reaction
+                        userID: userId,
+                        emoji: body.emoji
                     }
                 });
 
@@ -42,7 +41,7 @@ export async function registerReactionsRoutes(app: FastifyInstance) {
                 const reaction = await prisma.reaction.delete({
                     where: {
                         id: body.id,
-                        userID: body.authorID
+                        userID: userId
                     }
                 });
 

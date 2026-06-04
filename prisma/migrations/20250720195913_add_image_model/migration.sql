@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE `Image`
+CREATE TABLE `image`
 (
     `id`   VARCHAR(191) NOT NULL,
     `link` VARCHAR(191) NOT NULL,

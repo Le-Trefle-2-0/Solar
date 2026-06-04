@@ -7,9 +7,10 @@ import * as Icons from "lucide-react";
 import {Edit, Plus, Trash2, Users} from "lucide-react";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {RecruitmentDialog} from "./recruitment-dialog";
-import {deleteRecruitment} from "@/app/actions/recruitments";
+import {deleteRecruitment, toggleRecruitment} from "@/app/actions/recruitments";
 import {toast} from "sonner";
 import {Badge} from "@/components/ui/badge";
+import {Switch} from "@/components/ui/switch";
 
 interface RecruitmentClientProps {
     initialData: Recruitment[];
@@ -52,6 +53,16 @@ export function RecruitmentClient({initialData}: RecruitmentClientProps) {
         }
     };
 
+    const handleToggle = async (id: string, enabled: boolean) => {
+        try {
+            const result = await toggleRecruitment(id, enabled);
+            setRecruitments(recruitments.map((r) => (r.id === id ? result : r)));
+            toast.success(enabled ? "Recrutement ouvert" : "Recrutement fermé");
+        } catch (error) {
+            toast.error("Erreur lors du changement d'état");
+        }
+    };
+
     return (
         <div className="space-y-4">
             <div className="flex justify-end">
@@ -64,15 +75,16 @@ export function RecruitmentClient({initialData}: RecruitmentClientProps) {
                 {recruitments.map((recruitment) => {
                     const Icon = (Icons as any)[recruitment.icon || "Users"] || Icons.Users;
                     return (
-                        <Card key={recruitment.id} className="flex flex-col">
-                            <CardHeader>
+                        <Card key={recruitment.id} className="flex flex-col p-4">
+                            <CardHeader className="p-0">
                                 <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-3">
                                         <div className="p-2 bg-primary/10 rounded-lg text-primary">
                                             <Icon className="h-5 w-5"/>
                                         </div>
                                         <div className="flex flex-col">
-                                            <CardTitle className="line-clamp-1">{recruitment.title}</CardTitle>
+                                            <CardTitle
+                                                className="line-clamp-1 text-base font-semibold">{recruitment.title}</CardTitle>
                                             <div className="mt-1">
                                                 {recruitment.enabled ? (
                                                     <Badge variant="default"
@@ -84,21 +96,31 @@ export function RecruitmentClient({initialData}: RecruitmentClientProps) {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex gap-1">
-                                        <Button variant="ghost" size="icon" onClick={() => handleEdit(recruitment)}>
-                                            <Edit className="h-4 w-4"/>
-                                        </Button>
-                                        <Button variant="ghost" size="icon" onClick={() => handleDelete(recruitment.id)}
-                                                className="text-destructive">
-                                            <Trash2 className="h-4 w-4"/>
-                                        </Button>
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex items-center">
+                                            <Switch
+                                                id={`toggle-${recruitment.id}`}
+                                                checked={recruitment.enabled}
+                                                onCheckedChange={(checked) => handleToggle(recruitment.id, checked)}
+                                            />
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            <Button variant="ghost" size="icon" className="h-8 w-8"
+                                                    onClick={() => handleEdit(recruitment)}>
+                                                <Edit className="h-4 w-4"/>
+                                            </Button>
+                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive"
+                                                    onClick={() => handleDelete(recruitment.id)}>
+                                                <Trash2 className="h-4 w-4"/>
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
-                                <CardDescription className="line-clamp-2 mt-2">
+                                <CardDescription className="line-clamp-2 mt-3 text-sm">
                                     {recruitment.description}
                                 </CardDescription>
                             </CardHeader>
-                            <CardContent className="flex-1">
+                            <CardContent className="flex-1 p-0 mt-3">
                                 <div className="text-xs text-muted-foreground">
                                     Créé le {new Date(recruitment.createdAt).toLocaleDateString()}
                                 </div>

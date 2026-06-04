@@ -29,6 +29,42 @@ async function main() {
         const hashedPassword = await hashPassword(password);
         const userId = generateRandomString(32);
 
+        // Ensure default roles exist
+        const adminRole = await prisma.role.upsert({
+            where: {name: "admin"},
+            update: {},
+            create: {
+                name: "admin",
+                weight: 100,
+                permissions: JSON.stringify([
+                    "tickets.open", "tickets.close", "tickets.read_all", "tickets.attribute", "tickets.launch_voice",
+                    "tickets.send_message_all", "tickets.send_message", "tickets.transmission",
+                    "management.create_account", "management.delete_account", "management.ticket_history",
+                    "management.view_transmission", "management.view_stats", "management.reset_password",
+                    "permanence.open", "permanence.close", "permanence.register", "permanence.unregister",
+                    "permanence.unregister_other_all", "permanence.unregister_other_user", "permanence.register_other_all", "permanence.register_other_user",
+                    "messages.manage", "newsletters.manage",
+                    "user.create", "user.update", "user.delete", "user.read", "session.delete", "session.read", "impersonate.create"
+                ]),
+                icon: "Shield"
+            }
+        });
+
+        const volunteerRole = await prisma.role.upsert({
+            where: {name: "volunteer"},
+            update: {},
+            create: {
+                name: "volunteer",
+                weight: 10,
+                permissions: JSON.stringify([
+                    "tickets.close", "tickets.launch_voice", "tickets.send_message", "tickets.transmission",
+                    "management.view_stats",
+                    "permanence.register", "permanence.unregister"
+                ]),
+                icon: "Ear"
+            }
+        });
+
         await prisma.user.create({
             data: {
                 id: userId,
@@ -51,7 +87,7 @@ async function main() {
             },
         });
 
-        console.log(`Successfully created admin user: ${email}`);
+        console.log(`Successfully created admin user: ${email} and ensured default roles (admin, volunteer) exist.`);
     } catch (error) {
         console.error("Error creating admin user:", error);
     } finally {

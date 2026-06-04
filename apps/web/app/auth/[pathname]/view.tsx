@@ -8,8 +8,9 @@ import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} f
 import {authClient, signIn} from "@/lib/auth-client";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
-import {Fingerprint, Loader2} from "lucide-react";
+import {Fingerprint, Key, Loader2, ShieldCheck} from "lucide-react";
 import Link from "next/link";
+import {InputOTP, InputOTPGroup, InputOTPSlot} from "@/components/ui/input-otp";
 
 export const locale = {
     "SLUG_DOES_NOT_MATCH": "Le slug ne correspond pas",
@@ -381,7 +382,10 @@ export function AuthView({pathname}: { pathname: string }) {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [twoFactor, setTwoFactor] = useState(false);
+    const [isBackupCode, setIsBackupCode] = useState(false);
     const [otp, setOtp] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [token, setToken] = useState("");
     const [form, setForm] = useState({
         name: "",
         email: "",
@@ -390,14 +394,39 @@ export function AuthView({pathname}: { pathname: string }) {
     });
 
     useEffect(() => {
+        // Capture token from URL if on reset-password
+        if (pathname === "reset-password") {
+            const urlParams = new URLSearchParams(window.location.search);
+            const t = urlParams.get("token");
+            if (t) setToken(t);
+        }
+
         // Force refresh session state on auth page to avoid ghost sessions
         authClient.getSession().then(({data}) => {
+            console.log("[Auth] Session data:", data);
             if (data && !isSignUp) {
-                // If we are on sign-in but have a session, redirect to app
+                // If 2FA is required/enabled but not yet verified, don't redirect
+                if (twoFactor) {
+                    console.log("[Auth] 2FA UI is active, blocking redirect");
+                    return;
+                }
+
+                // Better-auth 2FA: if twoFactorRedirect is true in session, 2FA is needed
+                const session = data.session as any;
+                const user = data.user as any;
+
+                if (session?.twoFactorRedirect || (user?.twoFactorEnabled && !session?.twoFactorVerified)) {
+                    console.log("[Auth] 2FA required (redirect flag or unverified), showing OTP screen");
+                    setTwoFactor(true);
+                    return;
+                }
+
+                // If we are on sign-in but have a valid and verified session, redirect to app
+                console.log("[Auth] Session valid and verified, redirecting to /app");
                 router.push("/app");
             }
         });
-    }, [isSignUp, router]);
+    }, [isSignUp, router, twoFactor, pathname]);
 
     const handleSignUp = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -429,43 +458,92 @@ export function AuthView({pathname}: { pathname: string }) {
     const handleSignIn = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        const {error} = await signIn.email({
+        console.log("[SignIn] Attempting sign-in for:", form.email);
+        const {error, data} = await signIn.email({
             email: form.email,
             password: form.password,
-            callbackURL: "/app"
+            callbackURL: "/app",
         }, {
             onRequest: () => setLoading(true),
             onResponse: () => setLoading(false),
             onError: (ctx) => {
-                if (ctx.error.status === 403 && ctx.error.message?.includes("two-factor")) {
+                console.log("[SignIn] Error context:", ctx);
+                // Better Auth returns 403 or 400 with TWO_FACTOR_REQUIRED code or message
+                const is2FA = ctx.error.status === 403 ||
+                    ctx.error.code === "TWO_FACTOR_REQUIRED" ||
+                    (ctx.error as any).twoFactorRequired ||
+                    ctx.error.message?.toLowerCase().includes("two-factor");
+
+                if (is2FA) {
+                    console.log("[SignIn] Two-factor authentication required (via error)");
                     setTwoFactor(true);
                 } else {
                     toast.error(ctx.error.message || "Email ou mot de passe incorrect");
                 }
             },
-            onSuccess: () => {
+            onSuccess: (ctx) => {
+                console.log("[SignIn] Success context:", ctx);
+                // Better Auth might return success with twoFactorRedirect or twoFactorRequired
+                if (ctx.data && ((ctx.data as any).twoFactorRequired || (ctx.data as any).twoFactorRedirect)) {
+                    console.log("[SignIn] Two-factor required flag found in success response");
+                    setTwoFactor(true);
+                    return;
+                }
                 toast.success("Connecté avec succès !");
                 router.push("/app");
             }
         });
+
+        // Fallback check if response data is returned outside of onSuccess/onError context
+        if (data && ((data as any).twoFactorRequired || (data as any).twoFactorRedirect)) {
+            console.log("[SignIn] Two-factor required flag found in response data");
+            setTwoFactor(true);
+        }
+
         setLoading(false);
     };
 
-    const handleTwoFactorVerify = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleTwoFactorVerify = async (e?: React.FormEvent | string) => {
+        if (typeof e !== "string" && e?.preventDefault) e.preventDefault();
+        const codeToVerify = typeof e === "string" ? e : otp;
+
+        if (!codeToVerify || (isBackupCode ? codeToVerify.length < 8 : codeToVerify.length < 6)) {
+            return;
+        }
+
         setLoading(true);
-        const {error} = await authClient.twoFactor.verifyTotp({
-            code: otp,
-        }, {
-            onError: (ctx) => {
-                toast.error(ctx.error.message || "Code invalide");
-            },
-            onSuccess: () => {
-                toast.success("Connecté avec succès !");
-                router.push("/app");
+        try {
+            if (isBackupCode) {
+                const {error} = await authClient.twoFactor.verifyBackupCode({
+                    code: codeToVerify,
+                }, {
+                    onError: (ctx) => {
+                        toast.error(ctx.error.message || "Code de secours invalide");
+                    },
+                    onSuccess: () => {
+                        toast.success("Connecté avec succès !");
+                        router.push("/app");
+                    }
+                });
+            } else {
+                const {error} = await authClient.twoFactor.verifyTotp({
+                    code: codeToVerify,
+                }, {
+                    onError: (ctx) => {
+                        toast.error(ctx.error.message || "Code invalide");
+                    },
+                    onSuccess: () => {
+                        toast.success("Connecté avec succès !");
+                        router.push("/app");
+                    }
+                });
             }
-        });
-        setLoading(false);
+        } catch (err) {
+            console.error("[A2F] Error during verification:", err);
+            toast.error("Une erreur est survenue lors de la vérification");
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handlePasskeySignIn = async () => {
@@ -488,12 +566,75 @@ export function AuthView({pathname}: { pathname: string }) {
         });
     };
 
-    const cardTitle = twoFactor ? "Vérification A2F" : (isSignUp ? "Créer un compte" : "Se connecter");
+    const handleForgotPassword = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            const res = await fetch("/api/auth/forgot-password", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    email: form.email,
+                    redirectTo: `${window.location.origin}/auth/reset-password`,
+                })
+            });
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                throw new Error(data?.message || "Une erreur est survenue");
+            }
+            toast.success("E-mail de réinitialisation envoyé !");
+        } catch (err: any) {
+            toast.error(err?.message || "Une erreur est survenue");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleResetPassword = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (form.password !== form.confirmPassword) {
+            toast.error("Les mots de passe ne correspondent pas");
+            return;
+        }
+
+        if (!token) {
+            toast.error("Jeton de réinitialisation manquant ou invalide");
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const res = await fetch("/api/auth/reset-password", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    newPassword: form.password,
+                    token,
+                })
+            });
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                throw new Error(data?.message || "Échec de la réinitialisation");
+            }
+            toast.success("Mot de passe mis à jour avec succès !");
+            router.push("/auth/sign-in");
+        } catch (err: any) {
+            toast.error(err?.message || "Échec de la réinitialisation");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const cardTitle = twoFactor ? (isBackupCode ? "Code de secours" : "Vérification A2F") : (isSignUp ? "Créer un compte" : (pathname === "forgot-password" ? "Mot de passe oublié" : (pathname === "reset-password" ? "Réinitialiser le mot de passe" : "Se connecter")));
     const cardDescription = twoFactor
-        ? "Entrez le code de votre application d'authentification"
+        ? (isBackupCode ? "Entrez l'un de vos codes de secours à 10 caractères" : "Entrez le code de votre application d'authentification")
         : (isSignUp
             ? "Entrez vos informations pour créer votre compte Solar"
-            : "Entrez votre e-mail pour vous connecter à votre compte");
+            : (pathname === "forgot-password"
+                ? "Entrez votre e-mail pour recevoir un lien de réinitialisation"
+                : (pathname === "reset-password"
+                    ? "Entrez votre nouveau mot de passe ci-dessous"
+                    : "Entrez votre e-mail pour vous connecter à votre compte")));
 
     return (
         <main className="flex grow flex-col items-center justify-center p-4 w-full">
@@ -506,34 +647,84 @@ export function AuthView({pathname}: { pathname: string }) {
                     <CardContent className="space-y-4">
                         {twoFactor ? (
                             <form onSubmit={handleTwoFactorVerify} className="space-y-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="otp">Code de vérification</Label>
-                                    <Input
-                                        id="otp"
-                                        placeholder="000000"
-                                        required
-                                        value={otp}
-                                        onChange={(e) => setOtp(e.target.value)}
-                                        maxLength={6}
-                                        autoFocus
-                                    />
+                                <div className="space-y-2 flex flex-col items-center">
+                                    <Label htmlFor="otp" className="self-start">
+                                        {isBackupCode ? "Code de secours" : "Code de vérification"}
+                                    </Label>
+                                    {isBackupCode ? (
+                                        <Input
+                                            id="otp"
+                                            placeholder="Code de secours"
+                                            required
+                                            value={otp}
+                                            onChange={(e) => setOtp(e.target.value)}
+                                            autoFocus
+                                            className="text-center font-mono tracking-widest"
+                                        />
+                                    ) : (
+                                        <InputOTP
+                                            maxLength={6}
+                                            value={otp}
+                                            onChange={(value) => {
+                                                setOtp(value);
+                                                if (value.length === 6) {
+                                                    // Auto-submit when 6 digits are entered
+                                                    handleTwoFactorVerify(value);
+                                                }
+                                            }}
+                                            autoFocus
+                                        >
+                                            <InputOTPGroup>
+                                                <InputOTPSlot index={0}/>
+                                                <InputOTPSlot index={1}/>
+                                                <InputOTPSlot index={2}/>
+                                                <InputOTPSlot index={3}/>
+                                                <InputOTPSlot index={4}/>
+                                                <InputOTPSlot index={5}/>
+                                            </InputOTPGroup>
+                                        </InputOTP>
+                                    )}
                                 </div>
-                                <Button type="submit" className="w-full" disabled={loading}>
+                                <Button type="submit" className="w-full"
+                                        disabled={loading || (isBackupCode ? otp.length < 8 : otp.length < 6)}>
                                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
                                     Vérifier
                                 </Button>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    className="w-full"
-                                    onClick={() => setTwoFactor(false)}
-                                >
-                                    Retour
-                                </Button>
+                                <div className="flex flex-col gap-2 pt-2">
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className="w-full"
+                                        onClick={() => {
+                                            setIsBackupCode(!isBackupCode);
+                                            setOtp("");
+                                        }}
+                                    >
+                                        {isBackupCode ? (
+                                            <><ShieldCheck className="mr-2 h-4 w-4"/> Utiliser l'app authenticator</>
+                                        ) : (
+                                            <><Key className="mr-2 h-4 w-4"/> Utiliser un code de secours</>
+                                        )}
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        className="w-full"
+                                        onClick={() => {
+                                            setTwoFactor(false);
+                                            setIsBackupCode(false);
+                                            setOtp("");
+                                        }}
+                                    >
+                                        Retour
+                                    </Button>
+                                </div>
                             </form>
                         ) : (
                             <>
-                                <form onSubmit={isSignUp ? handleSignUp : handleSignIn} className="space-y-4">
+                                <form
+                                    onSubmit={isSignUp ? handleSignUp : (pathname === "forgot-password" ? handleForgotPassword : (pathname === "reset-password" ? handleResetPassword : handleSignIn))}
+                                    className="space-y-4">
                                     {isSignUp && (
                                         <div className="space-y-2">
                                             <Label htmlFor="name">Nom complet</Label>
@@ -546,41 +737,49 @@ export function AuthView({pathname}: { pathname: string }) {
                                             />
                                         </div>
                                     )}
-                                    <div className="space-y-2">
-                                        <Label htmlFor="email">Email</Label>
-                                        <Input
-                                            id="email"
-                                            type="email"
-                                            placeholder="jean@exemple.fr"
-                                            required
-                                            value={form.email}
-                                            onChange={(e) => setForm({...form, email: e.target.value})}
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <div className="flex items-center justify-between">
-                                            <Label htmlFor="password">Mot de passe</Label>
-                                            {!isSignUp && (
-                                                <Link
-                                                    href="/auth/forgot-password"
-                                                    className="text-xs text-primary hover:underline"
-                                                >
-                                                    Mot de passe oublié ?
-                                                </Link>
-                                            )}
-                                        </div>
-                                        <Input
-                                            id="password"
-                                            type="password"
-                                            placeholder="••••••••"
-                                            required
-                                            value={form.password}
-                                            onChange={(e) => setForm({...form, password: e.target.value})}
-                                        />
-                                    </div>
-                                    {isSignUp && (
+                                    {pathname !== "reset-password" && (
                                         <div className="space-y-2">
-                                            <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+                                            <Label htmlFor="email">Email</Label>
+                                            <Input
+                                                id="email"
+                                                type="email"
+                                                placeholder="jean@exemple.fr"
+                                                required
+                                                value={form.email}
+                                                onChange={(e) => setForm({...form, email: e.target.value})}
+                                            />
+                                        </div>
+                                    )}
+                                    {pathname !== "forgot-password" && (
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-between">
+                                                <Label htmlFor="password">
+                                                    {pathname === "reset-password" ? "Nouveau mot de passe" : "Mot de passe"}
+                                                </Label>
+                                                {!isSignUp && pathname === "sign-in" && (
+                                                    <Link
+                                                        href="/auth/forgot-password"
+                                                        className="text-xs text-primary hover:underline"
+                                                    >
+                                                        Mot de passe oublié ?
+                                                    </Link>
+                                                )}
+                                            </div>
+                                            <Input
+                                                id="password"
+                                                type="password"
+                                                placeholder="••••••••"
+                                                required
+                                                value={form.password}
+                                                onChange={(e) => setForm({...form, password: e.target.value})}
+                                            />
+                                        </div>
+                                    )}
+                                    {(isSignUp || pathname === "reset-password") && (
+                                        <div className="space-y-2">
+                                            <Label htmlFor="confirmPassword">
+                                                {pathname === "reset-password" ? "Confirmer le nouveau mot de passe" : "Confirmer le mot de passe"}
+                                            </Label>
                                             <Input
                                                 id="confirmPassword"
                                                 type="password"
@@ -593,11 +792,11 @@ export function AuthView({pathname}: { pathname: string }) {
                                     )}
                                     <Button type="submit" className="w-full" disabled={loading}>
                                         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
-                                        {isSignUp ? "S'inscrire" : "Se connecter"}
+                                        {isSignUp ? "S'inscrire" : (pathname === "forgot-password" ? "Envoyer le lien" : (pathname === "reset-password" ? "Réinitialiser" : "Se connecter"))}
                                     </Button>
                                 </form>
 
-                                {!isSignUp && (
+                                {pathname === "sign-in" && (
                                     <div className="space-y-2">
                                         <Button
                                             type="button"
@@ -612,32 +811,37 @@ export function AuthView({pathname}: { pathname: string }) {
                                     </div>
                                 )}
 
-                                <div className="relative">
-                                    <div className="absolute inset-0 flex items-center">
-                                        <span className="w-full border-t"/>
-                                    </div>
-                                    <div className="relative flex justify-center text-xs uppercase">
-                                        <span className="bg-background px-2 text-muted-foreground">
-                                            Ou continuer avec
-                                        </span>
-                                    </div>
-                                </div>
+                                {pathname === "sign-in" && (
+                                    <>
+                                        <div className="relative">
+                                            <div className="absolute inset-0 flex items-center">
+                                                <span className="w-full border-t"/>
+                                            </div>
+                                            <div className="relative flex justify-center text-xs uppercase">
+                                                <span className="bg-background px-2 text-muted-foreground">
+                                                    Ou continuer avec
+                                                </span>
+                                            </div>
+                                        </div>
 
-                                <Button
-                                    variant="outline"
-                                    type="button"
-                                    className="w-full"
-                                    onClick={handleDiscordSignIn}
-                                    disabled={loading}
-                                >
-                                    <svg className="mr-2 h-4 w-4" aria-hidden="true" focusable="false" data-prefix="fab"
-                                         data-icon="discord" role="img" xmlns="http://www.w3.org/2000/svg"
-                                         viewBox="0 0 640 512">
-                                        <path fill="currentColor"
-                                              d="M524.5 448c-51.5 0-93.7-45.4-93.7-101.2s41.3-101.2 93.7-101.2c52.4 0 93.7 45.4 93.7 101.2s-41.3 101.2-93.7 101.2zm-209.1 0c-51.5 0-93.7-45.4-93.7-101.2s41.3-101.2 93.7-101.2c52.4 0 93.7 45.4 93.7 101.2s-41.3 101.2-93.7 101.2zM615.7 38.8c-47.5-22.1-98.3-36.2-152.1-40.6-.6 1.1-1.3 2.7-2 4.4-60.4-9.2-122.3-9.2-182.7 0-.7-1.7-1.4-3.2-2-4.4-53.8 4.4-104.6 18.5-152.1 40.6-63.1 94.4-80.4 203.2-73.4 309.1 42.1 31.1 92.2 56.4 146 72.8 12.6-17.3 23.5-36 32.7-55.7-15.6-5.9-30.5-13.1-44.5-21.3 3.7-2.7 7.4-5.6 10.9-8.5 103.7 48 215.7 48 319.4 0 3.5 2.9 7.2 5.8 10.9 8.5-14 8.2-28.9 15.4-44.5 21.3 9.2 19.7 20.1 38.4 32.7 55.7 53.8-16.4 103.9-41.7 146-72.8 8.4-121.1-16.7-230.1-73.4-309.1z"></path>
-                                    </svg>
-                                    Discord
-                                </Button>
+                                        <Button
+                                            variant="outline"
+                                            type="button"
+                                            className="w-full"
+                                            onClick={handleDiscordSignIn}
+                                            disabled={loading}
+                                        >
+                                            <svg className="mr-2 h-4 w-4" aria-hidden="true" focusable="false"
+                                                 data-prefix="fab"
+                                                 data-icon="discord" role="img" xmlns="http://www.w3.org/2000/svg"
+                                                 viewBox="0 0 127.14 96.36">
+                                                <path fill="currentColor"
+                                                      d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.71,32.65-1.82,56.6.48,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1,105.25,105.25,0,0,0,32.24-16.14h0C130.46,50.45,121.43,26.71,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5.08-12.74,11.41-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5.08-12.74,11.44-12.74S96.23,46,96.12,53,91.07,65.69,84.69,65.69Z"></path>
+                                            </svg>
+                                            Discord
+                                        </Button>
+                                    </>
+                                )}
                             </>
                         )}
                     </CardContent>
@@ -651,6 +855,10 @@ export function AuthView({pathname}: { pathname: string }) {
                                             Se connecter
                                         </Link>
                                     </>
+                                ) : (pathname === "forgot-password" || pathname === "reset-password") ? (
+                                    <Link href="/auth/sign-in" className="text-primary hover:underline font-medium">
+                                        Retour à la connexion
+                                    </Link>
                                 ) : (
                                     <>
                                         Vous n'avez pas de compte ?{" "}

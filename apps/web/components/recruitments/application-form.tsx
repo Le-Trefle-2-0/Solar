@@ -34,9 +34,21 @@ export function ApplicationForm({recruitmentId, fields, onSuccess}: ApplicationF
 
         if (field.type === "email") {
             fieldSchema = fieldSchema.email("Email invalide") as any;
-        } else if (field.type === "number") {
-            // Numbers are often sent as strings in forms
         }
+
+        if (field.min) {
+            if (field.minUnit === "words") {
+                fieldSchema = fieldSchema.refine(
+                    (val) => val.trim().split(/\s+/).filter(Boolean).length >= (field.min || 0),
+                    {message: `Minimum ${field.min} mots`}
+                ) as any;
+            } else {
+                fieldSchema = fieldSchema.min(field.min, `Minimum ${field.min} caractères`) as any;
+            }
+        }
+
+        // Enforce 10k max characters
+        fieldSchema = fieldSchema.max(10000, "Maximum 10 000 caractères") as any;
 
         schemaShape[field.name] = fieldSchema;
     });

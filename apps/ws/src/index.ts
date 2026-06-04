@@ -75,6 +75,13 @@ io.use(async (socket, next) => {
         if (payload) {
             ok = true;
             (socket.data as any).isVolunteer = true;
+            (socket.data as any).userId = (payload.sub as string) || (payload as any).userId;
+            (socket.data as any).user = {
+                id: (socket.data as any).userId,
+                username: payload.displayUsername || payload.name || payload.username || (payload as any).displayUsername || 'User',
+                image: payload.image || (payload as any).picture || null,
+                role: (payload as any).role || 'training'
+            };
         }
     }
 
@@ -159,6 +166,14 @@ io.on('connection', (socket) => {
         socket.join(room);
         const size = io.sockets.adapter.rooms.get(room)?.size || 0;
         console.log(`[ws] ${socket.id} joined room ${room} (size=${size})`);
+
+        if ((socket.data as any).user) {
+            io.to(room).emit('userJoined', {
+                channelId: room,
+                user: (socket.data as any).user
+            });
+        }
+
         cb && cb(true);
     });
 
@@ -168,6 +183,27 @@ io.on('connection', (socket) => {
         socket.leave(room);
         const size = io.sockets.adapter.rooms.get(room)?.size || 0;
         console.log(`[ws] ${socket.id} left room ${room} (size=${size})`);
+
+        if ((socket.data as any).user) {
+            io.to(room).emit('userLeft', {
+                channelId: room,
+                user: (socket.data as any).user
+            });
+        }
+    });
+
+    socket.on('getOnlineUsers', async (data: { channelID: string }, cb?: (users: any[]) => void) => {
+        const room = data?.channelID;
+        if (!room) return cb && cb([]);
+
+        const sockets = await io.in(room).fetchSockets();
+        const users = sockets
+            .map(s => (s.data as any).user)
+            .filter(Boolean)
+            // Deduplicate by ID
+            .filter((u, index, self) => self.findIndex(t => t.id === u.id) === index);
+
+        cb && cb(users);
     });
 
     socket.on('sendMessage', (data: any, cb?: (ok: boolean) => void) => {
@@ -200,6 +236,19 @@ io.on('connection', (socket) => {
         if (roomId) socket.to(roomId).emit('signal', payload);
     });
 
+
+    socket.on('disconnecting', () => {
+        if ((socket.data as any).user) {
+            for (const room of socket.rooms) {
+                if (room !== socket.id) {
+                    io.to(room).emit('userLeft', {
+                        channelId: room,
+                        user: (socket.data as any).user
+                    });
+                }
+            }
+        }
+    });
 
     socket.on('disconnect', (reason) => {
         console.log(`[ws] disconnected ${socket.id} (${reason})`);

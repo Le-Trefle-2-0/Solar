@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE `Channel`
+CREATE TABLE `channel`
 (
     `id`   VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
@@ -8,7 +8,7 @@ CREATE TABLE `Channel`
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Ticket`
+CREATE TABLE `ticket`
 (
     `id`            INTEGER      NOT NULL AUTO_INCREMENT,
     `discordUserID` VARCHAR(191) NOT NULL,
@@ -20,9 +20,9 @@ CREATE TABLE `Ticket`
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `Message`
-    ADD CONSTRAINT `Message_channelId_fkey` FOREIGN KEY (`channelId`) REFERENCES `Channel` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `message`
+    ADD CONSTRAINT `message_channelId_fkey` FOREIGN KEY (`channelId`) REFERENCES `channel` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Ticket`
-    ADD CONSTRAINT `Ticket_channelId_fkey` FOREIGN KEY (`channelId`) REFERENCES `Channel` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `ticket`
+    ADD CONSTRAINT `ticket_channelId_fkey` FOREIGN KEY (`channelId`) REFERENCES `channel` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;

@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     addDays,
     addMonths,
@@ -22,7 +22,6 @@ import Event from './event';
 import {EventData} from "@/lib/interface";
 import {
     Button,
-    Checkbox,
     Dialog,
     DialogClose,
     DialogContent,
@@ -38,7 +37,8 @@ import {
     SelectContent,
     SelectItem,
     SelectTrigger,
-    SelectValue
+    SelectValue,
+    Switch
 } from "@/components/ui";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
@@ -71,13 +71,40 @@ const permSchema = z.object({
     message: "La date de fin de série doit être après la date de début",
     path: ["bulkUntil"]
 })
-export default function PlanningCalendar({events, userId}: { events: EventData[], userId?: string }) {
-    type RoleSlotForm = { role: 'manager' | 'volunteer'; goalCount: number; part?: 'first' | 'second' };
-    const DEFAULT_SLOTS: RoleSlotForm[] = [
-        {role: 'manager', goalCount: 1},
-        {role: 'volunteer', goalCount: 1, part: 'first'},
-        {role: 'volunteer', goalCount: 3, part: 'second'},
-    ];
+export default function PlanningCalendar({events, userId, onRefresh}: {
+    events: EventData[],
+    userId?: string,
+    onRefresh?: () => void
+}) {
+    type RoleSlotForm = { role: string; goalCount: number; part?: 'first' | 'second' };
+    const [defaultSlots, setDefaultSlots] = useState<RoleSlotForm[]>([]);
+    const [availableRoles, setAvailableRoles] = useState<{ id: string, name: string }[]>([]);
+    const [isOpen, setIsOpen] = useState(false);
+
+    useEffect(() => {
+        apiFetch('/v1/admin/settings').then((res: any) => {
+            if (res.settings && Array.isArray(res.settings)) {
+                const planningDefault = res.settings.find((s: any) => s.key === 'planning_default_slots');
+                if (planningDefault) {
+                    try {
+                        const slots = typeof planningDefault.value === 'string'
+                            ? JSON.parse(planningDefault.value)
+                            : planningDefault.value;
+                        setDefaultSlots(slots);
+                    } catch (e) {
+                        console.error("Failed to parse default slots", e);
+                    }
+                }
+            }
+        });
+
+        apiFetch('/v1/admin/roles').then((res: any) => {
+            if (res.roles) {
+                setAvailableRoles(res.roles);
+            }
+        });
+    }, []);
+
     const createEventForm = useForm<z.infer<typeof permSchema>>({
         resolver: zodResolver(permSchema),
         defaultValues: {
@@ -90,7 +117,7 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
     });
 
     const router = useRouter();
-    const [roleSlots, setRoleSlots] = useState<RoleSlotForm[]>([...DEFAULT_SLOTS]);
+    const [roleSlots, setRoleSlots] = useState<RoleSlotForm[]>([]);
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const {data: session} = useSession();
     const userRoles: string[] = (session?.user?.role || '')
@@ -170,12 +197,19 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
     };
 
     async function createEvent(data: z.infer<typeof permSchema>) {
+        if (roleSlots.length === 0) {
+            toast.error("Erreur", {
+                description: "Vous devez ajouter au moins un créneau pour créer une permanence.",
+            });
+            return;
+        }
+
         try {
             const sanitizedSlots = roleSlots
                 .map(s => ({
                     role: s.role,
                     goalCount: Math.max(1, Number(s.goalCount) || 1),
-                    part: s.role === 'volunteer' ? s.part : undefined,
+                    part: s.part,
                 }));
 
             const [startHour, startMinute] = data.startTime.split(":").map(Number)
@@ -252,7 +286,12 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
 
             toast.success(`${eventsToCreate.length} permanence(s) créée(s) !`)
 
-            router.refresh()
+            setIsOpen(false)
+            if (onRefresh) {
+                onRefresh()
+            } else {
+                router.refresh()
+            }
         } catch (error) {
             toast.error("Erreur lors de la création", {
                 description: (
@@ -285,9 +324,11 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
                         {format(currentMonth, 'MMMM yyyy', {locale: fr})}
                     </h2>
                     {canCreate && (
-                        <Dialog>
+                        <Dialog open={isOpen} onOpenChange={setIsOpen}>
                             <DialogTrigger asChild>
-                                <Button variant="outline" onClick={() => setRoleSlots([...DEFAULT_SLOTS])}
+                                <Button variant="outline" onClick={() => {
+                                    setRoleSlots([...defaultSlots]);
+                                }}
                                         aria-label="Ajouter une permanence">
                                     <CalendarPlus/>
                                 </Button>
@@ -426,7 +467,7 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
                                             render={({field}) => (
                                                 <FormItem className="flex flex-row items-center space-x-2 space-y-0">
                                                     <FormControl>
-                                                        <Checkbox
+                                                        <Switch
                                                             checked={field.value}
                                                             onCheckedChange={field.onChange}
                                                         />
@@ -497,11 +538,10 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
                                                         <Select
                                                             value={slot.role}
                                                             onValueChange={(val) => {
-                                                                const roleVal = val as 'manager' | 'volunteer'
                                                                 setRoleSlots(prev => prev.map((s, i) => i === idx ? {
-                                                                    role: roleVal,
+                                                                    role: val,
                                                                     goalCount: s.goalCount,
-                                                                    part: roleVal === 'volunteer' ? (s.part ?? 'first') : undefined
+                                                                    part: s.part ?? 'first'
                                                                 } : s));
                                                             }}
                                                         >
@@ -509,23 +549,33 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
                                                                 <SelectValue placeholder="Choisir un rôle"/>
                                                             </SelectTrigger>
                                                             <SelectContent>
-                                                                <SelectItem value="manager">Référent
-                                                                    (manager)</SelectItem>
-                                                                <SelectItem value="volunteer">Bénévole
-                                                                    (volunteer)</SelectItem>
+                                                                {availableRoles.length > 0 ? (
+                                                                    availableRoles.map(role => (
+                                                                        <SelectItem key={role.id} value={role.name}>
+                                                                            {role.name}
+                                                                        </SelectItem>
+                                                                    ))
+                                                                ) : (
+                                                                    <>
+                                                                        <SelectItem value="manager">Référent
+                                                                            (manager)</SelectItem>
+                                                                        <SelectItem value="volunteer">Bénévole
+                                                                            (volunteer)</SelectItem>
+                                                                    </>
+                                                                )}
                                                             </SelectContent>
                                                         </Select>
                                                     </div>
-                                                    {slot.role === 'volunteer' && (
+                                                    {slot.role && (
                                                         <div className="flex-1">
                                                             <FormLabel>Partie</FormLabel>
                                                             <Select
-                                                                value={(slot.part || 'first')}
+                                                                value={(slot.part || 'none')}
                                                                 onValueChange={(val) => {
-                                                                    const partVal = val as 'first' | 'second'
+                                                                    const partVal = val as 'first' | 'second' | 'none'
                                                                     setRoleSlots(prev => prev.map((s, i) => i === idx ? {
                                                                         ...s,
-                                                                        part: partVal
+                                                                        part: partVal === 'none' ? undefined : partVal
                                                                     } : s));
                                                                 }}
                                                             >
@@ -533,10 +583,12 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
                                                                     <SelectValue placeholder="Choisir une partie"/>
                                                                 </SelectTrigger>
                                                                 <SelectContent>
-                                                                    <SelectItem value="first">Partie 1
-                                                                        (20h00-21h30)</SelectItem>
-                                                                    <SelectItem value="second">Partie 2
-                                                                        (21h30-23h00)</SelectItem>
+                                                                    <SelectItem value="none">Tout
+                                                                        l'évènement</SelectItem>
+                                                                    <SelectItem value="first">Première
+                                                                        moitié</SelectItem>
+                                                                    <SelectItem value="second">Deuxième
+                                                                        moitié</SelectItem>
                                                                 </SelectContent>
                                                             </Select>
                                                         </div>
@@ -546,9 +598,16 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
                                                         <Input
                                                             type="number"
                                                             min={1}
-                                                            value={slot.goalCount}
+                                                            value={slot.goalCount || ""}
                                                             onChange={(e) => {
-                                                                const val = Math.max(1, Number(e.target.value) || 1);
+                                                                const val = e.target.value === "" ? 0 : parseInt(e.target.value);
+                                                                setRoleSlots(prev => prev.map((s, i) => i === idx ? {
+                                                                    ...s,
+                                                                    goalCount: val
+                                                                } : s));
+                                                            }}
+                                                            onBlur={(e) => {
+                                                                const val = parseInt(e.target.value) || 1;
                                                                 setRoleSlots(prev => prev.map((s, i) => i === idx ? {
                                                                     ...s,
                                                                     goalCount: val
@@ -573,7 +632,7 @@ export default function PlanningCalendar({events, userId}: { events: EventData[]
                                                 type="button"
                                                 variant="outline"
                                                 onClick={() => setRoleSlots(prev => ([...prev, {
-                                                    role: 'volunteer',
+                                                    role: availableRoles[0]?.name || 'volunteer',
                                                     goalCount: 1,
                                                     part: 'first'
                                                 }]))}

@@ -32,14 +32,25 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
             const visitorName = "utilisateur";
             const secret = process.env.WS_GUEST_SECRET || 'fallback_secret_for_dev_only';
 
+            const body = (req.body ?? {}) as { name?: string, forceNew?: boolean };
+            const forceNew = body.forceNew === true;
+
             let channelId = req.cookies.widget_channel || '';
             let uid = req.cookies.widget_uid || '';
             let expStr = req.cookies.widget_exp || '';
             let sig = req.cookies.widget_sig || '';
 
+            if (forceNew) {
+                clearWidgetCookies(reply);
+                channelId = '';
+                uid = '';
+                expStr = '';
+                sig = '';
+            }
+
             if (channelId) {
                 const ticket = await prisma.ticket.findUnique({where: {channelId}});
-                if (!ticket || ticket.statusName === 'closed' || ticket.statusName === 'commented') {
+                if (!ticket) {
                     clearWidgetCookies(reply);
                     // Instead of failing, we will just proceed to create a new one below by clearing channelId
                     channelId = '';
@@ -71,7 +82,9 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
                         return reply.send({
                             success: true,
                             channelId,
-                            credentials: {channelId, uid, exp, sig}
+                            ticketId: ticket.id,
+                            credentials: {channelId, uid, exp, sig},
+                            status: ticket.statusName
                         });
                     }
                 }
@@ -128,6 +141,7 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
                 return reply.send({
                     success: true,
                     channelId,
+                    ticketId: ticket.id,
                     credentials: {channelId, uid, exp, sig}
                 });
             }
@@ -148,9 +162,12 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
             setWidgetCookie(reply, 'widget_sig', sig);
             setWidgetCookie(reply, 'widget_public', '1');
 
+            const ticket = channelId ? await prisma.ticket.findUnique({where: {channelId}}) : null;
+
             return reply.send({
                 success: true,
                 channelId,
+                ticketId: ticket?.id,
                 credentials: {channelId, uid, exp, sig}
             });
         } catch (e) {
@@ -195,7 +212,7 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
             });
             await broadcast(null, 'updateRequest', {channelId});
 
-            clearWidgetCookies(reply);
+            // We do NOT clear cookies here anymore, so the user can still read the chat until they clear it
             return reply.send({success: true, ticket: updated});
         } catch (e) {
             console.error('[widget] close error:', e);
@@ -288,10 +305,15 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
                 return reply.status(400).send({success: false, error: 'invalid_content'});
             }
 
+            const ticket = await prisma.ticket.findFirst({
+                where: {channelId}
+            });
+
             const message = await prisma.message.create({
                 data: {
                     userId: null,
                     channelId: channelId,
+                    ticketId: ticket?.id,
                     content: Buffer.from(content, 'utf8'),
                     createdAt: new Date(),
                 }

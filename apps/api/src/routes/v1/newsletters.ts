@@ -2,6 +2,7 @@ import type {FastifyInstance} from 'fastify';
 import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
 import {decodeBytes, sendNewsletter} from '../../lib/newsletter-service.js';
+import {getUserPermissions, hasPermission} from '../../lib/permissions.js';
 
 export async function registerNewslettersRoutes(app: FastifyInstance) {
 
@@ -10,9 +11,8 @@ export async function registerNewslettersRoutes(app: FastifyInstance) {
         const userId = await authenticate(req);
         if (!userId) return reply.status(401).send({error: 'unauthorized'});
 
-        const user = await prisma.user.findUnique({where: {id: userId}});
-        const roles = (user?.role || "").split(",").map(r => r.trim());
-        if (!user || (!roles.includes('newsletterManager') && !roles.includes('admin'))) {
+        const perms = await getUserPermissions(userId);
+        if (!hasPermission(perms, 'newsletters.manage')) {
             return reply.status(403).send({error: 'forbidden'});
         }
         return userId;

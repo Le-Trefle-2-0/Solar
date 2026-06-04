@@ -3,6 +3,8 @@
 import React, {createContext, useContext, useEffect, useRef, useState} from "react";
 import {initSocket, joinChannel, leaveChannel} from "@/lib/socket";
 import {apiFetch, getJwt} from "@/lib/api";
+import {authClient} from "@/lib/auth-client";
+import {PERMISSION_METADATA} from "@/lib/permissions";
 import {Socket} from "socket.io-client";
 import {usePathname, useRouter} from "next/navigation";
 import {toast} from "sonner";
@@ -210,8 +212,70 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({childre
 
         socket.on('message', onMessage);
 
+        const onPermissionsUpdate = async (data: { roleId: string, roleName: string, permissions: string[] }) => {
+            const {data: session} = await authClient.getSession();
+            if (!session) return;
+
+            const userRoles = (session.user.role || "").split(",").map((r: string) => r.trim());
+
+            // If the updated role is one of the user's roles
+            if (userRoles.includes(data.roleName)) {
+                // Refresh the session to update permissions in Better Auth state
+                await authClient.getSession({
+                    fetchOptions: {
+                        cache: "no-store"
+                    }
+                });
+
+                // Check if user still has access to the current page
+                // We use a small timeout to let the session state update
+                setTimeout(() => {
+                    const currentPath = currentPathRef.current;
+                    // Simple path-based check for common admin/restricted routes
+                    // In a more robust system, we would check the actual permissions required for the route
+                    const restrictedPages: Record<string, string> = {
+                        '/app/admin/roles': 'admin.sudo', // or check manager weight
+                        '/app/admin/users': 'management.create_account',
+                        '/app/admin/history': 'management.ticket_history',
+                        '/app/admin/stats': 'management.view_stats',
+                        '/app/admin/settings': 'admin.sudo',
+                        '/app/newsletters': 'newsletters.manage',
+                        '/app/recruitments': 'admin.sudo', // typically
+                    };
+
+                    for (const [route, permission] of Object.entries(restrictedPages)) {
+                        if (currentPath.startsWith(route)) {
+                            // This is a simplified check. Ideally we'd re-fetch permissions.
+                            // But better-auth might handle this if we use its hooks in the pages.
+                            // For now, let's force a reload if they are on an admin page to be safe
+                            // or re-verify via apiFetch.
+                            apiFetch('/v1/auth/get-session').then(newSession => {
+                                const newRoles = (newSession.user.role || "").split(",").map((r: string) => r.trim());
+                                const isAdmin = newRoles.includes("admin");
+                                const isManager = newRoles.includes("manager");
+                                const isNewsletter = newRoles.includes("newsletterManager");
+
+                                let hasAccess = true;
+                                if (route.startsWith('/app/admin') && !isAdmin && !isManager) hasAccess = false;
+                                if (route.startsWith('/app/newsletters') && !isAdmin && !isNewsletter) hasAccess = false;
+                                if (route.startsWith('/app/recruitments') && !isAdmin && !isManager) hasAccess = false;
+
+                                if (!hasAccess) {
+                                    toast.error("Vous n'avez plus accès à cette page.");
+                                    router.push('/app');
+                                }
+                            });
+                        }
+                    }
+                }, 500);
+            }
+        };
+
+        socket.on('permissionsUpdate', onPermissionsUpdate);
+
         return () => {
             socket.off('message', onMessage);
+            socket.off('permissionsUpdate', onPermissionsUpdate);
             if (overlayTimerRef.current) {
                 clearTimeout(overlayTimerRef.current);
                 overlayTimerRef.current = null;

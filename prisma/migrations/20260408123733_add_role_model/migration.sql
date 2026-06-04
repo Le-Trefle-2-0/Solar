@@ -1,0 +1,54 @@
+-- DropForeignKey
+ALTER TABLE `message` DROP FOREIGN KEY `message_channelId_fkey`;
+
+-- DropForeignKey
+ALTER TABLE `message` DROP FOREIGN KEY `message_userId_fkey`;
+
+-- DropForeignKey
+ALTER TABLE `ticket` DROP FOREIGN KEY `ticket_assignedUserId_fkey`;
+
+-- DropForeignKey
+ALTER TABLE `ticket` DROP FOREIGN KEY `ticket_channelId_channelName_fkey`;
+
+-- DropForeignKey
+ALTER TABLE `ticket` DROP FOREIGN KEY `ticket_statusName_statusLabel_fkey`;
+
+-- AlterTable
+ALTER TABLE `message` MODIFY `userId` VARCHAR (191) NULL;
+
+-- CreateTable
+CREATE TABLE `role`
+(
+    `id`          VARCHAR(191) NOT NULL,
+    `name`        VARCHAR(191) NOT NULL,
+    `permissions` TEXT         NOT NULL,
+    `weight`      INTEGER      NOT NULL DEFAULT 0,
+    `createdAt`   DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt`   DATETIME(3) NOT NULL,
+
+    UNIQUE INDEX `role_name_key`(`name`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AddForeignKey
+ALTER TABLE `message`
+    ADD CONSTRAINT `message_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `message`
+    ADD CONSTRAINT `message_channelId_fkey` FOREIGN KEY (`channelId`) REFERENCES `channel` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ticket`
+    ADD CONSTRAINT `ticket_channelId_channelName_fkey` FOREIGN KEY (`channelId`, `channelName`) REFERENCES `channel` (`id`, `name`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ticket`
+    ADD CONSTRAINT `ticket_assignedUserId_fkey` FOREIGN KEY (`assignedUserId`) REFERENCES `user` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ticket`
+    ADD CONSTRAINT `ticket_statusName_statusLabel_fkey` FOREIGN KEY (`statusName`, `statusLabel`) REFERENCES `ticket_status` (`name`, `label`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- RenameIndex
+ALTER TABLE `ticket` RENAME INDEX `ticket_channelId_key` TO `ticket_channelId_key`;

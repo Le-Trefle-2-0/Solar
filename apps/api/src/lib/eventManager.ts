@@ -1,8 +1,8 @@
-import { Prisma } from '@prisma/client';
-import {prisma} from '../prisma.js';
+import {Prisma, prisma} from '../prisma.js';
 import {createChannel} from './channelsManager.js';
 import {format, isAfter, setHours, setMinutes, setSeconds, startOfWeek} from 'date-fns';
 import {EventInput} from './types.js';
+import {getUserPermissions, hasPermission} from './permissions.js';
 
 export async function saveEvent(eventData: EventInput) {
     const {title, description, start, end, userId, roleSlots} = eventData;
@@ -94,7 +94,65 @@ export async function findEvent(eventId: string) {
             part: slot.part,
             goalCount: slot.goalCount,
             registrationsCount: slot.registrations.filter(r => r.status === 'confirmed').length,
-            registrations: slot.registrations,
+            registrations: slot.registrations.map(r => ({
+                ...r,
+                user: {
+                    ...r.user,
+                    hasActiveTicket: (r.user as any).Ticket?.length > 0
+                }
+            })),
+        }))
+    };
+}
+
+export async function findEventByChannel(channelId: string) {
+    const event = await prisma.event.findFirst({
+        where: {channelID: channelId},
+        include: {
+            roleSlots: {
+                include: {
+                    registrations: {
+                        include: {
+                            user: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    image: true,
+                                    role: true,
+                                    Ticket: {
+                                        where: {
+                                            status: {
+                                                name: {not: 'closed'}
+                                            }
+                                        },
+                                        select: {id: true}
+                                    }
+                                }
+                            }
+                        }
+                    },
+                },
+            },
+        },
+    });
+
+    if (!event) return null;
+
+    return {
+        ...event,
+        roleSlots: event.roleSlots.map((slot) => ({
+            id: slot.id,
+            role: slot.role,
+            part: slot.part,
+            goalCount: slot.goalCount,
+            registrationsCount: slot.registrations.filter(r => r.status === 'confirmed').length,
+            registrations: slot.registrations.map(r => ({
+                ...r,
+                user: {
+                    ...r.user,
+                    hasActiveTicket: (r.user as any).Ticket?.length > 0
+                }
+            })),
         }))
     };
 }
@@ -123,10 +181,11 @@ export async function registerUserToEvent(eventId: string, userId: string, part?
     let targetSlot: (Prisma.RoleSlotGetPayload<{ include: { registrations: true } }>) | null = null;
 
     if (roleSlotId) {
-        targetSlot = await prisma.roleSlot.findUnique({
+        const foundSlot = await prisma.roleSlot.findUnique({
             where: {id: roleSlotId},
             include: {registrations: true},
         });
+        targetSlot = foundSlot as (Prisma.RoleSlotGetPayload<{ include: { registrations: true } }>) | null;
         if (!targetSlot) {
             throw new Error("Créneau sélectionné introuvable.");
         }
@@ -152,7 +211,7 @@ export async function registerUserToEvent(eventId: string, userId: string, part?
         }
 
         const matchingSlots = await prisma.roleSlot.findMany({
-            where: roleSlotWhere,
+            where: roleSlotWhere as Prisma.RoleSlotWhereInput,
             include: {registrations: true},
         });
 
@@ -160,11 +219,12 @@ export async function registerUserToEvent(eventId: string, userId: string, part?
             throw new Error(`Aucun créneau disponible pour vos rôles${part ? ` et partie "${part}"` : ''} dans cet événement.`);
         }
 
-        targetSlot = matchingSlots.find((s) => s.registrations.filter((r) => r.status === 'confirmed').length < s.goalCount) ?? matchingSlots[0];
+        const slots = matchingSlots as Prisma.RoleSlotGetPayload<{ include: { registrations: true } }>[];
+        targetSlot = slots.find((s) => s.registrations.filter((r: any) => r.status === 'confirmed').length < s.goalCount) ?? slots[0];
     }
 
     const alreadyRegistered = await prisma.eventRegistration.findFirst({
-        where: {userId, roleSlotId: targetSlot.id},
+        where: {userId, roleSlotId: targetSlot?.id},
     });
 
     if (alreadyRegistered) {
@@ -172,8 +232,8 @@ export async function registerUserToEvent(eventId: string, userId: string, part?
     }
 
     // If not admin bypass, check slot capacity
-    if (!adminBypass) {
-        const confirmedCount = targetSlot.registrations.filter((r) => r.status === 'confirmed').length;
+    if (!adminBypass && targetSlot) {
+        const confirmedCount = targetSlot.registrations.filter((r: any) => r.status === 'confirmed').length;
         if (confirmedCount >= targetSlot.goalCount) {
             throw new Error("Ce créneau est complet.");
         }
@@ -183,9 +243,14 @@ export async function registerUserToEvent(eventId: string, userId: string, part?
     const eventDate = new Date(event.start);
     const deadline = setSeconds(setMinutes(setHours(startOfWeek(eventDate, {weekStartsOn: 1}), 12), 0), 0);
     const now = new Date();
-    const isAdmin = userRoles.includes('admin') || userRoles.includes('manager');
+    const perms = await getUserPermissions(userId);
+    const isAdmin = hasPermission(perms, 'permanence.register_other_user');
     // Admin/manager bypass deadline and register directly as confirmed, others follow normal deadline logic
     const status = (adminBypass && isAdmin) ? 'confirmed' : (isAfter(now, deadline) ? 'pending' : 'confirmed');
+
+    if (!targetSlot) {
+        throw new Error("Cible d'inscription introuvable.");
+    }
 
     const registration = await prisma.eventRegistration.create({
         data: {
@@ -271,7 +336,7 @@ export async function unregisterUserToEvent(eventId: string, userId: string, par
         }
 
         existingReg = await prisma.eventRegistration.findFirst({
-            where,
+            where: where as Prisma.EventRegistrationWhereInput,
         });
     }
 

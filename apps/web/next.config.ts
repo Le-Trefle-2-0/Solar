@@ -1,5 +1,10 @@
 import type {NextConfig} from "next";
 import withFlowbiteReact from "flowbite-react/plugin/nextjs";
+import {config} from "dotenv";
+import path from "path";
+
+// Load .env from project root
+config({path: path.resolve(__dirname, "../../.env")});
 
 const nextConfig: NextConfig = {
     /* config options here */

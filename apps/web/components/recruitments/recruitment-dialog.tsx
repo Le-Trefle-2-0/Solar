@@ -22,14 +22,14 @@ import {toast} from "sonner";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import ReactMarkdown from "react-markdown";
 import {FieldManager} from "./field-manager";
-import {Checkbox} from "@/components/ui/checkbox";
+import {Switch} from "@/components/ui/switch";
 import {IconPicker} from "@/components/ui";
 
 const DEFAULT_FIELDS: RecruitmentField[] = [
-    {name: "firstName", label: "Prénom", type: "text", required: true},
-    {name: "lastName", label: "Nom", type: "text", required: true},
-    {name: "email", label: "Email", type: "email", required: true},
-    {name: "message", label: "Message", type: "textarea", required: true},
+    {name: "firstName", label: "Prénom", type: "text", required: true, minUnit: "chars"},
+    {name: "lastName", label: "Nom", type: "text", required: true, minUnit: "chars"},
+    {name: "email", label: "Email", type: "email", required: true, minUnit: "chars"},
+    {name: "message", label: "Message", type: "textarea", required: true, minUnit: "chars"},
 ];
 
 type RecruitmentFormValues = RecruitmentValues;
@@ -51,6 +51,7 @@ export function RecruitmentDialog({open, onOpenChange, recruitment, onSave}: Rec
             description: "",
             icon: "Users",
             contactEmail: "",
+            discordWebhook: "",
             enabled: true,
             fields: DEFAULT_FIELDS,
         },
@@ -63,6 +64,7 @@ export function RecruitmentDialog({open, onOpenChange, recruitment, onSave}: Rec
                 description: recruitment.description,
                 icon: recruitment.icon,
                 contactEmail: recruitment.contactEmail || "",
+                discordWebhook: (recruitment as any).discordWebhook || "",
                 enabled: recruitment.enabled,
                 fields: (recruitment.fields as unknown as RecruitmentField[]) || DEFAULT_FIELDS,
             });
@@ -72,6 +74,7 @@ export function RecruitmentDialog({open, onOpenChange, recruitment, onSave}: Rec
                 description: "",
                 icon: "Users",
                 contactEmail: "",
+                discordWebhook: "",
                 enabled: true,
                 fields: DEFAULT_FIELDS,
             });
@@ -160,6 +163,23 @@ export function RecruitmentDialog({open, onOpenChange, recruitment, onSave}: Rec
                                     </FormItem>
                                 )}
                             />
+                            <FormField
+                                control={form.control}
+                                name="discordWebhook"
+                                render={({field}) => (
+                                    <FormItem className="sm:col-span-2">
+                                        <FormLabel>Webhook Discord (optionnel)</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="https://discord.com/api/webhooks/..." {...field}
+                                                   value={field.value || ""}/>
+                                        </FormControl>
+                                        <DialogDescription>
+                                            Une copie de la candidature sera envoyée à ce salon Discord.
+                                        </DialogDescription>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
                         </div>
 
                         <FormField
@@ -169,7 +189,7 @@ export function RecruitmentDialog({open, onOpenChange, recruitment, onSave}: Rec
                                 <FormItem
                                     className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow-xs">
                                     <FormControl>
-                                        <Checkbox
+                                        <Switch
                                             checked={field.value}
                                             onCheckedChange={field.onChange}
                                         />
