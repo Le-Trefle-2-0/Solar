@@ -47,9 +47,14 @@ const board: Person[] = [
 const managers: Person[] = [
     {
         name: "Louise",
-        role: "Coordinatrice des Équipes",
+        role: "Responsable du pôle Communauté",
         icon: Users,
         image: "https://cdn.discordapp.com/avatars/967058591494316033/fab79946a1d207f42fb220f9ed3d6e76.jpeg?size=1024"
+    },
+    {
+        name: "En attente de nomination",
+        role: "Responsable du pôle Écoutes",
+        icon: Users,
     },
 ];
 
@@ -71,12 +76,6 @@ const teamLeaders: Person[] = [
         role: "Référent Bénévoles Écoutants",
         icon: Users,
         image: "https://cdn.discordapp.com/avatars/1125820510236856372/94f320bf98e6231c32941864baefdd4f.png?size=4096"
-    },
-    {
-        name: "Darius",
-        role: "Référent Bénévoles Écoutants",
-        icon: Users,
-        image: "https://cdn.discordapp.com/avatars/1305103533246255198/95045c6b26739a3f64ea1610c0a37d91.png?size=4096"
     },
     {
         name: "Guillaume",

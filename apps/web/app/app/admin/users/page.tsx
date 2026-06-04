@@ -104,7 +104,13 @@ export default async function AdminUsersPage() {
     if (!session) redirect('/auth/sign-in');
 
     const userRoles = ((session.user as any).role || "").split(",").map((r: string) => r.trim());
-    if (!userRoles.includes("admin") && !userRoles.includes("manager")) {
+    const userPermissions = (session.user as any).permissions || [];
+    const hasAccess = userRoles.includes("admin") ||
+        userRoles.includes("manager") ||
+        userPermissions.includes("management.manage_accounts") ||
+        userPermissions.includes("admin.sudo");
+
+    if (!hasAccess) {
         redirect("/app");
     }
 

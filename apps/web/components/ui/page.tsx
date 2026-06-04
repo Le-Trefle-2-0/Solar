@@ -19,9 +19,9 @@ export function Page({
                          hideHeader = false,
                      }: PageProps) {
     return (
-        <div className={cn("flex flex-col w-full h-full min-h-0", containerClassName)}>
+        <div className={cn("flex flex-col w-full", containerClassName)}>
             {!hideHeader && (title || description) && (
-                <div className="flex flex-col gap-1 p-6 pl-14 pb-2 shrink-0">
+                <div className="flex flex-col gap-1 p-6 pl-14 pb-2">
                     {title && (
                         <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
                     )}
@@ -30,7 +30,7 @@ export function Page({
                     )}
                 </div>
             )}
-            <div className={cn("flex-1 p-6 pt-0 overflow-y-auto", hideHeader && "pt-6", className)}>
+            <div className={cn("p-6 pt-0", hideHeader && "pt-6", className)}>
                 {children}
             </div>
         </div>

@@ -229,38 +229,40 @@ export function RolesManager() {
                     </div>
                     <CardDescription>Hiérarchie des rôles (poids décroissant)</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                    {roles.map((role, index) => (
-                        <div
-                            key={role.id}
-                            draggable
-                            onDragStart={(e) => onDragStart(e, index)}
-                            onDragOver={(e) => onDragOver(e, index)}
-                            onDragEnd={onDragEnd}
-                            className={`flex items-center justify-between p-3 rounded-lg border transition-all cursor-pointer select-none ${editingRole?.id === role.id ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'hover:bg-muted'} ${draggedIndex === index ? 'opacity-40 border-primary border-dashed' : ''}`}
-                            onClick={() => setEditingRole({...role})}
-                        >
-                            <div className="flex items-center gap-3">
+                <CardContent>
+                    <div className="space-y-4">
+                            {roles.map((role, index) => (
                                 <div
-                                    className="cursor-grab active:cursor-grabbing text-muted-foreground/50 hover:text-primary transition-colors">
-                                    <GripVertical className="h-4 w-4"/>
+                                    key={role.id}
+                                    draggable
+                                    onDragStart={(e) => onDragStart(e, index)}
+                                    onDragOver={(e) => onDragOver(e, index)}
+                                    onDragEnd={onDragEnd}
+                                    className={`flex items-center justify-between p-3 rounded-lg border transition-all cursor-pointer select-none ${editingRole?.id === role.id ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'hover:bg-muted'} ${draggedIndex === index ? 'opacity-40 border-primary border-dashed' : ''}`}
+                                    onClick={() => setEditingRole({...role})}
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div
+                                            className="cursor-grab active:cursor-grabbing text-muted-foreground/50 hover:text-primary transition-colors">
+                                            <GripVertical className="h-4 w-4"/>
+                                        </div>
+                                        {renderRoleIcon(role)}
+                                        <div>
+                                            <p className="font-medium text-sm">{role.name}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDelete(role.id);
+                                                }}>
+                                            <Trash2 className="h-4 w-4"/>
+                                        </Button>
+                                    </div>
                                 </div>
-                                {renderRoleIcon(role)}
-                                <div>
-                                    <p className="font-medium text-sm">{role.name}</p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-1">
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleDelete(role.id);
-                                        }}>
-                                    <Trash2 className="h-4 w-4"/>
-                                </Button>
-                            </div>
+                            ))}
                         </div>
-                    ))}
                 </CardContent>
             </Card>
 
@@ -295,13 +297,10 @@ export function RolesManager() {
                                 </div>
                             </div>
 
-                            <Separator/>
-
                             <div className="space-y-4">
                                 <Label className="text-base font-bold">Permissions</Label>
-                                <ScrollArea className="h-[450px] pr-4">
-                                    <div className="space-y-8">
-                                        {Object.entries(CATEGORIZED_PERMISSIONS).map(([category, perms]) => (
+                                <div className="space-y-8">
+                                    {Object.entries(CATEGORIZED_PERMISSIONS).map(([category, perms]) => (
                                             <div key={category} className="space-y-4">
                                                 <h4 className="text-sm font-semibold text-primary uppercase tracking-wider">{category}</h4>
                                                 <div className="space-y-2">
@@ -335,14 +334,8 @@ export function RolesManager() {
                                             </div>
                                         ))}
                                     </div>
-                                </ScrollArea>
                             </div>
 
-                            <div className="flex justify-between items-center gap-3 pt-4 border-t">
-                                <Button variant="outline" onClick={() => setEditingRole(null)}>Fermer</Button>
-                                <p className="text-xs text-muted-foreground italic">Enregistrement automatique
-                                    activé</p>
-                            </div>
                         </div>
                     )}
                 </CardContent>

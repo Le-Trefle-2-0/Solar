@@ -53,6 +53,7 @@ next-env.d.ts
 apps/storage/dist
 apps/voice/dist/
 apps/ws/dist/
+apps/api/dist/*
 .output.txt
 confidentialite.html
 faq_content.html
@@ -60,3 +61,5 @@ apps/api/dist/
 /apps/api/dist/
 /apps/voice/node_modules/
 /apps/api/node_modules/
+/.idea/*
+/.ai/mcp/mcp.json

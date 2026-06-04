@@ -2,6 +2,8 @@ import type {FastifyInstance} from 'fastify';
 import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
 
+import {broadcast} from '../../lib/broadcast.js';
+
 async function checkAdmin(req: any, reply: any) {
     const userId = await authenticate(req);
 
@@ -70,6 +72,13 @@ export async function registerAdminRoutes(app: FastifyInstance) {
             where: id ? {id} : {name},
             update: {name, permissions, weight, icon},
             create: {name, permissions, weight, icon}
+        });
+
+        // Broadcast permissions update to all connected volunteers
+        await broadcast(null, 'permissionsUpdate', {
+            roleId: role.id,
+            roleName: role.name,
+            permissions: JSON.parse(role.permissions || "[]")
         });
 
         return reply.send({role});

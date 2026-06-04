@@ -122,7 +122,7 @@ export async function registerTicketsRoutes(app: FastifyInstance) {
             const user = await prisma.user.findUnique({where: {id: userId}});
             if (!user) return reply.status(401).send('unauthorized');
 
-            const canManage = roleHasTicketsReadAll(user.role);
+            const canManage = await canReadTicketsAll(userId);
             if (!canManage) return reply.status(403).send('forbidden');
 
             const {channelID, discordUserID} = bodySchema.parse((req.body ?? {}) as any);

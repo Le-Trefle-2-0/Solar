@@ -4,7 +4,7 @@ import {adminAc, defaultStatements} from "better-auth/plugins/admin/access";
 export const statement = {
     ...defaultStatements,
     tickets: ['open', 'close', 'read_all', 'attribute', 'launch_voice', 'send_message_all', 'send_message', 'transmission'],
-    management: ['create_account', 'delete_account', 'ticket_history', 'view_transmission', 'view_stats', 'reset_password'],
+    management: ['manage_accounts', 'ticket_history', 'view_transmission', 'view_stats'],
     permanence: ['open', 'close', 'register', 'unregister', 'unregister_other_all', 'unregister_other_user', 'register_other_all', 'register_other_user'],
     messages: ['manage'],
     newsletters: ['manage'],
@@ -70,16 +70,10 @@ export const PERMISSION_METADATA: Record<string, PermissionInfo> = {
     },
 
     // Management
-    'management.create_account': {
-        id: 'management.create_account',
-        label: 'Créer des comptes',
-        description: 'Permet d\'inviter de nouveaux membres dans l\'organisation',
-        category: 'Gestion'
-    },
-    'management.delete_account': {
-        id: 'management.delete_account',
-        label: 'Supprimer des comptes',
-        description: 'Permet de révoquer l\'accès d\'un membre',
+    'management.manage_accounts': {
+        id: 'management.manage_accounts',
+        label: 'Gérer les comptes',
+        description: 'Permet d\'inviter, de modifier, de réinitialiser les mots de passe et de révoquer l\'accès des membres',
         category: 'Gestion'
     },
     'management.ticket_history': {
@@ -98,12 +92,6 @@ export const PERMISSION_METADATA: Record<string, PermissionInfo> = {
         id: 'management.view_stats',
         label: 'Voir les statistiques',
         description: 'Accès au tableau de bord d\'activité et indicateurs',
-        category: 'Gestion'
-    },
-    'management.reset_password': {
-        id: 'management.reset_password',
-        label: 'Réinitialiser les mots de passe',
-        description: 'Permet de déclencher un email de récupération pour un membre',
         category: 'Gestion'
     },
 
@@ -178,50 +166,6 @@ export const PERMISSION_METADATA: Record<string, PermissionInfo> = {
         description: 'Outrepasse toutes les restrictions de permissions',
         category: 'Administration'
     },
-
-    // Système (Better Auth default)
-    'user.create': {
-        id: 'user.create',
-        label: 'Créer des utilisateurs (Système)',
-        description: 'Accès technique à la création d\'utilisateurs Auth',
-        category: 'Système'
-    },
-    'user.update': {
-        id: 'user.update',
-        label: 'Modifier des utilisateurs (Système)',
-        description: 'Accès technique à la modification d\'utilisateurs Auth',
-        category: 'Système'
-    },
-    'user.delete': {
-        id: 'user.delete',
-        label: 'Supprimer des utilisateurs (Système)',
-        description: 'Accès technique à la suppression d\'utilisateurs Auth',
-        category: 'Système'
-    },
-    'user.read': {
-        id: 'user.read',
-        label: 'Voir les utilisateurs (Système)',
-        description: 'Accès technique à la liste des utilisateurs Auth',
-        category: 'Système'
-    },
-    'session.delete': {
-        id: 'session.delete',
-        label: 'Révoquer des sessions',
-        description: 'Permet de déconnecter de force un utilisateur',
-        category: 'Système'
-    },
-    'session.read': {
-        id: 'session.read',
-        label: 'Voir les sessions',
-        description: 'Consultation des connexions actives',
-        category: 'Système'
-    },
-    'impersonate.create': {
-        id: 'impersonate.create',
-        label: 'Incarner un utilisateur',
-        description: 'Permet de se connecter à la place d\'un autre membre',
-        category: 'Système'
-    },
 };
 
 export const ac = createAccessControl(statement);
@@ -252,7 +196,7 @@ export const volunteer = ac.newRole({
 
 export const manager = ac.newRole({
     tickets: ['close', 'read_all', 'attribute', 'launch_voice', 'send_message_all'],
-    management: ['create_account', 'ticket_history', 'view_transmission', 'view_stats', 'reset_password'],
+    management: ['manage_accounts', 'ticket_history', 'view_transmission', 'view_stats'],
     permanence: ['open', 'close', 'register', 'unregister', 'register_other_user', 'unregister_other_user'],
     messages: ['manage']
 });
@@ -264,7 +208,7 @@ export const bot = ac.newRole({
 export const admin = ac.newRole({
     ...adminAc.statements,
     tickets: ['open', 'close', 'read_all', 'attribute', 'launch_voice', 'send_message_all', 'send_message', 'transmission'],
-    management: ['create_account', 'delete_account', 'ticket_history', 'view_transmission', 'view_stats', 'reset_password'],
+    management: ['manage_accounts', 'ticket_history', 'view_transmission', 'view_stats'],
     permanence: ['open', 'close', 'register', 'unregister', 'unregister_other_all', 'unregister_other_user', 'register_other_all', 'register_other_user'],
     messages: ['manage'],
     admin: ['sudo']

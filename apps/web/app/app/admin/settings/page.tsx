@@ -19,7 +19,8 @@ export default async function AdminSettingsPage() {
     if (!session) redirect('/auth/sign-in');
 
     const userRoles = ((session.user as any).role || "").split(",").map((r: string) => r.trim());
-    if (!userRoles.includes("admin") && !userRoles.includes("manager")) {
+    const userPermissions = (session.user as any).permissions || [];
+    if (!userRoles.includes("admin") && !userRoles.includes("manager") && !userPermissions.includes("admin.sudo")) {
         redirect("/app");
     }
 
