@@ -28,7 +28,7 @@ export default async function Home() {
                 orderBy: { name: 'asc' }
             }
         },
-        orderBy: { name: 'asc' }
+        orderBy: { order: 'asc' }
     });
 
     // Onboarding: ne pas rediriger d'ici, laisser la page d'accueil publique
