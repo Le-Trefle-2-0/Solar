@@ -1,10 +1,12 @@
 "use client";
 
 import {Card, CardContent} from "@/components/ui/card";
-import {Quote, Shield, Users} from "lucide-react";
+import * as LucideIcons from "lucide-react";
+import {Quote, Users} from "lucide-react";
 import {cn} from "@/lib/utils";
 import {ScrollReveal} from "./scroll-reveal";
 import Image from "next/image";
+import React, {useEffect, useRef, useState} from "react";
 import {
     Dialog,
     DialogContent,
@@ -17,111 +19,19 @@ import {
 interface Person {
     name: string;
     role: string;
-    icon: any;
-    image?: string; // optional photo URL
-    bio?: string;
+    image?: string | null;
+    bio?: string | null;
 }
 
-const board: Person[] = [
-    {
-        name: "Anthony",
-        role: "Président",
-        icon: Shield,
-        image: "https://cdn.discordapp.com/avatars/512409112231936021/19636aa5f20d108c2161fa7c58d94591.jpeg?size=1024"
-    },
-    {
-        name: "Paul",
-        role: "Administrateur",
-        icon: Shield,
-        image: "https://cdn.discordapp.com/avatars/369564132770578432/d9059864986d2b943ab7d1e61c35b74e.jpeg?size=1024",
-        bio: "Étudiant en physique et passionné par le numérique, j'ai rejoint l'association en 2021 avec l'envie concrète d'être utile. Fort d'une expérience en cybersécurité, j'ai accompagné la transformation digitale de l'association en l'aidant à se doter des outils adaptés à ses besoins. Au-delà de la technique, c'est l'engagement pour la santé mentale qui me tient à cœur et qui guide mon investissement au sein du conseil d'administration."
-    },
-    {
-        name: "Océane",
-        role: "Trésorière",
-        icon: Shield,
-        image: "https://cdn.discordapp.com/avatars/372806343108591617/518b38f6cb377b207d54b0de30a6220d.jpeg?size=1024"
-    },
-];
+interface Category {
+    id: string;
+    name: string;
+    icon?: string | null;
+    members: Person[];
+}
 
-const managers: Person[] = [
-    {
-        name: "Louise",
-        role: "Responsable du pôle Communauté",
-        icon: Users,
-        image: "https://cdn.discordapp.com/avatars/967058591494316033/fab79946a1d207f42fb220f9ed3d6e76.jpeg?size=1024"
-    },
-    {
-        name: "En attente de nomination",
-        role: "Responsable du pôle Écoutes",
-        icon: Users,
-    },
-];
 
-const teamLeaders: Person[] = [
-    {
-        name: "Arthur",
-        role: "Référent Bénévoles Écoutants",
-        icon: Users,
-        image: "https://cdn.discordapp.com/avatars/407961565166305301/54df661e844710e25de237077de6bbdd.png?size=4096"
-    },
-    {
-        name: "Berry",
-        role: "Référent Bénévoles Écoutants",
-        icon: Users,
-        image: "https://cdn.discordapp.com/avatars/720741419400036452/d74c37142c98c44c404650e17b061c6a.png?size=4096"
-    },
-    {
-        name: "Clem",
-        role: "Référent Bénévoles Écoutants",
-        icon: Users,
-        image: "https://cdn.discordapp.com/avatars/1125820510236856372/94f320bf98e6231c32941864baefdd4f.png?size=4096"
-    },
-    {
-        name: "Guillaume",
-        role: "Référent Bénévoles Écoutants",
-        icon: Users,
-        image: "https://cdn.discordapp.com/avatars/264842960187686912/35d5e06438b98f5bd44db81785407a2c.png?size=4096"
-    },
-    {
-        name: "Jérôme",
-        role: "Référent Bénévoles Écoutants",
-        icon: Users,
-        image: "https://cdn.discordapp.com/avatars/130352922935427072/1890454f4e70f2dd8c02211f4ce40830.png?size=4096"
-    },
-    {
-        name: "Léana",
-        role: "Référent Bénévoles Écoutants",
-        icon: Users,
-        image: "https://cdn.discordapp.com/avatars/550408743154745344/12e9b0db3e16d0f2958f5dbf5e0f327b.png?size=4096"
-    },
-    {
-        name: "Lisa",
-        role: "Référent Bénévoles Écoutants",
-        icon: Users,
-        image: "https://cdn.discordapp.com/avatars/827257471847759872/068d63207e4ef42356805e8ec27416f5.png?size=4096"
-    },
-    {
-        name: "Rémy",
-        role: "Référent Bénévoles Écoutants",
-        icon: Users,
-        image: "https://cdn.discordapp.com/avatars/181083128746475520/5b8522209bf18eaee89b7e407ba980ca.png?size=4096"
-    },
-    {
-        name: "Shoam",
-        role: "Référent Bénévoles Écoutants",
-        icon: Users,
-        image: "https://cdn.discordapp.com/avatars/344919009130446859/26e576ed86976c3e37788899aa1855a4.png?size=4096"
-    },
-    {
-        name: "Sarah",
-        role: "Référent Bénévoles Écoutants",
-        icon: Users,
-        image: "https://cdn.discordapp.com/avatars/692026167469015091/9712232709bf0005e882ad5dcfdf8328.png?size=4096"
-    },
-];
-
-export function OrganizationTree() {
+export function OrganizationTree({categories}: { categories: Category[] }) {
     return (
         <section className="relative py-20 md:py-32 w-full overflow-hidden bg-background">
             {/* Soft decorative blurs */}
@@ -145,62 +55,29 @@ export function OrganizationTree() {
                     <div
                         className="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-primary/50 via-primary/20 to-transparent hidden lg:block -translate-x-1/2 z-0"/>
 
-                    {/* Board Section */}
-                    <div className="relative z-10 space-y-8">
-                        <ScrollReveal animation="fade-in"
-                                      className="flex items-center gap-4 justify-center bg-background/80 backdrop-blur-sm w-fit mx-auto px-4 py-1 rounded-full border border-primary/20">
-                            <Shield className="h-5 w-5 text-primary"/>
-                            <h3 className="text-xl font-semibold uppercase tracking-widest text-primary font-barlow">Le
-                                Conseil
-                                d'Administration</h3>
-                        </ScrollReveal>
-                        <div className="flex flex-wrap justify-center gap-6 max-w-4xl mx-auto">
-                            {board.map((person, i) => (
-                                <ScrollReveal key={i} delay={i * 100} animation="slide-up"
-                                              className="w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.33%-16px)] max-w-sm">
-                                    <PersonCard person={person}/>
-                                </ScrollReveal>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Managers Section */}
-                    <div className="relative z-10 space-y-8">
-                        <ScrollReveal animation="fade-in"
-                                      className="flex items-center gap-4 justify-center bg-background/80 backdrop-blur-sm w-fit mx-auto px-4 py-1 rounded-full border border-primary/20">
-                            <Users className="h-5 w-5 text-primary"/>
-                            <h3 className="text-xl font-semibold uppercase tracking-widest text-primary font-barlow">
-                                Responsables de pôle
-                            </h3>
-                        </ScrollReveal>
-                        <div className="flex flex-wrap justify-center gap-6 max-w-4xl mx-auto">
-                            {managers.map((person, i) => (
-                                <ScrollReveal key={i} delay={i * 100} animation="slide-up"
-                                              className="w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.33%-16px)] max-w-sm">
-                                    <PersonCard person={person}/>
-                                </ScrollReveal>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Team Leaders Section */}
-                    {teamLeaders.length > 0 && (
-                        <div className="relative z-10 space-y-8">
-                            <ScrollReveal animation="fade-in"
-                                          className="flex items-center gap-4 justify-center bg-background/80 backdrop-blur-sm w-fit mx-auto px-4 py-1 rounded-full border border-primary/20">
-                                <Users className="h-5 w-5 text-primary"/>
-                                <h3 className="text-xl font-semibold uppercase tracking-widest text-primary font-barlow">
-                                    Responsable d'équipe
-                                </h3>
-                            </ScrollReveal>
-                            <div className="flex flex-wrap justify-center gap-6 max-w-4xl mx-auto">
-                                {teamLeaders.map((person, i) => (
-                                    <ScrollReveal key={i} delay={i * 100} animation="slide-up"
-                                                  className="w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.33%-16px)] max-w-sm">
-                                        <PersonCard person={person}/>
+                    {categories.length > 0 ? (
+                        categories.map((category) => {
+                            const Icon = (LucideIcons as any)[category.icon || "Users"] || LucideIcons.Users;
+                            // Sort members alphabetically by name
+                            const sortedMembers = [...category.members].sort((a, b) => 
+                                a.name.localeCompare(b.name)
+                            );
+                            return (
+                                <div key={category.id} className="relative z-10 space-y-8">
+                                    <ScrollReveal animation="fade-in"
+                                                  className="flex items-center gap-4 justify-center bg-background/80 backdrop-blur-sm w-fit mx-auto px-4 py-1 rounded-full border border-primary/20">
+                                        <Icon className="h-5 w-5 text-primary"/>
+                                        <h3 className="text-xl font-semibold uppercase tracking-widest text-primary font-barlow">
+                                            {category.name}
+                                        </h3>
                                     </ScrollReveal>
-                                ))}
-                            </div>
+                                    <ShowcaseCarousel items={sortedMembers}/>
+                                </div>
+                            );
+                        })
+                    ) : (
+                        <div className="text-center py-12">
+                            <p className="text-muted-foreground">Aucune information n'a été saisie ici pour le moment.</p>
                         </div>
                     )}
                 </div>
@@ -209,8 +86,109 @@ export function OrganizationTree() {
     );
 }
 
+function ShowcaseCarousel({items}: { items: Person[] }) {
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [isPaused, setIsPaused] = useState(false);
+    const [visibleCount, setVisibleCount] = useState(3);
+
+    useEffect(() => {
+        const updateVisibleCount = () => {
+            if (window.innerWidth < 640) {
+                setVisibleCount(1);
+            } else if (window.innerWidth < 1024) {
+                setVisibleCount(2);
+            } else {
+                setVisibleCount(3);
+            }
+        };
+
+        updateVisibleCount();
+        window.addEventListener("resize", updateVisibleCount);
+        return () => window.removeEventListener("resize", updateVisibleCount);
+    }, []);
+
+    const isCarousel = items.length > visibleCount;
+    const maxIndex = isCarousel ? items.length - visibleCount : 0;
+
+    useEffect(() => {
+        if (!isCarousel || isPaused) return;
+
+        const interval = setInterval(() => {
+            setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
+        }, 4000);
+
+        return () => clearInterval(interval);
+    }, [isCarousel, isPaused, items.length, maxIndex]);
+
+    useEffect(() => {
+        // Reset index if visibleCount changes to avoid empty space if items.length is small
+        setCurrentIndex(0);
+    }, [visibleCount]);
+
+    if (!isCarousel) {
+        return (
+            <div className="flex flex-wrap justify-center gap-6 max-w-6xl mx-auto px-4">
+                {items.map((person, i) => (
+                    <ScrollReveal key={i} delay={i * 100} animation="slide-up"
+                                  className={cn(
+                                      "w-full max-w-sm",
+                                      items.length === 1 ? "sm:w-1/2" : 
+                                      items.length === 2 ? "sm:w-[calc(50%-12px)]" : 
+                                      "sm:w-[calc(50%-12px)] lg:w-[calc(33.33%-16px)]"
+                                  )}>
+                        <PersonCard person={person}/>
+                    </ScrollReveal>
+                ))}
+            </div>
+        );
+    }
+
+    const translateX = `-${currentIndex * (100 / visibleCount)}%`;
+
+    return (
+        <div
+            className="w-full relative overflow-hidden px-4"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+        >
+            <div
+                className="flex transition-transform duration-1000 ease-in-out"
+                style={{
+                    transform: `translateX(${translateX})`,
+                }}
+            >
+                {items.map((person, i) => (
+                    <div
+                        key={i}
+                        className="px-3 shrink-0"
+                        style={{width: `${100 / visibleCount}%`}}
+                    >
+                        <PersonCard person={person}/>
+                    </div>
+                ))}
+            </div>
+
+            {/* Pagination dots */}
+            <div className="flex justify-center gap-2 mt-8">
+                {Array.from({ length: maxIndex + 1 }).map((_, i) => {
+                    return (
+                        <button
+                            key={i}
+                            onClick={() => setCurrentIndex(i)}
+                            className={cn(
+                                "w-2 h-2 rounded-full transition-all duration-300",
+                                currentIndex === i ? "bg-primary w-6" : "bg-primary/20 hover:bg-primary/40"
+                            )}
+                            aria-label={`Go to slide ${i + 1}`}
+                        />
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
+
 function PersonCard({person}: { person: Person }) {
-    const Icon = person.icon;
     return (
         <Dialog>
             <DialogTrigger asChild>
@@ -234,7 +212,7 @@ function PersonCard({person}: { person: Person }) {
                                         />
                                     </div>
                                 ) : (
-                                    <Icon className="h-10 w-10 text-primary"/>
+                                    <Users className="h-10 w-10 text-primary"/>
                                 )}
                             </div>
                         </div>
@@ -252,7 +230,7 @@ function PersonCard({person}: { person: Person }) {
                                        className="object-cover" unoptimized/>
                             ) : (
                                 <div className="w-full h-full bg-primary/10 flex items-center justify-center">
-                                    <Icon className="h-8 w-8 text-primary"/>
+                                    <Users className="h-8 w-8 text-primary"/>
                                 </div>
                             )}
                         </div>

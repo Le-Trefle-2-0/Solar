@@ -32,43 +32,64 @@ export async function sendNewsletter(newsletterId: string) {
 
     if (!newsletter) throw new Error('not_found');
 
-    const subscribers = await prisma.user.findMany({
-        where: {newsletterSubscription: true},
-        select: {email: true}
-    });
-
-    if (subscribers.length === 0) {
-        throw new Error('no_subscribers');
-    }
-
     // Use the stored HTML content if available, otherwise fallback to a basic wrap of the raw text
     const contentHtml = newsletter.htmlContent
         ? decodeBytes(newsletter.htmlContent)
         : `<div>${decodeBytes(newsletter.content)}</div>`;
 
-    const authorName = newsletter.author.displayUsername || newsletter.author.name || "L'équipe Solar";
-    const {html} = renderEmailTemplate({
-        title: newsletter.title,
-        content: contentHtml,
-        footer: `
-            <p>Cet e-mail a été envoyé par <strong>${authorName}</strong> via la plateforme Solar.</p>
-            <p>Vous recevez cet e-mail car vous êtes inscrit à notre newsletter. Vous pouvez gérer vos préférences d'abonnement dans les <a href="${APP_URL}/app/settings" style="color: #8cc088; text-decoration: none;">paramètres de votre compte</a> sur l'application.</p>
-        `
-    });
-
-    const emails = subscribers.map(s => s.email);
+    const isPublic = newsletter.target === 'public';
+    const authorName = (isPublic) 
+        ? "L'équipe Le Trèfle 2.0" 
+        : (newsletter.author.displayUsername || newsletter.author.name || "L'équipe Solar");
 
     try {
-        const {data, error} = await resend.emails.send({
-            from: "Newsletter <newsletter@solar.letrefle.org>",
-            to: emails,
-            subject: newsletter.title,
-            html,
-        });
+        let recipients: {email: string, id: string}[] = [];
 
-        if (error) {
-            console.error('[newsletters] Resend error:', error);
-            throw new Error(error.message);
+        if (isPublic) {
+            const subscribers = await prisma.newsletterSubscriber.findMany({
+                select: {email: true, id: true}
+            });
+            recipients = subscribers;
+        } else {
+            const subscribers = await prisma.user.findMany({
+                where: {newsletterSubscription: true},
+                select: {email: true, id: true}
+            });
+            recipients = subscribers;
+        }
+
+        if (recipients.length === 0) {
+            throw new Error('no_subscribers');
+        }
+
+        // Send individually to personalize unsubscribe link
+        const results = await Promise.allSettled(recipients.map(async (recipient) => {
+            const footerText = isPublic
+                ? `<p>Cet e-mail a été envoyé par <strong>${authorName}</strong>.</p>
+                   <p>Vous recevez cet e-mail car vous vous êtes inscrit à notre newsletter via letrefle.org.</p>`
+                : `<p>Cet e-mail a été envoyé par <strong>${authorName}</strong> via la plateforme Solar.</p>
+                   <p>Vous recevez cet e-mail car vous êtes inscrit à notre newsletter. Vous pouvez gérer vos préférences d'abonnement dans les <a href="${APP_URL}/app/settings" style="color: #8cc088; text-decoration: none;">paramètres de votre compte</a> sur l'application.</p>`;
+
+            const {html} = renderEmailTemplate({
+                title: newsletter.title,
+                content: contentHtml,
+                footer: footerText,
+                showSolarLink: !isPublic,
+                unsubscribeUrl: `${APP_URL}/newsletters/unsubscribe?id=${recipient.id}`
+            });
+
+            return resend.emails.send({
+                from: "Le Trèfle 2.0 <newsletter@solar.letrefle.org>",
+                to: recipient.email,
+                subject: newsletter.title,
+                html,
+            });
+        }));
+
+        const errors = results.filter(r => r.status === 'rejected' || (r.status === 'fulfilled' && r.value.error));
+        if (errors.length === recipients.length) {
+            console.error('[newsletters] All emails failed:', errors);
+            throw new Error('failed_to_send_all_emails');
         }
 
         await prisma.newsletter.update({
@@ -76,7 +97,7 @@ export async function sendNewsletter(newsletterId: string) {
             data: {status: 'sent', sentAt: new Date()}
         });
 
-        return data;
+        return {success: true, count: recipients.length - errors.length};
     } catch (e: any) {
         console.error('[newsletters] Send error:', e);
         throw e;

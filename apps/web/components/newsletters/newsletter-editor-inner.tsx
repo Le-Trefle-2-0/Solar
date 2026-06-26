@@ -4,7 +4,7 @@ import {apiFetch} from "@/lib/api";
 import {Button} from "@/components/ui/button";
 import {Card, CardContent} from "@/components/ui/card";
 import {Input} from "@/components/ui/input";
-import {ArrowLeft, Calendar, Globe, Loader2, Save, Send, Users} from "lucide-react";
+import {ArrowLeft, Calendar, Globe, Loader2, Save, Send, Users, UserCheck} from "lucide-react";
 import Link from "next/link";
 import {toast} from "sonner";
 import dynamic from "next/dynamic";
@@ -15,6 +15,7 @@ import "@mantine/core/styles.css";
 import "@blocknote/mantine/style.css";
 import "@blocknote/core/fonts/inter.css";
 import {ScheduleDialog, SendConfirmationDialog} from "./newsletter-dialogs";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 
 // Dynamically import BlockNote to avoid SSR issues
 const BlockNoteEditor = dynamic(() => import("@blocknote/mantine").then(m => m.BlockNoteView), {ssr: false});
@@ -23,13 +24,15 @@ interface NewsletterEditorInnerProps {
     id: string;
     initialNewsletter: any;
     volunteerCount: number;
+    subscriberCount: number;
 }
 
-export default function NewsletterEditorInner({id, initialNewsletter, volunteerCount}: NewsletterEditorInnerProps) {
+export default function NewsletterEditorInner({id, initialNewsletter, volunteerCount, subscriberCount}: NewsletterEditorInnerProps) {
     const [newsletter, setNewsletter] = useState<any>(initialNewsletter);
     const [saving, setSaving] = useState(false);
     const [sending, setSending] = useState(false);
     const [title, setTitle] = useState(initialNewsletter.title || "");
+    const [target, setTarget] = useState(initialNewsletter.target || "private");
     const [sendDialogOpen, setSendDialogOpen] = useState(false);
     const [scheduleDialogOpen, setScheduleDialogOpen] = useState(false);
 
@@ -138,6 +141,7 @@ export default function NewsletterEditorInner({id, initialNewsletter, volunteerC
                     content,
                     htmlContent,
                     status: currentStatus,
+                    target,
                     scheduledAt: scheduledAtOverride
                 })
             });
@@ -146,6 +150,7 @@ export default function NewsletterEditorInner({id, initialNewsletter, volunteerC
                 ...prev,
                 title,
                 status: currentStatus,
+                target,
                 scheduledAt: scheduledAtOverride || prev.scheduledAt
             }));
         } catch (error: any) {
@@ -167,7 +172,8 @@ export default function NewsletterEditorInner({id, initialNewsletter, volunteerC
                 body: JSON.stringify({
                     title,
                     content,
-                    htmlContent
+                    htmlContent,
+                    target
                 })
             });
 
@@ -199,6 +205,7 @@ export default function NewsletterEditorInner({id, initialNewsletter, volunteerC
                     content,
                     htmlContent,
                     status: 'scheduled',
+                    target,
                     scheduledAt: date.toISOString()
                 })
             });
@@ -245,6 +252,25 @@ export default function NewsletterEditorInner({id, initialNewsletter, volunteerC
                         placeholder="Titre de la newsletter"
                         disabled={isReadOnly}
                     />
+                    <Select value={target} onValueChange={setTarget} disabled={isReadOnly}>
+                        <SelectTrigger className="w-[180px] h-8">
+                            <SelectValue placeholder="Audience"/>
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="private">
+                                <div className="flex items-center gap-2">
+                                    <UserCheck className="h-4 w-4"/>
+                                    <span>Privée (Bénévoles)</span>
+                                </div>
+                            </SelectItem>
+                            <SelectItem value="public">
+                                <div className="flex items-center gap-2">
+                                    <Globe className="h-4 w-4"/>
+                                    <span>Publique (Tous)</span>
+                                </div>
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
                 <div className="flex items-center gap-2">
                     {newsletter?.status === 'scheduled' && (
@@ -305,9 +331,15 @@ export default function NewsletterEditorInner({id, initialNewsletter, volunteerC
 
                     <div className="flex items-center justify-between text-sm text-muted-foreground px-2">
                         <div className="flex items-center gap-4">
-                            <span className="flex items-center gap-1"><Users
-                                className="h-4 w-4"/> {volunteerCount} bénévoles ciblés</span>
-                            <span className="flex items-center gap-1"><Globe className="h-4 w-4"/> Mode public désactivé</span>
+                            {target === "private" ? (
+                                <span className="flex items-center gap-1">
+                                    <UserCheck className="h-4 w-4"/> {volunteerCount} bénévoles ciblés
+                                </span>
+                            ) : (
+                                <span className="flex items-center gap-1 text-primary">
+                                    <Globe className="h-4 w-4"/> {subscriberCount} abonnés publics ciblés
+                                </span>
+                            )}
                         </div>
                         <span>Dernière modification par {newsletter?.author?.name || "Utilisateur"}</span>
                     </div>

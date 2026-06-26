@@ -1,6 +1,6 @@
 "use client";
 
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {
     Button,
     Card,
@@ -21,6 +21,7 @@ import {toast} from "sonner";
 import {apiFetch} from "@/lib/api";
 import {Loader2, Plus, Trash2} from "lucide-react";
 import {BotClient} from "@/components/admin/bot-client";
+import {TeamSettings} from "@/components/admin/team-settings";
 
 interface Settings {
     widget_enabled: boolean;
@@ -34,10 +35,71 @@ interface RoleSlotSetting {
     part?: 'first' | 'second';
 }
 
+interface NewsletterSubscriber {
+    id: string;
+    email: string;
+    createdAt: string;
+}
+
 export default function AdminSettingsView({initialSettings, roles}: { initialSettings: Settings, roles: any[] }) {
     const [settings, setSettings] = useState<Settings>(initialSettings);
     const [loading, setLoading] = useState(false);
     const [newCategory, setNewCategory] = useState("");
+    const [subscribers, setSubscribers] = useState<NewsletterSubscriber[]>([]);
+    const [newSubscriberEmail, setNewSubscriberEmail] = useState("");
+    const [loadingSubscribers, setLoadingSubscribers] = useState(false);
+
+    useEffect(() => {
+        fetchSubscribers();
+    }, []);
+
+    const fetchSubscribers = async () => {
+        setLoadingSubscribers(true);
+        try {
+            const data = await apiFetch("/v1/admin/newsletter/subscribers");
+            setSubscribers(data.subscribers);
+        } catch (error) {
+            console.error(error);
+            toast.error("Erreur lors de la récupération des abonnés");
+        } finally {
+            setLoadingSubscribers(false);
+        }
+    };
+
+    const handleAddSubscriber = async () => {
+        if (!newSubscriberEmail.trim()) return;
+        setLoading(true);
+        try {
+            await apiFetch("/v1/admin/newsletter/subscribers", {
+                method: "POST",
+                body: JSON.stringify({email: newSubscriberEmail.trim()}),
+            });
+            setNewSubscriberEmail("");
+            toast.success("Abonné ajouté");
+            await fetchSubscribers();
+        } catch (error) {
+            console.error(error);
+            toast.error("Erreur lors de l'ajout de l'abonné");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleRemoveSubscriber = async (id: string) => {
+        setLoading(true);
+        try {
+            await apiFetch(`/v1/admin/newsletter/subscribers/${id}`, {
+                method: "DELETE",
+            });
+            toast.success("Abonné supprimé");
+            await fetchSubscribers();
+        } catch (error) {
+            console.error(error);
+            toast.error("Erreur lors de la suppression de l'abonné");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleToggleWidget = async (checked: boolean) => {
         setLoading(true);
@@ -318,6 +380,72 @@ export default function AdminSettingsView({initialSettings, roles}: { initialSet
             </Card>
 
             <BotClient/>
+
+            <TeamSettings/>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Liste de diffusion Newsletter</CardTitle>
+                    <CardDescription>
+                        Gérez manuellement les inscrits à la newsletter publique.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="flex space-x-2">
+                        <Input
+                            placeholder="Email de l'abonné"
+                            type="email"
+                            value={newSubscriberEmail}
+                            onChange={(e) => setNewSubscriberEmail(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" && handleAddSubscriber()}
+                            disabled={loading}
+                        />
+                        <Button onClick={handleAddSubscriber} disabled={loading || !newSubscriberEmail.trim()}>
+                            <Plus className="h-4 w-4 mr-2"/> Ajouter
+                        </Button>
+                    </div>
+
+                    <div className="border rounded-md">
+                        <div className="max-h-[400px] overflow-y-auto">
+                            {loadingSubscribers ? (
+                                <div className="flex justify-center py-8">
+                                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground"/>
+                                </div>
+                            ) : (
+                                <div className="divide-y">
+                                    {subscribers.map((subscriber) => (
+                                        <div
+                                            key={subscriber.id}
+                                            className="flex items-center justify-between p-3 hover:bg-muted/30 transition-colors"
+                                        >
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-medium">{subscriber.email}</span>
+                                                <span className="text-xs text-muted-foreground">
+                                                    Inscrit le {new Date(subscriber.createdAt).toLocaleDateString()}
+                                                </span>
+                                            </div>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                                onClick={() => handleRemoveSubscriber(subscriber.id)}
+                                                disabled={loading}
+                                            >
+                                                <Trash2 className="h-4 w-4"/>
+                                            </Button>
+                                        </div>
+                                    ))}
+                                    {subscribers.length === 0 && (
+                                        <p className="text-sm text-muted-foreground text-center py-8">
+                                            Aucun abonné trouvé.
+                                        </p>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
         </div>
     );
 }
