@@ -18,13 +18,14 @@ export async function registerNewslettersRoutes(app: FastifyInstance) {
         return userId;
     };
 
-    // Get subscribed volunteers count
-    app.get('/v1/newsletters/volunteers/count', async (req, reply) => {
+    // Get counts
+    app.get('/v1/newsletters/counts', async (req, reply) => {
         await checkNewsletterRole(req, reply);
-        const count = await prisma.user.count({
+        const volunteers = await prisma.user.count({
             where: {newsletterSubscription: true}
         });
-        return {count};
+        const subscribers = await prisma.newsletterSubscriber.count();
+        return {volunteers, subscribers};
     });
 
     // List all newsletters
@@ -57,13 +58,14 @@ export async function registerNewslettersRoutes(app: FastifyInstance) {
     // Create newsletter
     app.post('/v1/newsletters', async (req, reply) => {
         const userId = await checkNewsletterRole(req, reply);
-        const {title, content, htmlContent} = req.body as any;
+        const {title, content, htmlContent, target} = req.body as any;
 
         const newsletter = await prisma.newsletter.create({
             data: {
                 title: title || 'Sans titre',
                 content: Buffer.from(content || '', 'utf8'),
                 htmlContent: htmlContent ? Buffer.from(htmlContent, 'utf8') : null,
+                target: target || 'private',
                 authorId: userId as string,
                 status: 'draft'
             }
@@ -75,7 +77,7 @@ export async function registerNewslettersRoutes(app: FastifyInstance) {
     app.put('/v1/newsletters/:id', async (req, reply) => {
         await checkNewsletterRole(req, reply);
         const {id} = req.params as any;
-        const {title, content, htmlContent, status, scheduledAt} = req.body as any;
+        const {title, content, htmlContent, status, scheduledAt, target} = req.body as any;
 
         const existing = await prisma.newsletter.findUnique({where: {id}});
         if (!existing) return reply.status(404).send({error: 'not_found'});
@@ -93,6 +95,7 @@ export async function registerNewslettersRoutes(app: FastifyInstance) {
         if (htmlContent !== undefined) updateData.htmlContent = htmlContent ? Buffer.from(htmlContent, 'utf8') : null;
         if (status !== undefined) updateData.status = status;
         if (scheduledAt !== undefined) updateData.scheduledAt = scheduledAt ? new Date(scheduledAt) : null;
+        if (target !== undefined) updateData.target = target;
 
         const newsletter = await prisma.newsletter.update({
             where: {id},

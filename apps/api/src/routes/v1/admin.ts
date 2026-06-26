@@ -181,6 +181,53 @@ export async function registerAdminRoutes(app: FastifyInstance) {
         }
     });
 
+    app.get('/v1/admin/newsletter/subscribers', async (req, reply) => {
+        const admin = await checkAdmin(req, reply);
+        if (!admin) return;
+
+        const subscribers = await prisma.newsletterSubscriber.findMany({
+            orderBy: {createdAt: 'desc'}
+        });
+        return reply.send({subscribers});
+    });
+
+    app.post('/v1/admin/newsletter/subscribers', async (req, reply) => {
+        const admin = await checkAdmin(req, reply);
+        if (!admin) return;
+
+        const {email} = req.body as { email: string };
+        if (!email) return reply.status(400).send('email is required');
+
+        try {
+            const subscriber = await prisma.newsletterSubscriber.upsert({
+                where: {email},
+                update: {},
+                create: {email}
+            });
+            return reply.send({subscriber});
+        } catch (e) {
+            console.error("[Newsletter] Failed to add subscriber:", e);
+            return reply.status(500).send('failed to add subscriber');
+        }
+    });
+
+    app.delete('/v1/admin/newsletter/subscribers/:id', async (req, reply) => {
+        const admin = await checkAdmin(req, reply);
+        if (!admin) return;
+
+        const {id} = req.params as { id: string };
+
+        try {
+            await prisma.newsletterSubscriber.delete({
+                where: {id}
+            });
+            return reply.send({success: true});
+        } catch (e) {
+            console.error("[Newsletter] Failed to delete subscriber:", e);
+            return reply.status(500).send('failed to delete subscriber');
+        }
+    });
+
     app.get('/v1/admin/stats', async (req, reply) => {
         const admin = await checkAdmin(req, reply);
         if (!admin) return;

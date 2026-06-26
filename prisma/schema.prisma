@@ -1,6 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
-  output = "../generated/prisma"
+  provider      = "prisma-client-js"
+  output        = "../generated/prisma"
   binaryTargets = ["native", "windows", "debian-openssl-3.0.x", "linux-musl"]
 }
 
@@ -12,92 +12,88 @@ datasource db {
 model Newsletter {
   id          String    @id @default(cuid())
   title       String
-  content     Bytes // Store as JSON or Markdown (compressed or raw)
-  htmlContent Bytes? // Store rendered HTML for sending
-  status      String    @default("draft") // "draft", "scheduled", "sent"
+  content     Bytes
+  status      String    @default("draft")
+  target      String    @default("private")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   sentAt      DateTime?
   scheduledAt DateTime?
   authorId    String
+  htmlContent Bytes?
   author      User      @relation(fields: [authorId], references: [id])
 
+  @@index([authorId], map: "newsletter_authorId_fkey")
   @@map("newsletter")
 }
 
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+
+  @@map("newsletter_subscriber")
+}
+
 model User {
-  id            String    @id
-  name          String    @db.Text
-  email         String    @unique
-  emailVerified Boolean
-  image String? @db.LongText
-  createdAt     DateTime
-  updatedAt     DateTime
-  accounts      Account[]
-  sessions      Session[]
-  messages Message[]
+  id                     String              @id
+  name                   String              @db.Text
+  email                  String              @unique
+  emailVerified          Boolean
+  image                  String?             @db.LongText
+  createdAt              DateTime
+  updatedAt              DateTime
+  banExpires             DateTime?
+  banReason              String?             @db.Text
+  banned                 Boolean?
+  role                   String?             @db.Text
+  twoFactorEnabled       Boolean?
+  displayUsername        String?             @db.Text
+  username               String?             @unique
+  documentsRenewalAt     DateTime?
+  documentsSentAt        DateTime?
+  documentsStatus        String?             @default("missing")
+  documentsText          String?             @db.Text
+  documentsValidatedAt   DateTime?
+  addressCity            String?             @db.Text
+  addressNumber          String?             @db.Text
+  addressPostalCode      String?             @db.Text
+  addressStreet          String?             @db.Text
+  birthDate              DateTime?
+  casierFileId           String?
+  casierRejectReason     String?             @db.Text
+  casierStatus           String?             @default("missing")
+  firstName              String?             @db.Text
+  idCardFileId           String?
+  idCardRejectReason     String?             @db.Text
+  idCardStatus           String?             @default("missing")
+  lastName               String?             @db.Text
+  newsletterSubscription Boolean             @default(false)
+  accounts               Account[]
+  apikeys                Apikey[]
+  Event                  Event[]
+  EventRegistration      EventRegistration[]
+  invitations            Invitation[]
+  members                Member[]
+  messages               Message[]
+  newsletters            Newsletter[]
+  passkeys               Passkey[]
+  Reaction               Reaction[]
+  sessions               Session[]
+  Ticket                 Ticket[]
+  twofactors             TwoFactor[]
 
-  role       String?   @db.Text
-  banned     Boolean?
-  banReason  String?   @db.Text
-  banExpires DateTime?
-
-  members     Member[]
-  invitations Invitation[]
-
-  twoFactorEnabled  Boolean?
-  twofactors        TwoFactor[]
-  Event             Event[]
-  EventRegistration EventRegistration[]
-
-  username        String?
-  displayUsername String? @db.Text
-  Ticket          Ticket[]
-
-  apikeys Apikey[]
-
-  passkeys Passkey[]
-  Reaction Reaction[]
-
-  // Document validation fields
-  documentsStatus      String?   @default("missing") // "missing", "submitted", "validated", "rejected"
-  documentsSentAt      DateTime?
-  documentsValidatedAt DateTime?
-  documentsRenewalAt   DateTime?
-  documentsText        String?   @db.Text
-
-  firstName         String?   @db.Text
-  lastName          String?   @db.Text
-  birthDate         DateTime?
-  addressStreet     String?   @db.Text
-  addressNumber     String?   @db.Text
-  addressPostalCode String?   @db.Text
-  addressCity       String?   @db.Text
-
-  newsletterSubscription Boolean @default(false)
-
-  idCardFileId       String?
-  idCardStatus       String? @default("missing") // "missing", "submitted", "validated", "rejected"
-  idCardRejectReason String? @db.Text
-
-  casierFileId       String?
-  casierStatus       String? @default("missing") // "missing", "submitted", "validated", "rejected"
-  casierRejectReason String? @db.Text
-
-  newsletters Newsletter[]
-
-  @@unique([username])
   @@map("user")
 }
 
 model Role {
   id          String   @id @default(cuid())
   name        String   @unique
-  permissions String   @db.Text // JSON string of permissions
-  weight      Int      @default(0) // For hierarchy
-  icon        String?
+  permissions String   @db.Text
+  weight      Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  icon        String?
 
   @@map("role")
 }
@@ -105,7 +101,7 @@ model Role {
 model File {
   id        String   @id @default(uuid())
   filename  String   @db.Text
-  content   Bytes    @db.LongBlob
+  content   Bytes
   mime      String   @db.Text
   size      Int
   createdAt DateTime @default(now())
@@ -114,19 +110,17 @@ model File {
 }
 
 model Session {
-  id        String   @id
-  expiresAt DateTime
-  token     String   @unique
-  createdAt DateTime
-  updatedAt DateTime
-  ipAddress String?  @db.Text
-  userAgent String?  @db.Text
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  impersonatedBy String? @db.Text
-
-  activeOrganizationId String? @db.Text
+  id                   String   @id
+  expiresAt            DateTime
+  token                String   @unique
+  createdAt            DateTime
+  updatedAt            DateTime
+  ipAddress            String?  @db.Text
+  userAgent            String?  @db.Text
+  userId               String
+  activeOrganizationId String?  @db.Text
+  impersonatedBy       String?  @db.Text
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId], map: "session_userId_fkey")
   @@map("session")
@@ -166,83 +160,87 @@ model Verification {
 model Organization {
   id          String       @id
   name        String       @db.Text
-  slug        String?
+  slug        String?      @unique
   logo        String?      @db.Text
   createdAt   DateTime
   metadata    String?      @db.Text
-  members     Member[]
   invitations Invitation[]
+  members     Member[]
 
-  @@unique([slug])
   @@map("organization")
 }
 
 model Member {
   id             String       @id
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   userId         String
-  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   role           String       @db.Text
   createdAt      DateTime
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([organizationId], map: "member_organizationId_fkey")
+  @@index([userId], map: "member_userId_fkey")
   @@map("member")
 }
 
 model Invitation {
   id             String       @id
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   email          String       @db.Text
   role           String?      @db.Text
   status         String       @db.Text
   expiresAt      DateTime
   inviterId      String
   user           User         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
+  @@index([inviterId], map: "invitation_inviterId_fkey")
+  @@index([organizationId], map: "invitation_organizationId_fkey")
   @@map("invitation")
 }
 
 model TwoFactor {
-  id          String @id
-  secret      String @db.Text
-  backupCodes String @db.Text
-  verified    Boolean
+  id          String  @id
+  secret      String  @db.Text
+  backupCodes String  @db.Text
   userId      String
-  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verified    Boolean
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId], map: "two_factor_userId_fkey")
   @@map("two_factor")
 }
 
 model Channel {
-  id   String @id @default(cuid())
-  name String
-
+  id      String    @id @default(cuid())
+  name    String
+  Event   Event[]
   Message Message[]
-  Ticket  Ticket[]
-  Event Event[]
+  Ticket  Ticket?
 
   @@unique([id, name])
   @@map("channel")
 }
 
 model Message {
-  id        Int      @id @default(autoincrement())
+  id        Int        @id @default(autoincrement())
   createdAt DateTime
-  discordID String?
-  userId String?
-  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String?
   channelId String
-  channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
   content   Bytes
-  replyID Int?
-  edited Boolean @default(false)
+  discordID String?
+  edited    Boolean    @default(false)
+  replyID   Int?
+  ticketId  Int?
+  channel   Channel    @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  ticket    Ticket?    @relation(fields: [ticketId], references: [id])
+  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Reaction  Reaction[]
 
-  ticketId Int?
-  ticket   Ticket? @relation(fields: [ticketId], references: [id])
-
-  Reaction Reaction[]
-
+  @@index([channelId], map: "message_channelId_fkey")
+  @@index([ticketId], map: "message_ticketId_fkey")
+  @@index([userId], map: "message_userId_fkey")
   @@map("message")
 }
 
@@ -250,10 +248,12 @@ model Reaction {
   id        String  @id @default(cuid())
   emoji     String
   messageID Int
-  message   Message @relation(fields: [messageID], references: [id])
   userID    String
+  message   Message @relation(fields: [messageID], references: [id])
   user      User    @relation(fields: [userID], references: [id])
 
+  @@index([messageID], map: "reaction_messageID_fkey")
+  @@index([userID], map: "reaction_userID_fkey")
   @@map("reaction")
 }
 
@@ -266,71 +266,79 @@ model Event {
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
   userId        String
+  channelID     String
+  channel       Channel             @relation(fields: [channelID], references: [id])
   user          User                @relation(fields: [userId], references: [id])
-  channelID String
-  channel   Channel @relation(fields: [channelID], references: [id])
-  roleSlots     RoleSlot[]
   registrations EventRegistration[]
+  roleSlots     RoleSlot[]
 
+  @@index([channelID], map: "event_channelID_fkey")
+  @@index([userId], map: "event_userId_fkey")
   @@map("event")
 }
 
 model RoleSlot {
   id            String              @id @default(cuid())
   role          String
-  goalCount     Int
-  part String?
-  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
   eventId       String
+  goalCount     Int
+  part          String?
   registrations EventRegistration[]
+  event         Event               @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
+  @@index([eventId], map: "role_slot_eventId_fkey")
   @@map("role_slot")
 }
 
 model EventRegistration {
   id           String   @id @default(cuid())
-  user         User     @relation(fields: [userId], references: [id])
   userId       String
-  roleSlot RoleSlot @relation(fields: [roleSlotId], references: [id], onDelete: Cascade)
   roleSlotId   String
   registeredAt DateTime @default(now())
-  status String @default("confirmed") // "confirmed", "pending"
-  Event    Event?   @relation(fields: [eventId], references: [id], onDelete: Cascade)
   eventId      String?
+  status       String   @default("confirmed")
+  Event        Event?   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  roleSlot     RoleSlot @relation(fields: [roleSlotId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, roleSlotId])
+  @@index([eventId], map: "event_registration_eventId_fkey")
+  @@index([roleSlotId], map: "event_registration_roleSlotId_fkey")
   @@map("event_registration")
 }
 
 model Ticket {
-  id           Int          @id @default(autoincrement())
+  id             Int          @id @default(autoincrement())
   discordUserID  String
-  source   String @default("discord")
-  metadata Json?
-  channelId    String?      @unique
-  channelName  String?
-  channel      Channel?     @relation(fields: [channelId, channelName], references: [id, name], onDelete: Cascade)
+  channelId      String?      @unique
   createdAt      DateTime
   updatedAt      DateTime
-  user         User?        @relation(fields: [assignedUserId], references: [id])
   assignedUserId String?
-  statusName   String
-  statusLabel  String
-  status       TicketStatus @relation(fields: [statusName, statusLabel], references: [name, label])
-  problematic  String?
-  observations String?
-  info         String?
-  voice Boolean @default(false)
-  categories Json?
-  feedback Json?
+  channelName    String?
+  statusLabel    String
+  statusName     String
+  info           String?
+  observations   String?
+  problematic    String?
+  voice          Boolean      @default(false)
+  metadata       Json?
+  source         String       @default("discord")
+  categories     Json?
+  feedback       Json?
+  Message        Message[]
+  user           User?        @relation(fields: [assignedUserId], references: [id])
+  channel        Channel?     @relation(fields: [channelId, channelName], references: [id, name], onDelete: Cascade)
+  status         TicketStatus @relation(fields: [statusName, statusLabel], references: [name, label])
 
-  Message Message[]
-
+  @@unique([channelId, channelName])
+  @@index([assignedUserId], map: "ticket_assignedUserId_fkey")
+  @@index([channelId, channelName], map: "ticket_channelId_channelName_fkey")
+  @@index([statusName, statusLabel], map: "ticket_statusName_statusLabel_fkey")
   @@map("ticket")
 }
 
 model TicketStatus {
-  id Int @id @default(autoincrement())
+  id     Int      @id @default(autoincrement())
   name   String   @unique(map: "name") @db.VarChar(192)
   label  String   @db.VarChar(192)
   ticket Ticket[]
@@ -346,7 +354,6 @@ model Apikey {
   prefix              String?   @db.Text
   key                 String    @db.Text
   userId              String
-  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   refillInterval      Int?
   refillAmount        Int?
   lastRefillAt        DateTime?
@@ -362,7 +369,9 @@ model Apikey {
   updatedAt           DateTime
   permissions         String?   @db.Text
   metadata            String?   @db.Text
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId], map: "apikey_userId_fkey")
   @@map("apikey")
 }
 
@@ -377,12 +386,11 @@ model Jwks {
 
 model RouteProtection {
   id                       String  @id
-  route                    String
+  route                    String  @unique
   isRoleProtected          Boolean
   roleProtection           String  @db.Text
   isAuthenticatedProtected Boolean
 
-  @@unique([route])
   @@map("route_protection")
 }
 
@@ -391,7 +399,6 @@ model Passkey {
   name         String?   @db.Text
   publicKey    String    @db.Text
   userId       String
-  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   credentialID String    @db.Text
   counter      Int
   deviceType   String    @db.Text
@@ -399,23 +406,24 @@ model Passkey {
   transports   String?   @db.Text
   createdAt    DateTime?
   aaguid       String?   @db.Text
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId], map: "passkey_userId_fkey")
   @@map("passkey")
 }
 
 model Recruitment {
-  id           String   @id @default(cuid())
-  title        String
-  description  String   @db.LongText
-  icon         String?
-  contactEmail String?
+  id             String                @id @default(cuid())
+  title          String
+  description    String                @db.LongText
+  icon           String?
   fields         Json
-  discordWebhook String? @db.Text
-  enabled        Boolean @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  waitlist RecruitmentWaitlist[]
+  enabled        Boolean               @default(true)
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  contactEmail   String?
+  discordWebhook String?               @db.Text
+  waitlist       RecruitmentWaitlist[]
 
   @@map("recruitment")
 }
@@ -424,10 +432,11 @@ model RecruitmentWaitlist {
   id            String      @id @default(cuid())
   email         String
   recruitmentId String
-  recruitment   Recruitment @relation(fields: [recruitmentId], references: [id], onDelete: Cascade)
   createdAt     DateTime    @default(now())
+  recruitment   Recruitment @relation(fields: [recruitmentId], references: [id], onDelete: Cascade)
 
   @@unique([email, recruitmentId])
+  @@index([recruitmentId], map: "recruitment_waitlist_recruitmentId_fkey")
   @@map("recruitment_waitlist")
 }
 

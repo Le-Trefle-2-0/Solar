@@ -4,9 +4,11 @@ interface EmailTemplateProps {
     title: string;
     content: string;
     footer?: string;
+    unsubscribeUrl?: string;
+    showSolarLink?: boolean;
 }
 
-export function renderEmailTemplate({title, content, footer}: EmailTemplateProps) {
+export function renderEmailTemplate({title, content, footer, unsubscribeUrl, showSolarLink = true}: EmailTemplateProps) {
     const appUrl = APP_URL;
     const primaryColor = "#8cc088";
     const backgroundColor = "#f6f6f6";
@@ -127,7 +129,8 @@ export function renderEmailTemplate({title, content, footer}: EmailTemplateProps
         </div>
         <div class="footer">
             <p>&copy; ${new Date().getFullYear()} Le Trèfle 2.0. Tous droits réservés.</p>
-            <p><a href="${appUrl}" style="color: ${primaryColor}; text-decoration: none;">Accéder à Solar</a></p>
+            ${showSolarLink ? `<p><a href="${appUrl}" style="color: ${primaryColor}; text-decoration: none;">Accéder à Solar</a></p>` : ""}
+            ${unsubscribeUrl ? `<p><a href="${unsubscribeUrl}" style="color: #666; text-decoration: underline; font-size: 12px;">Se désinscrire</a></p>` : ""}
         </div>
     </div>
 </body>

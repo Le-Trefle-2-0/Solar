@@ -24,16 +24,15 @@ export function ApplicationForm({recruitmentId, fields, onSuccess}: ApplicationF
     // Dynamic Zod Schema
     const schemaShape: Record<string, any> = {};
     fields.forEach((field) => {
-        let fieldSchema = z.string();
-
-        if (field.required) {
-            fieldSchema = fieldSchema.min(1, `${field.label} est obligatoire`);
-        } else {
-            fieldSchema = fieldSchema.optional() as any;
-        }
+        let fieldSchema: z.ZodTypeAny = z.string();
 
         if (field.type === "email") {
-            fieldSchema = fieldSchema.email("Email invalide") as any;
+            fieldSchema = (fieldSchema as z.ZodString).email("Email invalide");
+        }
+
+        // Apply max first while it's still a ZodString
+        if (fieldSchema instanceof z.ZodString) {
+            fieldSchema = fieldSchema.max(10000, "Maximum 10 000 caractères");
         }
 
         if (field.min) {
@@ -41,14 +40,21 @@ export function ApplicationForm({recruitmentId, fields, onSuccess}: ApplicationF
                 fieldSchema = fieldSchema.refine(
                     (val) => val.trim().split(/\s+/).filter(Boolean).length >= (field.min || 0),
                     {message: `Minimum ${field.min} mots`}
-                ) as any;
+                );
             } else {
-                fieldSchema = fieldSchema.min(field.min, `Minimum ${field.min} caractères`) as any;
+                if (fieldSchema instanceof z.ZodString) {
+                    fieldSchema = fieldSchema.min(field.min, `Minimum ${field.min} caractères`);
+                }
             }
         }
 
-        // Enforce 10k max characters
-        fieldSchema = fieldSchema.max(10000, "Maximum 10 000 caractères") as any;
+        if (field.required) {
+            if (fieldSchema instanceof z.ZodString) {
+                fieldSchema = fieldSchema.min(1, `${field.label} est obligatoire`);
+            }
+        } else {
+            fieldSchema = fieldSchema.optional();
+        }
 
         schemaShape[field.name] = fieldSchema;
     });

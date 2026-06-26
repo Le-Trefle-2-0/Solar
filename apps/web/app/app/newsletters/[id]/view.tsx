@@ -23,7 +23,10 @@ export default function NewsletterDetailView() {
 
     const [newsletter, setNewsletter] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const [volunteerCount, setVolunteerCount] = useState<number>(0);
+    const [counts, setCounts] = useState<{ volunteers: number; subscribers: number }>({
+        volunteers: 0,
+        subscribers: 0
+    });
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
@@ -42,21 +45,21 @@ export default function NewsletterDetailView() {
         }
     }, [id, router]);
 
-    const fetchVolunteerCount = useCallback(async () => {
+    const fetchCounts = useCallback(async () => {
         try {
-            const data = await apiFetch('/v1/newsletters/volunteers/count');
-            setVolunteerCount(data.count);
+            const data = await apiFetch('/v1/newsletters/counts');
+            setCounts(data);
         } catch (e) {
-            console.error("Failed to fetch volunteer count", e);
+            console.error("Failed to fetch counts", e);
         }
     }, []);
 
     useEffect(() => {
         if (isMounted) {
             fetchNewsletter();
-            fetchVolunteerCount();
+            fetchCounts();
         }
-    }, [id, isMounted, fetchNewsletter, fetchVolunteerCount]);
+    }, [id, isMounted, fetchNewsletter, fetchCounts]);
 
     if (!isMounted || loading) return (
         <div className="flex items-center justify-center h-full">
@@ -70,7 +73,8 @@ export default function NewsletterDetailView() {
         <NewsletterEditorInner
             id={id}
             initialNewsletter={newsletter}
-            volunteerCount={volunteerCount}
+            volunteerCount={counts.volunteers}
+            subscriberCount={counts.subscribers}
         />
     );
 }
