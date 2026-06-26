@@ -228,6 +228,96 @@ export async function registerAdminRoutes(app: FastifyInstance) {
         }
     });
 
+    app.get('/v1/admin/team/categories', async (req, reply) => {
+        const admin = await checkAdmin(req, reply);
+        if (!admin) return;
+
+        const categories = await prisma.teamCategory.findMany({
+            include: {
+                members: {
+                    orderBy: {name: 'asc'}
+                }
+            },
+            orderBy: {order: 'asc'}
+        });
+        return reply.send({categories});
+    });
+
+    app.post('/v1/admin/team/categories', async (req, reply) => {
+        const admin = await checkAdmin(req, reply);
+        if (!admin) return;
+
+        const {id, name, icon, order} = req.body as { id?: string, name: string, icon?: string, order?: number };
+
+        try {
+            const category = await prisma.teamCategory.upsert({
+                where: {id: id || 'new'},
+                update: {name, icon, order},
+                create: {name, icon, order: order || 0}
+            });
+            return reply.send({category});
+        } catch (e) {
+            console.error("[Team] Failed to upsert category:", e);
+            return reply.status(500).send('failed to update category');
+        }
+    });
+
+    app.delete('/v1/admin/team/categories/:id', async (req, reply) => {
+        const admin = await checkAdmin(req, reply);
+        if (!admin) return;
+
+        const {id} = req.params as { id: string };
+
+        try {
+            await prisma.teamCategory.delete({where: {id}});
+            return reply.send({success: true});
+        } catch (e) {
+            console.error("[Team] Failed to delete category:", e);
+            return reply.status(500).send('failed to delete category');
+        }
+    });
+
+    app.post('/v1/admin/team/members', async (req, reply) => {
+        const admin = await checkAdmin(req, reply);
+        if (!admin) return;
+
+        const {id, name, role, image, bio, categoryId} = req.body as {
+            id?: string,
+            name: string,
+            role: string,
+            image?: string,
+            bio?: string,
+            categoryId: string
+        };
+
+        try {
+            const member = await prisma.teamMember.upsert({
+                where: {id: id || 'new'},
+                update: {name, role, image, bio, categoryId},
+                create: {name, role, image, bio, categoryId}
+            });
+            return reply.send({member});
+        } catch (e) {
+            console.error("[Team] Failed to upsert member:", e);
+            return reply.status(500).send('failed to update member');
+        }
+    });
+
+    app.delete('/v1/admin/team/members/:id', async (req, reply) => {
+        const admin = await checkAdmin(req, reply);
+        if (!admin) return;
+
+        const {id} = req.params as { id: string };
+
+        try {
+            await prisma.teamMember.delete({where: {id}});
+            return reply.send({success: true});
+        } catch (e) {
+            console.error("[Team] Failed to delete member:", e);
+            return reply.status(500).send('failed to delete member');
+        }
+    });
+
     app.get('/v1/admin/stats', async (req, reply) => {
         const admin = await checkAdmin(req, reply);
         if (!admin) return;

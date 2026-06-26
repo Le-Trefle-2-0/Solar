@@ -440,6 +440,33 @@ model RecruitmentWaitlist {
   @@map("recruitment_waitlist")
 }
 
+model TeamCategory {
+  id        String       @id @default(cuid())
+  name      String
+  icon      String?
+  order     Int          @default(0)
+  members   TeamMember[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@map("team_category")
+}
+
+model TeamMember {
+  id         String       @id @default(cuid())
+  name       String
+  role       String
+  image      String?      @db.LongText
+  bio        String?      @db.Text
+  categoryId String
+  category   TeamCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  @@index([categoryId], map: "team_member_categoryId_fkey")
+  @@map("team_member")
+}
+
 model Image {
   id   String @id @default(cuid())
   link String @db.LongText

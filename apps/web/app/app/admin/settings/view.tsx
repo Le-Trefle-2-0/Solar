@@ -21,6 +21,7 @@ import {toast} from "sonner";
 import {apiFetch} from "@/lib/api";
 import {Loader2, Plus, Trash2} from "lucide-react";
 import {BotClient} from "@/components/admin/bot-client";
+import {TeamSettings} from "@/components/admin/team-settings";
 
 interface Settings {
     widget_enabled: boolean;
@@ -379,6 +380,8 @@ export default function AdminSettingsView({initialSettings, roles}: { initialSet
             </Card>
 
             <BotClient/>
+
+            <TeamSettings/>
 
             <Card>
                 <CardHeader>

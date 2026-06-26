@@ -10,6 +10,7 @@ import {PublicFooter} from "@/components/landing/footer";
 import {ScrollReveal} from "@/components/landing/scroll-reveal";
 
 import {constructMetadata} from "@/lib/metadata";
+import prisma from "@/lib/prisma";
 
 export const metadata = constructMetadata({
     title: "Le Trèfle 2.0 - Services d'écoute et de soutien moral",
@@ -19,6 +20,15 @@ export const metadata = constructMetadata({
 export default async function Home() {
     const session = await auth.api.getSession({
         headers: await headers(),
+    });
+
+    const categories = await prisma.teamCategory.findMany({
+        include: {
+            members: {
+                orderBy: { name: 'asc' }
+            }
+        },
+        orderBy: { name: 'asc' }
     });
 
     // Onboarding: ne pas rediriger d'ici, laisser la page d'accueil publique
@@ -39,7 +49,7 @@ export default async function Home() {
                     <Partners/>
                 </ScrollReveal>
                 <ScrollReveal>
-                    <OrganizationTree/>
+                    <OrganizationTree categories={categories}/>
                 </ScrollReveal>
             </main>
             <ScrollReveal animation="fade-in">
