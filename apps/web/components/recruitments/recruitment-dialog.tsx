@@ -49,6 +49,7 @@ export function RecruitmentDialog({open, onOpenChange, recruitment, onSave}: Rec
         defaultValues: {
             title: "",
             description: "",
+            shortDescription: "",
             icon: "Users",
             contactEmail: "",
             discordWebhook: "",
@@ -62,6 +63,7 @@ export function RecruitmentDialog({open, onOpenChange, recruitment, onSave}: Rec
             form.reset({
                 title: recruitment.title,
                 description: recruitment.description,
+                shortDescription: (recruitment as any).shortDescription || "",
                 icon: recruitment.icon,
                 contactEmail: recruitment.contactEmail || "",
                 discordWebhook: (recruitment as any).discordWebhook || "",
@@ -72,6 +74,7 @@ export function RecruitmentDialog({open, onOpenChange, recruitment, onSave}: Rec
             form.reset({
                 title: "",
                 description: "",
+                shortDescription: "",
                 icon: "Users",
                 contactEmail: "",
                 discordWebhook: "",
@@ -201,6 +204,28 @@ export function RecruitmentDialog({open, onOpenChange, recruitment, onSave}: Rec
                                             de candidatures.
                                         </DialogDescription>
                                     </div>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="shortDescription"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Résumé IA (optionnel)</FormLabel>
+                                    <FormControl>
+                                        <Textarea
+                                            placeholder="Laissez vide pour générer automatiquement à partir de la description..."
+                                            className="min-h-[80px]"
+                                            {...field}
+                                            value={field.value || ""}
+                                        />
+                                    </FormControl>
+                                    <DialogDescription>
+                                        Ce court résumé sera affiché sur la liste des recrutements. Si vous le laissez vide, il sera automatiquement généré par l'IA lors de l'enregistrement.
+                                    </DialogDescription>
+                                    <FormMessage/>
                                 </FormItem>
                             )}
                         />

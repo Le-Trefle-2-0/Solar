@@ -413,17 +413,18 @@ model Passkey {
 }
 
 model Recruitment {
-  id             String                @id @default(cuid())
-  title          String
-  description    String                @db.LongText
-  icon           String?
-  fields         Json
-  enabled        Boolean               @default(true)
-  createdAt      DateTime              @default(now())
-  updatedAt      DateTime              @updatedAt
-  contactEmail   String?
-  discordWebhook String?               @db.Text
-  waitlist       RecruitmentWaitlist[]
+  id               String                @id @default(cuid())
+  title            String
+  description      String                @db.LongText
+  shortDescription String?               @db.Text
+  icon             String?
+  fields           Json
+  enabled          Boolean               @default(true)
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  contactEmail     String?
+  discordWebhook   String?               @db.Text
+  waitlist         RecruitmentWaitlist[]
 
   @@map("recruitment")
 }

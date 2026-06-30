@@ -8,6 +8,8 @@ import {useState} from "react";
 import {subscribeToNewsletter} from "@/app/actions/newsletter";
 import {toast} from "sonner";
 import {Loader2} from "lucide-react";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faFacebook, faInstagram, faLinkedin, faTiktok, faYoutube} from "@fortawesome/free-brands-svg-icons";
 
 export function PublicFooter() {
     const [email, setEmail] = useState("");
@@ -47,6 +49,23 @@ export function PublicFooter() {
                             30120 Le Vigan<br/>
                             RNA : W30 300 5428
                         </p>
+                        <div className="flex gap-4 mt-2">
+                            <Link href="https://www.facebook.com/LeTrefle2.0/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors" aria-label="Facebook">
+                                <FontAwesomeIcon icon={faFacebook} className="h-5 w-5"/>
+                            </Link>
+                            <Link href="https://www.instagram.com/letrefle2.0" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors" aria-label="Instagram">
+                                <FontAwesomeIcon icon={faInstagram} className="h-5 w-5"/>
+                            </Link>
+                            <Link href="https://www.linkedin.com/company/le-trèfle-2-0/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors" aria-label="LinkedIn">
+                                <FontAwesomeIcon icon={faLinkedin} className="h-5 w-5"/>
+                            </Link>
+                            <Link href="https://www.tiktok.com/@letrefle2_0" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors" aria-label="TikTok">
+                                <FontAwesomeIcon icon={faTiktok} className="h-5 w-5"/>
+                            </Link>
+                            <Link href="https://www.youtube.com/channel/UCFT7egJfWIZjk6IxAapYuqg" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors" aria-label="YouTube">
+                                <FontAwesomeIcon icon={faYoutube} className="h-5 w-5"/>
+                            </Link>
+                        </div>
                     </div>
                     <div className="flex flex-col gap-4">
                         <h3 className="font-semibold font-barlow">Newsletter</h3>
