@@ -11,6 +11,7 @@ export function NavProjects({
         name: string
         url: string
         icon: LucideIcon
+        hasNotification?: boolean
     }[]
 }) {
     const router = useRouter()
@@ -25,11 +26,16 @@ export function NavProjects({
                     return (
                         <SidebarMenuItem key={item.name}>
                             <SidebarMenuButton asChild isActive={isActive}>
-                                <a onClick={() => router.push(item.url)} className="cursor-pointer relative">
+                                <a onClick={() => router.push(item.url)} className="cursor-pointer relative flex items-center gap-2">
                                     {isActive && (
                                         <div className="absolute left-[-12px] h-1.5 w-1.5 rounded-full bg-primary"/>
                                     )}
-                                    <item.icon/>
+                                    <div className="relative">
+                                        <item.icon className="size-4 shrink-0" />
+                                        {item.hasNotification && (
+                                            <span className="absolute -top-1 -right-1 flex h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                                        )}
+                                    </div>
                                     <span>{item.name}</span>
                                 </a>
                             </SidebarMenuButton>

@@ -69,6 +69,7 @@ import {useSocket} from "@/context/Socket";
 import {usePeer} from "@/context/VoicePeer";
 import {VisuallyHidden} from "@radix-ui/react-visually-hidden";
 import {apiFetch} from "@/lib/api";
+import {markChannelAsRead} from "@/app/actions/chat";
 
 export function Chat(props: { channelID: string, statusID: number }) {
     const {channelID, statusID} = props;
@@ -119,6 +120,9 @@ export function Chat(props: { channelID: string, statusID: number }) {
     const [eventInfo, setEventInfo] = useState<EventData | null>(null);
     const [loadingEvent, setLoadingEvent] = useState(false);
     const [eventDialogOpen, setEventDialogOpen] = useState(false);
+    const [lastReadTimestamp, setLastReadTimestamp] = useState<number | null>(null);
+    const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
+    const lastReadFetched = useRef<string | null>(null);
 
     const fetchEventInfo = async () => {
         setLoadingEvent(true);
@@ -511,12 +515,21 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
         const onMessage = (data: Msg) => {
             if (data.channel.id === channelID) {
+                const isMe = data.author.id === session?.user.id;
                 setChat((pre) => {
                     const exists = (data as MsgWithID).id && pre.some(m => m.id === (data as MsgWithID).id);
                     if (exists) return pre;
                     return [...pre, data as MsgWithID];
                 })
                 if (timer) clearTimeout(timer)
+                
+                // Mark as read if at bottom or if it's my own message
+                if (isAtBottomRef.current || isMe) {
+                    markChannelAsRead(channelID);
+                    setLastReadTimestamp(Date.now());
+                } else if (document.hasFocus()) {
+                    markChannelAsRead(channelID);
+                }
             }
         };
 
@@ -652,6 +665,14 @@ export function Chat(props: { channelID: string, statusID: number }) {
     }, [socket, channelID, session?.user]);
 
     useEffect(() => {
+        markChannelAsRead(channelID);
+
+        const onFocus = () => markChannelAsRead(channelID);
+        window.addEventListener('focus', onFocus);
+        return () => window.removeEventListener('focus', onFocus);
+    }, [channelID]);
+
+    useEffect(() => {
         let cancelled = false;
         let timer: NodeJS.Timeout | null = null;
 
@@ -746,6 +767,17 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
         load();
 
+        if (lastReadFetched.current !== channelID) {
+            lastReadFetched.current = channelID;
+            apiFetch(`/v1/channel/${channelID}/read`).then((res: any) => {
+                if (res.lastRead) {
+                    setLastReadTimestamp(new Date(res.lastRead).getTime());
+                } else {
+                    setLastReadTimestamp(null);
+                }
+            }).catch(() => setLastReadTimestamp(null));
+        }
+
         return () => {
             cancelled = true;
             if (timer) clearTimeout(timer);
@@ -836,7 +868,14 @@ export function Chat(props: { channelID: string, statusID: number }) {
                 if (initialAutoScrollPending.current) return;
                 // update bottom state
                 const distanceFromBottom = el.scrollHeight - (el.scrollTop + el.clientHeight);
+                const wasAtBottom = isAtBottomRef.current;
                 isAtBottomRef.current = distanceFromBottom <= 100;
+                
+                if (isAtBottomRef.current && !wasAtBottom) {
+                    markChannelAsRead(channelID);
+                    setLastReadTimestamp(null);
+                }
+
                 if (el.scrollTop < 250) {
                     loadOlder();
                 }
@@ -1042,38 +1081,70 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                 const isLastInBlock = !isSameAuthorAsNext || !isWithin10MinOfNext
 
                                 const ref = replyID ? chat.find(m => m.id === replyID) : undefined;
+
+                                const showUnreadBar = lastReadTimestamp && 
+                                    currentDate > lastReadTimestamp && 
+                                    (!prevDate || prevDate <= lastReadTimestamp) &&
+                                    author.id !== session?.user.id;
+
                                 return (
-                                    <Message
-                                        prevDate={prevDate as number}
-                                        currentDate={currentDate}
-                                        timestamp={timestamp}
-                                        reactions={reactions as Reaction[]}
-                                        key={id}
-                                        isLastInBlock={isLastInBlock}
-                                        showAuthorInfo={showAuthorInfo}
-                                        isAuthor={author.id === session?.user.id}
-                                        profilePicture={author.image}
-                                        authorRole={author.role}
-                                        authorName={author.name}
-                                        content={content}
-                                        userID={session?.user.id as string}
-                                        id={id as number}
-                                        channelId={channelID}
-                                        canManageMessages={canManageMessages}
-                                        edited={edited}
-                                        onReply={({id, authorName, content, timestamp}) => {
-                                            setReplyTo({id, authorName, content, timestamp});
-                                            setTimeout(() => textRef.current?.focus(), 0);
-                                        }}
-                                        replyTargetId={replyTo?.id}
-                                        replyOf={ref ? {
-                                            id: ref.id,
-                                            authorName: ref.author.name,
-                                            content: ref.content,
-                                            image: ref.author.image
-                                        } : undefined}
-                                        readOnly={status === 3 || status === 4}
-                                    />
+                                    <React.Fragment key={id}>
+                                        {showUnreadBar && (
+                                            <div 
+                                                className="flex items-center my-4 unread-separator"
+                                                ref={(el) => {
+                                                    if (el && lastReadTimestamp) {
+                                                        const observer = new IntersectionObserver(
+                                                            ([entry]) => {
+                                                                if (entry.isIntersecting) {
+                                                                    setLastReadTimestamp(null);
+                                                                    observer.disconnect();
+                                                                }
+                                                            },
+                                                            { threshold: 1.0 }
+                                                        );
+                                                        observer.observe(el);
+                                                    }
+                                                }}
+                                            >
+                                                <div className="flex-grow h-px bg-red-500/50" />
+                                                <span className="mx-4 text-xs font-bold text-red-500 uppercase tracking-wider bg-background px-2">
+                                                    Nouveaux messages
+                                                </span>
+                                                <div className="flex-grow h-px bg-red-500/50" />
+                                            </div>
+                                        )}
+                                        <Message
+                                            prevDate={prevDate as number}
+                                            currentDate={currentDate}
+                                            timestamp={timestamp}
+                                            reactions={reactions as Reaction[]}
+                                            isLastInBlock={isLastInBlock}
+                                            showAuthorInfo={showAuthorInfo}
+                                            isAuthor={author.id === session?.user.id}
+                                            profilePicture={author.image}
+                                            authorRole={author.role}
+                                            authorName={author.name}
+                                            content={content}
+                                            userID={session?.user.id as string}
+                                            id={id as number}
+                                            channelId={channelID}
+                                            canManageMessages={canManageMessages}
+                                            edited={edited}
+                                            onReply={({id, authorName, content, timestamp}) => {
+                                                setReplyTo({id, authorName, content, timestamp});
+                                                setTimeout(() => textRef.current?.focus(), 0);
+                                            }}
+                                            replyTargetId={replyTo?.id}
+                                            replyOf={ref ? {
+                                                id: ref.id,
+                                                authorName: ref.author.name,
+                                                content: ref.content,
+                                                image: ref.author.image
+                                            } : undefined}
+                                            readOnly={status === 3 || status === 4}
+                                        />
+                                    </React.Fragment>
                                 );
                             })}
                         </React.Fragment>

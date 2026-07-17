@@ -98,7 +98,7 @@ export async function findEvent(eventId: string) {
                 ...r,
                 user: {
                     ...r.user,
-                    hasActiveTicket: (r.user as any).Ticket?.length > 0
+                    hasActiveTicket: (r.user as any).tickets?.length > 0
                 }
             })),
         }))
@@ -119,7 +119,7 @@ export async function findEventByChannel(channelId: string) {
                                     name: true,
                                     image: true,
                                     role: true,
-                                    Ticket: {
+                                    tickets: {
                                         where: {
                                             status: {
                                                 name: {not: 'closed'}
@@ -150,7 +150,7 @@ export async function findEventByChannel(channelId: string) {
                 ...r,
                 user: {
                     ...r.user,
-                    hasActiveTicket: (r.user as any).Ticket?.length > 0
+                    hasActiveTicket: (r.user as any).tickets?.length > 0
                 }
             })),
         }))

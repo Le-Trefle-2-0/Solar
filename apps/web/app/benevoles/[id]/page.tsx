@@ -52,8 +52,8 @@ export default async function RecruitmentDetailPage({params}: { params: Promise<
                     </Link>
 
                     <div className="max-w-4xl mx-auto space-y-8">
-                        <Card className="border-none shadow-sm overflow-hidden">
-                            <CardHeader className="bg-primary/5 border-b p-8">
+                        <Card className="border-none shadow-sm overflow-hidden flex flex-col gap-0 p-0">
+                            <CardHeader className="bg-primary/5 border-b p-8 pt-10">
                                 <div className="flex flex-col md:flex-row md:items-center gap-6">
                                     <div className="p-4 bg-background rounded-2xl shadow-sm text-primary w-fit">
                                         <Icon className="h-10 w-10"/>
@@ -68,7 +68,7 @@ export default async function RecruitmentDetailPage({params}: { params: Promise<
                                     </div>
                                 </div>
                             </CardHeader>
-                            <CardContent className="p-8 md:p-12">
+                            <CardContent className="p-8 md:p-12 pt-10 md:pt-12">
                                 <div className="prose dark:prose-invert max-w-none mb-12">
                                     <ReactMarkdown>{recruitment.description}</ReactMarkdown>
                                 </div>

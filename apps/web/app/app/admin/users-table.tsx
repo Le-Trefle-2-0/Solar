@@ -20,14 +20,13 @@ import {
     Check,
     ChevronDown,
     ChevronsUpDown,
-    ExternalLink,
     FileCheck,
     FileClock,
-    FileText,
     FileX,
     IdCardLanyard,
     Info,
     MoreHorizontal,
+    ShieldCheck,
     Trash,
     UserPen,
     UserPlus
@@ -68,6 +67,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
+    Label,
     Popover,
     PopoverContent,
     PopoverTrigger
@@ -90,7 +90,7 @@ import {
 import {format} from "date-fns";
 import {fr} from "date-fns/locale";
 import {Textarea} from "@/components/ui/textarea";
-import {Label} from "@/components/ui/label";
+import {AdminValidationView} from "@/components/users/admin-validation-view";
 
 const FormSchema = z.object({
     name: z.string(),
@@ -108,6 +108,7 @@ export function UsersTable({data, availableRoles}: DataTableProps) {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [allRenewalAlertOpen, setAllRenewalAlertOpen] = useState(false);
     const [isInviting, setIsInviting] = useState(false);
+    const [validationViewAccount, setValidationViewAccount] = useState<DisplayAccount | null>(null);
     const router = useRouter();
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -233,9 +234,15 @@ export function UsersTable({data, availableRoles}: DataTableProps) {
                 }
                 if (status === 'submitted') {
                     return (
-                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 gap-1">
-                            <FileClock size={14}/> Envoyé
-                        </Badge>
+                        <div className="relative inline-block">
+                            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 gap-1">
+                                <FileClock size={14}/> Envoyé
+                            </Badge>
+                            <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                            </span>
+                        </div>
                     );
                 }
                 if (status === 'rejected') {
@@ -259,7 +266,6 @@ export function UsersTable({data, availableRoles}: DataTableProps) {
                 const account = row.original;
                 const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
                 const [editDialogOpen, setEditDialogOpen] = useState(false);
-                const [viewDocOpen, setViewDocOpen] = useState(false);
                 const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
                 const [rejectType, setRejectType] = useState<'idCard' | 'casier' | null>(null);
                 const [rejectReasonText, setRejectReasonText] = useState("");
@@ -320,8 +326,8 @@ export function UsersTable({data, availableRoles}: DataTableProps) {
                                     <Info/> Voir le profil
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator/>
-                                <DropdownMenuItem onClick={() => setViewDocOpen(true)}>
-                                    <FileText/> Documents administratifs
+                                <DropdownMenuItem onClick={() => setValidationViewAccount(account)}>
+                                    <ShieldCheck/> Validation administrative
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => {
                                     toast.promise(requestRenewalAction(account.id), {
@@ -464,202 +470,6 @@ export function UsersTable({data, availableRoles}: DataTableProps) {
                             </DialogContent>
                         </Dialog>
 
-                        <Dialog open={viewDocOpen} onOpenChange={setViewDocOpen}>
-                            <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
-                                <DialogHeader>
-                                    <DialogTitle>Dossier de {account.name}</DialogTitle>
-                                    <DialogDescription>
-                                        Statut global : {
-                                        account.documentsStatus === 'validated' ? 'Validé' :
-                                            account.documentsStatus === 'submitted' ? 'En attente' :
-                                                account.documentsStatus === 'rejected' ? 'Refusé' : 'Manquant'
-                                    }
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <div className="space-y-6 py-4">
-                                    {/* Personal Info */}
-                                    <div className="grid grid-cols-2 gap-x-8 gap-y-4 text-sm border-b pb-4">
-                                        <div>
-                                            <Label className="text-xs text-muted-foreground">Prénom</Label>
-                                            <p className="font-medium">{account.firstName || '-'}</p>
-                                        </div>
-                                        <div>
-                                            <Label className="text-xs text-muted-foreground">Nom</Label>
-                                            <p className="font-medium">{account.lastName || '-'}</p>
-                                        </div>
-                                        <div>
-                                            <Label className="text-xs text-muted-foreground">Date de naissance</Label>
-                                            <p className="font-medium">{account.birthDate ? format(new Date(account.birthDate), "PPP", {locale: fr}) : '-'}</p>
-                                        </div>
-                                        <div>
-                                            <Label className="text-xs text-muted-foreground">Adresse</Label>
-                                            <p className="font-medium">
-                                                {account.addressNumber} {account.addressStreet}<br/>
-                                                {account.addressPostalCode} {account.addressCity}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    {/* Documents */}
-                                    <div className="space-y-4">
-                                        {/* ID Card */}
-                                        <div
-                                            className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
-                                            <div className="flex items-center gap-3">
-                                                <div className="p-2 bg-background rounded border">
-                                                    <IdCardLanyard size={20} className="text-blue-600"/>
-                                                </div>
-                                                <div>
-                                                    <p className="text-sm font-medium">Pièce d'identité</p>
-                                                    <div className="flex items-center gap-2">
-                                                        <Badge variant="outline" className={cn(
-                                                            "text-[10px] h-4 px-1",
-                                                            account.idCardStatus === 'validated' ? "bg-green-50 text-green-700 border-green-200" :
-                                                                account.idCardStatus === 'submitted' ? "bg-blue-50 text-blue-700 border-blue-200" :
-                                                                    "bg-red-50 text-red-700 border-red-200"
-                                                        )}>
-                                                            {account.idCardStatus === 'validated' ? 'Validé' : account.idCardStatus === 'submitted' ? 'Soumis' : 'Manquant'}
-                                                        </Badge>
-                                                        {account.idCardFileId && (
-                                                            <a
-                                                                href={`${process.env.NEXT_PUBLIC_STORAGE_URL || 'http://localhost:3004'}/v1/files/${account.idCardFileId}`}
-                                                                target="_blank"
-                                                                className="text-xs text-blue-600 hover:underline flex items-center gap-1"
-                                                            >
-                                                                Voir <ExternalLink size={10}/>
-                                                            </a>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            {account.idCardStatus === 'submitted' && (
-                                                <div className="flex gap-2">
-                                                    <Button size="sm" variant="outline"
-                                                            className="h-8 text-red-600 border-red-200 hover:bg-red-50"
-                                                            onClick={() => {
-                                                                setRejectType('idCard');
-                                                                setRejectReasonText("");
-                                                                setRejectDialogOpen(true);
-                                                            }}>Refuser</Button>
-                                                    <Button size="sm" className="h-8 bg-green-600 hover:bg-green-700"
-                                                            onClick={async () => {
-                                                                await validateDocumentsAction(account.id, 'idCard');
-                                                                setUsers(prev => {
-                                                                    return prev.map(u => {
-                                                                        if (u.id === account.id) {
-                                                                            const newIdCardStatus = 'validated';
-                                                                            const newCasierStatus = u.casierStatus;
-                                                                            const allValidated = newIdCardStatus === 'validated' && newCasierStatus === 'validated';
-                                                                            return {
-                                                                                ...u,
-                                                                                idCardStatus: newIdCardStatus,
-                                                                                idCardRejectReason: null,
-                                                                                documentsStatus: allValidated ? 'validated' : u.documentsStatus,
-                                                                                documentsValidatedAt: allValidated ? new Date() : u.documentsValidatedAt
-                                                                            };
-                                                                        }
-                                                                        return u;
-                                                                    });
-                                                                });
-                                                                router.refresh();
-                                                            }}>Valider</Button>
-                                                </div>
-                                            )}
-                                        </div>
-                                        {account.idCardRejectReason && (
-                                            <p className="text-xs text-red-600 px-3">Raison du refus
-                                                : {account.idCardRejectReason}</p>
-                                        )}
-
-                                        {/* Casier */}
-                                        <div
-                                            className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
-                                            <div className="flex items-center gap-3">
-                                                <div className="p-2 bg-background rounded border">
-                                                    <FileText size={20} className="text-purple-600"/>
-                                                </div>
-                                                <div>
-                                                    <p className="text-sm font-medium">Casier judiciaire</p>
-                                                    <div className="flex items-center gap-2">
-                                                        <Badge variant="outline" className={cn(
-                                                            "text-[10px] h-4 px-1",
-                                                            account.casierStatus === 'validated' ? "bg-green-50 text-green-700 border-green-200" :
-                                                                account.casierStatus === 'submitted' ? "bg-blue-50 text-blue-700 border-blue-200" :
-                                                                    "bg-red-50 text-red-700 border-red-200"
-                                                        )}>
-                                                            {account.casierStatus === 'validated' ? 'Validé' : account.casierStatus === 'submitted' ? 'Soumis' : 'Manquant'}
-                                                        </Badge>
-                                                        {account.casierFileId && (
-                                                            <a
-                                                                href={`${process.env.NEXT_PUBLIC_STORAGE_URL || 'http://localhost:7001'}/v1/files/${account.casierFileId}`}
-                                                                target="_blank"
-                                                                className="text-xs text-blue-600 hover:underline flex items-center gap-1"
-                                                            >
-                                                                Voir <ExternalLink size={10}/>
-                                                            </a>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            {account.casierStatus === 'submitted' && (
-                                                <div className="flex gap-2">
-                                                    <Button size="sm" variant="outline"
-                                                            className="h-8 text-red-600 border-red-200 hover:bg-red-50"
-                                                            onClick={() => {
-                                                                setRejectType('casier');
-                                                                setRejectReasonText("");
-                                                                setRejectDialogOpen(true);
-                                                            }}>Refuser</Button>
-                                                    <Button size="sm" className="h-8 bg-green-600 hover:bg-green-700"
-                                                            onClick={async () => {
-                                                                await validateDocumentsAction(account.id, 'casier');
-                                                                setUsers(prev => {
-                                                                    return prev.map(u => {
-                                                                        if (u.id === account.id) {
-                                                                            const newCasierStatus = 'validated';
-                                                                            const newIdCardStatus = u.idCardStatus;
-                                                                            const allValidated = newIdCardStatus === 'validated' && newCasierStatus === 'validated';
-                                                                            return {
-                                                                                ...u,
-                                                                                casierStatus: newCasierStatus,
-                                                                                casierRejectReason: null,
-                                                                                documentsStatus: allValidated ? 'validated' : u.documentsStatus,
-                                                                                documentsValidatedAt: allValidated ? new Date() : u.documentsValidatedAt
-                                                                            };
-                                                                        }
-                                                                        return u;
-                                                                    });
-                                                                });
-                                                                router.refresh();
-                                                            }}>Valider</Button>
-                                                </div>
-                                            )}
-                                        </div>
-                                        {account.casierRejectReason && (
-                                            <p className="text-xs text-red-600 px-3">Raison du refus
-                                                : {account.casierRejectReason}</p>
-                                        )}
-                                    </div>
-
-                                    <div
-                                        className="grid grid-cols-2 gap-4 text-[10px] text-muted-foreground border-t pt-4">
-                                        <div>
-                                            <p>Envoyé le
-                                                : {account.documentsSentAt ? format(new Date(account.documentsSentAt), "PPp", {locale: fr}) : "Jamais"}</p>
-                                        </div>
-                                        <div>
-                                            <p>Dernière validation
-                                                : {account.documentsValidatedAt ? format(new Date(account.documentsValidatedAt), "PPp", {locale: fr}) : "Jamais"}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <DialogFooter>
-                                    <DialogClose asChild>
-                                        <Button variant="outline">Fermer</Button>
-                                    </DialogClose>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
 
                         <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
                             <DialogContent className="sm:max-w-[425px]">
@@ -1063,6 +873,15 @@ export function UsersTable({data, availableRoles}: DataTableProps) {
                     </Button>
                 </div>
             </div>
+            {validationViewAccount && (
+                <AdminValidationView
+                    account={validationViewAccount}
+                    onClose={() => setValidationViewAccount(null)}
+                    onUpdate={(updated) => {
+                        setUsers(prev => prev.map(u => u.id === updated.id ? updated : u));
+                    }}
+                />
+            )}
         </div>
     );
 }

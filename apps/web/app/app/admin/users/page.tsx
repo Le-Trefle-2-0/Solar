@@ -37,7 +37,7 @@ async function getData(): Promise<{ users: DisplayAccount[], roles: any[] }> {
             casierFileId: true,
             casierStatus: true,
             casierRejectReason: true,
-            Ticket: {
+            tickets: {
                 where: {
                     createdAt: {
                         gte: subDays(new Date(), 90),
@@ -66,7 +66,7 @@ async function getData(): Promise<{ users: DisplayAccount[], roles: any[] }> {
                 username: acc.username as string,
                 email: hideEmails ? truncateEmail(acc.email) : acc.email,
                 role: acc.role as string,
-                lastTicketTimestamp: acc.Ticket.length > 0 ? acc.Ticket[0].createdAt.getTime() : 0,
+                lastTicketTimestamp: acc.tickets.length > 0 ? acc.tickets[0].createdAt.getTime() : 0,
                 documentsStatus: acc.documentsStatus,
                 documentsSentAt: acc.documentsSentAt,
                 documentsValidatedAt: acc.documentsValidatedAt,

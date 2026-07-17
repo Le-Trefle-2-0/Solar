@@ -21,6 +21,7 @@ import {
     Users,
 } from "lucide-react"
 import {NavProjects} from "@/components/nav-projects"
+import {useParams} from "next/navigation";
 import {
     Sidebar,
     SidebarContent,
@@ -43,8 +44,91 @@ import {useSocket} from "@/context/Socket";
 import {usePeer} from "@/context/VoicePeer";
 import {UserButton} from "@/components/user-button";
 
-export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({pendingDocsCount = 0, unreadChannelIds = [], pendingDocsIds = [], ...props}: React.ComponentProps<typeof Sidebar> & { pendingDocsCount?: number, unreadChannelIds?: string[], pendingDocsIds?: string[] }) {
     const {peerInstance, isMuted, toggleMute, stopCall, connectedUsers, netQuality, rttMs, lossPct} = usePeer();
+    const {socket} = useSocket();
+    const [session, setSession] = useState<any>(null);
+    const params = useParams();
+    const [activeChannelId, setActiveChannelId] = useState<string | null>(null);
+
+    useEffect(() => {
+        const path = window.location.pathname;
+        if (path.startsWith('/app/ticket/')) {
+            setActiveChannelId(path.split('/').pop() || null);
+        } else if (path === '/app/be') {
+            setActiveChannelId('1');
+        } else if (path === '/app/chat') {
+            setActiveChannelId('chat');
+        } else {
+            setActiveChannelId(null);
+        }
+    }, [params]);
+
+    const [unreadIds, setUnreadIds] = useState<Set<string>>(new Set(unreadChannelIds));
+    const [pendingIds, setPendingIds] = useState<Set<string>>(new Set(pendingDocsIds));
+
+    useEffect(() => {
+        setUnreadIds(new Set(unreadChannelIds));
+    }, [unreadChannelIds]);
+
+    useEffect(() => {
+        setPendingIds(new Set(pendingDocsIds));
+    }, [pendingDocsIds]);
+
+    useEffect(() => {
+        if (!socket) return;
+
+        const handleMessage = (data: any) => {
+            const channelId = data.channel?.id;
+            const authorId = data.author?.id;
+            const currentUserId = session?.user?.id;
+            console.log('[AppSidebar] Received message for channel:', channelId, 'Active channel:', activeChannelId, 'Author:', authorId, 'Me:', currentUserId);
+            if (channelId && channelId !== activeChannelId && authorId !== currentUserId) {
+                setUnreadIds(prev => {
+                    const next = new Set(prev);
+                    next.add(channelId);
+                    console.log('[AppSidebar] Updated unreadIds:', Array.from(next));
+                    return next;
+                });
+            }
+        };
+
+        const handleChannelRead = (data: any) => {
+            console.log('[AppSidebar] Received channelRead event:', data);
+            if (data.userId === session?.user?.id) {
+                setUnreadIds(prev => {
+                    const next = new Set(prev);
+                    next.delete(data.channelId);
+                    console.log('[AppSidebar] Cleared unreadId:', data.channelId, 'Remaining:', Array.from(next));
+                    return next;
+                });
+            }
+        };
+
+        socket.on('message', handleMessage);
+        socket.on('channelRead', handleChannelRead);
+
+        const handleDocumentsUpdate = (data: any) => {
+            console.log('[AppSidebar] Received documentsUpdate event:', data);
+            setPendingIds(prev => {
+                const next = new Set(prev);
+                if (data.status === 'submitted') {
+                    next.add(data.userId);
+                } else {
+                    next.delete(data.userId);
+                }
+                return next;
+            });
+        };
+        socket.on('documentsUpdate', handleDocumentsUpdate);
+
+        return () => {
+            socket.off('message', handleMessage);
+            socket.off('channelRead', handleChannelRead);
+            socket.off('documentsUpdate', handleDocumentsUpdate);
+        };
+    }, [socket, activeChannelId, session]);
+
     const baseData = [
         {
             name: "Accueil",
@@ -55,11 +139,13 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
             name: "Discussion BE libre",
             url: "/app/be",
             icon: MessageSquareMore,
+            hasNotification: unreadIds.has('1') && activeChannelId !== '1'
         },
         {
             name: "Chat Permanence",
             url: "/app/chat",
             icon: MessagesSquare,
+            hasNotification: Array.from(unreadIds).some(id => id !== '1' && !id.startsWith('ticket-')) && activeChannelId !== 'chat'
         },
         {
             name: "Planning",
@@ -83,6 +169,7 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
             url: "/app/admin/users",
             icon: ShieldUser,
             adminOnly: true,
+            hasNotification: pendingDocsCount > 0
         },
         {
             name: "Statistiques",
@@ -110,10 +197,6 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
         },
     ]
     const [tickets, setTickets] = useState<any[]>([]);
-    const socketRef = useRef<Socket | null>(null);
-    const {socket} = useSocket();
-
-    const [session, setSession] = useState<any>(null);
 
     useEffect(() => {
         const updateSession = () => apiFetch('/v1/auth/get-session').then(res => setSession(res));
@@ -150,8 +233,19 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
             if (isManager && item.name === "Rôles") return true;
 
             return false;
+        }).map(item => {
+            if (item.name === "Discussion BE libre") {
+                return { ...item, hasNotification: unreadIds.has('1') && activeChannelId !== '1' };
+            }
+            if (item.name === "Chat Permanence") {
+                return { ...item, hasNotification: Array.from(unreadIds).some(id => id !== '1' && !id.startsWith('ticket-')) && activeChannelId !== 'chat' };
+            }
+            if (item.name === "Utilisateurs") {
+                return { ...item, hasNotification: pendingIds.size > 0 };
+            }
+            return item;
         });
-    }, [session]);
+    }, [session, unreadIds, activeChannelId, pendingIds]);
 
     const MAX_TICKETS_BEFORE_COLLAPSE = 5;
 
@@ -175,7 +269,9 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
                         return {
                             name: displayName,
                             url: '/app/ticket/' + ticket.channelId,
-                            icon: Ear
+                            channelId: ticket.channelId,
+                            icon: Ear,
+                            hasNotification: unreadIds.has(ticket.channelId) && activeChannelId !== ticket.channelId
                         };
                     });
                     setTickets(items);
@@ -186,7 +282,7 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
 
     useEffect(() => {
         updateTickets()
-    }, [session]);
+    }, [session, unreadIds, activeChannelId]);
 
     return (
         <Sidebar variant="inset" {...props}>
@@ -219,9 +315,12 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
                                 <Collapsible asChild className="group/collapsible">
                                     <SidebarMenuItem>
                                         <CollapsibleTrigger asChild>
-                                            <SidebarMenuButton tooltip="Tickets">
+                                            <SidebarMenuButton tooltip="Tickets" className="relative">
                                                 <Ear/>
                                                 <span>Tickets ({tickets.length})</span>
+                                                {tickets.some(t => t.hasNotification) && (
+                                                    <span className="absolute top-2 left-5 flex h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                                                )}
                                                 <ChevronRight
                                                     className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"/>
                                             </SidebarMenuButton>
@@ -230,9 +329,12 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
                                             <SidebarMenuSub>
                                                 {tickets.map((ticket) => (
                                                     <SidebarMenuSubItem key={ticket.name}>
-                                                        <SidebarMenuSubButton asChild>
+                                                        <SidebarMenuSubButton asChild className="relative">
                                                             <a href={ticket.url}>
                                                                 <span>{ticket.name}</span>
+                                                                {ticket.hasNotification && (
+                                                                    <span className="absolute top-1/2 -translate-y-1/2 right-2 flex h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                                                                )}
                                                             </a>
                                                         </SidebarMenuSubButton>
                                                     </SidebarMenuSubItem>

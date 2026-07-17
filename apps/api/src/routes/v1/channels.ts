@@ -5,6 +5,8 @@ import {authenticate} from '../../auth.js';
 
 import {getUserPermissions, hasPermission} from '../../lib/permissions.js';
 
+import {broadcast} from '../../lib/broadcast.js';
+
 async function canReadTicketsAll(userId: string): Promise<boolean> {
     const perms = await getUserPermissions(userId);
     return hasPermission(perms, 'tickets.read_all');
@@ -149,6 +151,65 @@ export async function registerChannelsRoutes(app: FastifyInstance) {
             }));
 
             return reply.send({success: true, members});
+        } catch (e) {
+            console.error(e);
+            return reply.status(500).send({success: false, error: 'internal_error'});
+        }
+    });
+
+    // GET /v1/channel/:id/read – get last read timestamp
+    app.get('/v1/channel/:id/read', async (req, reply) => {
+        try {
+            const {id: channelId} = req.params as any;
+            const userId = await authenticate(req);
+            if (!userId) return reply.status(401).send('unauthorized');
+
+            const read = await prisma.userChannelRead.findUnique({
+                where: {
+                    userId_channelId: {
+                        userId,
+                        channelId,
+                    },
+                },
+            });
+
+            return reply.send({lastRead: read?.lastRead || null});
+        } catch (e) {
+            console.error(e);
+            return reply.status(500).send({success: false, error: 'internal_error'});
+        }
+    });
+
+    // POST /v1/channel/:id/read – mark channel as read
+    app.post('/v1/channel/:id/read', async (req, reply) => {
+        try {
+            const {id: channelId} = req.params as any;
+            const userId = await authenticate(req);
+            if (!userId) return reply.status(401).send('unauthorized');
+
+            const channel = await prisma.channel.findUnique({where: {id: channelId}});
+            if (!channel) return reply.status(404).send({error: 'not_found'});
+
+            await prisma.userChannelRead.upsert({
+                where: {
+                    userId_channelId: {
+                        userId,
+                        channelId,
+                    },
+                },
+                update: {
+                    lastRead: new Date(),
+                },
+                create: {
+                    userId,
+                    channelId,
+                    lastRead: new Date(),
+                },
+            });
+
+            await broadcast(null, 'channelRead', {userId, channelId});
+
+            return reply.send({success: true});
         } catch (e) {
             console.error(e);
             return reply.status(500).send({success: false, error: 'internal_error'});

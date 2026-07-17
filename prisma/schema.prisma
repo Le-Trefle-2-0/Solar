@@ -71,17 +71,18 @@ model User {
   newsletterSubscription Boolean             @default(false)
   accounts               Account[]
   apikeys                Apikey[]
-  Event                  Event[]
-  EventRegistration      EventRegistration[]
+  events                 Event[]
+  eventRegistrations     EventRegistration[]
   invitations            Invitation[]
   members                Member[]
   messages               Message[]
   newsletters            Newsletter[]
   passkeys               Passkey[]
-  Reaction               Reaction[]
+  reactions              Reaction[]
   sessions               Session[]
-  Ticket                 Ticket[]
+  tickets                Ticket[]
   twofactors             TwoFactor[]
+  channelReads           UserChannelRead[]
 
   @@map("user")
 }
@@ -213,14 +214,26 @@ model TwoFactor {
 }
 
 model Channel {
-  id      String    @id @default(cuid())
-  name    String
-  Event   Event[]
-  Message Message[]
-  Ticket  Ticket?
+  id           String            @id @default(cuid())
+  name         String
+  events       Event[]
+  messages     Message[]
+  ticket       Ticket?
+  channelReads UserChannelRead[]
 
   @@unique([id, name])
   @@map("channel")
+}
+
+model UserChannelRead {
+  userId    String
+  channelId String
+  lastRead  DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  @@id([userId, channelId])
+  @@map("user_channel_read")
 }
 
 model Message {
@@ -236,7 +249,7 @@ model Message {
   channel   Channel    @relation(fields: [channelId], references: [id], onDelete: Cascade)
   ticket    Ticket?    @relation(fields: [ticketId], references: [id])
   user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Reaction  Reaction[]
+  reactions Reaction[]
 
   @@index([channelId], map: "message_channelId_fkey")
   @@index([ticketId], map: "message_ticketId_fkey")
@@ -297,7 +310,7 @@ model EventRegistration {
   registeredAt DateTime @default(now())
   eventId      String?
   status       String   @default("confirmed")
-  Event        Event?   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event        Event?   @relation(fields: [eventId], references: [id], onDelete: Cascade)
   roleSlot     RoleSlot @relation(fields: [roleSlotId], references: [id], onDelete: Cascade)
   user         User     @relation(fields: [userId], references: [id])
 
@@ -325,7 +338,7 @@ model Ticket {
   source         String       @default("discord")
   categories     Json?
   feedback       Json?
-  Message        Message[]
+  messages       Message[]
   user           User?        @relation(fields: [assignedUserId], references: [id])
   channel        Channel?     @relation(fields: [channelId, channelName], references: [id, name], onDelete: Cascade)
   status         TicketStatus @relation(fields: [statusName, statusLabel], references: [name, label])

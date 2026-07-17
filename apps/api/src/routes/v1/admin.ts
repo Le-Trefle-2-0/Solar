@@ -428,7 +428,7 @@ export async function registerAdminRoutes(app: FastifyInstance) {
         // 3. Planning stats (Volunteering time)
         const registrations = await prisma.eventRegistration.findMany({
             where: {
-                Event: {
+                event: {
                     start: {
                         gte: startDate,
                         lte: endDate
@@ -437,14 +437,14 @@ export async function registerAdminRoutes(app: FastifyInstance) {
                 status: 'confirmed'
             },
             include: {
-                Event: true
+                event: true
             }
         });
 
         let totalVolunteerSeconds = 0;
         registrations.forEach(reg => {
-            if (reg.Event) {
-                const duration = Math.floor((reg.Event.end.getTime() - reg.Event.start.getTime()) / 1000);
+            if (reg.event) {
+                const duration = Math.floor((reg.event.end.getTime() - reg.event.start.getTime()) / 1000);
                 totalVolunteerSeconds += duration;
             }
         });
@@ -498,10 +498,10 @@ export async function registerAdminRoutes(app: FastifyInstance) {
 
         // Fill volunteer data
         registrations.forEach(reg => {
-            if (reg.Event) {
-                const key = getGroupKey(reg.Event.start);
+            if (reg.event) {
+                const key = getGroupKey(reg.event.start);
                 if (timeSeries[key]) {
-                    const duration = Math.floor((reg.Event.end.getTime() - reg.Event.start.getTime()) / 1000);
+                    const duration = Math.floor((reg.event.end.getTime() - reg.event.start.getTime()) / 1000);
                     timeSeries[key].volunteer += duration;
                 }
             }
