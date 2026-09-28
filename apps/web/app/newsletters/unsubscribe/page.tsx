@@ -14,16 +14,6 @@ function UnsubscribeContent() {
     const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
     const [errorMessage, setErrorMessage] = useState("");
 
-    useEffect(() => {
-        const id = searchParams.get("id");
-        if (id) {
-            autoUnsubscribe(id);
-        } else {
-            setStatus("error");
-            setErrorMessage("Lien de désinscription invalide.");
-        }
-    }, [searchParams]);
-
     const autoUnsubscribe = async (id: string) => {
         setStatus("loading");
         const result = await unsubscribeById(id);
@@ -37,6 +27,16 @@ function UnsubscribeContent() {
             setErrorMessage(result.error || "Une erreur est survenue.");
         }
     };
+
+    useEffect(() => {
+        const id = searchParams.get("id");
+        if (id) {
+            autoUnsubscribe(id);
+        } else {
+            setStatus("error");
+            setErrorMessage("Lien de désinscription invalide.");
+        }
+    }, [searchParams]);
 
     return (
         <Card className="w-full max-w-md">

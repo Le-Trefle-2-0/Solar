@@ -49,10 +49,6 @@ export default function AdminSettingsView({initialSettings, roles}: { initialSet
     const [newSubscriberEmail, setNewSubscriberEmail] = useState("");
     const [loadingSubscribers, setLoadingSubscribers] = useState(false);
 
-    useEffect(() => {
-        fetchSubscribers();
-    }, []);
-
     const fetchSubscribers = async () => {
         setLoadingSubscribers(true);
         try {
@@ -65,6 +61,10 @@ export default function AdminSettingsView({initialSettings, roles}: { initialSet
             setLoadingSubscribers(false);
         }
     };
+
+    useEffect(() => {
+        fetchSubscribers();
+    }, []);
 
     const handleAddSubscriber = async () => {
         if (!newSubscriberEmail.trim()) return;

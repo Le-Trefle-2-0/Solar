@@ -103,6 +103,273 @@ interface DataTableProps {
     availableRoles: { id: string, name: string, icon?: string }[];
 }
 
+const RolesFormSchema = z.object({
+    roles: z.array(z.string())
+});
+
+interface UserActionsCellProps {
+    account: DisplayAccount;
+    availableRoles: DataTableProps["availableRoles"];
+    setUsers: React.Dispatch<React.SetStateAction<DisplayAccount[]>>;
+    setDialogOpen: (open: boolean) => void;
+    setValidationViewAccount: (account: DisplayAccount | null) => void;
+}
+
+function UserActionsCell({account, availableRoles, setUsers, setDialogOpen, setValidationViewAccount}: UserActionsCellProps) {
+    const router = useRouter();
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [editDialogOpen, setEditDialogOpen] = useState(false);
+    const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+    const [rejectType, setRejectType] = useState<'idCard' | 'casier' | null>(null);
+    const [rejectReasonText, setRejectReasonText] = useState("");
+
+    async function onSubmit(formData: z.infer<typeof RolesFormSchema>) {
+        try {
+            const {user: userData} = await apiFetch(`/v1/admin/users/${account.id}/role`, {
+                method: 'POST',
+                body: JSON.stringify({roles: formData.roles}),
+            });
+            setUsers((prev) =>
+                prev.map((u) =>
+                    u.id === userData.id
+                        ? {
+                            ...u,
+                            role: userData.role as string,
+                        }
+                        : u
+                )
+            );
+
+            setEditDialogOpen(false);
+            toast("Rôles modifiés")
+            form.reset();
+        } catch (e: any) {
+            return toast("Erreur lors de la modification", {
+                description: (
+                    <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
+                      <code className="text-white">{String(e?.message || e)}</code>
+                    </pre>
+                )
+            });
+        }
+    }
+
+    const form = useForm<z.infer<typeof RolesFormSchema>>({
+        resolver: zodResolver(RolesFormSchema),
+        defaultValues: {
+            roles: (account.role || '').split(',').map(r => r.trim()).filter(Boolean),
+        },
+    });
+
+    return (
+        <>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0">
+                        <span className="sr-only">Ouvrir le menu</span>
+                        <MoreHorizontal/>
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => router.push(`/app/admin/user/${account.id}`)}>
+                        <Info/> Voir le profil
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator/>
+                    <DropdownMenuItem onClick={() => setValidationViewAccount(account)}>
+                        <ShieldCheck/> Validation administrative
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => {
+                        toast.promise(requestRenewalAction(account.id), {
+                            loading: 'Demande de renouvellement...',
+                            success: () => {
+                                router.refresh();
+                                return 'Renouvellement demandé';
+                            },
+                            error: 'Erreur lors de la demande'
+                        });
+                    }}>
+                        <FileClock/> Demander renouvellement
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator/>
+                    <DropdownMenuItem
+                        onClick={() => navigator.clipboard.writeText(account.id)}
+                    >
+                        <IdCardLanyard/> Copier l'identifiant
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator/>
+                    <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                        <UserPen/> Modifier le rôle
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)}
+                                      className="text-destructive">
+                        <Trash/> Supprimer l'utilisateur
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+
+            <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Êtes-vous sûr de supprimer le compte
+                            de {account.name} ?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Cette action est irréversible. L'utilisateur sera définitivement supprimé.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Annuler</AlertDialogCancel>
+                        <Button
+                            onClick={async () => {
+                                await authClient.admin.removeUser({userId: account.id});
+                                setUsers(prev => prev.filter(user => user.id !== account.id));
+                                toast("Utilisateur supprimé");
+                                setDialogOpen(false);
+                            }}
+                            variant="destructive"
+                        >
+                            Supprimer
+                        </Button>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Modifier le rôle de {account.name}</DialogTitle>
+                    </DialogHeader>
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+                            <div className="grid gap-3">
+                                <FormField
+                                    control={form.control}
+                                    name="roles"
+                                    render={({field}) => (
+                                        <FormItem className="flex flex-col">
+                                            <FormLabel>Rôles</FormLabel>
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <FormControl>
+                                                        <Button
+                                                            variant="outline"
+                                                            role="combobox"
+                                                            className={cn(
+                                                                "w-full justify-between",
+                                                                (!field.value || field.value.length === 0) && "text-muted-foreground"
+                                                            )}
+                                                        >
+                                                            {field.value && field.value.length > 0
+                                                                ? availableRoles
+                                                                    .filter((r) => (field.value as string[]).includes(r.name))
+                                                                    .map((r) => r.name)
+                                                                    .join(', ')
+                                                                : "Sélectionner un ou plusieurs rôles"}
+                                                            <ChevronsUpDown className="opacity-50"/>
+                                                        </Button>
+                                                    </FormControl>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-full p-0">
+                                                    <Command>
+                                                        <CommandList>
+                                                            <CommandGroup>
+                                                                {availableRoles.map((role) => {
+                                                                    const selected = ((field.value as string[]) || []).includes(role.name)
+                                                                    return (
+                                                                        <CommandItem
+                                                                            value={role.name}
+                                                                            key={role.id}
+                                                                            onSelect={() => {
+                                                                                const current = new Set((field.value as string[]) || [])
+                                                                                if (current.has(role.name)) {
+                                                                                    current.delete(role.name)
+                                                                                } else {
+                                                                                    current.add(role.name)
+                                                                                }
+                                                                                form.setValue("roles", Array.from(current) as any, {shouldDirty: true})
+                                                                            }}
+                                                                        >
+                                                                            {role.name}
+                                                                            <Check
+                                                                                className={cn(
+                                                                                    "ml-auto",
+                                                                                    selected ? "opacity-100" : "opacity-0"
+                                                                                )}
+                                                                            />
+                                                                        </CommandItem>
+                                                                    )
+                                                                })}
+                                                            </CommandGroup>
+                                                        </CommandList>
+                                                    </Command>
+                                                </PopoverContent>
+                                            </Popover>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <DialogFooter>
+                                <DialogClose asChild>
+                                    <Button variant="outline">Annuler</Button>
+                                </DialogClose>
+                                <Button type="submit" className="cursor-pointer">Enregistrer</Button>
+                            </DialogFooter>
+                        </form>
+                    </Form>
+                </DialogContent>
+            </Dialog>
+
+
+            <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Refuser le document</DialogTitle>
+                        <DialogDescription>
+                            Veuillez indiquer la raison du refus
+                            pour {rejectType === 'idCard' ? "la pièce d'identité" : "le casier judiciaire"}.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4">
+                        <Label htmlFor="reject-reason" className="text-xs mb-2 block">Raison du
+                            refus</Label>
+                        <Textarea
+                            id="reject-reason"
+                            placeholder="Ex: Document expiré, illisible..."
+                            value={rejectReasonText}
+                            onChange={(e) => setRejectReasonText(e.target.value)}
+                            rows={3}
+                        />
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline"
+                                onClick={() => setRejectDialogOpen(false)}>Annuler</Button>
+                        <Button
+                            variant="destructive"
+                            disabled={!rejectReasonText.trim()}
+                            onClick={async () => {
+                                if (rejectType) {
+                                    await rejectDocumentAction(account.id, rejectType, rejectReasonText);
+                                    setUsers(prev => prev.map(u => u.id === account.id ? {
+                                        ...u,
+                                        [rejectType === 'idCard' ? 'idCardStatus' : 'casierStatus']: 'rejected',
+                                        [rejectType === 'idCard' ? 'idCardRejectReason' : 'casierRejectReason']: rejectReasonText,
+                                        documentsStatus: 'rejected'
+                                    } : u));
+                                    setRejectDialogOpen(false);
+                                    router.refresh();
+                                    toast.success("Document refusé");
+                                }
+                            }}
+                        >
+                            Refuser
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </>
+    );
+}
+
 export function UsersTable({data, availableRoles}: DataTableProps) {
     const [users, setUsers] = useState<DisplayAccount[]>(data);
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -262,264 +529,15 @@ export function UsersTable({data, availableRoles}: DataTableProps) {
         {
             id: "actions",
             enableHiding: false,
-            cell: ({row}) => {
-                const account = row.original;
-                const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-                const [editDialogOpen, setEditDialogOpen] = useState(false);
-                const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
-                const [rejectType, setRejectType] = useState<'idCard' | 'casier' | null>(null);
-                const [rejectReasonText, setRejectReasonText] = useState("");
-
-                const FormSchema = z.object({
-                    roles: z.array(z.string())
-                });
-
-                async function onSubmit(formData: z.infer<typeof FormSchema>) {
-                    try {
-                        const {user: userData} = await apiFetch(`/v1/admin/users/${account.id}/role`, {
-                            method: 'POST',
-                            body: JSON.stringify({roles: formData.roles}),
-                        });
-                        setUsers((prev) =>
-                            prev.map((u) =>
-                                u.id === userData.id
-                                    ? {
-                                        ...u,
-                                        role: userData.role as string,
-                                    }
-                                    : u
-                            )
-                        );
-
-                        setEditDialogOpen(false);
-                        toast("Rôles modifiés")
-                        form.reset();
-                    } catch (e: any) {
-                        return toast("Erreur lors de la modification", {
-                            description: (
-                                <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
-                                  <code className="text-white">{String(e?.message || e)}</code>
-                                </pre>
-                            )
-                        });
-                    }
-                }
-
-                const form = useForm<z.infer<typeof FormSchema>>({
-                    resolver: zodResolver(FormSchema),
-                    defaultValues: {
-                        roles: (account.role || '').split(',').map(r => r.trim()).filter(Boolean),
-                    },
-                });
-
-                return (
-                    <>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" className="h-8 w-8 p-0">
-                                    <span className="sr-only">Ouvrir le menu</span>
-                                    <MoreHorizontal/>
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => router.push(`/app/admin/user/${account.id}`)}>
-                                    <Info/> Voir le profil
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator/>
-                                <DropdownMenuItem onClick={() => setValidationViewAccount(account)}>
-                                    <ShieldCheck/> Validation administrative
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => {
-                                    toast.promise(requestRenewalAction(account.id), {
-                                        loading: 'Demande de renouvellement...',
-                                        success: () => {
-                                            router.refresh();
-                                            return 'Renouvellement demandé';
-                                        },
-                                        error: 'Erreur lors de la demande'
-                                    });
-                                }}>
-                                    <FileClock/> Demander renouvellement
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator/>
-                                <DropdownMenuItem
-                                    onClick={() => navigator.clipboard.writeText(account.id)}
-                                >
-                                    <IdCardLanyard/> Copier l'identifiant
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator/>
-                                <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
-                                    <UserPen/> Modifier le rôle
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)}
-                                                  className="text-destructive">
-                                    <Trash/> Supprimer l'utilisateur
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-
-                        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                            <AlertDialogContent>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>Êtes-vous sûr de supprimer le compte
-                                        de {account.name} ?</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                        Cette action est irréversible. L'utilisateur sera définitivement supprimé.
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                    <Button
-                                        onClick={async () => {
-                                            await authClient.admin.removeUser({userId: account.id});
-                                            setUsers(prev => prev.filter(user => user.id !== account.id));
-                                            toast("Utilisateur supprimé");
-                                            setDialogOpen(false);
-                                        }}
-                                        variant="destructive"
-                                    >
-                                        Supprimer
-                                    </Button>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
-
-                        <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-                            <DialogContent className="sm:max-w-[425px]">
-                                <DialogHeader>
-                                    <DialogTitle>Modifier le rôle de {account.name}</DialogTitle>
-                                </DialogHeader>
-                                <Form {...form}>
-                                    <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
-                                        <div className="grid gap-3">
-                                            <FormField
-                                                control={form.control}
-                                                name="roles"
-                                                render={({field}) => (
-                                                    <FormItem className="flex flex-col">
-                                                        <FormLabel>Rôles</FormLabel>
-                                                        <Popover>
-                                                            <PopoverTrigger asChild>
-                                                                <FormControl>
-                                                                    <Button
-                                                                        variant="outline"
-                                                                        role="combobox"
-                                                                        className={cn(
-                                                                            "w-full justify-between",
-                                                                            (!field.value || field.value.length === 0) && "text-muted-foreground"
-                                                                        )}
-                                                                    >
-                                                                        {field.value && field.value.length > 0
-                                                                            ? availableRoles
-                                                                                .filter((r) => (field.value as string[]).includes(r.name))
-                                                                                .map((r) => r.name)
-                                                                                .join(', ')
-                                                                            : "Sélectionner un ou plusieurs rôles"}
-                                                                        <ChevronsUpDown className="opacity-50"/>
-                                                                    </Button>
-                                                                </FormControl>
-                                                            </PopoverTrigger>
-                                                            <PopoverContent className="w-full p-0">
-                                                                <Command>
-                                                                    <CommandList>
-                                                                        <CommandGroup>
-                                                                            {availableRoles.map((role) => {
-                                                                                const selected = ((field.value as string[]) || []).includes(role.name)
-                                                                                return (
-                                                                                    <CommandItem
-                                                                                        value={role.name}
-                                                                                        key={role.id}
-                                                                                        onSelect={() => {
-                                                                                            const current = new Set((field.value as string[]) || [])
-                                                                                            if (current.has(role.name)) {
-                                                                                                current.delete(role.name)
-                                                                                            } else {
-                                                                                                current.add(role.name)
-                                                                                            }
-                                                                                            form.setValue("roles", Array.from(current) as any, {shouldDirty: true})
-                                                                                        }}
-                                                                                    >
-                                                                                        {role.name}
-                                                                                        <Check
-                                                                                            className={cn(
-                                                                                                "ml-auto",
-                                                                                                selected ? "opacity-100" : "opacity-0"
-                                                                                            )}
-                                                                                        />
-                                                                                    </CommandItem>
-                                                                                )
-                                                                            })}
-                                                                        </CommandGroup>
-                                                                    </CommandList>
-                                                                </Command>
-                                                            </PopoverContent>
-                                                        </Popover>
-                                                        <FormMessage/>
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
-                                        <DialogFooter>
-                                            <DialogClose asChild>
-                                                <Button variant="outline">Annuler</Button>
-                                            </DialogClose>
-                                            <Button type="submit" className="cursor-pointer">Enregistrer</Button>
-                                        </DialogFooter>
-                                    </form>
-                                </Form>
-                            </DialogContent>
-                        </Dialog>
-
-
-                        <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
-                            <DialogContent className="sm:max-w-[425px]">
-                                <DialogHeader>
-                                    <DialogTitle>Refuser le document</DialogTitle>
-                                    <DialogDescription>
-                                        Veuillez indiquer la raison du refus
-                                        pour {rejectType === 'idCard' ? "la pièce d'identité" : "le casier judiciaire"}.
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <div className="py-4">
-                                    <Label htmlFor="reject-reason" className="text-xs mb-2 block">Raison du
-                                        refus</Label>
-                                    <Textarea
-                                        id="reject-reason"
-                                        placeholder="Ex: Document expiré, illisible..."
-                                        value={rejectReasonText}
-                                        onChange={(e) => setRejectReasonText(e.target.value)}
-                                        rows={3}
-                                    />
-                                </div>
-                                <DialogFooter>
-                                    <Button variant="outline"
-                                            onClick={() => setRejectDialogOpen(false)}>Annuler</Button>
-                                    <Button
-                                        variant="destructive"
-                                        disabled={!rejectReasonText.trim()}
-                                        onClick={async () => {
-                                            if (rejectType) {
-                                                await rejectDocumentAction(account.id, rejectType, rejectReasonText);
-                                                setUsers(prev => prev.map(u => u.id === account.id ? {
-                                                    ...u,
-                                                    [rejectType === 'idCard' ? 'idCardStatus' : 'casierStatus']: 'rejected',
-                                                    [rejectType === 'idCard' ? 'idCardRejectReason' : 'casierRejectReason']: rejectReasonText,
-                                                    documentsStatus: 'rejected'
-                                                } : u));
-                                                setRejectDialogOpen(false);
-                                                router.refresh();
-                                                toast.success("Document refusé");
-                                            }
-                                        }}
-                                    >
-                                        Refuser
-                                    </Button>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
-                    </>
-                );
-            },
+            cell: ({row}) => (
+                <UserActionsCell
+                    account={row.original}
+                    availableRoles={availableRoles}
+                    setUsers={setUsers}
+                    setDialogOpen={setDialogOpen}
+                    setValidationViewAccount={setValidationViewAccount}
+                />
+            ),
         },
     ];
 

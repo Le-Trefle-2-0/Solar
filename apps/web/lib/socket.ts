@@ -5,7 +5,7 @@ let socket: Socket | null = null;
 export async function initSocket(jwt: string): Promise<Socket | null> {
     if (socket) {
         if (jwt && (socket.auth as any)?.jwt !== jwt) {
-            // eslint-disable-next-line no-console
+             
             console.log('[ws] updating jwt and reconnecting');
             (socket.auth as any).jwt = jwt;
             socket.disconnect().connect();
@@ -53,7 +53,7 @@ export async function initSocket(jwt: string): Promise<Socket | null> {
         base = `${proto}${base}`;
     }
 
-    // eslint-disable-next-line no-console
+     
     console.log('[ws] connecting to', base);
     const transportsEnv = (process.env.NEXT_PUBLIC_WS_TRANSPORTS || 'websocket,polling')
         .split(',')
@@ -84,11 +84,11 @@ export async function initSocket(jwt: string): Promise<Socket | null> {
 
     // Debug listeners to help diagnose connection issues
     socket.on('connect', () => {
-        // eslint-disable-next-line no-console
+         
         console.log('[ws] connected', socket?.id);
     });
     const onConnectError = (err: any) => {
-        // eslint-disable-next-line no-console
+         
         console.error('[ws] connect_error', err?.message || err, {
             base,
             transport: socket?.io?.engine?.transport?.name,
@@ -97,17 +97,17 @@ export async function initSocket(jwt: string): Promise<Socket | null> {
     };
     socket.on('connect_error', onConnectError);
     socket.on('error', (err) => {
-        // eslint-disable-next-line no-console
+         
         console.error('[ws] error', err);
     });
     socket.io.on('reconnect_attempt', (attempt) => {
-        // eslint-disable-next-line no-console
+         
         console.warn('[ws] reconnect_attempt', attempt, {
             transport: socket?.io?.engine?.transport?.name
         });
     });
     socket.io.on('reconnect', (n) => {
-        // eslint-disable-next-line no-console
+         
         console.log('[ws] reconnected', n);
     });
 

@@ -108,7 +108,6 @@ export async function inviteUserAction(formData: z.infer<typeof inviteSchema>) {
         console.log(`[inviteAction] Triggering password reset for ${email}`);
 
         try {
-            // @ts-ignore
             const api = auth.api;
 
             // Based on better-auth structure, we try to find the password reset function

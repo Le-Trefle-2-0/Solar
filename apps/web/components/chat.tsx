@@ -312,7 +312,6 @@ export function Chat(props: { channelID: string, statusID: number }) {
                 "tabSize",
             ] as const;
             props.forEach((p) => {
-                // @ts-ignore - dynamic style copy
                 ov.style[p] = (cs as any)[p] || "";
             });
             // Ensure wrapping behavior matches textarea
@@ -888,7 +887,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
         return () => {
             el.removeEventListener('scroll', onScroll);
         };
-    }, [messagesContainerRef.current, hasMore, loadingOlder, loadingMessages, chat, channelID]);
+    }, [hasMore, loadingOlder, loadingMessages, chat, channelID]);
 
     useEffect(() => {
         function generateSkeletons() {

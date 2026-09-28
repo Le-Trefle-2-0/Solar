@@ -49,7 +49,6 @@ export default async function RootLayout({
 }>) {
     let widgetEnabled = true;
     try {
-        // @ts-ignore
         const widgetEnabledSetting = await prisma.settings.findUnique({
             where: {key: "widget_enabled"}
         });

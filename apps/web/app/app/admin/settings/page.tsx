@@ -24,7 +24,7 @@ export default async function AdminSettingsPage() {
         redirect("/app");
     }
 
-    let initialSettings = {
+    const initialSettings = {
         widget_enabled: true,
         monitoring_categories: [] as string[],
         planning_default_slots: [] as any[]

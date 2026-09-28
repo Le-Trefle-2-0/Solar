@@ -88,10 +88,6 @@ export function TeamSettings() {
     const [isPersonModalOpen, setIsPersonModalOpen] = useState(false);
     const [editingPerson, setEditingPerson] = useState<Partial<TeamPerson> | null>(null);
 
-    useEffect(() => {
-        fetchData();
-    }, []);
-
     const fetchData = async () => {
         setLoading(true);
         try {
@@ -108,6 +104,10 @@ export function TeamSettings() {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
 
     const handleSaveCategory = async () => {
         if (!editingCategory?.name) return;

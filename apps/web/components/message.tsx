@@ -228,7 +228,7 @@ export function Message(props: {
             });
     }
 
-    const MessageContent = () => (
+    const messageContent = (
         <div
             id={`message-${id}`}
             className={cn(
@@ -505,7 +505,7 @@ export function Message(props: {
                 <ContextMenu>
                     <ContextMenuTrigger asChild>
                         <div>
-                            <MessageContent/>
+                            {messageContent}
                         </div>
                     </ContextMenuTrigger>
                     <ContextMenuContent>
@@ -540,9 +540,7 @@ export function Message(props: {
                         </ContextMenuItem>
                     </ContextMenuContent>
                 </ContextMenu>
-            ) : (
-                <MessageContent/>
-            )}
+            ) : messageContent}
 
             <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
                 <DialogContent>

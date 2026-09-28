@@ -1,7 +1,8 @@
 import * as Icons from "lucide-react";
 
-export const LUCIDE_ICON_NAMES = Object.keys(Icons).filter(
+const iconExports = Icons as Record<string, unknown>;
+
+export const LUCIDE_ICON_NAMES = Object.keys(iconExports).filter(
     (key) =>
-        // @ts-ignore
-        typeof Icons[key] === "function" || (typeof Icons[key] === "object" && Icons[key] !== null)
+        typeof iconExports[key] === "function" || (typeof iconExports[key] === "object" && iconExports[key] !== null)
 ).filter(key => /^[A-Z]/.test(key) && key !== "createLucideIcon" && key !== "LucideProps");

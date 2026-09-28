@@ -249,23 +249,14 @@ export function AppSidebar({pendingDocsCount = 0, unreadChannelIds = [], pending
 
     const MAX_TICKETS_BEFORE_COLLAPSE = 5;
 
-    useEffect(() => {
-        if (!socket) return;
-        const onUpdateRequest = () => updateTickets();
-        socket.on('updateRequest', onUpdateRequest);
-        return () => {
-            socket.off('updateRequest', onUpdateRequest);
-        };
-    }, [socket]);
-
     const updateTickets = () => {
         apiFetch(`/v1/tickets`)
             .then((res) => {
                 if (res.success) {
                     const ticketList = res.tickets;
                     const items = ticketList.map((ticket: any) => {
-                        let idStr = String(ticket.id).padStart(5, '0');
-                        let displayName = `Ticket-${idStr}`;
+                        const idStr = String(ticket.id).padStart(5, '0');
+                        const displayName = `Ticket-${idStr}`;
                         return {
                             name: displayName,
                             url: '/app/ticket/' + ticket.channelId,
@@ -279,6 +270,15 @@ export function AppSidebar({pendingDocsCount = 0, unreadChannelIds = [], pending
             })
             .catch(err => console.error('Failed to load tickets:', err));
     }
+
+    useEffect(() => {
+        if (!socket) return;
+        const onUpdateRequest = () => updateTickets();
+        socket.on('updateRequest', onUpdateRequest);
+        return () => {
+            socket.off('updateRequest', onUpdateRequest);
+        };
+    }, [socket]);
 
     useEffect(() => {
         updateTickets()
