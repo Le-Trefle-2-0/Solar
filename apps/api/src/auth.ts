@@ -41,7 +41,7 @@ export async function authenticate(req: any): Promise<string | null> {
     if (token) {
         const key = await prisma.apikey.findFirst({where: {key: token}});
         if (key && key.enabled !== false && (!key.expiresAt || key.expiresAt > new Date())) {
-            return key.userId;
+            return key.referenceId;
         }
     }
 

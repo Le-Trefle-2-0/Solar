@@ -1,184 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AIDiffSettings">
+    <option name="showAIDiff" value="true" />
+  </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="Upgrade the monolithic architecture to full dynamic independant microservices">
+    <list default="true" id="b4ff21a9-b8f5-4b61-8416-e6585975b78c" name="Changes" comment="Add admin tools for document validation, secure previewing, and watermarking, with broadcasting support">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_13_12_2025_17_13_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_13_12_2025_17_13__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/app-build-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/app-build-manifest.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/0.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/0.pack.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/1.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/1.pack.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/10.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/10.pack.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/11.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/11.pack.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/2.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/2.pack.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/3.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/3.pack.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/4.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/4.pack.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/5.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/5.pack.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/6.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/6.pack.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/7.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/7.pack.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/8.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/8.pack.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/9.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/9.pack.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/index.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/index.pack.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/index.pack.gz.old" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/client-development/index.pack.gz.old" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/0.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/0.pack.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/1.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/1.pack.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/10.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/10.pack.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/11.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/11.pack.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/2.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/2.pack.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/3.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/3.pack.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/4.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/4.pack.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/5.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/5.pack.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/6.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/6.pack.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/7.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/7.pack.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/8.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/8.pack.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/9.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/9.pack.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/index.pack.gz" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/index.pack.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/index.pack.gz.old" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/cache/webpack/server-development/index.pack.gz.old" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/prerender-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/prerender-manifest.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/react-loadable-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/react-loadable-manifest.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/app-paths-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/server/app-paths-manifest.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/app/_not-found/page.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/app/_not-found/page_client-reference-manifest.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/app/api/auth/[...all]/route.js" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/server/app/api/auth/[...all]/route.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/app/api/auth/[...all]/route_client-reference-manifest.js" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/server/app/api/auth/[...all]/route_client-reference-manifest.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/app/api/events/getAvailable/route.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/app/api/events/getAvailable/route_client-reference-manifest.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/app/app/be/page.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/app/app/be/page_client-reference-manifest.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/app/favicon.ico/route.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/middleware-react-loadable-manifest.js" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/server/middleware-react-loadable-manifest.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/server-reference-manifest.js" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/server/server-reference-manifest.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/server-reference-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/server/server-reference-manifest.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@babel.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@better-auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@better-auth.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@better-fetch.js" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@better-fetch.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@daveyplate.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@floating-ui.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@fortawesome.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@hcaptcha.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@hookform.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@marsidev.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@msgpack.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@radix-ui.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@react-email.js" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@react-email.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@socket.io.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@swc.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/@wojtekmaj.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/aria-hidden.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/better-auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/better-auth.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/class-variance-authority.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/clsx.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/cmdk.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/engine.io-client.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/engine.io-parser.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/frimousse.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/get-nonce.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/gif-picker-react.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/hoist-non-react-statics.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/input-otp.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/js-sha256.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/lucide-react.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/ms.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/nanostores.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/next-themes.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/next.js" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/next.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/object-assign.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/peerjs-js-binarypack.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/peerjs.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/prop-types.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/qr.js.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/react-async-script.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/react-google-recaptcha.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/react-hook-form.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/react-is.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/react-qr-code.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/react-remove-scroll-bar.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/react-remove-scroll.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/react-style-singleton.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/resend.js" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/resend.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/sdp.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/socket.io-client.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/socket.io-parser.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/sonner.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/styled-jsx.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/supports-color.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/tailwind-merge.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/tslib.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/ua-parser-js.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/use-callback-ref.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/use-sidecar.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/use-sync-external-store.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/vaul.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/warning.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/webrtc-adapter.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/xmlhttprequest-ssl.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/vendor-chunks/zod.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/server/webpack-runtime.js" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/server/webpack-runtime.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/chunks/app-pages-internals.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/chunks/app/_not-found/page.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/chunks/app/api/events/getAvailable/route.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/chunks/app/app/be/page.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/chunks/app/app/layout.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/chunks/app/layout.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/chunks/webpack.js" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/static/chunks/webpack.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/css/app/layout.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/media/4cf2300e9c8272f7-s.p.woff2" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/media/747892c23ea88013-s.woff2" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/media/8d697b304b401681-s.woff2" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/media/93f479601ee12b01-s.p.woff2" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/media/9610d9e46709d722-s.woff2" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/media/ba015fad6dcf6784-s.woff2" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/media/logo.7c80edea.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/webpack/19afdf2addea5fe1.webpack.hot-update.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/webpack/29fc0510e1d02a79.webpack.hot-update.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/webpack/app/layout.19afdf2addea5fe1.hot-update.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/webpack/webpack.19afdf2addea5fe1.hot-update.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/static/webpack/webpack.29fc0510e1d02a79.hot-update.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/trace" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/.next/trace" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/types/app/api/events/getAvailable/route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/types/app/app/be/page.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/types/app/app/layout.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/.next/types/app/layout.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/components/chat.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/components/chat.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/context/Socket.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/context/Socket.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="ChangesViewManager">
+    <option name="groupingKeys">
+      <option value="directory" />
+      <option value="repository" />
+    </option>
+  </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="151" />
+    <option name="cachedIndexableFilesCount" value="359" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="tsconfig.json" />
-        <option value="CSS File" />
-        <option value="JavaScript File" />
-        <option value="TypeScript JSX File" />
-        <option value="TypeScript File" />
-      </list>
-    </option>
-  </component>
-  <component name="FormatOnSaveOptions">
-    <option name="myRunOnSave" value="false" />
-    <option name="myAllFileTypesSelected" value="true" />
-    <option name="mySelectedFileTypes">
-      <set />
-    </option>
-  </component>
   <component name="Git.Settings">
-    <option name="RECENT_BRANCH_BY_REPOSITORY">
-      <map>
-        <entry key="$PROJECT_DIR$" value="beta-1.0-updated" />
-      </map>
-    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-    <option name="RESET_MODE" value="HARD" />
-    <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -186,546 +37,167 @@
     &quot;assignee&quot;: &quot;PaulPR-44&quot;
   }
 }</component>
-  <component name="GithubProjectSettings">
-    <option name="branchProtectionPatterns">
-      <list>
-        <option value="stable" />
-        <option value="dev" />
-      </list>
-    </option>
-  </component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/Le-Trefle-2-0/Solar.git&quot;,
-    &quot;accountId&quot;: &quot;aa84fc37-7a25-4061-a16d-6cd63ff7a22f&quot;
+    &quot;accountId&quot;: &quot;820c1bf6-b344-441a-90f1-2ca3f9c5498d&quot;
   }
 }</component>
-  <component name="ProblemsViewState">
-    <option name="selectedTabId" value="ProjectErrors" />
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
   </component>
   <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 5
+  &quot;associatedIndex&quot;: 1
 }</component>
-  <component name="ProjectId" id="2y5enfk6v7qnKkFGLHy191opMjZ" />
+  <component name="ProjectId" id="3EoiJ5GRt8v3Fb7aeurI5g463lR" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
     &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;remake&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/admin/WebstormProjects/School-buttons-main&quot;,
-    &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;shadcn.welcome.notification.shown&quot;: &quot;true&quot;,
     &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\admin\\WebstormProjects\\Solar\\node_modules\\typescript\\lib&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/paul/WebstormProjects/Solar/node_modules/typescript/lib&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
-  },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;mysql&quot;
-    ]
   }
 }</component>
-  <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\admin\WebstormProjects\Solar\app\app\chat" />
-      <recent name="$PROJECT_DIR$/app/app/chat" />
-      <recent name="$PROJECT_DIR$/components/ui/modals" />
-      <recent name="$PROJECT_DIR$/lib" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\admin\WebstormProjects\Solar\ssl" />
-      <recent name="$PROJECT_DIR$/app" />
-      <recent name="C:\Users\admin\WebstormProjects\Solar\app\api\messages" />
-      <recent name="C:\Users\admin\WebstormProjects\Solar\lib" />
-      <recent name="C:\Users\admin\WebstormProjects\Solar\public" />
-    </key>
+  <component name="RecapSpentCounter">
+    <option name="endsOfQuotaMs" value="1782057636215" />
+    <option name="spentUsd" value="0.036302548" />
+  </component>
+  <component name="RecapUselessUpdatesCounter">
+    <option name="suspendCountdown" value="0" />
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-c7e53b3be11b-JavaScript-WS-253.28294.332" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-WS-253.31033.133" />
       </set>
     </attachedChunks>
   </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
+    <task id="LOCAL-00001" summary="Refactor permissions logic and enhance role-based access control across API and web components, adding support for dynamic updates.">
+      <option name="closed" value="true" />
+      <created>1780607678967</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1780607678967</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Add Counter.dev tracking script with pathname-based exclusion logic">
+      <option name="closed" value="true" />
+      <created>1780612823215</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1780612823215</updated>
+    </task>
     <task active="true" id="Default" summary="Default task">
-      <changelist id="b45674df-c67a-49eb-a4d9-5be73889a59a" name="Changes" comment="" />
-      <created>1749129029242</created>
+      <changelist id="b4ff21a9-b8f5-4b61-8416-e6585975b78c" name="Changes" comment="Add Counter.dev tracking script with pathname-based exclusion logic" />
+      <created>1780851248438</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1749129029242</updated>
-      <workItem from="1749129030358" duration="8079000" />
-      <workItem from="1749387412260" duration="1223000" />
-      <workItem from="1749388665920" duration="7169000" />
-      <workItem from="1749471981714" duration="4976000" />
-      <workItem from="1749477012478" duration="15760000" />
-      <workItem from="1749913419546" duration="1325000" />
-      <workItem from="1750256176404" duration="27172000" />
-      <workItem from="1750317616997" duration="272000" />
-      <workItem from="1750317896164" duration="6375000" />
-      <workItem from="1750325497089" duration="5738000" />
-      <workItem from="1750343385303" duration="1148000" />
-      <workItem from="1750344542615" duration="13911000" />
-      <workItem from="1750363667156" duration="9319000" />
-      <workItem from="1750427135972" duration="32156000" />
-      <workItem from="1750726875409" duration="13460000" />
-      <workItem from="1752089213252" duration="381000" />
-      <workItem from="1765641987408" duration="21918000" />
+      <updated>1780851248438</updated>
+      <workItem from="1780851249527" duration="2487000" />
+      <workItem from="1781084061451" duration="1945000" />
+      <workItem from="1781281297293" duration="45000" />
+      <workItem from="1782469907650" duration="8133000" />
+      <workItem from="1782560622876" duration="1357000" />
+      <workItem from="1782815349797" duration="4685000" />
+      <workItem from="1782913588035" duration="1490000" />
+      <workItem from="1782995642764" duration="556000" />
+      <workItem from="1783038300351" duration="655000" />
+      <workItem from="1783419491919" duration="5576000" />
+      <workItem from="1783431106727" duration="538000" />
+      <workItem from="1783431739131" duration="6009000" />
+      <workItem from="1784205141765" duration="3312000" />
+      <workItem from="1784284894461" duration="8261000" />
+      <workItem from="1785502055738" duration="3974000" />
+      <workItem from="1788174733393" duration="6000" />
+      <workItem from="1789984558470" duration="4797000" />
+      <workItem from="1790517627626" duration="3605000" />
+      <workItem from="1790538258029" duration="47000" />
+      <workItem from="1790601155793" duration="3221000" />
     </task>
-    <task id="LOCAL-00015" summary="base app interface layout">
+    <task id="LOCAL-00003" summary="Add Counter.dev tracking script to layout template">
       <option name="closed" value="true" />
-      <created>1749522876431</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
+      <created>1780851349288</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
       <option name="project" value="LOCAL" />
-      <updated>1749522876431</updated>
+      <updated>1780851349288</updated>
     </task>
-    <task id="LOCAL-00016" summary="install socket.io">
+    <task id="LOCAL-00004" summary="Add newsletter subscriber management with public/private targeting and new admin functionality">
       <option name="closed" value="true" />
-      <created>1749547285771</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
+      <created>1782508667104</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
       <option name="project" value="LOCAL" />
-      <updated>1749547285771</updated>
+      <updated>1782508667104</updated>
     </task>
-    <task id="LOCAL-00017" summary="setup socket server">
+    <task id="LOCAL-00005" summary="Add team management functionality with UI, API, and database integration, including team categories and members handling">
       <option name="closed" value="true" />
-      <created>1750260978496</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
+      <created>1782510684055</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
       <option name="project" value="LOCAL" />
-      <updated>1750260978496</updated>
+      <updated>1782510684056</updated>
     </task>
-    <task id="LOCAL-00018" summary="auth ui update">
+    <task id="LOCAL-00006" summary="Fix query parameter key in Prisma call from `name` to `order`">
       <option name="closed" value="true" />
-      <created>1750261079133</created>
-      <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
+      <created>1782512183081</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
       <option name="project" value="LOCAL" />
-      <updated>1750261079133</updated>
+      <updated>1782512183081</updated>
     </task>
-    <task id="LOCAL-00019" summary="update prisma schema">
+    <task id="LOCAL-00007" summary="Add Instagram Feed component and integrate recruitment short descriptions with AI summarization feature">
       <option name="closed" value="true" />
-      <created>1750285059162</created>
-      <option name="number" value="00019" />
-      <option name="presentableId" value="LOCAL-00019" />
+      <created>1782821537503</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
       <option name="project" value="LOCAL" />
-      <updated>1750285059162</updated>
+      <updated>1782821537503</updated>
     </task>
-    <task id="LOCAL-00020" summary="prisma client update">
+    <task id="LOCAL-00008" summary="Add admin tools for document validation, secure previewing, and watermarking, with broadcasting support">
       <option name="closed" value="true" />
-      <created>1750285082078</created>
-      <option name="number" value="00020" />
-      <option name="presentableId" value="LOCAL-00020" />
+      <created>1784286477556</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
       <option name="project" value="LOCAL" />
-      <updated>1750285082078</updated>
+      <updated>1784286477556</updated>
     </task>
-    <task id="LOCAL-00021" summary="add typing interfaces">
-      <option name="closed" value="true" />
-      <created>1750285100163</created>
-      <option name="number" value="00021" />
-      <option name="presentableId" value="LOCAL-00021" />
-      <option name="project" value="LOCAL" />
-      <updated>1750285100163</updated>
-    </task>
-    <task id="LOCAL-00022" summary="include message managing and fetching route">
-      <option name="closed" value="true" />
-      <created>1750285130172</created>
-      <option name="number" value="00022" />
-      <option name="presentableId" value="LOCAL-00022" />
-      <option name="project" value="LOCAL" />
-      <updated>1750285130172</updated>
-    </task>
-    <task id="LOCAL-00023" summary="update sidebar width">
-      <option name="closed" value="true" />
-      <created>1750285142236</created>
-      <option name="number" value="00023" />
-      <option name="presentableId" value="LOCAL-00023" />
-      <option name="project" value="LOCAL" />
-      <updated>1750285142236</updated>
-    </task>
-    <task id="LOCAL-00024" summary="chat page with instant socket messaging and database storage and fetching">
-      <option name="closed" value="true" />
-      <created>1750285185292</created>
-      <option name="number" value="00024" />
-      <option name="presentableId" value="LOCAL-00024" />
-      <option name="project" value="LOCAL" />
-      <updated>1750285185292</updated>
-    </task>
-    <task id="LOCAL-00025" summary="WebStorm update">
-      <option name="closed" value="true" />
-      <created>1750285205272</created>
-      <option name="number" value="00025" />
-      <option name="presentableId" value="LOCAL-00025" />
-      <option name="project" value="LOCAL" />
-      <updated>1750285205272</updated>
-    </task>
-    <task id="LOCAL-00026" summary="add react-input-emoji package">
-      <option name="closed" value="true" />
-      <created>1750285220906</created>
-      <option name="number" value="00026" />
-      <option name="presentableId" value="LOCAL-00026" />
-      <option name="project" value="LOCAL" />
-      <updated>1750285220906</updated>
-    </task>
-    <task id="LOCAL-00027" summary="add emoji selector to message sending">
-      <option name="closed" value="true" />
-      <created>1750288120949</created>
-      <option name="number" value="00027" />
-      <option name="presentableId" value="LOCAL-00027" />
-      <option name="project" value="LOCAL" />
-      <updated>1750288120949</updated>
-    </task>
-    <task id="LOCAL-00028" summary="clean up console.log">
-      <option name="closed" value="true" />
-      <created>1750288190511</created>
-      <option name="number" value="00028" />
-      <option name="presentableId" value="LOCAL-00028" />
-      <option name="project" value="LOCAL" />
-      <updated>1750288190511</updated>
-    </task>
-    <task id="LOCAL-00029" summary="remove double styling property">
-      <option name="closed" value="true" />
-      <created>1750288272068</created>
-      <option name="number" value="00029" />
-      <option name="presentableId" value="LOCAL-00029" />
-      <option name="project" value="LOCAL" />
-      <updated>1750288272068</updated>
-    </task>
-    <task id="LOCAL-00030" summary="update database and text components to save long strings and line breaks">
-      <option name="closed" value="true" />
-      <created>1750324502631</created>
-      <option name="number" value="00030" />
-      <option name="presentableId" value="LOCAL-00030" />
-      <option name="project" value="LOCAL" />
-      <updated>1750324502632</updated>
-    </task>
-    <task id="LOCAL-00031" summary="update better-auth-ui to 2.0 and add Discord OAuth support">
-      <option name="closed" value="true" />
-      <created>1750424112157</created>
-      <option name="number" value="00031" />
-      <option name="presentableId" value="LOCAL-00031" />
-      <option name="project" value="LOCAL" />
-      <updated>1750424112157</updated>
-    </task>
-    <task id="LOCAL-00032" summary="fix message fetching">
-      <option name="closed" value="true" />
-      <created>1750424507773</created>
-      <option name="number" value="00032" />
-      <option name="presentableId" value="LOCAL-00032" />
-      <option name="project" value="LOCAL" />
-      <updated>1750424507773</updated>
-    </task>
-    <task id="LOCAL-00033" summary="add dynamic ticket links in sidebar">
-      <option name="closed" value="true" />
-      <created>1750426899116</created>
-      <option name="number" value="00033" />
-      <option name="presentableId" value="LOCAL-00033" />
-      <option name="project" value="LOCAL" />
-      <updated>1750426899116</updated>
-    </task>
-    <task id="LOCAL-00034" summary="add dynamic ticket page">
-      <option name="closed" value="true" />
-      <created>1750426910945</created>
-      <option name="number" value="00034" />
-      <option name="presentableId" value="LOCAL-00034" />
-      <option name="project" value="LOCAL" />
-      <updated>1750426910945</updated>
-    </task>
-    <task id="LOCAL-00035" summary="remove placeholder dashboard page">
-      <option name="closed" value="true" />
-      <created>1750683047338</created>
-      <option name="number" value="00035" />
-      <option name="presentableId" value="LOCAL-00035" />
-      <option name="project" value="LOCAL" />
-      <updated>1750683047338</updated>
-    </task>
-    <task id="LOCAL-00036" summary="adapt server and chat page to handle secure websocket connexion">
-      <option name="closed" value="true" />
-      <created>1750683154094</created>
-      <option name="number" value="00036" />
-      <option name="presentableId" value="LOCAL-00036" />
-      <option name="project" value="LOCAL" />
-      <updated>1750683154094</updated>
-    </task>
-    <task id="LOCAL-00037" summary="install shadcn components">
-      <option name="closed" value="true" />
-      <created>1750683507543</created>
-      <option name="number" value="00037" />
-      <option name="presentableId" value="LOCAL-00037" />
-      <option name="project" value="LOCAL" />
-      <updated>1750683507543</updated>
-    </task>
-    <task id="LOCAL-00038" summary="base ui setup">
-      <option name="closed" value="true" />
-      <created>1750684455908</created>
-      <option name="number" value="00038" />
-      <option name="presentableId" value="LOCAL-00038" />
-      <option name="project" value="LOCAL" />
-      <updated>1750684455908</updated>
-    </task>
-    <task id="LOCAL-00039" summary="components.json install">
-      <option name="closed" value="true" />
-      <created>1750684924361</created>
-      <option name="number" value="00039" />
-      <option name="presentableId" value="LOCAL-00039" />
-      <option name="project" value="LOCAL" />
-      <updated>1750684924361</updated>
-    </task>
-    <task id="LOCAL-00040" summary="update responsive sidebar">
-      <option name="closed" value="true" />
-      <created>1750723515593</created>
-      <option name="number" value="00040" />
-      <option name="presentableId" value="LOCAL-00040" />
-      <option name="project" value="LOCAL" />
-      <updated>1750723515593</updated>
-    </task>
-    <task id="LOCAL-00041" summary="update message retrieving including username">
-      <option name="closed" value="true" />
-      <created>1750724634772</created>
-      <option name="number" value="00041" />
-      <option name="presentableId" value="LOCAL-00041" />
-      <option name="project" value="LOCAL" />
-      <updated>1750724634772</updated>
-    </task>
-    <task id="LOCAL-00042" summary="remove unused console.log">
-      <option name="closed" value="true" />
-      <created>1750725638026</created>
-      <option name="number" value="00042" />
-      <option name="presentableId" value="LOCAL-00042" />
-      <option name="project" value="LOCAL" />
-      <updated>1750725638026</updated>
-    </task>
-    <task id="LOCAL-00043" summary="update app layout and chat ui styling">
-      <option name="closed" value="true" />
-      <created>1750725657844</created>
-      <option name="number" value="00043" />
-      <option name="presentableId" value="LOCAL-00043" />
-      <option name="project" value="LOCAL" />
-      <updated>1750725657844</updated>
-    </task>
-    <task id="LOCAL-00044" summary="remove old auth pages">
-      <option name="closed" value="true" />
-      <created>1750727345697</created>
-      <option name="number" value="00044" />
-      <option name="presentableId" value="LOCAL-00044" />
-      <option name="project" value="LOCAL" />
-      <updated>1750727345697</updated>
-    </task>
-    <task id="LOCAL-00045" summary="ui update">
-      <option name="closed" value="true" />
-      <created>1750729550940</created>
-      <option name="number" value="00045" />
-      <option name="presentableId" value="LOCAL-00045" />
-      <option name="project" value="LOCAL" />
-      <updated>1750729550940</updated>
-    </task>
-    <task id="LOCAL-00046" summary="update socket connection property in chat and ui update">
-      <option name="closed" value="true" />
-      <created>1750814061836</created>
-      <option name="number" value="00046" />
-      <option name="presentableId" value="LOCAL-00046" />
-      <option name="project" value="LOCAL" />
-      <updated>1750814061836</updated>
-    </task>
-    <task id="LOCAL-00047" summary="update ticket page to sync with chat update">
-      <option name="closed" value="true" />
-      <created>1750814234942</created>
-      <option name="number" value="00047" />
-      <option name="presentableId" value="LOCAL-00047" />
-      <option name="project" value="LOCAL" />
-      <updated>1750814234942</updated>
-    </task>
-    <task id="LOCAL-00048" summary="prisma update">
-      <option name="closed" value="true" />
-      <created>1751292086586</created>
-      <option name="number" value="00048" />
-      <option name="presentableId" value="LOCAL-00048" />
-      <option name="project" value="LOCAL" />
-      <updated>1751292086586</updated>
-    </task>
-    <task id="LOCAL-00049" summary="include role data in message info">
-      <option name="closed" value="true" />
-      <created>1751292126571</created>
-      <option name="number" value="00049" />
-      <option name="presentableId" value="LOCAL-00049" />
-      <option name="project" value="LOCAL" />
-      <updated>1751292126571</updated>
-    </task>
-    <task id="LOCAL-00050" summary="remove unused console.log">
-      <option name="closed" value="true" />
-      <created>1751292620762</created>
-      <option name="number" value="00050" />
-      <option name="presentableId" value="LOCAL-00050" />
-      <option name="project" value="LOCAL" />
-      <updated>1751292620762</updated>
-    </task>
-    <task id="LOCAL-00051" summary="update message rendering to handle multi message from single user and text wrapping">
-      <option name="closed" value="true" />
-      <created>1751293485105</created>
-      <option name="number" value="00051" />
-      <option name="presentableId" value="LOCAL-00051" />
-      <option name="project" value="LOCAL" />
-      <updated>1751293485105</updated>
-    </task>
-    <task id="LOCAL-00052" summary="add temporary getAvailable endpoint">
-      <option name="closed" value="true" />
-      <created>1751331512506</created>
-      <option name="number" value="00052" />
-      <option name="presentableId" value="LOCAL-00052" />
-      <option name="project" value="LOCAL" />
-      <updated>1751331512506</updated>
-    </task>
-    <task id="LOCAL-00053" summary="export socket as global">
-      <option name="closed" value="true" />
-      <created>1751331522470</created>
-      <option name="number" value="00053" />
-      <option name="presentableId" value="LOCAL-00053" />
-      <option name="project" value="LOCAL" />
-      <updated>1751331522470</updated>
-    </task>
-    <task id="LOCAL-00054" summary="add formVolunteer interface">
-      <option name="closed" value="true" />
-      <created>1751331539091</created>
-      <option name="number" value="00054" />
-      <option name="presentableId" value="LOCAL-00054" />
-      <option name="project" value="LOCAL" />
-      <updated>1751331539091</updated>
-    </task>
-    <task id="LOCAL-00055" summary="add assignment api endpoint">
-      <option name="closed" value="true" />
-      <created>1751331556176</created>
-      <option name="number" value="00055" />
-      <option name="presentableId" value="LOCAL-00055" />
-      <option name="project" value="LOCAL" />
-      <updated>1751331556176</updated>
-    </task>
-    <task id="LOCAL-00056" summary="add dynamic volunteer list retrieval">
-      <option name="closed" value="true" />
-      <created>1751332397346</created>
-      <option name="number" value="00056" />
-      <option name="presentableId" value="LOCAL-00056" />
-      <option name="project" value="LOCAL" />
-      <updated>1751332397346</updated>
-    </task>
-    <task id="LOCAL-00057" summary="add basic admin page">
-      <option name="closed" value="true" />
-      <created>1751335212158</created>
-      <option name="number" value="00057" />
-      <option name="presentableId" value="LOCAL-00057" />
-      <option name="project" value="LOCAL" />
-      <updated>1751335212158</updated>
-    </task>
-    <task id="LOCAL-00058" summary="better-auth minor update">
-      <option name="closed" value="true" />
-      <created>1751418528449</created>
-      <option name="number" value="00058" />
-      <option name="presentableId" value="LOCAL-00058" />
-      <option name="project" value="LOCAL" />
-      <updated>1751418528449</updated>
-    </task>
-    <task id="LOCAL-00059" summary="add temporary user info endpoint">
-      <option name="closed" value="true" />
-      <created>1751418542304</created>
-      <option name="number" value="00059" />
-      <option name="presentableId" value="LOCAL-00059" />
-      <option name="project" value="LOCAL" />
-      <updated>1751418542304</updated>
-    </task>
-    <task id="LOCAL-00060" summary="remove unused console.log">
-      <option name="closed" value="true" />
-      <created>1751418576498</created>
-      <option name="number" value="00060" />
-      <option name="presentableId" value="LOCAL-00060" />
-      <option name="project" value="LOCAL" />
-      <updated>1751418576499</updated>
-    </task>
-    <task id="LOCAL-00061" summary="add admin user page">
-      <option name="closed" value="true" />
-      <created>1751418616782</created>
-      <option name="number" value="00061" />
-      <option name="presentableId" value="LOCAL-00061" />
-      <option name="project" value="LOCAL" />
-      <updated>1751418616783</updated>
-    </task>
-    <task id="LOCAL-00062" summary="include user detail page link in admin table">
-      <option name="closed" value="true" />
-      <created>1751418655761</created>
-      <option name="number" value="00062" />
-      <option name="presentableId" value="LOCAL-00062" />
-      <option name="project" value="LOCAL" />
-      <updated>1751418655761</updated>
-    </task>
-    <task id="LOCAL-00063" summary="Upgrade the monolithic architecture to full dynamic independant microservices">
-      <option name="closed" value="true" />
-      <created>1765670461240</created>
-      <option name="number" value="00063" />
-      <option name="presentableId" value="LOCAL-00063" />
-      <option name="project" value="LOCAL" />
-      <updated>1765670461241</updated>
-    </task>
-    <option name="localTasksCounter" value="64" />
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
-  <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State />
-          </value>
-        </entry>
-      </map>
-    </option>
-  </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="install shadcn components" />
-    <MESSAGE value="base ui setup" />
-    <MESSAGE value="components.json install" />
-    <MESSAGE value="update responsive sidebar" />
-    <MESSAGE value="update message retrieving including username" />
-    <MESSAGE value="update app layout and chat ui styling" />
-    <MESSAGE value="remove old auth pages" />
-    <MESSAGE value="ui update" />
-    <MESSAGE value="update socket connection property in chat and ui update" />
-    <MESSAGE value="update ticket page to sync with chat update" />
-    <MESSAGE value="prisma update" />
-    <MESSAGE value="include role data in message info" />
-    <MESSAGE value="update message rendering to handle multi message from single user and text wrapping" />
-    <MESSAGE value="add temporary getAvailable endpoint" />
-    <MESSAGE value="export socket as global" />
-    <MESSAGE value="add formVolunteer interface" />
-    <MESSAGE value="add assignment api endpoint" />
-    <MESSAGE value="add dynamic volunteer list retrieval" />
-    <MESSAGE value="add basic admin page" />
-    <MESSAGE value="better-auth minor update" />
-    <MESSAGE value="add temporary user info endpoint" />
-    <MESSAGE value="remove unused console.log" />
-    <MESSAGE value="add admin user page" />
-    <MESSAGE value="include user detail page link in admin table" />
-    <MESSAGE value="Upgrade the monolithic architecture to full dynamic independant microservices" />
-    <option name="LAST_COMMIT_MESSAGE" value="Upgrade the monolithic architecture to full dynamic independant microservices" />
-    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
-    <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
+    <MESSAGE value="Refactor permissions logic and enhance role-based access control across API and web components, adding support for dynamic updates." />
+    <MESSAGE value="Add Counter.dev tracking script with pathname-based exclusion logic" />
+    <MESSAGE value="Add Counter.dev tracking script to layout template" />
+    <MESSAGE value="Add newsletter subscriber management with public/private targeting and new admin functionality" />
+    <MESSAGE value="Add team management functionality with UI, API, and database integration, including team categories and members handling" />
+    <MESSAGE value="Fix query parameter key in Prisma call from `name` to `order`" />
+    <MESSAGE value="Add Instagram Feed component and integrate recruitment short descriptions with AI summarization feature" />
+    <MESSAGE value="Add admin tools for document validation, secure previewing, and watermarking, with broadcasting support" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add admin tools for document validation, secure previewing, and watermarking, with broadcasting support" />
   </component>
 </project>
