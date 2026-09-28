@@ -142,6 +142,13 @@ async function main() {
         if (r.code !== 0) return report(results, targets);
     }
 
+    // Un lien apps/web/.env vers un .env racine absent fait échouer `next build` (ENOENT)
+    const webEnv = path.join(ROOT, "apps/web/.env");
+    if (fs.lstatSync(webEnv, {throwIfNoEntry: false})?.isSymbolicLink() && !fs.existsSync(webEnv)) {
+        console.log(c.dim("Suppression du lien apps/web/.env cassé (pas de .env à la racine)"));
+        fs.unlinkSync(webEnv);
+    }
+
     if (flag("clean")) {
         for (const t of targets) for (const dir of CLEAN_DIRS[t] ?? []) fs.rmSync(path.join(ROOT, dir), {recursive: true, force: true, maxRetries: 5, retryDelay: 200});
     }
