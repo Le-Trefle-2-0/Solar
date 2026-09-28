@@ -63,3 +63,6 @@ apps/api/dist/
 /apps/api/node_modules/
 /.idea/*
 /.ai/mcp/mcp.json
+
+# Logs du test de build (scripts/test-build.mjs)
+.build-logs/

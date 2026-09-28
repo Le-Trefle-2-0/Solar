@@ -31,6 +31,7 @@
     "dev:web": "npm run dev -w apps/web",
     "build:web": "npm run build -w apps/web",
     "build:all": "npm run build:api && npm run build:ws && npm run build:voice && npm run build:storage && npm run build:web",
+    "test:build": "node scripts/test-build.mjs",
     "start:web": "npm run start -w apps/web",
     "compose:up": "docker compose up",
     "compose:down": "docker compose down -v",
