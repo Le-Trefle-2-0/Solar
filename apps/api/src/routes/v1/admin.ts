@@ -235,7 +235,14 @@ export async function registerAdminRoutes(app: FastifyInstance) {
         const categories = await prisma.teamCategory.findMany({
             include: {
                 members: {
-                    orderBy: {name: 'asc'}
+                    include: {
+                        person: true
+                    },
+                    orderBy: {
+                        person: {
+                            name: 'asc'
+                        }
+                    }
                 }
             },
             orderBy: {order: 'asc'}
@@ -247,13 +254,20 @@ export async function registerAdminRoutes(app: FastifyInstance) {
         const admin = await checkAdmin(req, reply);
         if (!admin) return;
 
-        const {id, name, icon, order} = req.body as { id?: string, name: string, icon?: string, order?: number };
+        const {id, name, icon, type, color, order} = req.body as {
+            id?: string,
+            name: string,
+            icon?: string,
+            type?: string,
+            color?: string,
+            order?: number
+        };
 
         try {
             const category = await prisma.teamCategory.upsert({
                 where: {id: id || 'new'},
-                update: {name, icon, order},
-                create: {name, icon, order: order || 0}
+                update: {name, icon, type, color, order},
+                create: {name, icon, type: type || 'DEFAULT', color, order: order || 0}
             });
             return reply.send({category});
         } catch (e) {
@@ -281,25 +295,74 @@ export async function registerAdminRoutes(app: FastifyInstance) {
         const admin = await checkAdmin(req, reply);
         if (!admin) return;
 
-        const {id, name, role, image, bio, categoryId} = req.body as {
+        const {id, role, isLead, teamName, categoryId, personId} = req.body as {
             id?: string,
-            name: string,
             role: string,
-            image?: string,
-            bio?: string,
-            categoryId: string
+            isLead?: boolean,
+            teamName?: string,
+            categoryId: string,
+            personId: string
         };
 
         try {
             const member = await prisma.teamMember.upsert({
                 where: {id: id || 'new'},
-                update: {name, role, image, bio, categoryId},
-                create: {name, role, image, bio, categoryId}
+                update: {role, isLead, teamName, categoryId, personId},
+                create: {role, isLead: isLead || false, teamName, categoryId, personId}
             });
             return reply.send({member});
         } catch (e) {
             console.error("[Team] Failed to upsert member:", e);
             return reply.status(500).send('failed to update member');
+        }
+    });
+
+    app.get('/v1/admin/team/people', async (req, reply) => {
+        const admin = await checkAdmin(req, reply);
+        if (!admin) return;
+
+        const people = await prisma.teamPerson.findMany({
+            orderBy: {name: 'asc'}
+        });
+        return reply.send({people});
+    });
+
+    app.post('/v1/admin/team/people', async (req, reply) => {
+        const admin = await checkAdmin(req, reply);
+        if (!admin) return;
+
+        const {id, name, image, bio} = req.body as {
+            id?: string,
+            name: string,
+            image?: string,
+            bio?: string
+        };
+
+        try {
+            const person = await prisma.teamPerson.upsert({
+                where: {id: id || 'new'},
+                update: {name, image, bio},
+                create: {name, image, bio}
+            });
+            return reply.send({person});
+        } catch (e) {
+            console.error("[Team] Failed to upsert person:", e);
+            return reply.status(500).send('failed to update person');
+        }
+    });
+
+    app.delete('/v1/admin/team/people/:id', async (req, reply) => {
+        const admin = await checkAdmin(req, reply);
+        if (!admin) return;
+
+        const {id} = req.params as { id: string };
+
+        try {
+            await prisma.teamPerson.delete({where: {id}});
+            return reply.send({success: true});
+        } catch (e) {
+            console.error("[Team] Failed to delete person:", e);
+            return reply.status(500).send('failed to delete person');
         }
     });
 
