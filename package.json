@@ -43,6 +43,30 @@
   },
   "overrides": {
     "zod": "3.25.76",
+    "better-auth": {
+      "zod": "^4.5.4",
+      "better-call": {
+        "zod": "3.25.76"
+      }
+    },
+    "@better-auth/core": {
+      "zod": "^4.5.4",
+      "better-call": {
+        "zod": "3.25.76"
+      }
+    },
+    "@better-auth/api-key": {
+      "zod": "^4.5.4",
+      "better-call": {
+        "zod": "3.25.76"
+      }
+    },
+    "@better-auth/passkey": {
+      "zod": "^4.5.4",
+      "better-call": {
+        "zod": "3.25.76"
+      }
+    },
     "deepmerge-ts": "^8.0.2"
   },
   "dependencies": {
