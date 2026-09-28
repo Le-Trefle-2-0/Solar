@@ -14,7 +14,7 @@ export async function registerKeysRoutes(app: FastifyInstance) {
 
             let user = null;
             if (valid && key) {
-                user = await prisma.user.findUnique({where: {id: key.userId}});
+                user = await prisma.user.findUnique({where: {id: key.referenceId}});
             }
 
             return reply.send({valid, key: valid ? key : null, user});
@@ -38,7 +38,7 @@ export async function registerKeysRoutes(app: FastifyInstance) {
                 return reply.status(401).send({error: 'invalid_key'});
             }
 
-            const user = await prisma.user.findUnique({where: {id: key.userId}});
+            const user = await prisma.user.findUnique({where: {id: key.referenceId}});
             if (!user) return reply.status(404).send({error: 'user_not_found'});
 
             return reply.send({user});
