@@ -378,7 +378,7 @@ export function TeamSettings() {
                                                 <div>
                                                     <p className="text-sm font-medium flex items-center gap-2">
                                                         {member.person?.name || "Personne non liée"}
-                                                        {member.isLead && <Crown className="h-3 w-3 text-yellow-500" title="Responsable" />}
+                                                        {member.isLead && <span title="Responsable"><Crown className="h-3 w-3 text-yellow-500" /></span>}
                                                     </p>
                                                     <p className="text-xs text-muted-foreground">
                                                         {member.role}

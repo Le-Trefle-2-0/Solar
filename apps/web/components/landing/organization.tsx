@@ -156,7 +156,7 @@ export function OrganizationTree({categories}: { categories: Category[] }) {
                                                             sortedMembers.length === 2 ? "sm:w-[calc(50%-12px)]" : 
                                                             "sm:w-[calc(50%-12px)] lg:w-[calc(33.33%-16px)]"
                                                         )}>
-                                                <PersonCard person={person}/>
+                                                <PersonCard person={member.person} role={member.role}/>
                                             </ScrollReveal>
                                         ))}
                                     </div>
@@ -436,7 +436,7 @@ function CACarousel({members, getPolesForPerson}: { members: TeamMember[], getPo
     );
 }
 
-function ShowcaseCarousel({items}: { items: Person[] }) {
+function ShowcaseCarousel({items}: { items: TeamMember[] }) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
     const [visibleCount, setVisibleCount] = useState(3);
@@ -478,7 +478,7 @@ function ShowcaseCarousel({items}: { items: Person[] }) {
     if (!isCarousel) {
         return (
             <div className="flex flex-wrap justify-center gap-6 max-w-6xl mx-auto px-4">
-                {items.map((person, i) => (
+                {items.map((member, i) => (
                     <ScrollReveal key={i} delay={i * 100} animation="slide-up"
                                   className={cn(
                                       "w-full max-w-sm",
@@ -486,7 +486,7 @@ function ShowcaseCarousel({items}: { items: Person[] }) {
                                       items.length === 2 ? "sm:w-[calc(50%-12px)]" : 
                                       "sm:w-[calc(50%-12px)] lg:w-[calc(33.33%-16px)]"
                                   )}>
-                        <PersonCard person={person}/>
+                        <PersonCard person={member.person} role={member.role}/>
                     </ScrollReveal>
                 ))}
             </div>
@@ -507,13 +507,13 @@ function ShowcaseCarousel({items}: { items: Person[] }) {
                     transform: `translateX(${translateX})`,
                 }}
             >
-                {items.map((person, i) => (
+                {items.map((member, i) => (
                     <div
                         key={i}
                         className="px-3 shrink-0"
                         style={{width: `${100 / visibleCount}%`}}
                     >
-                        <PersonCard person={person}/>
+                        <PersonCard person={member.person} role={member.role}/>
                     </div>
                 ))}
             </div>
