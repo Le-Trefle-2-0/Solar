@@ -83,6 +83,10 @@ jobs:
 
       - run: npm ci
 
+      # next-env.d.ts (types des imports d'images, routes) est ignoré par git et généré par Next
+      - name: Types générés par Next.js
+        run: npx next typegen apps/web
+
       - name: TypeScript sur chaque workspace
         run: |
           status=0
@@ -118,6 +122,7 @@ jobs:
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
 
   dependency-review:
     name: Revue des dépendances
