@@ -9,6 +9,68 @@ import {revalidatePath} from "next/cache";
 import {recruitmentSchema} from "@/lib/recruitments";
 import {renderEmailTemplate} from "@/lib/email-template";
 
+const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
+
+async function summarizeDescription(title: string, description: string) {
+    if (!process.env.GROQ_API_KEY) {
+        console.warn("GROQ_API_KEY is not set. Skipping AI summarization.");
+        return null;
+    }
+
+    try {
+        const SYSTEM_PROMPT = `Tu es un assistant chargé de résumer des offres de recrutement pour des bénévoles. 
+Ta tâche est de fournir un résumé court (maximum 2 phrases, environ 30-40 mots) qui donne envie de postuler et explique l'essentiel de la mission.
+Réponds UNIQUEMENT avec un objet JSON au format: {"summary": "ton résumé ici"}.`;
+
+        const model = 'qwen/qwen3.6-27b';
+
+        const response = await fetch(GROQ_API_URL, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: model,
+                messages: [
+                    {role: 'system', content: SYSTEM_PROMPT},
+                    {
+                        role: 'user',
+                        content: `Titre du poste: ${title}\nDescription:\n${description}`
+                    }
+                ],
+                temperature: 0.7,
+                max_tokens: 300,
+                response_format: {type: "json_object"}
+            })
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            console.error(`Groq API error (${response.status}):`, error);
+            return null;
+        }
+
+        const data = await response.json();
+        let content = data.choices?.[0]?.message?.content;
+        if (!content) return null;
+
+        // Remove thinking process if present
+        content = content.replace(/<think>[\s\S]*?(?:<\/think>|$)/gi, '').trim();
+
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+            content = jsonMatch[0];
+        }
+
+        const parsed = JSON.parse(content);
+        return parsed.summary || null;
+    } catch (error) {
+        console.error("AI Summarization failed:", error);
+        return null;
+    }
+}
+
 export async function getRecruitments() {
     return prisma.recruitment.findMany({
         orderBy: [
@@ -236,10 +298,16 @@ export async function createRecruitment(data: z.infer<typeof recruitmentSchema>)
 
     const validated = recruitmentSchema.parse(data);
 
+    let shortDescription = validated.shortDescription;
+    if (!shortDescription) {
+        shortDescription = await summarizeDescription(validated.title, validated.description);
+    }
+
     const recruitment = await prisma.recruitment.create({
         data: {
             title: validated.title,
             description: validated.description,
+            shortDescription: shortDescription,
             icon: validated.icon,
             contactEmail: validated.contactEmail,
             discordWebhook: validated.discordWebhook,
@@ -268,14 +336,32 @@ export async function updateRecruitment(id: string, data: z.infer<typeof recruit
 
     const oldRecruitment = await prisma.recruitment.findUnique({
         where: {id},
-        select: {enabled: true, title: true},
+        select: {enabled: true, title: true, description: true, shortDescription: true},
     });
+
+    if (!oldRecruitment) {
+        throw new Error("Recrutement introuvable");
+    }
+
+    let shortDescription = validated.shortDescription;
+    // Automatically generate shortDescription if:
+    // 1. It is explicitly cleared (empty string)
+    // 2. It is not provided AND the description has changed
+    const descriptionChanged = validated.description !== oldRecruitment.description;
+    const shouldSummarize =
+        shortDescription === "" ||
+        (!shortDescription && descriptionChanged);
+
+    if (shouldSummarize) {
+        shortDescription = await summarizeDescription(validated.title, validated.description);
+    }
 
     const recruitment = await prisma.recruitment.update({
         where: {id},
         data: {
             title: validated.title,
             description: validated.description,
+            shortDescription: shortDescription,
             icon: validated.icon,
             contactEmail: validated.contactEmail,
             discordWebhook: validated.discordWebhook,

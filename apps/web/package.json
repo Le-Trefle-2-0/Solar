@@ -6,11 +6,15 @@
     "dev": "next dev -p 3000",
     "build": "next build",
     "start": "next start -p 3000",
-    "lint": "next lint"
+    "lint": "eslint ."
   },
   "dependencies": {
     "@radix-ui/react-switch": "^1.2.6",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.7"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.2.3"
   }
 }

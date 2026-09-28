@@ -1,4 +1,4 @@
-import {PrismaClient} from "@prisma/client";
+import {PrismaClient} from "../generated/prisma";
 import {generateRandomString, hashPassword} from "better-auth/crypto";
 import * as readline from "readline";
 

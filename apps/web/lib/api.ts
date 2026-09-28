@@ -48,7 +48,7 @@ export function clearJwtCache() {
 export async function apiFetch(path: string, init: RequestInit = {}) {
     const base = getApiBase();
     const url = `${base}${path.startsWith('/') ? '' : '/'}${path}`;
-    let jwt = await getJwt();
+    const jwt = await getJwt();
     const headers = new Headers(init.headers as any);
     if (jwt) headers.set('Authorization', `Bearer ${jwt}`);
     if (!headers.has('Content-Type') && init.body && !(init.body instanceof FormData)) {

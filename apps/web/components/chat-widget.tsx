@@ -95,6 +95,31 @@ export default function ChatWidget() {
         };
     }, []);
 
+    const loadMessages = useCallback(async (cid: string) => {
+        try {
+            const data = await apiFetch(`/v1/messages/widget/${cid}?limit=60`);
+            setMessages(data || []);
+        } catch (e) {
+            // silent
+        }
+    }, []);
+
+    const loadTicketStatus = useCallback(async (cid: string) => {
+        try {
+            const data = await apiFetch('/v1/tickets/findBy/channelID', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({channelID: cid}),
+            });
+            if (data?.success && data?.ticket) {
+                if (data.ticket.statusName) setTicketStatus(data.ticket.statusName);
+                if (data.ticket.id) setTicketId(data.ticket.id);
+            }
+        } catch {
+            // silent
+        }
+    }, []);
+
     // Initialize a public chat session: ensures a ticket + sets cookies + returns WS guest credentials
     const initSession = useCallback(async (name?: string, forceNew = false): Promise<{
         channelId: string,
@@ -131,32 +156,7 @@ export default function ChatWidget() {
             }
             return null;
         }
-    }, []);
-
-    const loadMessages = useCallback(async (cid: string) => {
-        try {
-            const data = await apiFetch(`/v1/messages/widget/${cid}?limit=60`);
-            setMessages(data || []);
-        } catch (e) {
-            // silent
-        }
-    }, []);
-
-    const loadTicketStatus = useCallback(async (cid: string) => {
-        try {
-            const data = await apiFetch('/v1/tickets/findBy/channelID', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({channelID: cid}),
-            });
-            if (data?.success && data?.ticket) {
-                if (data.ticket.statusName) setTicketStatus(data.ticket.statusName);
-                if (data.ticket.id) setTicketId(data.ticket.id);
-            }
-        } catch {
-            // silent
-        }
-    }, []);
+    }, [loadMessages, loadTicketStatus]);
 
     const startPolling = useCallback((cid: string) => {
         if (pollRef.current) return;

@@ -64,15 +64,6 @@ export default function SettingsPage() {
     const [sessions, setSessions] = useState<any[]>([]);
     const [accounts, setAccounts] = useState<any[]>([]);
 
-    useEffect(() => {
-        if (session?.user) {
-            setIsTwoFactorEnabled(!!session.user.twoFactorEnabled);
-            fetchPasskeys();
-            fetchSessions();
-            fetchAccounts();
-        }
-    }, [session]);
-
     const fetchSessions = async () => {
         const {data, error} = await authClient.listSessions();
         if (data && !error) {
@@ -93,6 +84,15 @@ export default function SettingsPage() {
             setPasskeys(data);
         }
     };
+
+    useEffect(() => {
+        if (session?.user) {
+            setIsTwoFactorEnabled(!!session.user.twoFactorEnabled);
+            fetchPasskeys();
+            fetchSessions();
+            fetchAccounts();
+        }
+    }, [session]);
 
     if (isPending) return null;
     if (!session) return null;

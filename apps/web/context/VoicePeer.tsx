@@ -62,7 +62,6 @@ export const PeerProvider: React.FC<{ children: React.ReactNode }> = ({children}
             if (myAudioRef.current) {
                 myAudioRef.current.srcObject = stream;
                 // ensure it plays without user gesture in some browsers
-                // @ts-ignore
                 myAudioRef.current.muted = true;
                 myAudioRef.current.play?.().catch(() => {
                 });

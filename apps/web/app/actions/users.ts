@@ -9,6 +9,7 @@ import {getResendClient} from "@/lib/resend";
 import {renderEmailTemplate} from "@/lib/email-template";
 
 import {truncateEmail} from "@/lib/utils";
+import {broadcast} from "@/lib/broadcast";
 
 const inviteSchema = z.object({
     name: z.string().min(1),
@@ -107,7 +108,6 @@ export async function inviteUserAction(formData: z.infer<typeof inviteSchema>) {
         console.log(`[inviteAction] Triggering password reset for ${email}`);
 
         try {
-            // @ts-ignore
             const api = auth.api;
 
             // Based on better-auth structure, we try to find the password reset function
@@ -190,6 +190,12 @@ export async function submitDocumentsAction(data: {
             where: {id: session.user.id},
             data: updateData,
         });
+
+        await broadcast(null, 'documentsUpdate', {
+            userId: session.user.id,
+            status: 'submitted'
+        });
+
         return {success: true};
     } catch (e: any) {
         console.error("[submitDocumentsAction] Error:", e);
@@ -236,6 +242,12 @@ export async function validateDocumentsAction(userId: string, type: 'idCard' | '
             where: {id: userId},
             data: updateData,
         });
+
+        await broadcast(null, 'documentsUpdate', {
+            userId,
+            status: updateData.documentsStatus || 'partial'
+        });
+
         return {success: true};
     } catch (e: any) {
         console.error("[validateDocumentsAction] Error:", e);
@@ -271,6 +283,12 @@ export async function rejectDocumentAction(userId: string, type: 'idCard' | 'cas
             where: {id: userId},
             data: updateData,
         });
+
+        await broadcast(null, 'documentsUpdate', {
+            userId,
+            status: 'rejected'
+        });
+
         return {success: true};
     } catch (e: any) {
         console.error("[rejectDocumentAction] Error:", e);
@@ -304,6 +322,12 @@ export async function requestRenewalAction(userId: string) {
                 casierRejectReason: null,
             },
         });
+
+        await broadcast(null, 'documentsUpdate', {
+            userId,
+            status: 'missing'
+        });
+
         return {success: true};
     } catch (e: any) {
         console.error("[requestRenewalAction] Error:", e);

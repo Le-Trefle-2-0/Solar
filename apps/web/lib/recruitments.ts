@@ -12,6 +12,7 @@ export const fieldSchema = z.object({
 export const recruitmentSchema = z.object({
     title: z.string().min(1, "Le titre est obligatoire"),
     description: z.string().min(1, "La description est obligatoire"),
+    shortDescription: z.string().optional().nullable(),
     icon: z.string().optional().nullable(),
     contactEmail: z.string().email("Email de contact invalide").optional().nullable().or(z.literal("")),
     discordWebhook: z.string().url("URL de webhook invalide").optional().nullable().or(z.literal("")),

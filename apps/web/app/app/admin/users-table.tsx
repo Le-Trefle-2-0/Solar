@@ -20,14 +20,13 @@ import {
     Check,
     ChevronDown,
     ChevronsUpDown,
-    ExternalLink,
     FileCheck,
     FileClock,
-    FileText,
     FileX,
     IdCardLanyard,
     Info,
     MoreHorizontal,
+    ShieldCheck,
     Trash,
     UserPen,
     UserPlus
@@ -68,6 +67,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
+    Label,
     Popover,
     PopoverContent,
     PopoverTrigger
@@ -90,7 +90,7 @@ import {
 import {format} from "date-fns";
 import {fr} from "date-fns/locale";
 import {Textarea} from "@/components/ui/textarea";
-import {Label} from "@/components/ui/label";
+import {AdminValidationView} from "@/components/users/admin-validation-view";
 
 const FormSchema = z.object({
     name: z.string(),
@@ -103,11 +103,279 @@ interface DataTableProps {
     availableRoles: { id: string, name: string, icon?: string }[];
 }
 
+const RolesFormSchema = z.object({
+    roles: z.array(z.string())
+});
+
+interface UserActionsCellProps {
+    account: DisplayAccount;
+    availableRoles: DataTableProps["availableRoles"];
+    setUsers: React.Dispatch<React.SetStateAction<DisplayAccount[]>>;
+    setDialogOpen: (open: boolean) => void;
+    setValidationViewAccount: (account: DisplayAccount | null) => void;
+}
+
+function UserActionsCell({account, availableRoles, setUsers, setDialogOpen, setValidationViewAccount}: UserActionsCellProps) {
+    const router = useRouter();
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [editDialogOpen, setEditDialogOpen] = useState(false);
+    const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+    const [rejectType, setRejectType] = useState<'idCard' | 'casier' | null>(null);
+    const [rejectReasonText, setRejectReasonText] = useState("");
+
+    async function onSubmit(formData: z.infer<typeof RolesFormSchema>) {
+        try {
+            const {user: userData} = await apiFetch(`/v1/admin/users/${account.id}/role`, {
+                method: 'POST',
+                body: JSON.stringify({roles: formData.roles}),
+            });
+            setUsers((prev) =>
+                prev.map((u) =>
+                    u.id === userData.id
+                        ? {
+                            ...u,
+                            role: userData.role as string,
+                        }
+                        : u
+                )
+            );
+
+            setEditDialogOpen(false);
+            toast("Rôles modifiés")
+            form.reset();
+        } catch (e: any) {
+            return toast("Erreur lors de la modification", {
+                description: (
+                    <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
+                      <code className="text-white">{String(e?.message || e)}</code>
+                    </pre>
+                )
+            });
+        }
+    }
+
+    const form = useForm<z.infer<typeof RolesFormSchema>>({
+        resolver: zodResolver(RolesFormSchema),
+        defaultValues: {
+            roles: (account.role || '').split(',').map(r => r.trim()).filter(Boolean),
+        },
+    });
+
+    return (
+        <>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0">
+                        <span className="sr-only">Ouvrir le menu</span>
+                        <MoreHorizontal/>
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => router.push(`/app/admin/user/${account.id}`)}>
+                        <Info/> Voir le profil
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator/>
+                    <DropdownMenuItem onClick={() => setValidationViewAccount(account)}>
+                        <ShieldCheck/> Validation administrative
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => {
+                        toast.promise(requestRenewalAction(account.id), {
+                            loading: 'Demande de renouvellement...',
+                            success: () => {
+                                router.refresh();
+                                return 'Renouvellement demandé';
+                            },
+                            error: 'Erreur lors de la demande'
+                        });
+                    }}>
+                        <FileClock/> Demander renouvellement
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator/>
+                    <DropdownMenuItem
+                        onClick={() => navigator.clipboard.writeText(account.id)}
+                    >
+                        <IdCardLanyard/> Copier l'identifiant
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator/>
+                    <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                        <UserPen/> Modifier le rôle
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)}
+                                      className="text-destructive">
+                        <Trash/> Supprimer l'utilisateur
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+
+            <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Êtes-vous sûr de supprimer le compte
+                            de {account.name} ?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Cette action est irréversible. L'utilisateur sera définitivement supprimé.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Annuler</AlertDialogCancel>
+                        <Button
+                            onClick={async () => {
+                                await authClient.admin.removeUser({userId: account.id});
+                                setUsers(prev => prev.filter(user => user.id !== account.id));
+                                toast("Utilisateur supprimé");
+                                setDialogOpen(false);
+                            }}
+                            variant="destructive"
+                        >
+                            Supprimer
+                        </Button>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Modifier le rôle de {account.name}</DialogTitle>
+                    </DialogHeader>
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+                            <div className="grid gap-3">
+                                <FormField
+                                    control={form.control}
+                                    name="roles"
+                                    render={({field}) => (
+                                        <FormItem className="flex flex-col">
+                                            <FormLabel>Rôles</FormLabel>
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <FormControl>
+                                                        <Button
+                                                            variant="outline"
+                                                            role="combobox"
+                                                            className={cn(
+                                                                "w-full justify-between",
+                                                                (!field.value || field.value.length === 0) && "text-muted-foreground"
+                                                            )}
+                                                        >
+                                                            {field.value && field.value.length > 0
+                                                                ? availableRoles
+                                                                    .filter((r) => (field.value as string[]).includes(r.name))
+                                                                    .map((r) => r.name)
+                                                                    .join(', ')
+                                                                : "Sélectionner un ou plusieurs rôles"}
+                                                            <ChevronsUpDown className="opacity-50"/>
+                                                        </Button>
+                                                    </FormControl>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-full p-0">
+                                                    <Command>
+                                                        <CommandList>
+                                                            <CommandGroup>
+                                                                {availableRoles.map((role) => {
+                                                                    const selected = ((field.value as string[]) || []).includes(role.name)
+                                                                    return (
+                                                                        <CommandItem
+                                                                            value={role.name}
+                                                                            key={role.id}
+                                                                            onSelect={() => {
+                                                                                const current = new Set((field.value as string[]) || [])
+                                                                                if (current.has(role.name)) {
+                                                                                    current.delete(role.name)
+                                                                                } else {
+                                                                                    current.add(role.name)
+                                                                                }
+                                                                                form.setValue("roles", Array.from(current) as any, {shouldDirty: true})
+                                                                            }}
+                                                                        >
+                                                                            {role.name}
+                                                                            <Check
+                                                                                className={cn(
+                                                                                    "ml-auto",
+                                                                                    selected ? "opacity-100" : "opacity-0"
+                                                                                )}
+                                                                            />
+                                                                        </CommandItem>
+                                                                    )
+                                                                })}
+                                                            </CommandGroup>
+                                                        </CommandList>
+                                                    </Command>
+                                                </PopoverContent>
+                                            </Popover>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <DialogFooter>
+                                <DialogClose asChild>
+                                    <Button variant="outline">Annuler</Button>
+                                </DialogClose>
+                                <Button type="submit" className="cursor-pointer">Enregistrer</Button>
+                            </DialogFooter>
+                        </form>
+                    </Form>
+                </DialogContent>
+            </Dialog>
+
+
+            <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Refuser le document</DialogTitle>
+                        <DialogDescription>
+                            Veuillez indiquer la raison du refus
+                            pour {rejectType === 'idCard' ? "la pièce d'identité" : "le casier judiciaire"}.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4">
+                        <Label htmlFor="reject-reason" className="text-xs mb-2 block">Raison du
+                            refus</Label>
+                        <Textarea
+                            id="reject-reason"
+                            placeholder="Ex: Document expiré, illisible..."
+                            value={rejectReasonText}
+                            onChange={(e) => setRejectReasonText(e.target.value)}
+                            rows={3}
+                        />
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline"
+                                onClick={() => setRejectDialogOpen(false)}>Annuler</Button>
+                        <Button
+                            variant="destructive"
+                            disabled={!rejectReasonText.trim()}
+                            onClick={async () => {
+                                if (rejectType) {
+                                    await rejectDocumentAction(account.id, rejectType, rejectReasonText);
+                                    setUsers(prev => prev.map(u => u.id === account.id ? {
+                                        ...u,
+                                        [rejectType === 'idCard' ? 'idCardStatus' : 'casierStatus']: 'rejected',
+                                        [rejectType === 'idCard' ? 'idCardRejectReason' : 'casierRejectReason']: rejectReasonText,
+                                        documentsStatus: 'rejected'
+                                    } : u));
+                                    setRejectDialogOpen(false);
+                                    router.refresh();
+                                    toast.success("Document refusé");
+                                }
+                            }}
+                        >
+                            Refuser
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </>
+    );
+}
+
 export function UsersTable({data, availableRoles}: DataTableProps) {
     const [users, setUsers] = useState<DisplayAccount[]>(data);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [allRenewalAlertOpen, setAllRenewalAlertOpen] = useState(false);
     const [isInviting, setIsInviting] = useState(false);
+    const [validationViewAccount, setValidationViewAccount] = useState<DisplayAccount | null>(null);
     const router = useRouter();
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -233,9 +501,15 @@ export function UsersTable({data, availableRoles}: DataTableProps) {
                 }
                 if (status === 'submitted') {
                     return (
-                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 gap-1">
-                            <FileClock size={14}/> Envoyé
-                        </Badge>
+                        <div className="relative inline-block">
+                            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 gap-1">
+                                <FileClock size={14}/> Envoyé
+                            </Badge>
+                            <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                            </span>
+                        </div>
                     );
                 }
                 if (status === 'rejected') {
@@ -255,461 +529,15 @@ export function UsersTable({data, availableRoles}: DataTableProps) {
         {
             id: "actions",
             enableHiding: false,
-            cell: ({row}) => {
-                const account = row.original;
-                const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-                const [editDialogOpen, setEditDialogOpen] = useState(false);
-                const [viewDocOpen, setViewDocOpen] = useState(false);
-                const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
-                const [rejectType, setRejectType] = useState<'idCard' | 'casier' | null>(null);
-                const [rejectReasonText, setRejectReasonText] = useState("");
-
-                const FormSchema = z.object({
-                    roles: z.array(z.string())
-                });
-
-                async function onSubmit(formData: z.infer<typeof FormSchema>) {
-                    try {
-                        const {user: userData} = await apiFetch(`/v1/admin/users/${account.id}/role`, {
-                            method: 'POST',
-                            body: JSON.stringify({roles: formData.roles}),
-                        });
-                        setUsers((prev) =>
-                            prev.map((u) =>
-                                u.id === userData.id
-                                    ? {
-                                        ...u,
-                                        role: userData.role as string,
-                                    }
-                                    : u
-                            )
-                        );
-
-                        setEditDialogOpen(false);
-                        toast("Rôles modifiés")
-                        form.reset();
-                    } catch (e: any) {
-                        return toast("Erreur lors de la modification", {
-                            description: (
-                                <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
-                                  <code className="text-white">{String(e?.message || e)}</code>
-                                </pre>
-                            )
-                        });
-                    }
-                }
-
-                const form = useForm<z.infer<typeof FormSchema>>({
-                    resolver: zodResolver(FormSchema),
-                    defaultValues: {
-                        roles: (account.role || '').split(',').map(r => r.trim()).filter(Boolean),
-                    },
-                });
-
-                return (
-                    <>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" className="h-8 w-8 p-0">
-                                    <span className="sr-only">Ouvrir le menu</span>
-                                    <MoreHorizontal/>
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => router.push(`/app/admin/user/${account.id}`)}>
-                                    <Info/> Voir le profil
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator/>
-                                <DropdownMenuItem onClick={() => setViewDocOpen(true)}>
-                                    <FileText/> Documents administratifs
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => {
-                                    toast.promise(requestRenewalAction(account.id), {
-                                        loading: 'Demande de renouvellement...',
-                                        success: () => {
-                                            router.refresh();
-                                            return 'Renouvellement demandé';
-                                        },
-                                        error: 'Erreur lors de la demande'
-                                    });
-                                }}>
-                                    <FileClock/> Demander renouvellement
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator/>
-                                <DropdownMenuItem
-                                    onClick={() => navigator.clipboard.writeText(account.id)}
-                                >
-                                    <IdCardLanyard/> Copier l'identifiant
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator/>
-                                <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
-                                    <UserPen/> Modifier le rôle
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)}
-                                                  className="text-destructive">
-                                    <Trash/> Supprimer l'utilisateur
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-
-                        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                            <AlertDialogContent>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>Êtes-vous sûr de supprimer le compte
-                                        de {account.name} ?</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                        Cette action est irréversible. L'utilisateur sera définitivement supprimé.
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                    <Button
-                                        onClick={async () => {
-                                            await authClient.admin.removeUser({userId: account.id});
-                                            setUsers(prev => prev.filter(user => user.id !== account.id));
-                                            toast("Utilisateur supprimé");
-                                            setDialogOpen(false);
-                                        }}
-                                        variant="destructive"
-                                    >
-                                        Supprimer
-                                    </Button>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
-
-                        <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-                            <DialogContent className="sm:max-w-[425px]">
-                                <DialogHeader>
-                                    <DialogTitle>Modifier le rôle de {account.name}</DialogTitle>
-                                </DialogHeader>
-                                <Form {...form}>
-                                    <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
-                                        <div className="grid gap-3">
-                                            <FormField
-                                                control={form.control}
-                                                name="roles"
-                                                render={({field}) => (
-                                                    <FormItem className="flex flex-col">
-                                                        <FormLabel>Rôles</FormLabel>
-                                                        <Popover>
-                                                            <PopoverTrigger asChild>
-                                                                <FormControl>
-                                                                    <Button
-                                                                        variant="outline"
-                                                                        role="combobox"
-                                                                        className={cn(
-                                                                            "w-full justify-between",
-                                                                            (!field.value || field.value.length === 0) && "text-muted-foreground"
-                                                                        )}
-                                                                    >
-                                                                        {field.value && field.value.length > 0
-                                                                            ? availableRoles
-                                                                                .filter((r) => (field.value as string[]).includes(r.name))
-                                                                                .map((r) => r.name)
-                                                                                .join(', ')
-                                                                            : "Sélectionner un ou plusieurs rôles"}
-                                                                        <ChevronsUpDown className="opacity-50"/>
-                                                                    </Button>
-                                                                </FormControl>
-                                                            </PopoverTrigger>
-                                                            <PopoverContent className="w-full p-0">
-                                                                <Command>
-                                                                    <CommandList>
-                                                                        <CommandGroup>
-                                                                            {availableRoles.map((role) => {
-                                                                                const selected = ((field.value as string[]) || []).includes(role.name)
-                                                                                return (
-                                                                                    <CommandItem
-                                                                                        value={role.name}
-                                                                                        key={role.id}
-                                                                                        onSelect={() => {
-                                                                                            const current = new Set((field.value as string[]) || [])
-                                                                                            if (current.has(role.name)) {
-                                                                                                current.delete(role.name)
-                                                                                            } else {
-                                                                                                current.add(role.name)
-                                                                                            }
-                                                                                            form.setValue("roles", Array.from(current) as any, {shouldDirty: true})
-                                                                                        }}
-                                                                                    >
-                                                                                        {role.name}
-                                                                                        <Check
-                                                                                            className={cn(
-                                                                                                "ml-auto",
-                                                                                                selected ? "opacity-100" : "opacity-0"
-                                                                                            )}
-                                                                                        />
-                                                                                    </CommandItem>
-                                                                                )
-                                                                            })}
-                                                                        </CommandGroup>
-                                                                    </CommandList>
-                                                                </Command>
-                                                            </PopoverContent>
-                                                        </Popover>
-                                                        <FormMessage/>
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
-                                        <DialogFooter>
-                                            <DialogClose asChild>
-                                                <Button variant="outline">Annuler</Button>
-                                            </DialogClose>
-                                            <Button type="submit" className="cursor-pointer">Enregistrer</Button>
-                                        </DialogFooter>
-                                    </form>
-                                </Form>
-                            </DialogContent>
-                        </Dialog>
-
-                        <Dialog open={viewDocOpen} onOpenChange={setViewDocOpen}>
-                            <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
-                                <DialogHeader>
-                                    <DialogTitle>Dossier de {account.name}</DialogTitle>
-                                    <DialogDescription>
-                                        Statut global : {
-                                        account.documentsStatus === 'validated' ? 'Validé' :
-                                            account.documentsStatus === 'submitted' ? 'En attente' :
-                                                account.documentsStatus === 'rejected' ? 'Refusé' : 'Manquant'
-                                    }
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <div className="space-y-6 py-4">
-                                    {/* Personal Info */}
-                                    <div className="grid grid-cols-2 gap-x-8 gap-y-4 text-sm border-b pb-4">
-                                        <div>
-                                            <Label className="text-xs text-muted-foreground">Prénom</Label>
-                                            <p className="font-medium">{account.firstName || '-'}</p>
-                                        </div>
-                                        <div>
-                                            <Label className="text-xs text-muted-foreground">Nom</Label>
-                                            <p className="font-medium">{account.lastName || '-'}</p>
-                                        </div>
-                                        <div>
-                                            <Label className="text-xs text-muted-foreground">Date de naissance</Label>
-                                            <p className="font-medium">{account.birthDate ? format(new Date(account.birthDate), "PPP", {locale: fr}) : '-'}</p>
-                                        </div>
-                                        <div>
-                                            <Label className="text-xs text-muted-foreground">Adresse</Label>
-                                            <p className="font-medium">
-                                                {account.addressNumber} {account.addressStreet}<br/>
-                                                {account.addressPostalCode} {account.addressCity}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    {/* Documents */}
-                                    <div className="space-y-4">
-                                        {/* ID Card */}
-                                        <div
-                                            className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
-                                            <div className="flex items-center gap-3">
-                                                <div className="p-2 bg-background rounded border">
-                                                    <IdCardLanyard size={20} className="text-blue-600"/>
-                                                </div>
-                                                <div>
-                                                    <p className="text-sm font-medium">Pièce d'identité</p>
-                                                    <div className="flex items-center gap-2">
-                                                        <Badge variant="outline" className={cn(
-                                                            "text-[10px] h-4 px-1",
-                                                            account.idCardStatus === 'validated' ? "bg-green-50 text-green-700 border-green-200" :
-                                                                account.idCardStatus === 'submitted' ? "bg-blue-50 text-blue-700 border-blue-200" :
-                                                                    "bg-red-50 text-red-700 border-red-200"
-                                                        )}>
-                                                            {account.idCardStatus === 'validated' ? 'Validé' : account.idCardStatus === 'submitted' ? 'Soumis' : 'Manquant'}
-                                                        </Badge>
-                                                        {account.idCardFileId && (
-                                                            <a
-                                                                href={`${process.env.NEXT_PUBLIC_STORAGE_URL || 'http://localhost:3004'}/v1/files/${account.idCardFileId}`}
-                                                                target="_blank"
-                                                                className="text-xs text-blue-600 hover:underline flex items-center gap-1"
-                                                            >
-                                                                Voir <ExternalLink size={10}/>
-                                                            </a>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            {account.idCardStatus === 'submitted' && (
-                                                <div className="flex gap-2">
-                                                    <Button size="sm" variant="outline"
-                                                            className="h-8 text-red-600 border-red-200 hover:bg-red-50"
-                                                            onClick={() => {
-                                                                setRejectType('idCard');
-                                                                setRejectReasonText("");
-                                                                setRejectDialogOpen(true);
-                                                            }}>Refuser</Button>
-                                                    <Button size="sm" className="h-8 bg-green-600 hover:bg-green-700"
-                                                            onClick={async () => {
-                                                                await validateDocumentsAction(account.id, 'idCard');
-                                                                setUsers(prev => {
-                                                                    return prev.map(u => {
-                                                                        if (u.id === account.id) {
-                                                                            const newIdCardStatus = 'validated';
-                                                                            const newCasierStatus = u.casierStatus;
-                                                                            const allValidated = newIdCardStatus === 'validated' && newCasierStatus === 'validated';
-                                                                            return {
-                                                                                ...u,
-                                                                                idCardStatus: newIdCardStatus,
-                                                                                idCardRejectReason: null,
-                                                                                documentsStatus: allValidated ? 'validated' : u.documentsStatus,
-                                                                                documentsValidatedAt: allValidated ? new Date() : u.documentsValidatedAt
-                                                                            };
-                                                                        }
-                                                                        return u;
-                                                                    });
-                                                                });
-                                                                router.refresh();
-                                                            }}>Valider</Button>
-                                                </div>
-                                            )}
-                                        </div>
-                                        {account.idCardRejectReason && (
-                                            <p className="text-xs text-red-600 px-3">Raison du refus
-                                                : {account.idCardRejectReason}</p>
-                                        )}
-
-                                        {/* Casier */}
-                                        <div
-                                            className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
-                                            <div className="flex items-center gap-3">
-                                                <div className="p-2 bg-background rounded border">
-                                                    <FileText size={20} className="text-purple-600"/>
-                                                </div>
-                                                <div>
-                                                    <p className="text-sm font-medium">Casier judiciaire</p>
-                                                    <div className="flex items-center gap-2">
-                                                        <Badge variant="outline" className={cn(
-                                                            "text-[10px] h-4 px-1",
-                                                            account.casierStatus === 'validated' ? "bg-green-50 text-green-700 border-green-200" :
-                                                                account.casierStatus === 'submitted' ? "bg-blue-50 text-blue-700 border-blue-200" :
-                                                                    "bg-red-50 text-red-700 border-red-200"
-                                                        )}>
-                                                            {account.casierStatus === 'validated' ? 'Validé' : account.casierStatus === 'submitted' ? 'Soumis' : 'Manquant'}
-                                                        </Badge>
-                                                        {account.casierFileId && (
-                                                            <a
-                                                                href={`${process.env.NEXT_PUBLIC_STORAGE_URL || 'http://localhost:7001'}/v1/files/${account.casierFileId}`}
-                                                                target="_blank"
-                                                                className="text-xs text-blue-600 hover:underline flex items-center gap-1"
-                                                            >
-                                                                Voir <ExternalLink size={10}/>
-                                                            </a>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            {account.casierStatus === 'submitted' && (
-                                                <div className="flex gap-2">
-                                                    <Button size="sm" variant="outline"
-                                                            className="h-8 text-red-600 border-red-200 hover:bg-red-50"
-                                                            onClick={() => {
-                                                                setRejectType('casier');
-                                                                setRejectReasonText("");
-                                                                setRejectDialogOpen(true);
-                                                            }}>Refuser</Button>
-                                                    <Button size="sm" className="h-8 bg-green-600 hover:bg-green-700"
-                                                            onClick={async () => {
-                                                                await validateDocumentsAction(account.id, 'casier');
-                                                                setUsers(prev => {
-                                                                    return prev.map(u => {
-                                                                        if (u.id === account.id) {
-                                                                            const newCasierStatus = 'validated';
-                                                                            const newIdCardStatus = u.idCardStatus;
-                                                                            const allValidated = newIdCardStatus === 'validated' && newCasierStatus === 'validated';
-                                                                            return {
-                                                                                ...u,
-                                                                                casierStatus: newCasierStatus,
-                                                                                casierRejectReason: null,
-                                                                                documentsStatus: allValidated ? 'validated' : u.documentsStatus,
-                                                                                documentsValidatedAt: allValidated ? new Date() : u.documentsValidatedAt
-                                                                            };
-                                                                        }
-                                                                        return u;
-                                                                    });
-                                                                });
-                                                                router.refresh();
-                                                            }}>Valider</Button>
-                                                </div>
-                                            )}
-                                        </div>
-                                        {account.casierRejectReason && (
-                                            <p className="text-xs text-red-600 px-3">Raison du refus
-                                                : {account.casierRejectReason}</p>
-                                        )}
-                                    </div>
-
-                                    <div
-                                        className="grid grid-cols-2 gap-4 text-[10px] text-muted-foreground border-t pt-4">
-                                        <div>
-                                            <p>Envoyé le
-                                                : {account.documentsSentAt ? format(new Date(account.documentsSentAt), "PPp", {locale: fr}) : "Jamais"}</p>
-                                        </div>
-                                        <div>
-                                            <p>Dernière validation
-                                                : {account.documentsValidatedAt ? format(new Date(account.documentsValidatedAt), "PPp", {locale: fr}) : "Jamais"}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <DialogFooter>
-                                    <DialogClose asChild>
-                                        <Button variant="outline">Fermer</Button>
-                                    </DialogClose>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
-
-                        <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
-                            <DialogContent className="sm:max-w-[425px]">
-                                <DialogHeader>
-                                    <DialogTitle>Refuser le document</DialogTitle>
-                                    <DialogDescription>
-                                        Veuillez indiquer la raison du refus
-                                        pour {rejectType === 'idCard' ? "la pièce d'identité" : "le casier judiciaire"}.
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <div className="py-4">
-                                    <Label htmlFor="reject-reason" className="text-xs mb-2 block">Raison du
-                                        refus</Label>
-                                    <Textarea
-                                        id="reject-reason"
-                                        placeholder="Ex: Document expiré, illisible..."
-                                        value={rejectReasonText}
-                                        onChange={(e) => setRejectReasonText(e.target.value)}
-                                        rows={3}
-                                    />
-                                </div>
-                                <DialogFooter>
-                                    <Button variant="outline"
-                                            onClick={() => setRejectDialogOpen(false)}>Annuler</Button>
-                                    <Button
-                                        variant="destructive"
-                                        disabled={!rejectReasonText.trim()}
-                                        onClick={async () => {
-                                            if (rejectType) {
-                                                await rejectDocumentAction(account.id, rejectType, rejectReasonText);
-                                                setUsers(prev => prev.map(u => u.id === account.id ? {
-                                                    ...u,
-                                                    [rejectType === 'idCard' ? 'idCardStatus' : 'casierStatus']: 'rejected',
-                                                    [rejectType === 'idCard' ? 'idCardRejectReason' : 'casierRejectReason']: rejectReasonText,
-                                                    documentsStatus: 'rejected'
-                                                } : u));
-                                                setRejectDialogOpen(false);
-                                                router.refresh();
-                                                toast.success("Document refusé");
-                                            }
-                                        }}
-                                    >
-                                        Refuser
-                                    </Button>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
-                    </>
-                );
-            },
+            cell: ({row}) => (
+                <UserActionsCell
+                    account={row.original}
+                    availableRoles={availableRoles}
+                    setUsers={setUsers}
+                    setDialogOpen={setDialogOpen}
+                    setValidationViewAccount={setValidationViewAccount}
+                />
+            ),
         },
     ];
 
@@ -1063,6 +891,15 @@ export function UsersTable({data, availableRoles}: DataTableProps) {
                     </Button>
                 </div>
             </div>
+            {validationViewAccount && (
+                <AdminValidationView
+                    account={validationViewAccount}
+                    onClose={() => setValidationViewAccount(null)}
+                    onUpdate={(updated) => {
+                        setUsers(prev => prev.map(u => u.id === updated.id ? updated : u));
+                    }}
+                />
+            )}
         </div>
     );
 }
