@@ -184,7 +184,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({childre
                 channelID = splits[splits.length - 1];
             }
 
-            let msgLink = data.channel.id === "1"
+            const msgLink = data.channel.id === "1"
                 ? `/app/chat`
                 : `/app/ticket/${data.channel.id}`;
 

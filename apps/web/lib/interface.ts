@@ -1,4 +1,4 @@
-import type {Reaction, User} from "@prisma/client"
+import type {Reaction, User} from "../../../generated/prisma"
 
 export interface Msg {
     author: {

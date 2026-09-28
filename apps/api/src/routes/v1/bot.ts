@@ -112,6 +112,7 @@ export async function registerBotRoutes(app: FastifyInstance) {
                 key: keyString,
                 name: 'Solar Bot Key',
                 userId: botUser.id,
+                referenceId: botUser.id,
                 enabled: true,
                 createdAt: new Date(),
                 updatedAt: new Date(),

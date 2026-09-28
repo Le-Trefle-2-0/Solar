@@ -49,7 +49,6 @@ export default async function RootLayout({
 }>) {
     let widgetEnabled = true;
     try {
-        // @ts-ignore
         const widgetEnabledSetting = await prisma.settings.findUnique({
             where: {key: "widget_enabled"}
         });
@@ -60,9 +59,7 @@ export default async function RootLayout({
 
     return (
         <html lang="en" suppressHydrationWarning>
-        <head>
-            <script src="https://cdn.counter.dev/script.js" data-id="f57a9dd6-2304-43c0-911b-bf75b45766bb" data-utcoffset="1"></script>
-        </head>
+        <head />
         <body className={`${geistSans.variable} ${geistMono.variable} ${barlowCondensed.variable} antialiased`}
               suppressHydrationWarning>
         <Providers>

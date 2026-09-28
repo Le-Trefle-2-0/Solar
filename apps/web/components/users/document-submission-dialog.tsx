@@ -18,12 +18,13 @@ import {Button} from "@/components/ui/button";
 import {toast} from "sonner";
 import {submitDocumentsAction} from "@/app/actions/users";
 import {authClient} from "@/lib/auth-client";
-import {CalendarIcon, Check, Upload} from "lucide-react";
+import {CalendarIcon, Check, ExternalLink, ShieldCheck, Upload} from "lucide-react";
 import {Calendar} from "@/components/ui/calendar";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {cn} from "@/lib/utils";
 import {format} from "date-fns";
 import {fr} from "date-fns/locale";
+import {watermarkDocument} from "@/lib/watermark";
 
 const docSchema = z.object({
     firstName: z.string().min(1, "Prénom requis").optional().or(z.literal("")),
@@ -95,8 +96,9 @@ export function DocumentSubmissionDialog({
     }, [form]);
 
     const uploadFile = async (file: File) => {
+        const watermarkedFile = await watermarkDocument(file);
         const formData = new FormData();
-        formData.append('file', file);
+        formData.append('file', watermarkedFile);
         const res = await fetch(`${process.env.NEXT_PUBLIC_STORAGE_URL || 'http://localhost:7001'}/v1/files`, {
             method: 'POST',
             body: formData,
@@ -325,7 +327,27 @@ export function DocumentSubmissionDialog({
                         <div className="space-y-4 pt-4 border-t">
                             {(user?.idCardStatus !== 'validated') ? (
                                 <div className="space-y-2">
-                                    <FormLabel>Pièce d'identité (Recto/Verso)</FormLabel>
+                                    <div className="flex items-center justify-between">
+                                        <FormLabel>Pièce d'identité (Recto/Verso)</FormLabel>
+                                        <a
+                                            href="https://france-identite.gouv.fr/"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-[10px] text-blue-600 hover:underline flex items-center gap-1"
+                                        >
+                                            <ShieldCheck className="h-3 w-3"/>
+                                            Utiliser France Identité
+                                            <ExternalLink className="h-2 w-2"/>
+                                        </a>
+                                    </div>
+                                    <div
+                                        className="p-2 bg-blue-50/30 border border-blue-100/50 rounded-md text-[10px] text-blue-800/80 mb-2 leading-tight">
+                                        <p className="font-medium flex items-center gap-1 mb-0.5">
+                                            <ShieldCheck className="h-3 w-3 text-blue-600"/>
+                                            Attestation France Identité
+                                        </p>
+                                        Évitez d'envoyer une copie de votre carte en générant une attestation à usage unique.
+                                    </div>
                                     <div className="flex items-center gap-4">
                                         <Button
                                             type="button"

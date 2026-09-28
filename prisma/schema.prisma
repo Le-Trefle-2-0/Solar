@@ -71,17 +71,18 @@ model User {
   newsletterSubscription Boolean             @default(false)
   accounts               Account[]
   apikeys                Apikey[]
-  Event                  Event[]
-  EventRegistration      EventRegistration[]
+  events                 Event[]
+  eventRegistrations     EventRegistration[]
   invitations            Invitation[]
   members                Member[]
   messages               Message[]
   newsletters            Newsletter[]
   passkeys               Passkey[]
-  Reaction               Reaction[]
+  reactions              Reaction[]
   sessions               Session[]
-  Ticket                 Ticket[]
+  tickets                Ticket[]
   twofactors             TwoFactor[]
+  channelReads           UserChannelRead[]
 
   @@map("user")
 }
@@ -191,6 +192,7 @@ model Invitation {
   role           String?      @db.Text
   status         String       @db.Text
   expiresAt      DateTime
+  createdAt      DateTime     @default(now())
   inviterId      String
   user           User         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
@@ -201,26 +203,40 @@ model Invitation {
 }
 
 model TwoFactor {
-  id          String  @id
-  secret      String  @db.Text
-  backupCodes String  @db.Text
-  userId      String
-  verified    Boolean
-  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                      String    @id
+  secret                  String    @db.Text
+  backupCodes             String    @db.Text
+  userId                  String
+  verified                Boolean
+  failedVerificationCount Int?      @default(0)
+  lockedUntil             DateTime?
+  user                    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId], map: "two_factor_userId_fkey")
   @@map("two_factor")
 }
 
 model Channel {
-  id      String    @id @default(cuid())
-  name    String
-  Event   Event[]
-  Message Message[]
-  Ticket  Ticket?
+  id           String            @id @default(cuid())
+  name         String
+  events       Event[]
+  messages     Message[]
+  ticket       Ticket?
+  channelReads UserChannelRead[]
 
   @@unique([id, name])
   @@map("channel")
+}
+
+model UserChannelRead {
+  userId    String
+  channelId String
+  lastRead  DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  @@id([userId, channelId])
+  @@map("user_channel_read")
 }
 
 model Message {
@@ -236,7 +252,7 @@ model Message {
   channel   Channel    @relation(fields: [channelId], references: [id], onDelete: Cascade)
   ticket    Ticket?    @relation(fields: [ticketId], references: [id])
   user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Reaction  Reaction[]
+  reactions Reaction[]
 
   @@index([channelId], map: "message_channelId_fkey")
   @@index([ticketId], map: "message_ticketId_fkey")
@@ -297,7 +313,7 @@ model EventRegistration {
   registeredAt DateTime @default(now())
   eventId      String?
   status       String   @default("confirmed")
-  Event        Event?   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event        Event?   @relation(fields: [eventId], references: [id], onDelete: Cascade)
   roleSlot     RoleSlot @relation(fields: [roleSlotId], references: [id], onDelete: Cascade)
   user         User     @relation(fields: [userId], references: [id])
 
@@ -325,7 +341,7 @@ model Ticket {
   source         String       @default("discord")
   categories     Json?
   feedback       Json?
-  Message        Message[]
+  messages       Message[]
   user           User?        @relation(fields: [assignedUserId], references: [id])
   channel        Channel?     @relation(fields: [channelId, channelName], references: [id, name], onDelete: Cascade)
   status         TicketStatus @relation(fields: [statusName, statusLabel], references: [name, label])
@@ -353,7 +369,9 @@ model Apikey {
   start               String?   @db.Text
   prefix              String?   @db.Text
   key                 String    @db.Text
-  userId              String
+  configId            String    @default("default")
+  referenceId         String
+  userId              String?
   refillInterval      Int?
   refillAmount        Int?
   lastRefillAt        DateTime?
@@ -369,17 +387,22 @@ model Apikey {
   updatedAt           DateTime
   permissions         String?   @db.Text
   metadata            String?   @db.Text
-  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId], map: "apikey_userId_fkey")
+  @@index([configId])
+  @@index([referenceId])
   @@map("apikey")
 }
 
 model Jwks {
-  id         String   @id
-  publicKey  String   @db.Text
-  privateKey String   @db.Text
+  id         String    @id
+  publicKey  String    @db.Text
+  privateKey String    @db.Text
   createdAt  DateTime
+  expiresAt  DateTime?
+  alg        String?
+  crv        String?
 
   @@map("jwks")
 }
@@ -413,17 +436,18 @@ model Passkey {
 }
 
 model Recruitment {
-  id             String                @id @default(cuid())
-  title          String
-  description    String                @db.LongText
-  icon           String?
-  fields         Json
-  enabled        Boolean               @default(true)
-  createdAt      DateTime              @default(now())
-  updatedAt      DateTime              @updatedAt
-  contactEmail   String?
-  discordWebhook String?               @db.Text
-  waitlist       RecruitmentWaitlist[]
+  id               String                @id @default(cuid())
+  title            String
+  description      String                @db.LongText
+  shortDescription String?               @db.Text
+  icon             String?
+  fields           Json
+  enabled          Boolean               @default(true)
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  contactEmail     String?
+  discordWebhook   String?               @db.Text
+  waitlist         RecruitmentWaitlist[]
 
   @@map("recruitment")
 }
@@ -444,6 +468,8 @@ model TeamCategory {
   id        String       @id @default(cuid())
   name      String
   icon      String?
+  type      String       @default("DEFAULT")
+  color     String?
   order     Int          @default(0)
   members   TeamMember[]
   createdAt DateTime     @default(now())
@@ -452,18 +478,32 @@ model TeamCategory {
   @@map("team_category")
 }
 
+model TeamPerson {
+  id        String       @id @default(cuid())
+  name      String       @unique
+  image     String?      @db.LongText
+  bio       String?      @db.Text
+  members   TeamMember[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@map("team_person")
+}
+
 model TeamMember {
   id         String       @id @default(cuid())
-  name       String
   role       String
-  image      String?      @db.LongText
-  bio        String?      @db.Text
+  isLead     Boolean      @default(false)
+  teamName   String?
   categoryId String
+  personId   String?
   category   TeamCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  person     TeamPerson?  @relation(fields: [personId], references: [id], onDelete: Cascade)
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
 
   @@index([categoryId], map: "team_member_categoryId_fkey")
+  @@index([personId], map: "team_member_personId_fkey")
   @@map("team_member")
 }
 

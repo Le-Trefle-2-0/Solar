@@ -34,8 +34,25 @@ jobs:
 
       - run: npm ci
 
+      - name: Cache Next.js
+        uses: actions/cache@v4
+        with:
+          path: apps/web/.next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ hashFiles('apps/web/**/*.ts', 'apps/web/**/*.tsx') }}
+          restore-keys: |
+            nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
+
+      # Rejoue chaque étape de build:all, vérifie les artefacts et écrit un résumé dans le job
       - name: Build de tous les services
-        run: npm run build:all
+        run: npm run test:build
+
+      - name: Logs de build
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: .build-logs/
+          retention-days: 7
 
   lint:
     name: Lint
@@ -66,9 +83,19 @@ jobs:
 
       - run: npm ci
 
+      # next-env.d.ts (types des imports d'images, routes) est ignoré par git et généré par Next
+      - name: Types générés par Next.js
+        run: npx next typegen apps/web
+
       - name: TypeScript sur chaque workspace
-        run: npx tsc --noEmit -p apps/api
-        continue-on-error: true
+        run: |
+          status=0
+          for ws in api ws voice storage web; do
+            echo "::group::tsc apps/$ws"
+            npx tsc --noEmit -p "apps/$ws" || status=1
+            echo "::endgroup::"
+          done
+          exit $status
 
   audit:
     name: Audit npm
@@ -95,6 +122,7 @@ jobs:
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
 
   dependency-review:
     name: Revue des dépendances

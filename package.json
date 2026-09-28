@@ -12,7 +12,7 @@
     "db": "prisma migrate reset -y",
     "start": "npm run start -w apps/web",
     "lint": "npm run lint -w apps/web",
-    "postinstall": "flowbite-react patch && prisma generate --schema=prisma/schema.prisma && (cd apps/web && ln -sf ../../.env .env)",
+    "postinstall": "flowbite-react patch && prisma generate --schema=prisma/schema.prisma && (cd apps/web && if [ -f ../../.env ]; then ln -sf ../../.env .env; fi)",
     "generate": "prisma generate --schema=prisma/schema.prisma",
     "dev:api": "npm run dev -w apps/api",
     "dev:ws": "npm run dev -w websocket-service",
@@ -31,6 +31,7 @@
     "dev:web": "npm run dev -w apps/web",
     "build:web": "npm run build -w apps/web",
     "build:all": "npm run build:api && npm run build:ws && npm run build:voice && npm run build:storage && npm run build:web",
+    "test:build": "node scripts/test-build.mjs",
     "start:web": "npm run start -w apps/web",
     "compose:up": "docker compose up",
     "compose:down": "docker compose down -v",
@@ -41,11 +42,36 @@
     "seed": "tsx prisma/seed.ts"
   },
   "overrides": {
-    "zod": "3.25.76"
+    "zod": "3.25.76",
+    "better-auth": {
+      "zod": "^4.5.4",
+      "better-call": {
+        "zod": "3.25.76"
+      }
+    },
+    "@better-auth/core": {
+      "zod": "^4.5.4",
+      "better-call": {
+        "zod": "3.25.76"
+      }
+    },
+    "@better-auth/api-key": {
+      "zod": "^4.5.4",
+      "better-call": {
+        "zod": "3.25.76"
+      }
+    },
+    "@better-auth/passkey": {
+      "zod": "^4.5.4",
+      "better-call": {
+        "zod": "3.25.76"
+      }
+    },
+    "deepmerge-ts": "^8.0.2"
   },
   "dependencies": {
-    "@better-auth/api-key": "^1.6.2",
-    "@better-auth/passkey": "^1.6.2",
+    "@better-auth/api-key": "^1.7.6",
+    "@better-auth/passkey": "^1.7.6",
     "@blocknote/core": "^0.45.0",
     "@blocknote/mantine": "^0.45.0",
     "@blocknote/react": "^0.45.0",
@@ -88,7 +114,7 @@
     "@radix-ui/react-tooltip": "^1.2.7",
     "@tanstack/react-table": "^8.21.3",
     "@tiptap/extensions": "^3.22.3",
-    "better-auth": "1.6.2",
+    "better-auth": "1.7.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -110,6 +136,7 @@
     "mime-types": "^3.0.2",
     "next": "^16.2.3",
     "next-themes": "^1.0.0-beta.0",
+    "pdf-lib": "^1.17.1",
     "peer": "^1.0.2",
     "peerjs": "^1.5.5",
     "postcss": "^8.5.6",

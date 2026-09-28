@@ -64,15 +64,6 @@ export default function SettingsPage() {
     const [sessions, setSessions] = useState<any[]>([]);
     const [accounts, setAccounts] = useState<any[]>([]);
 
-    useEffect(() => {
-        if (session?.user) {
-            setIsTwoFactorEnabled(!!session.user.twoFactorEnabled);
-            fetchPasskeys();
-            fetchSessions();
-            fetchAccounts();
-        }
-    }, [session]);
-
     const fetchSessions = async () => {
         const {data, error} = await authClient.listSessions();
         if (data && !error) {
@@ -93,6 +84,15 @@ export default function SettingsPage() {
             setPasskeys(data);
         }
     };
+
+    useEffect(() => {
+        if (session?.user) {
+            setIsTwoFactorEnabled(!!session.user.twoFactorEnabled);
+            fetchPasskeys();
+            fetchSessions();
+            fetchAccounts();
+        }
+    }, [session]);
 
     if (isPending) return null;
     if (!session) return null;
@@ -213,6 +213,7 @@ export default function SettingsPage() {
         const {data, error} = await authClient.twoFactor.enable({
             issuer: "Solar",
             password: confirmPassword,
+            method: "totp",
         });
 
         if (error) {
@@ -222,7 +223,7 @@ export default function SettingsPage() {
                 setConfirmPassword("");
                 setTwoFactorStep("password");
             }
-        } else if (data) {
+        } else if (data?.method === "totp") {
             setQrCode(data.totpURI);
             setTwoFactorStep("qr");
             setLoading(false);
@@ -389,9 +390,11 @@ export default function SettingsPage() {
     };
 
     const handleUnlinkDiscord = async () => {
+        const discordAccount = accounts.find(a => a.providerId === "discord");
+        if (!discordAccount) return;
         setLoading(true);
         const {error} = await authClient.unlinkAccount({
-            providerId: "discord",
+            accountId: discordAccount.id,
         });
         setLoading(false);
 

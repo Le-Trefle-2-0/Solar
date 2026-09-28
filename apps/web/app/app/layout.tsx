@@ -8,6 +8,7 @@ import {PeerProvider} from "@/context/VoicePeer";
 import {DocumentSubmissionDialog} from "@/components/users/document-submission-dialog";
 import {addDays, differenceInDays, format} from "date-fns";
 import {fr} from "date-fns/locale";
+import prisma from "@/lib/prisma";
 
 import {constructMetadata} from "@/lib/metadata";
 
@@ -57,23 +58,6 @@ export default async function RootLayout({
                 isDismissible = false;
             }
         }
-    } else if (user.documentsStatus === 'submitted') {
-        if (!user.documentsValidatedAt || new Date(user.documentsSentAt) > new Date(user.documentsValidatedAt)) {
-            const daysSinceSubmission = differenceInDays(new Date(), new Date(user.documentsSentAt));
-            if (daysSinceSubmission >= 7) {
-                // Not validated after 1 week
-                showDocDialog = true;
-                isDismissible = isAdmin;
-            } else if (isAdmin) {
-                // Admins are prompted at each login if not fully validated
-                showDocDialog = true;
-                isDismissible = true;
-            }
-        }
-    } else if (isAdmin && user.documentsStatus !== 'validated') {
-        // Any other non-validated status for admin
-        showDocDialog = true;
-        isDismissible = true;
     }
 
     // Double check: Admin must ALWAYS be able to dismiss
@@ -81,11 +65,70 @@ export default async function RootLayout({
         isDismissible = true;
     }
 
+    let pendingDocsCount = 0;
+    if (isAdmin) {
+        pendingDocsCount = await prisma.user.count({
+            where: {
+                documentsStatus: 'submitted'
+            }
+        });
+    }
+
+    // Unread messages logic
+    const unreadChannels = await prisma.userChannelRead.findMany({
+        where: { userId: user.id }
+    });
+
+    const channelLastReadMap = new Map(unreadChannels.map(ur => [ur.channelId, ur.lastRead]));
+
+    const channels = await prisma.channel.findMany({
+        select: {
+            id: true,
+            messages: {
+                orderBy: { createdAt: 'desc' },
+                take: 1,
+                select: { createdAt: true, userId: true }
+            }
+        }
+    });
+
+    console.log('[Layout] Channels with latest messages:', JSON.stringify(channels, null, 2));
+    console.log('[Layout] User ID:', user.id);
+    console.log('[Layout] Channel last read map:', JSON.stringify(Array.from(channelLastReadMap.entries()), null, 2));
+
+    const unreadChannelIds = channels
+        .filter(c => {
+            const lastRead = channelLastReadMap.get(c.id);
+            const latestMessage = c.messages[0];
+            // If no message ever, it's not unread
+            if (!latestMessage) return false;
+            // If we are the author of the latest message, it's not unread for us
+            if (latestMessage.userId === user.id) return false;
+            // If we never read it, and there is a message, it is unread
+            if (!lastRead) return true;
+            // If latest message is AFTER our last read, it is unread
+            return latestMessage.createdAt > lastRead;
+        })
+        .map(c => c.id);
+
+    console.log('[Layout] Calculated unreadChannelIds:', unreadChannelIds);
+
+    const pendingDocs = await prisma.user.findMany({
+        where: { documentsStatus: 'submitted' },
+        select: { id: true }
+    });
+    const pendingDocsIds = pendingDocs.map(u => u.id);
+
     return (
         <SocketProvider>
             <PeerProvider>
                 <SidebarProvider>
-                    <AppSidebar className="border-r-main border-r"/>
+                    <AppSidebar
+                        className="border-r-main border-r"
+                        pendingDocsCount={pendingDocsCount}
+                        unreadChannelIds={unreadChannelIds}
+                        pendingDocsIds={pendingDocsIds}
+                    />
                     <div className="flex flex-col h-full w-full overflow-hidden relative">
                         <SidebarTrigger
                             className="absolute top-2 left-2 z-50 bg-background/50 backdrop-blur shadow-sm border rounded-md"/>
