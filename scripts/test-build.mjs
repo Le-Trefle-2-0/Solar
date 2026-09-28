@@ -13,7 +13,7 @@
  *   node scripts/test-build.mjs [options]
  *
  * Options :
- *   --install      Lance `npm ci` avant les builds (utile en CI)
+ *   --install      Lance `npm ci` avant les builds
  *   --clean        Supprime les artefacts existants (dist/, .next/) avant le build
  *   --fail-fast    S'arrête à la première étape en échec
  *   --only=a,b     Ne teste que certaines cibles (ex: --only=api,web)
