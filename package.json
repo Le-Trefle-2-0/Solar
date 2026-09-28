@@ -42,11 +42,12 @@
     "seed": "tsx prisma/seed.ts"
   },
   "overrides": {
-    "zod": "3.25.76"
+    "zod": "3.25.76",
+    "deepmerge-ts": "^8.0.2"
   },
   "dependencies": {
-    "@better-auth/api-key": "^1.6.2",
-    "@better-auth/passkey": "^1.6.2",
+    "@better-auth/api-key": "^1.7.6",
+    "@better-auth/passkey": "^1.7.6",
     "@blocknote/core": "^0.45.0",
     "@blocknote/mantine": "^0.45.0",
     "@blocknote/react": "^0.45.0",
@@ -89,7 +90,7 @@
     "@radix-ui/react-tooltip": "^1.2.7",
     "@tanstack/react-table": "^8.21.3",
     "@tiptap/extensions": "^3.22.3",
-    "better-auth": "1.6.2",
+    "better-auth": "1.7.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",

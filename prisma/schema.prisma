@@ -202,12 +202,14 @@ model Invitation {
 }
 
 model TwoFactor {
-  id          String  @id
-  secret      String  @db.Text
-  backupCodes String  @db.Text
-  userId      String
-  verified    Boolean
-  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                      String    @id
+  secret                  String    @db.Text
+  backupCodes             String    @db.Text
+  userId                  String
+  verified                Boolean
+  failedVerificationCount Int?      @default(0)
+  lockedUntil             DateTime?
+  user                    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId], map: "two_factor_userId_fkey")
   @@map("two_factor")
@@ -393,6 +395,8 @@ model Jwks {
   publicKey  String   @db.Text
   privateKey String   @db.Text
   createdAt  DateTime
+  alg        String?
+  crv        String?
 
   @@map("jwks")
 }
