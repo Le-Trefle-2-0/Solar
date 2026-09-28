@@ -1,5 +1,5 @@
 "use client";
-import type {Reaction} from "@prisma/client";
+import type {Reaction} from "../../../generated/prisma";
 import {apiFetch} from "@/lib/api";
 import React, {useEffect, useState} from "react";
 import {

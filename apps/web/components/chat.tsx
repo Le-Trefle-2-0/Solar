@@ -62,7 +62,7 @@ import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandL
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form"
 import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover"
 import {ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger} from "@/components/ui/context-menu"
-import type {Reaction, Ticket} from "@prisma/client"
+import type {Reaction, Ticket} from "../../../generated/prisma"
 import {useRouter} from "next/navigation";
 import {Message} from "@/components/message";
 import {useSocket} from "@/context/Socket";

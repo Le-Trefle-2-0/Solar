@@ -1,7 +1,7 @@
 "use client";
 
 import {useEffect, useState} from "react";
-import {Recruitment} from "@prisma/client";
+import type {Recruitment} from "../../../../generated/prisma";
 import {
     Dialog,
     DialogContent,
