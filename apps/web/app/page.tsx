@@ -25,7 +25,14 @@ export default async function Home() {
     const categories = await prisma.teamCategory.findMany({
         include: {
             members: {
-                orderBy: { name: 'asc' }
+                include: {
+                    person: true
+                },
+                orderBy: {
+                    person: {
+                        name: 'asc'
+                    }
+                }
             }
         },
         orderBy: { order: 'asc' }
