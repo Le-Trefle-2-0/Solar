@@ -124,13 +124,20 @@ exports.Prisma.NewsletterScalarFieldEnum = {
   id: 'id',
   title: 'title',
   content: 'content',
-  htmlContent: 'htmlContent',
   status: 'status',
+  target: 'target',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   sentAt: 'sentAt',
   scheduledAt: 'scheduledAt',
-  authorId: 'authorId'
+  authorId: 'authorId',
+  htmlContent: 'htmlContent'
+};
+
+exports.Prisma.NewsletterSubscriberScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.UserScalarFieldEnum = {
@@ -141,32 +148,32 @@ exports.Prisma.UserScalarFieldEnum = {
   image: 'image',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  role: 'role',
-  banned: 'banned',
-  banReason: 'banReason',
   banExpires: 'banExpires',
+  banReason: 'banReason',
+  banned: 'banned',
+  role: 'role',
   twoFactorEnabled: 'twoFactorEnabled',
-  username: 'username',
   displayUsername: 'displayUsername',
-  documentsStatus: 'documentsStatus',
-  documentsSentAt: 'documentsSentAt',
-  documentsValidatedAt: 'documentsValidatedAt',
+  username: 'username',
   documentsRenewalAt: 'documentsRenewalAt',
+  documentsSentAt: 'documentsSentAt',
+  documentsStatus: 'documentsStatus',
   documentsText: 'documentsText',
-  firstName: 'firstName',
-  lastName: 'lastName',
-  birthDate: 'birthDate',
-  addressStreet: 'addressStreet',
+  documentsValidatedAt: 'documentsValidatedAt',
+  addressCity: 'addressCity',
   addressNumber: 'addressNumber',
   addressPostalCode: 'addressPostalCode',
-  addressCity: 'addressCity',
-  newsletterSubscription: 'newsletterSubscription',
-  idCardFileId: 'idCardFileId',
-  idCardStatus: 'idCardStatus',
-  idCardRejectReason: 'idCardRejectReason',
+  addressStreet: 'addressStreet',
+  birthDate: 'birthDate',
   casierFileId: 'casierFileId',
+  casierRejectReason: 'casierRejectReason',
   casierStatus: 'casierStatus',
-  casierRejectReason: 'casierRejectReason'
+  firstName: 'firstName',
+  idCardFileId: 'idCardFileId',
+  idCardRejectReason: 'idCardRejectReason',
+  idCardStatus: 'idCardStatus',
+  lastName: 'lastName',
+  newsletterSubscription: 'newsletterSubscription'
 };
 
 exports.Prisma.RoleScalarFieldEnum = {
@@ -174,9 +181,9 @@ exports.Prisma.RoleScalarFieldEnum = {
   name: 'name',
   permissions: 'permissions',
   weight: 'weight',
-  icon: 'icon',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  icon: 'icon'
 };
 
 exports.Prisma.FileScalarFieldEnum = {
@@ -197,8 +204,8 @@ exports.Prisma.SessionScalarFieldEnum = {
   ipAddress: 'ipAddress',
   userAgent: 'userAgent',
   userId: 'userId',
-  impersonatedBy: 'impersonatedBy',
-  activeOrganizationId: 'activeOrganizationId'
+  activeOrganizationId: 'activeOrganizationId',
+  impersonatedBy: 'impersonatedBy'
 };
 
 exports.Prisma.AccountScalarFieldEnum = {
@@ -257,8 +264,8 @@ exports.Prisma.TwoFactorScalarFieldEnum = {
   id: 'id',
   secret: 'secret',
   backupCodes: 'backupCodes',
-  verified: 'verified',
-  userId: 'userId'
+  userId: 'userId',
+  verified: 'verified'
 };
 
 exports.Prisma.ChannelScalarFieldEnum = {
@@ -266,16 +273,22 @@ exports.Prisma.ChannelScalarFieldEnum = {
   name: 'name'
 };
 
+exports.Prisma.UserChannelReadScalarFieldEnum = {
+  userId: 'userId',
+  channelId: 'channelId',
+  lastRead: 'lastRead'
+};
+
 exports.Prisma.MessageScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
-  discordID: 'discordID',
   userId: 'userId',
   channelId: 'channelId',
   content: 'content',
+  discordID: 'discordID',
+  edited: 'edited',
   replyID: 'replyID',
-    edited: 'edited',
-    ticketId: 'ticketId'
+  ticketId: 'ticketId'
 };
 
 exports.Prisma.ReactionScalarFieldEnum = {
@@ -300,9 +313,9 @@ exports.Prisma.EventScalarFieldEnum = {
 exports.Prisma.RoleSlotScalarFieldEnum = {
   id: 'id',
   role: 'role',
+  eventId: 'eventId',
   goalCount: 'goalCount',
-  part: 'part',
-  eventId: 'eventId'
+  part: 'part'
 };
 
 exports.Prisma.EventRegistrationScalarFieldEnum = {
@@ -310,26 +323,26 @@ exports.Prisma.EventRegistrationScalarFieldEnum = {
   userId: 'userId',
   roleSlotId: 'roleSlotId',
   registeredAt: 'registeredAt',
-  status: 'status',
-  eventId: 'eventId'
+  eventId: 'eventId',
+  status: 'status'
 };
 
 exports.Prisma.TicketScalarFieldEnum = {
   id: 'id',
   discordUserID: 'discordUserID',
-  source: 'source',
-  metadata: 'metadata',
   channelId: 'channelId',
-  channelName: 'channelName',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   assignedUserId: 'assignedUserId',
-  statusName: 'statusName',
+  channelName: 'channelName',
   statusLabel: 'statusLabel',
-  problematic: 'problematic',
-  observations: 'observations',
+  statusName: 'statusName',
   info: 'info',
+  observations: 'observations',
+  problematic: 'problematic',
   voice: 'voice',
+  metadata: 'metadata',
+  source: 'source',
   categories: 'categories',
   feedback: 'feedback'
 };
@@ -397,20 +410,52 @@ exports.Prisma.RecruitmentScalarFieldEnum = {
   id: 'id',
   title: 'title',
   description: 'description',
+  shortDescription: 'shortDescription',
   icon: 'icon',
-  contactEmail: 'contactEmail',
   fields: 'fields',
-    discordWebhook: 'discordWebhook',
   enabled: 'enabled',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  contactEmail: 'contactEmail',
+  discordWebhook: 'discordWebhook'
+};
+
+exports.Prisma.RecruitmentWaitlistScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  recruitmentId: 'recruitmentId',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.TeamCategoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  icon: 'icon',
+  type: 'type',
+  color: 'color',
+  order: 'order',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.RecruitmentWaitlistScalarFieldEnum = {
-    id: 'id',
-    email: 'email',
-    recruitmentId: 'recruitmentId',
-    createdAt: 'createdAt'
+exports.Prisma.TeamPersonScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  image: 'image',
+  bio: 'bio',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.TeamMemberScalarFieldEnum = {
+  id: 'id',
+  role: 'role',
+  isLead: 'isLead',
+  teamName: 'teamName',
+  categoryId: 'categoryId',
+  personId: 'personId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.ImageScalarFieldEnum = {
@@ -446,7 +491,13 @@ exports.Prisma.NewsletterOrderByRelevanceFieldEnum = {
   id: 'id',
   title: 'title',
   status: 'status',
+  target: 'target',
   authorId: 'authorId'
+};
+
+exports.Prisma.NewsletterSubscriberOrderByRelevanceFieldEnum = {
+  id: 'id',
+  email: 'email'
 };
 
 exports.Prisma.UserOrderByRelevanceFieldEnum = {
@@ -454,24 +505,24 @@ exports.Prisma.UserOrderByRelevanceFieldEnum = {
   name: 'name',
   email: 'email',
   image: 'image',
-  role: 'role',
   banReason: 'banReason',
-  username: 'username',
+  role: 'role',
   displayUsername: 'displayUsername',
+  username: 'username',
   documentsStatus: 'documentsStatus',
   documentsText: 'documentsText',
-  firstName: 'firstName',
-  lastName: 'lastName',
-  addressStreet: 'addressStreet',
+  addressCity: 'addressCity',
   addressNumber: 'addressNumber',
   addressPostalCode: 'addressPostalCode',
-  addressCity: 'addressCity',
-  idCardFileId: 'idCardFileId',
-  idCardStatus: 'idCardStatus',
-  idCardRejectReason: 'idCardRejectReason',
+  addressStreet: 'addressStreet',
   casierFileId: 'casierFileId',
+  casierRejectReason: 'casierRejectReason',
   casierStatus: 'casierStatus',
-  casierRejectReason: 'casierRejectReason'
+  firstName: 'firstName',
+  idCardFileId: 'idCardFileId',
+  idCardRejectReason: 'idCardRejectReason',
+  idCardStatus: 'idCardStatus',
+  lastName: 'lastName'
 };
 
 exports.Prisma.RoleOrderByRelevanceFieldEnum = {
@@ -493,8 +544,8 @@ exports.Prisma.SessionOrderByRelevanceFieldEnum = {
   ipAddress: 'ipAddress',
   userAgent: 'userAgent',
   userId: 'userId',
-  impersonatedBy: 'impersonatedBy',
-  activeOrganizationId: 'activeOrganizationId'
+  activeOrganizationId: 'activeOrganizationId',
+  impersonatedBy: 'impersonatedBy'
 };
 
 exports.Prisma.AccountOrderByRelevanceFieldEnum = {
@@ -551,10 +602,15 @@ exports.Prisma.ChannelOrderByRelevanceFieldEnum = {
   name: 'name'
 };
 
-exports.Prisma.MessageOrderByRelevanceFieldEnum = {
-  discordID: 'discordID',
+exports.Prisma.UserChannelReadOrderByRelevanceFieldEnum = {
   userId: 'userId',
   channelId: 'channelId'
+};
+
+exports.Prisma.MessageOrderByRelevanceFieldEnum = {
+  userId: 'userId',
+  channelId: 'channelId',
+  discordID: 'discordID'
 };
 
 exports.Prisma.ReactionOrderByRelevanceFieldEnum = {
@@ -574,16 +630,16 @@ exports.Prisma.EventOrderByRelevanceFieldEnum = {
 exports.Prisma.RoleSlotOrderByRelevanceFieldEnum = {
   id: 'id',
   role: 'role',
-  part: 'part',
-  eventId: 'eventId'
+  eventId: 'eventId',
+  part: 'part'
 };
 
 exports.Prisma.EventRegistrationOrderByRelevanceFieldEnum = {
   id: 'id',
   userId: 'userId',
   roleSlotId: 'roleSlotId',
-  status: 'status',
-  eventId: 'eventId'
+  eventId: 'eventId',
+  status: 'status'
 };
 
 exports.Prisma.JsonNullValueFilter = {
@@ -599,15 +655,15 @@ exports.Prisma.QueryMode = {
 
 exports.Prisma.TicketOrderByRelevanceFieldEnum = {
   discordUserID: 'discordUserID',
-  source: 'source',
   channelId: 'channelId',
-  channelName: 'channelName',
   assignedUserId: 'assignedUserId',
-  statusName: 'statusName',
+  channelName: 'channelName',
   statusLabel: 'statusLabel',
-  problematic: 'problematic',
+  statusName: 'statusName',
+  info: 'info',
   observations: 'observations',
-  info: 'info'
+  problematic: 'problematic',
+  source: 'source'
 };
 
 exports.Prisma.TicketStatusOrderByRelevanceFieldEnum = {
@@ -653,15 +709,39 @@ exports.Prisma.RecruitmentOrderByRelevanceFieldEnum = {
   id: 'id',
   title: 'title',
   description: 'description',
+  shortDescription: 'shortDescription',
   icon: 'icon',
-    contactEmail: 'contactEmail',
-    discordWebhook: 'discordWebhook'
+  contactEmail: 'contactEmail',
+  discordWebhook: 'discordWebhook'
 };
 
 exports.Prisma.RecruitmentWaitlistOrderByRelevanceFieldEnum = {
-    id: 'id',
-    email: 'email',
-    recruitmentId: 'recruitmentId'
+  id: 'id',
+  email: 'email',
+  recruitmentId: 'recruitmentId'
+};
+
+exports.Prisma.TeamCategoryOrderByRelevanceFieldEnum = {
+  id: 'id',
+  name: 'name',
+  icon: 'icon',
+  type: 'type',
+  color: 'color'
+};
+
+exports.Prisma.TeamPersonOrderByRelevanceFieldEnum = {
+  id: 'id',
+  name: 'name',
+  image: 'image',
+  bio: 'bio'
+};
+
+exports.Prisma.TeamMemberOrderByRelevanceFieldEnum = {
+  id: 'id',
+  role: 'role',
+  teamName: 'teamName',
+  categoryId: 'categoryId',
+  personId: 'personId'
 };
 
 exports.Prisma.ImageOrderByRelevanceFieldEnum = {
@@ -677,6 +757,7 @@ exports.Prisma.SettingsOrderByRelevanceFieldEnum = {
 
 exports.Prisma.ModelName = {
   Newsletter: 'Newsletter',
+  NewsletterSubscriber: 'NewsletterSubscriber',
   User: 'User',
   Role: 'Role',
   File: 'File',
@@ -688,6 +769,7 @@ exports.Prisma.ModelName = {
   Invitation: 'Invitation',
   TwoFactor: 'TwoFactor',
   Channel: 'Channel',
+  UserChannelRead: 'UserChannelRead',
   Message: 'Message',
   Reaction: 'Reaction',
   Event: 'Event',
@@ -700,7 +782,10 @@ exports.Prisma.ModelName = {
   RouteProtection: 'RouteProtection',
   Passkey: 'Passkey',
   Recruitment: 'Recruitment',
-    RecruitmentWaitlist: 'RecruitmentWaitlist',
+  RecruitmentWaitlist: 'RecruitmentWaitlist',
+  TeamCategory: 'TeamCategory',
+  TeamPerson: 'TeamPerson',
+  TeamMember: 'TeamMember',
   Image: 'Image',
   Settings: 'Settings'
 };

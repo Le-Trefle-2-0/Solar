@@ -10,8 +10,7 @@ export async function registerReactionsRoutes(app) {
         const reactionSchema = z.object({
             id: z.string().optional(),
             messageID: z.number(),
-            authorID: z.string(),
-            reaction: z.string(),
+            emoji: z.string(),
             option: z.string(),
         });
         try {
@@ -20,8 +19,8 @@ export async function registerReactionsRoutes(app) {
                 const reaction = await prisma.reaction.create({
                     data: {
                         messageID: body.messageID,
-                        userID: body.authorID,
-                        emoji: body.reaction
+                        userID: userId,
+                        emoji: body.emoji
                     }
                 });
                 // Get message to know the channel for broadcast
@@ -38,7 +37,7 @@ export async function registerReactionsRoutes(app) {
                 const reaction = await prisma.reaction.delete({
                     where: {
                         id: body.id,
-                        userID: body.authorID
+                        userID: userId
                     }
                 });
                 const message = await prisma.message.findUnique({ where: { id: body.messageID } });

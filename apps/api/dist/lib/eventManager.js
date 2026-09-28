@@ -1,6 +1,7 @@
 import { prisma } from '../prisma.js';
 import { createChannel } from './channelsManager.js';
-import { format } from 'date-fns';
+import { format, isAfter, setHours, setMinutes, setSeconds, startOfWeek } from 'date-fns';
+import { getUserPermissions, hasPermission } from './permissions.js';
 export async function saveEvent(eventData) {
     const { title, description, start, end, userId, roleSlots } = eventData;
     const channel = await createChannel(`${title} du ${format(new Date(start), "dd/MM/yyyy")}`);
@@ -43,7 +44,8 @@ export async function getEvents() {
             id: slot.id,
             role: slot.role,
             goalCount: slot.goalCount,
-            registrationsCount: slot.registrations.length,
+            registrationsCount: slot.registrations.filter(r => r.status === 'confirmed').length,
+            pendingCount: slot.registrations.filter(r => r.status === 'pending').length,
         })),
     }));
 }
@@ -56,8 +58,15 @@ export async function findEvent(eventId) {
             roleSlots: {
                 include: {
                     registrations: {
-                        select: {
-                            userId: true
+                        include: {
+                            user: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    image: true,
+                                    role: true,
+                                }
+                            }
                         }
                     },
                 },
@@ -74,37 +83,101 @@ export async function findEvent(eventId) {
             role: slot.role,
             part: slot.part,
             goalCount: slot.goalCount,
-            registrationsCount: slot.registrations.length,
-            registrations: slot.registrations,
+            registrationsCount: slot.registrations.filter(r => r.status === 'confirmed').length,
+            registrations: slot.registrations.map(r => ({
+                ...r,
+                user: {
+                    ...r.user,
+                    hasActiveTicket: r.user.tickets?.length > 0
+                }
+            })),
         }))
     };
 }
-export async function registerUserToEvent(eventId, userId, part, roleSlotId) {
+export async function findEventByChannel(channelId) {
+    const event = await prisma.event.findFirst({
+        where: { channelID: channelId },
+        include: {
+            roleSlots: {
+                include: {
+                    registrations: {
+                        include: {
+                            user: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    image: true,
+                                    role: true,
+                                    tickets: {
+                                        where: {
+                                            status: {
+                                                name: { not: 'closed' }
+                                            }
+                                        },
+                                        select: { id: true }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                },
+            },
+        },
+    });
+    if (!event)
+        return null;
+    return {
+        ...event,
+        roleSlots: event.roleSlots.map((slot) => ({
+            id: slot.id,
+            role: slot.role,
+            part: slot.part,
+            goalCount: slot.goalCount,
+            registrationsCount: slot.registrations.filter(r => r.status === 'confirmed').length,
+            registrations: slot.registrations.map(r => ({
+                ...r,
+                user: {
+                    ...r.user,
+                    hasActiveTicket: r.user.tickets?.length > 0
+                }
+            })),
+        }))
+    };
+}
+export async function registerUserToEvent(eventId, userId, part, roleSlotId, adminBypass) {
     const user = await prisma.user.findUnique({
         where: { id: userId },
         select: { role: true },
     });
     if (!user || !user.role) {
-        throw new Error("User not found.");
+        throw new Error("Utilisateur introuvable.");
+    }
+    const event = await prisma.event.findUnique({
+        where: { id: eventId },
+        select: { start: true }
+    });
+    if (!event) {
+        throw new Error("Événement introuvable.");
     }
     const userRoles = user.role.split(',').map(r => r.trim()).filter(Boolean);
     let targetSlot = null;
     if (roleSlotId) {
-        targetSlot = await prisma.roleSlot.findUnique({
+        const foundSlot = await prisma.roleSlot.findUnique({
             where: { id: roleSlotId },
             include: { registrations: true },
         });
+        targetSlot = foundSlot;
         if (!targetSlot) {
-            throw new Error("Selected slot not found.");
+            throw new Error("Créneau sélectionné introuvable.");
         }
         if (targetSlot.eventId !== eventId) {
-            throw new Error("Selected slot does not belong to this event.");
+            throw new Error("Le créneau sélectionné n'appartient pas à cet événement.");
         }
         if (!userRoles.includes(targetSlot.role)) {
-            throw new Error("You are not allowed to register for this slot.");
+            throw new Error("Vous n'êtes pas autorisé à vous inscrire à ce créneau.");
         }
         if (targetSlot.role === 'volunteer' && targetSlot.part && part && targetSlot.part !== part) {
-            throw new Error("Invalid part selection for this slot.");
+            throw new Error("Sélection de partie invalide pour ce créneau.");
         }
     }
     else {
@@ -122,27 +195,55 @@ export async function registerUserToEvent(eventId, userId, part, roleSlotId) {
             include: { registrations: true },
         });
         if (!matchingSlots.length) {
-            throw new Error(`No available slots for your roles${part ? ` and part "${part}"` : ''} in this event.`);
+            throw new Error(`Aucun créneau disponible pour vos rôles${part ? ` et partie "${part}"` : ''} dans cet événement.`);
         }
-        targetSlot = matchingSlots.find((s) => s.registrations.length < s.goalCount) ?? matchingSlots[0];
+        const slots = matchingSlots;
+        targetSlot = slots.find((s) => s.registrations.filter((r) => r.status === 'confirmed').length < s.goalCount) ?? slots[0];
     }
     const alreadyRegistered = await prisma.eventRegistration.findFirst({
-        where: { userId, roleSlotId: targetSlot.id },
+        where: { userId, roleSlotId: targetSlot?.id },
     });
     if (alreadyRegistered) {
-        throw new Error("User is already registered for this slot.");
+        throw new Error("L'utilisateur est déjà inscrit à ce créneau.");
     }
-    if (targetSlot.registrations.length >= targetSlot.goalCount) {
-        throw new Error("This slot is full.");
+    // If not admin bypass, check slot capacity
+    if (!adminBypass && targetSlot) {
+        const confirmedCount = targetSlot.registrations.filter((r) => r.status === 'confirmed').length;
+        if (confirmedCount >= targetSlot.goalCount) {
+            throw new Error("Ce créneau est complet.");
+        }
+    }
+    // Deadline logic: Monday 12:00 of the week of the event
+    const eventDate = new Date(event.start);
+    const deadline = setSeconds(setMinutes(setHours(startOfWeek(eventDate, { weekStartsOn: 1 }), 12), 0), 0);
+    const now = new Date();
+    const perms = await getUserPermissions(userId);
+    const isAdmin = hasPermission(perms, 'permanence.register_other_user');
+    // Admin/manager bypass deadline and register directly as confirmed, others follow normal deadline logic
+    const status = (adminBypass && isAdmin) ? 'confirmed' : (isAfter(now, deadline) ? 'pending' : 'confirmed');
+    if (!targetSlot) {
+        throw new Error("Cible d'inscription introuvable.");
     }
     const registration = await prisma.eventRegistration.create({
         data: {
             userId,
             roleSlotId: targetSlot.id,
             eventId,
+            status,
         },
     });
     return registration;
+}
+export async function updateRegistrationStatus(registrationId, status) {
+    if (status === 'rejected') {
+        return prisma.eventRegistration.delete({
+            where: { id: registrationId },
+        });
+    }
+    return prisma.eventRegistration.update({
+        where: { id: registrationId },
+        data: { status },
+    });
 }
 export async function unregisterUserToEvent(eventId, userId, part, roleSlotId) {
     const user = await prisma.user.findUnique({
@@ -150,37 +251,108 @@ export async function unregisterUserToEvent(eventId, userId, part, roleSlotId) {
         select: { role: true },
     });
     if (!user || !user.role) {
-        throw new Error("User not found.");
+        throw new Error("Utilisateur introuvable.");
+    }
+    const event = await prisma.event.findUnique({
+        where: { id: eventId },
+        select: { start: true }
+    });
+    if (!event) {
+        throw new Error("Événement introuvable.");
+    }
+    // Deadline logic: Monday 12:00 of the week of the event
+    const eventDate = new Date(event.start);
+    const deadline = setSeconds(setMinutes(setHours(startOfWeek(eventDate, { weekStartsOn: 1 }), 12), 0), 0);
+    const now = new Date();
+    if (isAfter(now, deadline)) {
+        throw new Error("Impossible de se désinscrire après le lundi 12h00 de la semaine de l'événement. Veuillez contacter un responsable ou un administrateur.");
     }
     const userRoles = user.role.split(',').map(r => r.trim()).filter(Boolean);
     let existingReg = null;
     if (roleSlotId) {
         const slot = await prisma.roleSlot.findUnique({ where: { id: roleSlotId } });
         if (!slot || slot.eventId !== eventId) {
-            throw new Error("Selected slot not found in this event.");
+            throw new Error("Créneau sélectionné introuvable dans cet événement.");
         }
         if (!userRoles.includes(slot.role)) {
-            throw new Error("You are not allowed to unregister from this slot.");
+            throw new Error("Vous n'êtes pas autorisé à vous désinscrire de ce créneau.");
         }
         existingReg = await prisma.eventRegistration.findFirst({
             where: { userId, roleSlotId },
         });
     }
     else {
+        const where = {
+            userId,
+            roleSlot: {
+                eventId,
+                role: { in: userRoles },
+            },
+        };
+        if (userRoles.includes('volunteer') && part) {
+            where.roleSlot = {
+                ...where.roleSlot,
+                part
+            };
+        }
+        existingReg = await prisma.eventRegistration.findFirst({
+            where: where,
+        });
+    }
+    if (!existingReg) {
+        throw new Error("L'utilisateur n'est pas inscrit à ce créneau.");
+    }
+    const registration = await prisma.eventRegistration.delete({
+        where: { id: existingReg.id },
+    });
+    return registration;
+}
+export async function removeUserFromEvent(eventId, targetUserId, adminUserId, roleSlotId) {
+    // Check if the admin user has the right permissions
+    const adminUser = await prisma.user.findUnique({
+        where: { id: adminUserId },
+        select: { role: true },
+    });
+    if (!adminUser || !adminUser.role) {
+        throw new Error("Utilisateur administrateur introuvable.");
+    }
+    const adminRoles = adminUser.role.split(',').map(r => r.trim()).filter(Boolean);
+    if (!adminRoles.includes('admin') && !adminRoles.includes('manager')) {
+        throw new Error("Permissions insuffisantes. Seuls les administrateurs et responsables peuvent retirer des utilisateurs des événements.");
+    }
+    // Find the event to verify it exists
+    const event = await prisma.event.findUnique({
+        where: { id: eventId },
+        select: { id: true }
+    });
+    if (!event) {
+        throw new Error("Événement introuvable.");
+    }
+    // Find the registration to remove
+    let existingReg = null;
+    if (roleSlotId) {
+        const slot = await prisma.roleSlot.findUnique({ where: { id: roleSlotId } });
+        if (!slot || slot.eventId !== eventId) {
+            throw new Error("Créneau sélectionné introuvable dans cet événement.");
+        }
+        existingReg = await prisma.eventRegistration.findFirst({
+            where: { userId: targetUserId, roleSlotId },
+        });
+    }
+    else {
         existingReg = await prisma.eventRegistration.findFirst({
             where: {
-                userId,
+                userId: targetUserId,
                 roleSlot: {
                     eventId,
-                    role: { in: userRoles },
-                    ...(userRoles.includes('volunteer') && part ? { part } : {}),
                 },
             },
         });
     }
     if (!existingReg) {
-        throw new Error("User is not registered for the selected slot.");
+        throw new Error("L'utilisateur n'est pas inscrit à ce créneau.");
     }
+    // Remove the registration
     const registration = await prisma.eventRegistration.delete({
         where: { id: existingReg.id },
     });

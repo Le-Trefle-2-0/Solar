@@ -2,7 +2,8 @@ import { z } from 'zod';
 import { createHash } from 'crypto';
 import { prisma } from '../../prisma.js';
 import { authenticate } from '../../auth.js';
-import { findEvent, getEvents, registerUserToEvent, saveEvent, unregisterUserToEvent } from '../../lib/eventManager.js';
+import { getUserPermissions, hasPermission } from '../../lib/permissions.js';
+import { findEvent, findEventByChannel, getEvents, registerUserToEvent, removeUserFromEvent, saveEvent, unregisterUserToEvent, updateRegistrationStatus } from '../../lib/eventManager.js';
 const EventSchema = z.object({
     title: z.string().min(1),
     description: z.string().optional(),
@@ -13,7 +14,7 @@ const EventSchema = z.object({
         role: z.string().min(1),
         goalCount: z.number().int().nonnegative(),
         part: z.enum(["first", "second"]).optional()
-    })),
+    })).min(1, "Au moins un créneau est requis"),
 });
 async function checkAuth(req, reply) {
     const userId = await authenticate(req);
@@ -41,6 +42,14 @@ export async function registerEventsRoutes(app) {
         const userId = await checkAuth(req, reply);
         if (!userId)
             return;
+        // Only allow users with permanence.open permission to create events (sessions)
+        const perms = await getUserPermissions(userId);
+        if (!hasPermission(perms, 'permanence.open')) {
+            return reply.status(403).send({
+                success: false,
+                message: "Accès refusé : permission permanence.open requise"
+            });
+        }
         try {
             const body = req.body;
             const validated = EventSchema.parse(body);
@@ -126,6 +135,22 @@ export async function registerEventsRoutes(app) {
             return reply.status(500).send({ success: false, error: "Failed to compute available users" });
         }
     });
+    app.get('/v1/events/channel/:channelId', async (req, reply) => {
+        const userId = await checkAuth(req, reply);
+        if (!userId)
+            return;
+        const { channelId } = req.params;
+        try {
+            const event = await findEventByChannel(channelId);
+            if (!event)
+                return reply.status(404).send({ success: false, message: "Event not found for this channel" });
+            return reply.send({ success: true, event });
+        }
+        catch (err) {
+            console.error("Failed to fetch event by channel:", err);
+            return reply.status(500).send({ success: false, message: "Internal server error" });
+        }
+    });
     app.get('/v1/events/:id', async (req, reply) => {
         const userId = await checkAuth(req, reply);
         if (!userId)
@@ -171,6 +196,14 @@ export async function registerEventsRoutes(app) {
         const userId = await checkAuth(req, reply);
         if (!userId)
             return;
+        // Check if user has permission to close/delete sessions
+        const perms = await getUserPermissions(userId);
+        if (!hasPermission(perms, 'permanence.close')) {
+            return reply.status(403).send({
+                success: false,
+                message: "Accès refusé : permission permanence.close requise"
+            });
+        }
         const { id } = req.params;
         try {
             await prisma.event.delete({ where: { id } });
@@ -185,9 +218,16 @@ export async function registerEventsRoutes(app) {
         if (!userId)
             return;
         const { id } = req.params;
-        const { part, roleSlotId } = (req.body ?? {});
+        const { part, roleSlotId, adminBypass } = (req.body ?? {});
+        // If admin bypass is requested, verify user has permission
+        if (adminBypass) {
+            const perms = await getUserPermissions(userId);
+            if (!hasPermission(perms, 'permanence.register_other_user')) {
+                return reply.status(403).send({ success: false, message: "Permissions insuffisantes pour utiliser le bypass administrateur" });
+            }
+        }
         try {
-            const registration = await registerUserToEvent(id, userId, part, roleSlotId);
+            const registration = await registerUserToEvent(id, userId, part, roleSlotId, adminBypass);
             return reply.send({ success: true, registration });
         }
         catch (err) {
@@ -202,6 +242,42 @@ export async function registerEventsRoutes(app) {
         const { part, roleSlotId } = (req.body ?? {});
         try {
             const registration = await unregisterUserToEvent(id, userId, part, roleSlotId);
+            return reply.send({ success: true, registration });
+        }
+        catch (err) {
+            return reply.status(400).send({ success: false, message: err.message });
+        }
+    });
+    app.post('/v1/events/registrations/:registrationId/status', async (req, reply) => {
+        const userId = await checkAuth(req, reply);
+        if (!userId)
+            return;
+        // Check if user has management permissions
+        const perms = await getUserPermissions(userId);
+        if (!hasPermission(perms, 'permanence.register_other_user')) {
+            return reply.status(403).send({ success: false, message: "Forbidden" });
+        }
+        const { registrationId } = req.params;
+        const { status } = (req.body ?? {});
+        try {
+            await updateRegistrationStatus(registrationId, status);
+            return reply.send({ success: true });
+        }
+        catch (err) {
+            return reply.status(400).send({ success: false, message: err.message });
+        }
+    });
+    app.post('/v1/events/:id/remove-user', async (req, reply) => {
+        const adminUserId = await checkAuth(req, reply);
+        if (!adminUserId)
+            return;
+        const { id } = req.params;
+        const { userId, roleSlotId } = (req.body ?? {});
+        if (!userId) {
+            return reply.status(400).send({ success: false, message: "userId is required" });
+        }
+        try {
+            const registration = await removeUserFromEvent(id, userId, adminUserId, roleSlotId);
             return reply.send({ success: true, registration });
         }
         catch (err) {

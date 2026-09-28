@@ -12,6 +12,7 @@ import { registerBotRoutes } from './bot.js';
 import { registerWidgetRoutes } from './widget.js';
 import { registerWsRoutes } from './ws.js';
 import { registerAuthRoutes } from './auth.js';
+import { registerNewslettersRoutes } from './newsletters.js';
 export async function registerV1Routes(app) {
     await registerUsersRoutes(app);
     await registerMessagesRoutes(app);
@@ -27,4 +28,5 @@ export async function registerV1Routes(app) {
     await registerWidgetRoutes(app);
     await registerWsRoutes(app);
     await registerAuthRoutes(app);
+    await registerNewslettersRoutes(app);
 }

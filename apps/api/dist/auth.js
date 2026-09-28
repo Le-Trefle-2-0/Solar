@@ -1,19 +1,24 @@
 import { createRemoteJWKSet, jwtVerify } from 'jose';
-import { APP_URL } from './env.js';
+import { APP_URL, INTERNAL_AUTH_URL } from './env.js';
 import { prisma } from './prisma.js';
-const JWKS = createRemoteJWKSet(new URL(`${APP_URL}/api/auth/jwks`));
+const JWKS = createRemoteJWKSet(new URL(`${INTERNAL_AUTH_URL}/api/auth/jwks`));
+const normalizeUrl = (value) => value.replace(/\/$/, '');
+const issuerCandidates = Array.from(new Set([APP_URL, INTERNAL_AUTH_URL].filter(Boolean).map(normalizeUrl)));
+const jwtIssuer = issuerCandidates.length === 1 ? issuerCandidates[0] : issuerCandidates;
+const jwtAudience = jwtIssuer;
 export async function verifyAuthorizationHeader(authHeader) {
     if (!authHeader)
         return null;
     const token = authHeader.replace('Bearer ', '');
     try {
         const { payload } = await jwtVerify(token, JWKS, {
-            issuer: APP_URL,
-            audience: APP_URL,
+            issuer: jwtIssuer,
+            audience: jwtAudience,
         });
         return payload;
     }
-    catch {
+    catch (e) {
+        console.warn('[auth] JWT verification failed:', e.message);
         return null;
     }
 }

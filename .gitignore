@@ -53,7 +53,7 @@ next-env.d.ts
 apps/storage/dist
 apps/voice/dist/
 apps/ws/dist/
-apps/api/dist/*
+apps/api/dist/
 .output.txt
 confidentialite.html
 faq_content.html
@@ -66,3 +66,6 @@ apps/api/dist/
 
 # Logs du test de build (scripts/test-build.mjs)
 .build-logs/
+
+# Client Prisma généré (npm install / prisma generate)
+/generated/

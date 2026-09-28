@@ -2,6 +2,7 @@ import { prisma } from '../../prisma.js';
 import { authenticate } from '../../auth.js';
 import { broadcast } from '../../lib/broadcast.js';
 import { z } from "zod";
+import { getUserPermissions, hasPermission } from '../../lib/permissions.js';
 async function checkAuth(req, reply) {
     const userId = await authenticate(req);
     if (!userId) {
@@ -11,11 +12,8 @@ async function checkAuth(req, reply) {
     return userId;
 }
 async function hasManagePermission(userId) {
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-    if (!user)
-        return false;
-    const role = (user.role || '').toLowerCase();
-    return role === 'admin' || role === 'moderator' || role === 'owner' || role === 'manager';
+    const perms = await getUserPermissions(userId);
+    return hasPermission(perms, 'messages.manage');
 }
 export async function registerMessageRoutes(app) {
     app.post('/v1/messages', async (req, reply) => {
@@ -33,10 +31,14 @@ export async function registerMessageRoutes(app) {
             const user = await prisma.user.findUnique({ where: { id: userId } });
             if (!user)
                 return reply.status(404).send({ success: false, error: 'User not found' });
+            const ticket = await prisma.ticket.findFirst({
+                where: { channelId: body.channelId }
+            });
             const message = await prisma.message.create({
                 data: {
                     userId,
                     channelId: body.channelId,
+                    ticketId: ticket?.id,
                     content: Buffer.from(body.content, 'utf8'),
                     discordID: body.discordID || undefined,
                     replyID: body.replyID || undefined,
