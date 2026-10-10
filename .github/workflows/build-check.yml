@@ -25,6 +25,13 @@ jobs:
       NEXT_PUBLIC_WS_URL: "ws://localhost:5000"
       NEXT_PUBLIC_API_URL: "http://localhost:3000"
     steps:
+      - name: Check required secrets
+        run: |
+          if [ -z "${{ secrets.WS_GUEST_SECRET }}" ]; then
+            echo "::error::WS_GUEST_SECRET is missing from GitHub Secrets"
+            exit 1
+          fi
+
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4

@@ -1,7 +1,8 @@
 import type {FastifyInstance} from 'fastify';
 import {prisma} from '../../prisma.js';
 import crypto from 'crypto';
-import {broadcast} from '../../lib/broadcast.js';
+import { broadcast } from '../../lib/broadcast.js';
+import { WS_GUEST_SECRET } from '../../env';
 
 const WIDGET_COOKIES = ['widget_channel', 'widget_uid', 'widget_exp', 'widget_sig', 'widget_public'];
 
@@ -30,7 +31,8 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
     app.post('/v1/widget/session', async (req, reply) => {
         try {
             const visitorName = "utilisateur";
-            const secret = process.env.WS_GUEST_SECRET || 'fallback_secret_for_dev_only';
+
+            const secret = WS_GUEST_SECRET;
 
             const body = (req.body ?? {}) as { name?: string, forceNew?: boolean };
             const forceNew = body.forceNew === true;

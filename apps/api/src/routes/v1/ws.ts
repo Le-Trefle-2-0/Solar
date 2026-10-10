@@ -1,10 +1,11 @@
 import type {FastifyInstance} from 'fastify';
-import crypto, {createHmac} from 'crypto';
+import crypto, { createHmac } from 'crypto';
+import { WS_GUEST_SECRET } from '../../env';
 
 export async function registerWsRoutes(app: FastifyInstance) {
     app.post('/v1/ws/guest', async (req, reply) => {
         try {
-            const secret = process.env.WS_GUEST_SECRET || 'fallback_secret_for_dev_only';
+            const secret = WS_GUEST_SECRET;
             if (!secret) return reply.send({success: false, error: 'missing_secret'});
 
             const body = (req.body ?? {}) as { channelId?: string, uid?: string };
