@@ -3,6 +3,7 @@ import cors from '@fastify/cors';
 import cookie from '@fastify/cookie';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
+import fastifyRateLimit from '@fastify/rate-limit';
 import {registerV1Routes} from './routes/v1/index.js';
 import {API_HOST, API_PORT} from './env.js';
 import {startNewsletterScheduler} from './lib/scheduler.js';
@@ -30,6 +31,13 @@ const corsOrigin = corsOriginList.length
 
 await app.register(cors, {origin: corsOrigin, credentials: true});
 await app.register(cookie);
+
+await app.register(fastifyRateLimit, {
+    // Configuration globale par défaut (peut être surchargée par route)
+    global: false,
+    max: 100,
+    timeWindow: '1 minute'
+});
 
 await app.register(swagger, {
     openapi: {

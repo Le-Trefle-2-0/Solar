@@ -20,3 +20,9 @@ export const API_BASE_URL = process.env.API_BASE_URL || `http://localhost:${API_
 if (!process.env.API_BASE_URL) {
     console.warn(`API_BASE_URL is not set, falling back to http://localhost:${API_PORT}`);
 }
+export const INTERNAL_API_SECRET = process.env.INTERNAL_API_SECRET;
+if (!INTERNAL_API_SECRET) {
+    console.error("🚨 ERREUR CRITIQUE : La variable d'environnement INTERNAL_API_SECRET est manquante. Démarrage annulé.");
+    process.exit(1);
+}
+export const WS_GUEST_SECRET = process.env.WS_GUEST_SECRET;

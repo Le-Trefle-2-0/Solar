@@ -46,6 +46,12 @@ DATABASE_URL="mysql://utilisateur:motdepasse@localhost:3306/solar"
 # Clé secrète pour l'authentification
 BETTER_AUTH_SECRET=une_cle_secrete_tres_longue
 
+# Clé secrète pour les connexions WebSocket invitées
+WS_GUEST_SECRET=une_cle_secrete_aleatoire_pour_les_ws
+
+# Clé secrète pour les communications internes (Service-to-Service API)
+INTERNAL_API_SECRET=une_cle_secrete_aleatoire_pour_l_api
+
 # Configuration Email (Resend)
 RESEND_API_KEY=re_your_key
 

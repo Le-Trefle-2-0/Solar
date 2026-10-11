@@ -65,7 +65,7 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
                     if (exp <= now) exp = now + 24 * 60 * 60 * 1000;
 
                     const authBase = `${channelId}.${uid}.${exp}`;
-                    const expectedSig = crypto.createHmac('sha256', secret).update(authBase).digest('hex');
+                    const expectedSig = crypto.createHmac('sha256', secret as string).update(authBase).digest('hex');
                     if (sig !== expectedSig) sig = expectedSig;
 
                     setWidgetCookie(reply, 'widget_channel', channelId);
@@ -128,7 +128,7 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
                 const exp = now + 24 * 60 * 60 * 1000;
                 if (!uid) uid = `guest_${crypto.randomUUID()}`;
                 const authBase = `${channelId}.${uid}.${exp}`;
-                sig = crypto.createHmac('sha256', secret).update(authBase).digest('hex');
+                sig = crypto.createHmac('sha256', secret as string).update(authBase).digest('hex');
 
                 setWidgetCookie(reply, 'widget_channel', channelId);
                 setWidgetCookie(reply, 'widget_uid', uid);
@@ -153,7 +153,7 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
             if (exp <= now) exp = now + 24 * 60 * 60 * 1000;
 
             const authBase = `${channelId}.${uid}.${exp}`;
-            const expectedSig = crypto.createHmac('sha256', secret).update(authBase).digest('hex');
+            const expectedSig = crypto.createHmac('sha256', secret as string).update(authBase).digest('hex');
             if (sig !== expectedSig) sig = expectedSig;
 
             setWidgetCookie(reply, 'widget_channel', channelId);
