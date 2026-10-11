@@ -110,41 +110,63 @@ export async function registerAdminRoutes(app: FastifyInstance) {
         return reply.send({success: true});
     });
     app.post('/v1/admin/users/:id/role', async (req, reply) => {
-        const admin = await checkAdmin(req, reply);
-        if (!admin) return;
+            const admin = await checkAdmin(req, reply);
+            if (!admin) return;
 
-        const {id} = req.params as { id: string };
-        const {roles} = (req.body ?? {}) as { roles: string[] };
+            const {id} = req.params as { id: string };
+            const {roles} = (req.body ?? {}) as { roles: string[] };
 
-        if (!Array.isArray(roles)) {
-            return reply.status(400).send('Invalid roles');
-        }
-
-        const user = await prisma.user.update({
-            where: {id},
-            data: {
-                role: roles.join(',')
+            if (!Array.isArray(roles)) {
+                return reply.status(400).send('Invalid roles');
             }
+
+            const adminRolesList = (admin.role || "").split(",").map((r: string) => r.trim());
+            if (!adminRolesList.includes("admin")) {
+                const adminHighestRole = await prisma.role.findFirst({
+                    where: {name: {in: adminRolesList}},
+                    orderBy: {weight: 'desc'}
+                });
+
+                if (!adminHighestRole) {
+                    return reply.status(403).send('forbidden: no valid roles found for caller');
+                }
+
+                const targetRoles = await prisma.role.findMany({
+                    where: {name: {in: roles}}
+                });
+
+                const hasEqualOrHigherWeight = targetRoles.some(r => r.weight >= adminHighestRole.weight);
+
+                if (hasEqualOrHigherWeight) {
+                    return reply.status(403).send('forbidden: cannot assign roles of equal or higher weight');
+                }
+            }
+
+            const user = await prisma.user.update({
+                where: {id},
+                data: {
+                    role: roles.join(',')
+                }
+            });
+
+            const hideEmails = process.env.HIDE_EMAILS_IN_ADMIN === "true";
+            if (hideEmails && user.email) {
+                const [localPart, domain] = user.email.split('@');
+                if (localPart && domain) {
+                    const visibleLength = Math.min(3, Math.floor(localPart.length / 2));
+                    user.email = `${localPart.substring(0, visibleLength)}***@${domain}`;
+                } else {
+                    user.email = "***";
+                }
+            }
+
+            // @ts-ignore
+            delete user.password;
+            // @ts-ignore
+            delete user.twoFactorSecret;
+
+            return reply.send({user});
         });
-
-        const hideEmails = process.env.HIDE_EMAILS_IN_ADMIN === "true";
-        if (hideEmails && user.email) {
-            const [localPart, domain] = user.email.split('@');
-            if (localPart && domain) {
-                const visibleLength = Math.min(3, Math.floor(localPart.length / 2));
-                user.email = `${localPart.substring(0, visibleLength)}***@${domain}`;
-            } else {
-                user.email = "***";
-            }
-        }
-
-        // @ts-ignore
-        delete user.password;
-        // @ts-ignore
-        delete user.twoFactorSecret;
-
-        return reply.send({user});
-    });
 
     app.get('/v1/admin/settings', async (req, reply) => {
         const admin = await checkAdmin(req, reply);

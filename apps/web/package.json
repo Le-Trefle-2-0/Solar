@@ -11,7 +11,8 @@
   "dependencies": {
     "@radix-ui/react-switch": "^1.2.6",
     "jspdf": "^4.2.1",
-    "jspdf-autotable": "^5.0.7"
+    "jspdf-autotable": "^5.0.7",
+    "pdf-lib": "^1.17.1"
   },
   "devDependencies": {
     "eslint": "^9.39.5",
