@@ -19,7 +19,20 @@ async function broadcastStatusUpdate(channelId: string, statusId: number, status
     await broadcast(null, 'updateRequest', {channelId});
 }
 
-export async function registerTicketsRoutes(app: FastifyInstance) {
+export interface TicketsRouteDeps {
+    authenticate: (req: any) => Promise<string | null | undefined>;
+    getPermissions: (userId: string) => Promise<string[]>;
+}
+
+const defaultDeps: TicketsRouteDeps = {
+    authenticate,
+    getPermissions: getUserPermissions,
+};
+
+/** Roles able to handle tickets: a ticket may only be assigned to a user holding one of these. */
+const TICKET_HANDLER_PERMISSIONS = ['tickets.close', 'tickets.read_all', 'tickets.send_message', 'tickets.send_message_all'];
+
+export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsRouteDeps = defaultDeps) {
     // GET /v1/tickets – list tickets depending on auth
     app.get('/v1/tickets', async (req, reply) => {
         const userId = await authenticate(req);
@@ -79,6 +92,12 @@ export async function registerTicketsRoutes(app: FastifyInstance) {
 
     // POST /v1/tickets/assign
     app.post('/v1/tickets/assign', async (req, reply) => {
+        const userId = await deps.authenticate(req);
+        if (!userId) return reply.status(401).send('unauthorized');
+        if (!hasPermission(await deps.getPermissions(userId), 'tickets.attribute')) {
+            return reply.status(403).send('forbidden');
+        }
+
         const bodySchema = z.object({ticketID: z.number(), assignmentID: z.string()});
         try {
             const {ticketID, assignmentID} = bodySchema.parse((req.body ?? {}) as any);
@@ -86,6 +105,11 @@ export async function registerTicketsRoutes(app: FastifyInstance) {
             if (!ticket) return reply.status(400).send('Ticket not found');
             const user = await prisma.user.findUnique({where: {id: assignmentID}});
             if (!user) return reply.status(400).send('User not found');
+            // The target must be allowed to handle tickets.
+            const targetPerms = await deps.getPermissions(user.id);
+            if (!TICKET_HANDLER_PERMISSIONS.some(p => hasPermission(targetPerms, p))) {
+                return reply.status(400).send('User cannot handle tickets');
+            }
             const status = await prisma.ticketStatus.findUnique({where: {name: 'started'}});
             if (!status) return reply.status(500).send({success: false, error: 'status_missing'});
             const update = await prisma.ticket.update({
@@ -186,6 +210,12 @@ export async function registerTicketsRoutes(app: FastifyInstance) {
 
     // POST /v1/tickets/transmission
     app.post('/v1/tickets/transmission', async (req, reply) => {
+        const userId = await deps.authenticate(req);
+        if (!userId) return reply.status(401).send('unauthorized');
+        if (!hasPermission(await deps.getPermissions(userId), 'tickets.transmission')) {
+            return reply.status(403).send('forbidden');
+        }
+
         const bodySchema = z.object({
             channelID: z.string(),
             problematic: z.string(),
