@@ -69,3 +69,5 @@ apps/api/dist/
 
 # Client Prisma généré (npm install / prisma generate)
 /generated/
+
+.idea/*
