@@ -65,7 +65,7 @@
     "@fullcalendar/react": "^6.1.17",
     "@fullcalendar/timegrid": "^6.1.17",
     "@hcaptcha/react-hcaptcha": "^2.0.2",
-    "@heroui/react": "^2.8.0-beta.9",
+    "@heroui/react": "^3.2.7",
     "@hookform/resolvers": "^5.1.1",
     "@mantine/core": "^8.3.10",
     "@mantine/hooks": "^8.3.10",
