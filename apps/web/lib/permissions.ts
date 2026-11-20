@@ -8,6 +8,7 @@ export const statement = {
     permanence: ['open', 'close', 'register', 'unregister', 'unregister_other_all', 'unregister_other_user', 'register_other_all', 'register_other_user'],
     messages: ['manage'],
     newsletters: ['manage'],
+    users: ['read_all'],
     admin: ['sudo']
 } as const;
 
@@ -92,6 +93,13 @@ export const PERMISSION_METADATA: Record<string, PermissionInfo> = {
         id: 'management.view_stats',
         label: 'Voir les statistiques',
         description: 'Accès au tableau de bord d\'activité et indicateurs',
+        category: 'Gestion'
+    },
+
+    'users.read_all': {
+        id: 'users.read_all',
+        label: 'Consulter tous les profils',
+        description: 'Permet de consulter le profil public de n\'importe quel membre',
         category: 'Gestion'
     },
 
@@ -198,7 +206,8 @@ export const manager = ac.newRole({
     tickets: ['close', 'read_all', 'attribute', 'launch_voice', 'send_message_all'],
     management: ['manage_accounts', 'ticket_history', 'view_transmission', 'view_stats'],
     permanence: ['open', 'close', 'register', 'unregister', 'register_other_user', 'unregister_other_user'],
-    messages: ['manage']
+    messages: ['manage'],
+    users: ['read_all']
 });
 
 export const bot = ac.newRole({
@@ -211,5 +220,6 @@ export const admin = ac.newRole({
     management: ['manage_accounts', 'ticket_history', 'view_transmission', 'view_stats'],
     permanence: ['open', 'close', 'register', 'unregister', 'unregister_other_all', 'unregister_other_user', 'register_other_all', 'register_other_user'],
     messages: ['manage'],
+    users: ['read_all'],
     admin: ['sudo']
 });

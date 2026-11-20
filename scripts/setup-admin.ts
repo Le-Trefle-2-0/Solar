@@ -43,7 +43,7 @@ async function main() {
                     "management.view_transmission", "management.view_stats", "management.reset_password",
                     "permanence.open", "permanence.close", "permanence.register", "permanence.unregister",
                     "permanence.unregister_other_all", "permanence.unregister_other_user", "permanence.register_other_all", "permanence.register_other_user",
-                    "messages.manage", "newsletters.manage",
+                    "messages.manage", "newsletters.manage", "users.read_all",
                     "user.create", "user.update", "user.delete", "user.read", "session.delete", "session.read", "impersonate.create"
                 ]),
                 icon: "Shield"
