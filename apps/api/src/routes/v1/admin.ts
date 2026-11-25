@@ -4,6 +4,7 @@ import {authenticate} from '../../auth.js';
 
 import {broadcast} from '../../lib/broadcast.js';
 import {checkRoleAssignment, checkRoleChange} from '../../lib/roleAssignment.js';
+import {parseStatsRange} from '../../lib/statsRange.js';
 
 async function checkAdmin(req: any, reply: any) {
     const userId = await authenticate(req);
@@ -403,13 +404,9 @@ export async function registerAdminRoutes(app: FastifyInstance) {
         const admin = await checkAdmin(req, reply);
         if (!admin) return;
 
-        const {start, end, interval = 'day'} = req.query as {
-            start?: string,
-            end?: string,
-            interval?: 'day' | 'week' | 'month'
-        };
-        const startDate = start ? new Date(start) : new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-        const endDate = end ? new Date(end) : new Date();
+        const range = parseStatsRange(req.query as {start?: string, end?: string, interval?: string});
+        if ('error' in range) return reply.status(400).send({success: false, error: range.error});
+        const {startDate, endDate, interval} = range;
 
         // 1. Tickets within range
         const tickets = await prisma.ticket.findMany({
