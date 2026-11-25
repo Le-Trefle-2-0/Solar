@@ -25,6 +25,20 @@ jobs:
       NEXT_PUBLIC_WS_URL: "ws://localhost:5000"
       NEXT_PUBLIC_API_URL: "http://localhost:3000"
     steps:
+      # GitHub ne transmet pas les secrets aux PR de forks ni de Dependabot
+      - name: Check required secrets
+        if: github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]'
+        env:
+          WS_GUEST_SECRET: ${{ secrets.WS_GUEST_SECRET }}
+          INTERNAL_API_SECRET: ${{ secrets.INTERNAL_API_SECRET }}
+        run: |
+          for name in WS_GUEST_SECRET INTERNAL_API_SECRET; do
+            if [ -z "${!name}" ]; then
+              echo "::error::$name is missing from GitHub Secrets"
+              exit 1
+            fi
+          done
+
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4

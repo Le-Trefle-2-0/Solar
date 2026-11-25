@@ -14,6 +14,13 @@ const __dirname = path.dirname(__filename);
 // Load .env from project root
 config({path: path.resolve(__dirname, '../../../.env')});
 
+// Fail closed: guest signatures and API key checks depend on these
+const missingSecrets = ['WS_GUEST_SECRET', 'INTERNAL_API_SECRET'].filter(name => !process.env[name]);
+if (missingSecrets.length) {
+    console.error(`[ws] Missing required environment variables: ${missingSecrets.join(', ')}. Aborting startup.`);
+    process.exit(1);
+}
+
 const PORT = Number(process.env.WS_PORT || 5000);
 const HOST = process.env.WS_HOST || '0.0.0.0';
 // Better Auth JWKS lives on the web app; keep issuer public and JWKS fetch internal when available
@@ -94,7 +101,10 @@ io.use(async (socket, next) => {
             }
             const res = await fetch(`${apiBase}/v1/keys/check`, {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${process.env.INTERNAL_API_SECRET}`,
+                },
                 body: JSON.stringify({key: apiToken}),
             });
             if (res.ok) {
@@ -112,13 +122,13 @@ io.use(async (socket, next) => {
 
     // 3) Guest access for public widget, restricted to a single room
     if (!ok && guest && typeof guest === 'object') {
-        const secret = process.env.WS_GUEST_SECRET;
+        const secret = process.env.WS_GUEST_SECRET!;
         const uid = String(guest.uid || '');
         const channelId = String(guest.channelId || '');
         const exp = Number(guest.exp || 0);
         const sig = String(guest.sig || '');
         const now = Date.now();
-        if (secret && uid && channelId && exp > now && sig) {
+        if (uid && channelId && exp > now && sig) {
             const base = `${channelId}.${uid}.${exp}`;
             const h = createHmac('sha256', secret).update(base).digest('hex');
             if (h.length === sig.length && timingSafeEqual(Buffer.from(h), Buffer.from(sig))) {

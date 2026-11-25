@@ -20,3 +20,12 @@ export const API_BASE_URL = process.env.API_BASE_URL || `http://localhost:${API_
 if (!process.env.API_BASE_URL) {
     console.warn(`API_BASE_URL is not set, falling back to http://localhost:${API_PORT}`);
 }
+
+/** Called at startup (not on import, so tests can load modules without secrets). */
+export function assertRequiredSecrets() {
+    const missing = ['WS_GUEST_SECRET', 'INTERNAL_API_SECRET'].filter(name => !process.env[name]);
+    if (missing.length) {
+        console.error(`Missing required environment variables: ${missing.join(', ')}. Aborting startup.`);
+        process.exit(1);
+    }
+}
