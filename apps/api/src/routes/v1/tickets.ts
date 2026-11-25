@@ -22,11 +22,13 @@ async function broadcastStatusUpdate(channelId: string, statusId: number, status
 export interface TicketsRouteDeps {
     authenticate: (req: any) => Promise<string | null | undefined>;
     getPermissions: (userId: string) => Promise<string[]>;
+    findTicketByChannelId: (channelId: string) => Promise<{assignedUserId: string | null} | null>;
 }
 
 const defaultDeps: TicketsRouteDeps = {
     authenticate,
     getPermissions: getUserPermissions,
+    findTicketByChannelId: (channelId) => prisma.ticket.findUnique({where: {channelId}}),
 };
 
 /** Roles able to handle tickets: a ticket may only be assigned to a user holding one of these. */
@@ -349,16 +351,21 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
     });
 
     // POST /v1/tickets/findBy/channelID
+    // Requires tickets.read_all, except for the user the ticket is assigned to.
+    // Lookup is by channelId only: sequential numeric IDs must never be accepted here.
     app.post('/v1/tickets/findBy/channelID', async (req, reply) => {
+        const userId = await deps.authenticate(req);
+        if (!userId) return reply.status(401).send('unauthorized');
+
         const bodySchema = z.object({channelID: z.string()});
         try {
             const {channelID} = bodySchema.parse((req.body ?? {}) as any);
-            // Try by channelId first
-            let ticket = await prisma.ticket.findUnique({where: {channelId: channelID}});
+            const canReadAll = hasPermission(await deps.getPermissions(userId), 'tickets.read_all');
+            const ticket = await deps.findTicketByChannelId(channelID);
 
-            // If not found and channelID looks like a numeric ID, try by ID
-            if (!ticket && /^\d+$/.test(channelID)) {
-                ticket = await prisma.ticket.findUnique({where: {id: parseInt(channelID, 10)}});
+            // Same answer for "missing" and "not yours", so existence is not disclosed.
+            if (!canReadAll && ticket?.assignedUserId !== userId) {
+                return reply.status(403).send('forbidden');
             }
 
             if (!ticket) {

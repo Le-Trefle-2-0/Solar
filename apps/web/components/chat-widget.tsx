@@ -104,13 +104,9 @@ export default function ChatWidget() {
         }
     }, []);
 
-    const loadTicketStatus = useCallback(async (cid: string) => {
+    const loadTicketStatus = useCallback(async () => {
         try {
-            const data = await apiFetch('/v1/tickets/findBy/channelID', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({channelID: cid}),
-            });
+            const data = await apiFetch('/v1/widget/status');
             if (data?.success && data?.ticket) {
                 if (data.ticket.statusName) setTicketStatus(data.ticket.statusName);
                 if (data.ticket.id) setTicketId(data.ticket.id);
@@ -143,7 +139,7 @@ export default function ChatWidget() {
                 } catch {
                 }
                 loadMessages(cid);
-                loadTicketStatus(cid);
+                loadTicketStatus();
             }
             return cid && creds ? {channelId: cid, ticketId: tId, creds, status} : {
                 channelId: '',
@@ -224,7 +220,7 @@ export default function ChatWidget() {
             if (cid) {
                 setChannelId(cid);
                 await loadMessages(cid);
-                if (!status) await loadTicketStatus(cid);
+                if (!status) await loadTicketStatus();
 
                 // Establish WS guest connection if credentials provided
                 if (!socket) {

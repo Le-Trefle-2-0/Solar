@@ -176,6 +176,25 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
         }
     });
 
+    // Ticket id and status for the visitor's own session (cookie-bound), nothing else.
+    app.get('/v1/widget/status', async (req, reply) => {
+        try {
+            const channelId = req.cookies.widget_channel;
+            if (!channelId) return reply.status(401).send({success: false, error: 'no_active_session'});
+
+            const ticket = await prisma.ticket.findUnique({
+                where: {channelId},
+                select: {id: true, statusName: true},
+            });
+            if (!ticket) return reply.status(404).send({success: false, error: 'ticket_not_found'});
+
+            return reply.send({success: true, ticket});
+        } catch (e) {
+            console.error('[widget] status error:', e);
+            return reply.status(500).send({success: false, error: 'internal_error'});
+        }
+    });
+
     app.post('/v1/widget/close', async (req, reply) => {
         try {
             const channelId = req.cookies.widget_channel;
