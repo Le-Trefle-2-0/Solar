@@ -1,0 +1,40 @@
+export interface RoleAssignment {
+    /** Comma-separated roles of the user doing the assignment. */
+    callerRole: string | null;
+    /** Comma-separated roles the target currently holds. */
+    targetRole: string | null;
+    requested: unknown[];
+    /** Every role defined in the database. */
+    knownRoles: {name: string; weight: number}[];
+    isSelf: boolean;
+}
+
+const split = (roles: string | null) => (roles || '').split(',').map(r => r.trim());
+
+/** Returns why the assignment must be refused, or null if it is allowed. */
+export function checkRoleAssignment({callerRole, targetRole, requested, knownRoles, isSelf}: RoleAssignment)
+    : {status: 400 | 403; message: string} | null {
+    const weights = new Map(knownRoles.map(r => [r.name, r.weight]));
+
+    // Roles are stored comma-joined, so only exact existing names may be written:
+    // "x,admin" or "admin " would otherwise be read back as "admin".
+    if (!requested.every((r): r is string => typeof r === 'string' && !r.includes(',') && r === r.trim() && weights.has(r))) {
+        return {status: 400, message: 'Invalid roles'};
+    }
+
+    const callerRoles = split(callerRole);
+    if (callerRoles.includes('admin')) return null;
+
+    const highest = (roles: string[]) => Math.max(-Infinity, ...roles.flatMap(r => weights.get(r) ?? []));
+    const callerWeight = highest(callerRoles);
+
+    // 'admin' is refused by name too, in case its weight has been lowered.
+    if (requested.some(r => r === 'admin' || weights.get(r)! >= callerWeight)) {
+        return {status: 403, message: 'forbidden: cannot assign roles of equal or higher weight'};
+    }
+    // Without this, a manager could strip an admin of their roles.
+    if (!isSelf && (split(targetRole).includes('admin') || highest(split(targetRole)) >= callerWeight)) {
+        return {status: 403, message: 'forbidden: cannot manage users of equal or higher weight'};
+    }
+    return null;
+}

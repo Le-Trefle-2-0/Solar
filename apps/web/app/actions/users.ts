@@ -35,6 +35,21 @@ export async function inviteUserAction(formData: z.infer<typeof inviteSchema>) {
     }
 
     const {name, email, roles} = validated.data;
+
+    // Same rule as POST /v1/admin/users/:id/role: only existing roles, and below the inviter's own.
+    const knownRoles = await prisma.role.findMany({select: {name: true, weight: true}});
+    const weights = new Map(knownRoles.map((r) => [r.name, r.weight]));
+    if (!roles.every((r) => !r.includes(",") && r === r.trim() && weights.has(r))) {
+        return {error: "Invalid data"};
+    }
+    const inviterRoles: string[] = userRole.split(",").map((r: string) => r.trim());
+    if (!inviterRoles.includes("admin")) {
+        const inviterWeight = Math.max(-Infinity, ...inviterRoles.flatMap((r) => weights.get(r) ?? []));
+        if (roles.some((r) => r === "admin" || weights.get(r)! >= inviterWeight)) {
+            return {error: "Unauthorized"};
+        }
+    }
+
     const primaryRole = roles[0];
     const tempPassword = Math.random().toString(36).slice(-10) + Math.random().toString(36).slice(-10);
 

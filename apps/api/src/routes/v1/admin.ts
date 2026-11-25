@@ -3,6 +3,7 @@ import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
 
 import {broadcast} from '../../lib/broadcast.js';
+import {checkRoleAssignment} from '../../lib/roleAssignment.js';
 
 async function checkAdmin(req: any, reply: any) {
     const userId = await authenticate(req);
@@ -119,6 +120,18 @@ export async function registerAdminRoutes(app: FastifyInstance) {
         if (!Array.isArray(roles)) {
             return reply.status(400).send('Invalid roles');
         }
+
+        const target = await prisma.user.findUnique({where: {id}, select: {role: true}});
+        if (!target) return reply.status(404).send('user not found');
+
+        const refusal = checkRoleAssignment({
+            callerRole: admin.role,
+            targetRole: target.role,
+            requested: roles,
+            knownRoles: await prisma.role.findMany({select: {name: true, weight: true}}),
+            isSelf: id === admin.id,
+        });
+        if (refusal) return reply.status(refusal.status).send(refusal.message);
 
         const user = await prisma.user.update({
             where: {id},
