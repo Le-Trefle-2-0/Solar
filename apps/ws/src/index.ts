@@ -6,7 +6,7 @@ import {Server} from 'socket.io';
 import Redis from 'ioredis';
 import {createAdapter} from '@socket.io/redis-adapter';
 import {createRemoteJWKSet, jwtVerify} from 'jose';
-import {createHmac} from 'crypto';
+import {createHmac, timingSafeEqual} from 'crypto';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -112,16 +112,16 @@ io.use(async (socket, next) => {
 
     // 3) Guest access for public widget, restricted to a single room
     if (!ok && guest && typeof guest === 'object') {
-        const secret = process.env.WS_GUEST_SECRET || 'fallback_secret_for_dev_only';
+        const secret = process.env.WS_GUEST_SECRET;
         const uid = String(guest.uid || '');
         const channelId = String(guest.channelId || '');
         const exp = Number(guest.exp || 0);
         const sig = String(guest.sig || '');
         const now = Date.now();
-        if (uid && channelId && exp > now && sig) {
+        if (secret && uid && channelId && exp > now && sig) {
             const base = `${channelId}.${uid}.${exp}`;
             const h = createHmac('sha256', secret).update(base).digest('hex');
-            if (h === sig) {
+            if (h.length === sig.length && timingSafeEqual(Buffer.from(h), Buffer.from(sig))) {
                 ok = true;
                 isGuest = true;
                 (socket.data as any).guest = true;

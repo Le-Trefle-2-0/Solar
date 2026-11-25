@@ -2,6 +2,7 @@ import type {FastifyInstance} from 'fastify';
 import {prisma} from '../../prisma.js';
 import crypto from 'crypto';
 import {broadcast} from '../../lib/broadcast.js';
+import {signWidgetSession, verifyWidgetSession} from '../../lib/widgetSession.js';
 
 const WIDGET_COOKIES = ['widget_channel', 'widget_uid', 'widget_exp', 'widget_sig', 'widget_public'];
 
@@ -11,7 +12,7 @@ function setWidgetCookie(reply: any, name: string, value: string, maxAgeSec = 60
         maxAge: maxAgeSec,
         sameSite: 'lax',
         secure: process.env.NODE_ENV === 'production',
-        httpOnly: false, // Must be readable by client for WS auth
+        httpOnly: true, // The client gets its WS credentials from the response body
     });
 }
 
@@ -30,23 +31,15 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
     app.post('/v1/widget/session', async (req, reply) => {
         try {
             const visitorName = "utilisateur";
-            const secret = process.env.WS_GUEST_SECRET || 'fallback_secret_for_dev_only';
-
             const body = (req.body ?? {}) as { name?: string, forceNew?: boolean };
             const forceNew = body.forceNew === true;
 
-            let channelId = req.cookies.widget_channel || '';
-            let uid = req.cookies.widget_uid || '';
-            let expStr = req.cookies.widget_exp || '';
-            let sig = req.cookies.widget_sig || '';
+            // Resume only a validly signed session: cookie values are never re-signed unverified.
+            const existing = forceNew ? null : verifyWidgetSession(req.cookies);
+            if (!existing) clearWidgetCookies(reply);
 
-            if (forceNew) {
-                clearWidgetCookies(reply);
-                channelId = '';
-                uid = '';
-                expStr = '';
-                sig = '';
-            }
+            let channelId = existing?.channelId ?? '';
+            let uid = existing?.uid ?? '';
 
             if (channelId) {
                 const ticket = await prisma.ticket.findUnique({where: {channelId}});
@@ -55,106 +48,56 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
                     // Instead of failing, we will just proceed to create a new one below by clearing channelId
                     channelId = '';
                     uid = '';
-                    expStr = '';
-                    sig = '';
                 } else {
                     // Valid existing ticket session, return immediately to avoid re-broadcasting updateRequest
-                    const now = Date.now();
-                    let exp = Number(expStr) || now + 24 * 60 * 60 * 1000;
-                    if (!uid) uid = `guest_${crypto.randomUUID()}`;
-                    if (exp <= now) exp = now + 24 * 60 * 60 * 1000;
-
-                    const authBase = `${channelId}.${uid}.${exp}`;
-                    const expectedSig = crypto.createHmac('sha256', secret).update(authBase).digest('hex');
-                    if (sig !== expectedSig) sig = expectedSig;
-
-                    setWidgetCookie(reply, 'widget_channel', channelId);
-                    setWidgetCookie(reply, 'widget_uid', uid);
-                    setWidgetCookie(reply, 'widget_exp', String(exp));
-                    setWidgetCookie(reply, 'widget_sig', sig);
-                    setWidgetCookie(reply, 'widget_public', '1');
-
-                    // Make sure we also have a channel for this ticket
-                    if (!ticket.channelId) {
-                        // This is an edge case where ticket exists but channel doesn't
-                        channelId = ''; // Force recreation
-                    } else {
-                        return reply.send({
-                            success: true,
-                            channelId,
-                            ticketId: ticket.id,
-                            credentials: {channelId, uid, exp, sig},
-                            status: ticket.statusName
-                        });
-                    }
+                    const {exp, sig} = existing!;
+                    return reply.send({
+                        success: true,
+                        channelId,
+                        ticketId: ticket.id,
+                        credentials: {channelId, uid, exp, sig},
+                        status: ticket.statusName
+                    });
                 }
             }
 
-            if (!channelId) {
-                const syntheticId = `web:${crypto.randomUUID()}`;
-                const ua = req.headers['user-agent'] || 'unknown';
+            const syntheticId = `web:${crypto.randomUUID()}`;
+            const ua = req.headers['user-agent'] || 'unknown';
 
-                const status = await prisma.ticketStatus.findUnique({where: {name: 'waiting'}});
-                if (!status) return reply.status(500).send({success: false, error: 'status_missing'});
+            const status = await prisma.ticketStatus.findUnique({where: {name: 'waiting'}});
+            if (!status) return reply.status(500).send({success: false, error: 'status_missing'});
 
-                const ticket = await prisma.ticket.create({
-                    data: {
-                        discordUserID: syntheticId,
-                        source: 'web',
-                        metadata: {userAgent: ua, visitorName},
-                        createdAt: new Date(),
-                        updatedAt: new Date(),
-                        statusName: status.name,
-                        statusLabel: status.label,
-                    },
-                });
+            const ticket = await prisma.ticket.create({
+                data: {
+                    discordUserID: syntheticId,
+                    source: 'web',
+                    metadata: {userAgent: ua, visitorName},
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    statusName: status.name,
+                    statusLabel: status.label,
+                },
+            });
 
-                let channelName = String(ticket.id).padStart(5, '0');
-                channelName = 'Ticket-' + channelName;
-                const channel = await prisma.channel.create({data: {name: channelName}});
+            let channelName = String(ticket.id).padStart(5, '0');
+            channelName = 'Ticket-' + channelName;
+            const channel = await prisma.channel.create({data: {name: channelName}});
 
-                const updatedTicket = await prisma.ticket.update({
-                    where: {id: ticket.id},
-                    data: {
-                        updatedAt: new Date(),
-                        channelName: channel.name,
-                        channelId: channel.id,
-                    },
-                });
+            const updatedTicket = await prisma.ticket.update({
+                where: {id: ticket.id},
+                data: {
+                    updatedAt: new Date(),
+                    channelName: channel.name,
+                    channelId: channel.id,
+                },
+            });
 
-                channelId = updatedTicket.channelId!;
-                // Ensure cookies are set for the new session immediately
-                const now = Date.now();
-                const exp = now + 24 * 60 * 60 * 1000;
-                if (!uid) uid = `guest_${crypto.randomUUID()}`;
-                const authBase = `${channelId}.${uid}.${exp}`;
-                sig = crypto.createHmac('sha256', secret).update(authBase).digest('hex');
-
-                setWidgetCookie(reply, 'widget_channel', channelId);
-                setWidgetCookie(reply, 'widget_uid', uid);
-                setWidgetCookie(reply, 'widget_exp', String(exp));
-                setWidgetCookie(reply, 'widget_sig', sig);
-                setWidgetCookie(reply, 'widget_public', '1');
-
-                await broadcast(null, 'updateRequest', {channelId});
-
-                return reply.send({
-                    success: true,
-                    channelId,
-                    ticketId: ticket.id,
-                    credentials: {channelId, uid, exp, sig}
-                });
-            }
-
-            // Fallback (should not be reached with the logic above)
+            channelId = updatedTicket.channelId!;
+            // Ensure cookies are set for the new session immediately
             const now = Date.now();
-            let exp = Number(expStr) || now + 24 * 60 * 60 * 1000;
+            const exp = now + 24 * 60 * 60 * 1000;
             if (!uid) uid = `guest_${crypto.randomUUID()}`;
-            if (exp <= now) exp = now + 24 * 60 * 60 * 1000;
-
-            const authBase = `${channelId}.${uid}.${exp}`;
-            const expectedSig = crypto.createHmac('sha256', secret).update(authBase).digest('hex');
-            if (sig !== expectedSig) sig = expectedSig;
+            const sig = signWidgetSession(channelId, uid, exp);
 
             setWidgetCookie(reply, 'widget_channel', channelId);
             setWidgetCookie(reply, 'widget_uid', uid);
@@ -162,12 +105,12 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
             setWidgetCookie(reply, 'widget_sig', sig);
             setWidgetCookie(reply, 'widget_public', '1');
 
-            const ticket = channelId ? await prisma.ticket.findUnique({where: {channelId}}) : null;
+            await broadcast(null, 'updateRequest', {channelId});
 
             return reply.send({
                 success: true,
                 channelId,
-                ticketId: ticket?.id,
+                ticketId: ticket.id,
                 credentials: {channelId, uid, exp, sig}
             });
         } catch (e) {
@@ -179,8 +122,9 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
     // Ticket id and status for the visitor's own session (cookie-bound), nothing else.
     app.get('/v1/widget/status', async (req, reply) => {
         try {
-            const channelId = req.cookies.widget_channel;
-            if (!channelId) return reply.status(401).send({success: false, error: 'no_active_session'});
+            const session = verifyWidgetSession(req.cookies);
+            if (!session) return reply.status(401).send({success: false, error: 'no_active_session'});
+            const {channelId} = session;
 
             const ticket = await prisma.ticket.findUnique({
                 where: {channelId},
@@ -197,8 +141,9 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
 
     app.post('/v1/widget/close', async (req, reply) => {
         try {
-            const channelId = req.cookies.widget_channel;
-            if (!channelId) return reply.status(401).send({success: false, error: 'no_active_session'});
+            const session = verifyWidgetSession(req.cookies);
+            if (!session) return reply.status(401).send({success: false, error: 'no_active_session'});
+            const {channelId} = session;
 
             const ticket = await prisma.ticket.findUnique({where: {channelId}});
             if (!ticket) return reply.status(404).send({success: false, error: 'ticket_not_found'});
@@ -242,9 +187,8 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
     app.get('/v1/messages/widget/:channelId', async (req, reply) => {
         try {
             const {channelId} = req.params as { channelId: string };
-            const cookieChannelId = req.cookies.widget_channel;
 
-            if (!cookieChannelId || cookieChannelId !== channelId) {
+            if (verifyWidgetSession(req.cookies)?.channelId !== channelId) {
                 return reply.status(401).send({success: false, error: 'unauthorized'});
             }
 
@@ -311,13 +255,13 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
     app.post('/v1/messages/widget/:channelId', async (req, reply) => {
         try {
             const {channelId} = req.params as { channelId: string };
-            const cookieChannelId = req.cookies.widget_channel;
-            const uid = req.cookies.widget_uid;
+            const session = verifyWidgetSession(req.cookies);
 
-            if (!cookieChannelId || cookieChannelId !== channelId || !uid) {
+            if (!session || session.channelId !== channelId) {
                 return reply.status(401).send({success: false, error: 'unauthorized'});
             }
 
+            const {uid} = session;
             const body = (req.body ?? {}) as { content?: string };
             const content = body.content;
             if (typeof content !== 'string' || content.trim().length === 0 || content.length > 2000) {
@@ -341,7 +285,7 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
             const messageData = {
                 id: message.id,
                 author: {
-                    id: uid || 'guest',
+                    id: uid,
                     image: null,
                     name: 'Utilisateur',
                     role: null,
