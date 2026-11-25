@@ -6,6 +6,8 @@ import {broadcast} from '../../lib/broadcast.js';
 import {pseudonymize} from '../../lib/pseudonym.js';
 import {verifyWidgetSession} from '../../lib/widgetSession.js';
 import {getUserPermissions, hasPermission} from '../../lib/permissions.js';
+import {verifyPow} from '../../lib/pow.js';
+import {limitPerMinute} from '../../lib/rateLimit.js';
 
 async function canReadTicketsAll(userId: string): Promise<boolean> {
     const perms = await getUserPermissions(userId);
@@ -211,7 +213,8 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
         } catch (e) {
             console.error('[api] Error closing ticket:', e);
             if (e instanceof z.ZodError) return reply.status(400).send({success: false, error: e.flatten()});
-            return reply.status(500).send({success: false, error: String(e)});
+            req.log.error(e);
+            return reply.status(500).send({success: false, error: 'internal_error'});
         }
     });
 
@@ -252,12 +255,13 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
             return reply.send({success: true, update});
         } catch (e) {
             if (e instanceof z.ZodError) return reply.status(400).send({success: false, error: e.flatten()});
-            return reply.status(500).send({success: false, error: String(e)});
+            req.log.error(e);
+            return reply.status(500).send({success: false, error: 'internal_error'});
         }
     });
 
     // POST /v1/tickets/create
-    app.post('/v1/tickets/create', async (req, reply) => {
+    app.post('/v1/tickets/create', limitPerMinute(60), async (req, reply) => {
         const bodySchema = z.object({
             discordUserID: z.string(),
             token: z.string(),
@@ -315,7 +319,10 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
     });
 
     // POST /v1/tickets/web-create
-    app.post('/v1/tickets/web-create', async (req, reply) => {
+    app.post('/v1/tickets/web-create', limitPerMinute(5), async (req, reply) => {
+        if (!verifyPow((req.body as {pow?: unknown} | undefined)?.pow)) {
+            return reply.status(403).send({success: false, error: 'pow_required'});
+        }
         try {
             const syntheticId = `web:${crypto.randomUUID()}`;
             const status = await prisma.ticketStatus.findUnique({where: {name: 'waiting'}});
@@ -380,7 +387,8 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
         } catch (e) {
             console.error('[API] Error in findBy/channelID:', e);
             if (e instanceof z.ZodError) return reply.status(400).send({success: false, error: e.flatten()});
-            return reply.status(500).send({success: false, error: String(e)});
+            req.log.error(e);
+            return reply.status(500).send({success: false, error: 'internal_error'});
         }
     });
 
@@ -405,12 +413,13 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
             return reply.send({success: true, update});
         } catch (e) {
             if (e instanceof z.ZodError) return reply.status(400).send({success: false, error: e.flatten()});
-            return reply.status(500).send({success: false, error: String(e)});
+            req.log.error(e);
+            return reply.status(500).send({success: false, error: 'internal_error'});
         }
     });
 
     // POST /v1/tickets/submit-feedback
-    app.post('/v1/tickets/submit-feedback', async (req, reply) => {
+    app.post('/v1/tickets/submit-feedback', limitPerMinute(10), async (req, reply) => {
         const bodySchema = z.object({
             ticketID: z.number(),
             feedback: z.object({
@@ -444,7 +453,8 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
             return reply.send({success: true});
         } catch (e) {
             if (e instanceof z.ZodError) return reply.status(400).send({success: false, error: e.flatten()});
-            return reply.status(500).send({success: false, error: String(e)});
+            req.log.error(e);
+            return reply.status(500).send({success: false, error: 'internal_error'});
         }
     });
 }

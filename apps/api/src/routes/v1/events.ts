@@ -14,6 +14,7 @@ import {
     unregisterUserToEvent,
     updateRegistrationStatus
 } from '../../lib/eventManager.js';
+import {publicMessage} from '../../lib/errors.js';
 
 const EventSchema = z.object({
     title: z.string().min(1),
@@ -266,7 +267,8 @@ export async function registerEventsRoutes(app: FastifyInstance) {
             const registration = await registerUserToEvent(id, userId, part, roleSlotId, adminBypass);
             return reply.send({success: true, registration});
         } catch (err: any) {
-            return reply.status(400).send({success: false, message: err.message});
+            req.log.error(err);
+            return reply.status(400).send({success: false, message: publicMessage(err)});
         }
     });
 
@@ -281,7 +283,8 @@ export async function registerEventsRoutes(app: FastifyInstance) {
             const registration = await unregisterUserToEvent(id, userId, part, roleSlotId);
             return reply.send({success: true, registration});
         } catch (err: any) {
-            return reply.status(400).send({success: false, message: err.message});
+            req.log.error(err);
+            return reply.status(400).send({success: false, message: publicMessage(err)});
         }
     });
 
@@ -302,7 +305,8 @@ export async function registerEventsRoutes(app: FastifyInstance) {
             await updateRegistrationStatus(registrationId, status);
             return reply.send({success: true});
         } catch (err: any) {
-            return reply.status(400).send({success: false, message: err.message});
+            req.log.error(err);
+            return reply.status(400).send({success: false, message: publicMessage(err)});
         }
     });
 
@@ -321,7 +325,8 @@ export async function registerEventsRoutes(app: FastifyInstance) {
             const registration = await removeUserFromEvent(id, userId, adminUserId, roleSlotId);
             return reply.send({success: true, registration});
         } catch (err: any) {
-            return reply.status(400).send({success: false, message: err.message});
+            req.log.error(err);
+            return reply.status(400).send({success: false, message: publicMessage(err)});
         }
     });
 }

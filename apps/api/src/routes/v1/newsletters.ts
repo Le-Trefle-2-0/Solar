@@ -139,7 +139,8 @@ export async function registerNewslettersRoutes(app: FastifyInstance) {
         } catch (e: any) {
             if (e.message === 'not_found') return reply.status(404).send({error: 'not_found'});
             if (e.message === 'no_subscribers') return reply.status(400).send({error: 'no_subscribers'});
-            return reply.status(500).send({error: String(e)});
+            req.log.error(e);
+            return reply.status(500).send({error: 'internal_error'});
         }
     });
 }

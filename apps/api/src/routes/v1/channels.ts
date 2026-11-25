@@ -58,7 +58,7 @@ export async function registerChannelsRoutes(app: FastifyInstance, deps: Channel
             return reply.send({success: true, accessedChannels: accessed});
         } catch (e) {
             if (e instanceof z.ZodError) {
-                return reply.status(400).send({success: false, error: e.flatten?.() ?? String(e)});
+                return reply.status(400).send({success: false, error: e.flatten()});
             }
             return reply.status(500).send({success: false, error: 'internal_error'});
         }

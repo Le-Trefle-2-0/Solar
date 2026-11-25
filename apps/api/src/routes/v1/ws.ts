@@ -1,6 +1,7 @@
 import type {FastifyInstance} from 'fastify';
 import {prisma} from '../../prisma.js';
 import {verifyWidgetSession} from '../../lib/widgetSession.js';
+import {limitPerMinute} from '../../lib/rateLimit.js';
 
 export interface WsRouteDeps {
     findTicketByChannelId: (channelId: string) => Promise<{statusName: string} | null>;
@@ -13,7 +14,7 @@ const defaultDeps: WsRouteDeps = {
 export async function registerWsRoutes(app: FastifyInstance, deps: WsRouteDeps = defaultDeps) {
     // Returns WS credentials only for the channel of the caller's signed widget session,
     // while its ticket is still open. Nothing from the request body is ever signed.
-    app.post('/v1/ws/guest', async (req, reply) => {
+    app.post('/v1/ws/guest', limitPerMinute(10), async (req, reply) => {
         try {
             const session = verifyWidgetSession(req.cookies);
             if (!session) return reply.status(401).send({success: false, error: 'unauthorized'});

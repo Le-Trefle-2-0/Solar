@@ -5,6 +5,7 @@ import {broadcast} from '../../lib/broadcast.js';
 import {z} from "zod";
 
 import {getUserPermissions, hasPermission} from '../../lib/permissions.js';
+import {neutralizeHtml} from '../../lib/sanitize.js';
 
 async function checkAuth(req: any, reply: any) {
     const userId = await authenticate(req);
@@ -34,6 +35,7 @@ export async function registerMessageRoutes(app: FastifyInstance) {
 
         try {
             const body = bodySchema.parse(req.body);
+            body.content = neutralizeHtml(body.content);
             const user = await prisma.user.findUnique({where: {id: userId}});
             if (!user) return reply.status(404).send({success: false, error: 'User not found'});
 
@@ -77,7 +79,8 @@ export async function registerMessageRoutes(app: FastifyInstance) {
             if (e instanceof z.ZodError) {
                 return reply.status(400).send({success: false, error: e.flatten()});
             }
-            return reply.status(500).send({success: false, error: String(e)});
+            req.log.error(e);
+            return reply.status(500).send({success: false, error: 'internal_error'});
         }
     });
 
@@ -120,10 +123,10 @@ export async function registerMessageRoutes(app: FastifyInstance) {
         }
 
         const body = (req.body ?? {}) as { content?: string };
-        const newContent = body.content;
-        if (typeof newContent !== 'string' || newContent.trim().length === 0 || newContent.length > 2000) {
+        if (typeof body.content !== 'string' || body.content.trim().length === 0 || body.content.length > 2000) {
             return reply.status(400).send({success: false, error: 'Invalid content'});
         }
+        const newContent = neutralizeHtml(body.content);
 
         const message = await prisma.message.findUnique({where: {id: messageIdNum}});
         if (!message) return reply.status(404).send({success: false, error: 'Not found'});

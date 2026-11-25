@@ -2,6 +2,7 @@ import type {FastifyInstance} from 'fastify';
 import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
 import {getUserPermissions, hasPermission} from '../../lib/permissions.js';
+import {neutralizeHtml} from '../../lib/sanitize.js';
 
 export interface MessagesRouteDeps {
     authenticate: (req: any) => Promise<string | null | undefined>;
@@ -66,7 +67,8 @@ export async function registerMessagesRoutes(app: FastifyInstance, deps: Message
                     name: user ? (user.displayUsername || user.name) : (msg.userId?.startsWith('guest_') ? 'utilisateur' : (msg.userId ? 'Admin' : 'utilisateur')),
                     role: user?.role ?? null,
                 },
-                content,
+                // Also covers messages stored before sanitisation
+                content: neutralizeHtml(content),
                 timestamp: new Date(msg.createdAt).getTime(),
                 channel: {id: channelId},
                 discordID: (msg as any).discordID,

@@ -8,11 +8,20 @@ import {registerV1Routes} from './routes/v1/index.js';
 import {API_HOST, API_PORT, assertRequiredSecrets} from './env.js';
 import {startNewsletterScheduler} from './lib/scheduler.js';
 import {seedDefaultRoles} from './lib/seed.js';
+import {redactUrl} from './lib/redact.js';
+import {GLOBAL_RATE_LIMIT, trustProxySetting} from './lib/rateLimit.js';
+import {errorHandler} from './lib/errors.js';
 
 assertRequiredSecrets();
 
 const app = Fastify({
-    logger: true,
+    logger: {
+        serializers: {
+            req: (req) => ({method: req.method, url: redactUrl(req.url ?? ''), remoteAddress: req.ip}),
+        },
+    },
+    // Needed behind a reverse proxy, otherwise every client shares the proxy's rate limit
+    trustProxy: trustProxySetting(),
     bodyLimit: 50 * 1024 * 1024 // 50MB
 });
 
@@ -33,8 +42,11 @@ const corsOrigin = corsOriginList.length
 
 await app.register(cors, {origin: corsOrigin, credentials: true});
 await app.register(cookie);
-// Opt-in per route (see routes/v1/keys.ts)
-await app.register(rateLimit, {global: false});
+// Global limit; sensitive routes declare tighter ones
+await app.register(rateLimit, GLOBAL_RATE_LIMIT);
+app.setErrorHandler(errorHandler);
+// The default handler logs the full URL, query string included
+app.setNotFoundHandler((_req, reply) => reply.status(404).send({error: 'not_found'}));
 
 await app.register(swagger, {
     openapi: {
@@ -57,11 +69,6 @@ await app.register(swagger, {
                     type: 'apiKey',
                     name: 'token',
                     in: 'header',
-                },
-                apiKeyQuery: {
-                    type: 'apiKey',
-                    name: 'token',
-                    in: 'query',
                 }
             }
         }

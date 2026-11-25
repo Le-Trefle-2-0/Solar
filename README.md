@@ -54,6 +54,11 @@ INTERNAL_API_SECRET=une_autre_cle_secrete_aleatoire
 # Pseudonymisation des identifiants Discord (API uniquement). Ne jamais la changer ensuite.
 DISCORD_ID_HASH_SECRET=encore_une_cle_secrete_aleatoire
 
+# Derrière un reverse proxy : "true", un nombre de sauts ou les adresses des proxys (limitation de débit par IP)
+TRUST_PROXY=1
+# Hôtes autorisés pour les images distantes (POST /v1/image), séparés par des virgules
+IMAGE_ALLOWED_HOSTS=
+
 # Configuration Email (Resend)
 RESEND_API_KEY=re_your_key
 

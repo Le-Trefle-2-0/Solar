@@ -6,6 +6,7 @@ import {apiFetch} from '@/lib/api';
 import {io, Socket} from 'socket.io-client';
 import {usePathname} from "next/navigation";
 import {FeedbackForm} from "@/components/feedback-form";
+import {solvePow} from "@/lib/pow";
 
 type Msg = {
     id: number;
@@ -125,9 +126,13 @@ export default function ChatWidget() {
         error?: string
     } | null> => {
         try {
-            const res = await apiFetch('/v1/widget/session', {
+            const openSession = (pow?: object) => apiFetch('/v1/widget/session', {
                 method: 'POST',
-                body: JSON.stringify({name, forceNew})
+                body: JSON.stringify({name, forceNew, pow})
+            });
+            const res = await openSession().catch(async (err) => {
+                if (err.message !== 'pow_required') throw err;
+                return openSession(await solvePow(await apiFetch('/v1/widget/challenge')));
             });
             const cid = res?.channelId;
             const tId = res?.ticketId;

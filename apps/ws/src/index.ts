@@ -227,6 +227,8 @@ io.on('connection', (socket) => {
                 return cb && cb(false);
             }
         }
+        // Same neutralisation as apps/api/src/lib/sanitize.ts: this relay bypasses the API
+        if (typeof data.content === 'string') data.content = data.content.replace(/<(?=[a-zA-Z!/?])/g, '<\u200B');
         // emit to everyone in the room + all volunteers (for toasts)
         io.to(room).to('volunteers').emit('message', data);
         cb && cb(true);

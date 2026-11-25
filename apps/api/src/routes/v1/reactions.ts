@@ -61,7 +61,8 @@ export async function registerReactionsRoutes(app: FastifyInstance) {
             if (e instanceof z.ZodError) {
                 return reply.status(400).send({success: false, error: e.flatten()});
             }
-            return reply.status(500).send({success: false, error: String(e)});
+            req.log.error(e);
+            return reply.status(500).send({success: false, error: 'internal_error'});
         }
     });
 }

@@ -4,6 +4,9 @@ import crypto from 'crypto';
 import {broadcast} from '../../lib/broadcast.js';
 import {pseudonymize} from '../../lib/pseudonym.js';
 import {signWidgetSession, verifyWidgetSession} from '../../lib/widgetSession.js';
+import {neutralizeHtml} from '../../lib/sanitize.js';
+import {createChallenge, verifyPow} from '../../lib/pow.js';
+import {limitPerMinute} from '../../lib/rateLimit.js';
 
 const WIDGET_COOKIES = ['widget_channel', 'widget_uid', 'widget_exp', 'widget_sig', 'widget_public'];
 
@@ -29,10 +32,12 @@ function clearWidgetCookies(reply: any) {
 }
 
 export async function registerWidgetRoutes(app: FastifyInstance) {
-    app.post('/v1/widget/session', async (req, reply) => {
+    app.get('/v1/widget/challenge', limitPerMinute(20), async () => createChallenge());
+
+    app.post('/v1/widget/session', limitPerMinute(20), async (req, reply) => {
         try {
             const visitorName = "utilisateur";
-            const body = (req.body ?? {}) as { name?: string, forceNew?: boolean };
+            const body = (req.body ?? {}) as { name?: string, forceNew?: boolean, pow?: unknown };
             const forceNew = body.forceNew === true;
 
             // Resume only a validly signed session: cookie values are never re-signed unverified.
@@ -61,6 +66,9 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
                     });
                 }
             }
+
+            // Resuming a session is free; opening a new ticket requires a proof of work.
+            if (!verifyPow(body.pow)) return reply.status(403).send({success: false, error: 'pow_required'});
 
             const syntheticId = `web:${crypto.randomUUID()}`;
             const ua = req.headers['user-agent'] || 'unknown';
@@ -140,7 +148,7 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
         }
     });
 
-    app.post('/v1/widget/close', async (req, reply) => {
+    app.post('/v1/widget/close', limitPerMinute(10), async (req, reply) => {
         try {
             const session = verifyWidgetSession(req.cookies);
             if (!session) return reply.status(401).send({success: false, error: 'no_active_session'});
@@ -240,7 +248,7 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
                 out.push({
                     id: msg.id,
                     author,
-                    content,
+                    content: neutralizeHtml(content),
                     timestamp: new Date(msg.createdAt).getTime(),
                     channel: {id: channelId},
                     reactions: [],
@@ -253,7 +261,7 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
         }
     });
 
-    app.post('/v1/messages/widget/:channelId', async (req, reply) => {
+    app.post('/v1/messages/widget/:channelId', limitPerMinute(30), async (req, reply) => {
         try {
             const {channelId} = req.params as { channelId: string };
             const session = verifyWidgetSession(req.cookies);
@@ -264,10 +272,10 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
 
             const {uid} = session;
             const body = (req.body ?? {}) as { content?: string };
-            const content = body.content;
-            if (typeof content !== 'string' || content.trim().length === 0 || content.length > 2000) {
+            if (typeof body.content !== 'string' || body.content.trim().length === 0 || body.content.length > 2000) {
                 return reply.status(400).send({success: false, error: 'invalid_content'});
             }
+            const content = neutralizeHtml(body.content);
 
             const ticket = await prisma.ticket.findFirst({
                 where: {channelId}

@@ -1,6 +1,6 @@
 import type {FastifyInstance, FastifyRequest} from 'fastify';
 import {z} from 'zod';
-import {timingSafeEqual} from 'crypto';
+import {isInternal} from '../../lib/internalAuth.js';
 import {prisma} from '../../prisma.js';
 
 /** The only fields these routes may read. Never add `key`, `password` or `twoFactorSecret`. */
@@ -16,15 +16,6 @@ const defaultDeps: KeysRouteDeps = {
     findKey: (key) => prisma.apikey.findFirst({where: {key}, select: KEY_SELECT}),
     findUser: (id) => prisma.user.findUnique({where: {id}, select: KEY_USER_SELECT}),
 };
-
-// Service-to-service authentication: Authorization: Bearer <INTERNAL_API_SECRET>
-function isInternal(req: FastifyRequest): boolean {
-    const secret = process.env.INTERNAL_API_SECRET;
-    if (!secret) return false;
-    const expected = Buffer.from(`Bearer ${secret}`);
-    const received = Buffer.from(req.headers.authorization ?? '');
-    return received.length === expected.length && timingSafeEqual(received, expected);
-}
 
 export async function registerKeysRoutes(app: FastifyInstance, deps: KeysRouteDeps = defaultDeps) {
     const bodySchema = z.object({key: z.string().min(1)});

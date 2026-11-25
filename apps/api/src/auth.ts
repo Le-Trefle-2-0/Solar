@@ -36,8 +36,8 @@ export async function authenticate(req: any): Promise<string | null> {
         return (jwt.sub as string) || (jwt as any).userId || null;
     }
 
-    // 2. Try API Key (Header or Query)
-    const token = (req.headers['token'] as string) || (req.query?.token as string) || '';
+    // 2. Try API Key (header only: query strings end up in logs and browser history)
+    const token = (req.headers['token'] as string) || '';
     if (token) {
         const key = await prisma.apikey.findFirst({where: {key: token}});
         if (key && key.enabled !== false && (!key.expiresAt || key.expiresAt > new Date())) {
