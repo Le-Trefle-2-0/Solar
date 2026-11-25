@@ -3,7 +3,7 @@ import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
 
 import {broadcast} from '../../lib/broadcast.js';
-import {checkRoleAssignment} from '../../lib/roleAssignment.js';
+import {checkRoleAssignment, checkRoleChange} from '../../lib/roleAssignment.js';
 
 async function checkAdmin(req: any, reply: any) {
     const userId = await authenticate(req);
@@ -50,16 +50,21 @@ export async function registerAdminRoutes(app: FastifyInstance) {
         };
 
         // Hierarchy check: Non-admins can only manage roles with lower weight than their own highest role
-        const userRoles = (admin.role || "").split(",");
+        const userRoles = (admin.role || "").split(",").map((r: string) => r.trim());
         if (!userRoles.includes("admin")) {
             const adminHighestRole = await prisma.role.findFirst({
                 where: {name: {in: userRoles}},
                 orderBy: {weight: 'desc'}
             });
 
-            if (!adminHighestRole || weight >= adminHighestRole.weight) {
+            if (!adminHighestRole) {
                 return reply.status(403).send('forbidden: cannot manage roles of equal or higher weight');
             }
+
+            // Compare with the weight stored in the database, not only the one sent by the caller
+            const existing = await prisma.role.findUnique({where: id ? {id} : {name}});
+            const refusal = checkRoleChange(adminHighestRole.weight, existing, {name, weight});
+            if (refusal) return reply.status(403).send(refusal);
 
             // Check permissions: cannot grant permissions the admin doesn't have
             const adminPerms = JSON.parse(adminHighestRole.permissions || "[]") as string[];

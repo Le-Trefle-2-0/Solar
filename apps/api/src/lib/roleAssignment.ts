@@ -38,3 +38,19 @@ export function checkRoleAssignment({callerRole, targetRole, requested, knownRol
     }
     return null;
 }
+
+/** Returns why a non-admin may not create or update a role, or null if allowed. */
+export function checkRoleChange(
+    callerWeight: number,
+    /** The role as currently stored, if the request targets an existing one. */
+    existing: {name: string; weight: number} | null,
+    requested: {name: unknown; weight: unknown},
+): string | null {
+    const tooHigh = 'forbidden: cannot manage roles of equal or higher weight';
+    if (existing && (existing.name === 'admin' || existing.weight >= callerWeight)) return tooHigh;
+    // A missing or non-numeric weight would pass a plain ">=" comparison.
+    if (requested.name === 'admin' || typeof requested.weight !== 'number' || !(requested.weight < callerWeight)) {
+        return tooHigh;
+    }
+    return null;
+}
