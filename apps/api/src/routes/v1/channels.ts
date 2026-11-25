@@ -12,7 +12,21 @@ async function canReadTicketsAll(userId: string): Promise<boolean> {
     return hasPermission(perms, 'tickets.read_all');
 }
 
-export async function registerChannelsRoutes(app: FastifyInstance) {
+export interface ChannelsRouteDeps {
+    authenticate: (req: any) => Promise<string | null | undefined>;
+    getPermissions: (userId: string) => Promise<string[]>;
+    findChannel: (id: string) => Promise<{id: string; name: string} | null>;
+    findTicketByChannelId: (channelId: string) => Promise<{assignedUserId: string | null} | null>;
+}
+
+const defaultDeps: ChannelsRouteDeps = {
+    authenticate,
+    getPermissions: getUserPermissions,
+    findChannel: (id) => prisma.channel.findUnique({where: {id}}),
+    findTicketByChannelId: (channelId) => prisma.ticket.findUnique({where: {channelId}}),
+};
+
+export async function registerChannelsRoutes(app: FastifyInstance, deps: ChannelsRouteDeps = defaultDeps) {
     const bodySchema = z.object({id: z.string().min(1)});
 
     // POST /v1/channels – returns channels the user can access
@@ -51,9 +65,21 @@ export async function registerChannelsRoutes(app: FastifyInstance) {
     });
 
     // GET /v1/channel/:id – channel info
+    // Public channel '1' is open to any signed-in user; others require tickets.read_all
+    // or being assigned to the channel's ticket.
     app.get('/v1/channel/:id', async (req, reply) => {
-        const {id} = req.params as any;
-        const channel = await prisma.channel.findUnique({where: {id}});
+        const userId = await deps.authenticate(req);
+        if (!userId) return reply.status(401).send('unauthorized');
+
+        const {id} = req.params as {id: string};
+
+        // Checked before the channel lookup, so existence is not disclosed.
+        if (id !== '1' && !hasPermission(await deps.getPermissions(userId), 'tickets.read_all')) {
+            const ticket = await deps.findTicketByChannelId(id);
+            if (ticket?.assignedUserId !== userId) return reply.status(403).send('forbidden');
+        }
+
+        const channel = await deps.findChannel(id);
         if (!channel) return reply.status(404).send({error: 'not_found'});
         return channel;
     });
