@@ -51,6 +51,8 @@ BETTER_AUTH_SECRET=une_cle_secrete_tres_longue
 WS_GUEST_SECRET=une_cle_secrete_aleatoire_pour_les_ws
 # Communications internes entre services (/v1/keys/check)
 INTERNAL_API_SECRET=une_autre_cle_secrete_aleatoire
+# Pseudonymisation des identifiants Discord (API uniquement). Ne jamais la changer ensuite.
+DISCORD_ID_HASH_SECRET=encore_une_cle_secrete_aleatoire
 
 # Configuration Email (Resend)
 RESEND_API_KEY=re_your_key

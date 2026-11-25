@@ -3,7 +3,8 @@ import {z} from 'zod';
 import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
 import {broadcast} from '../../lib/broadcast.js';
-import {createHash} from 'crypto';
+import {pseudonymize} from '../../lib/pseudonym.js';
+import {verifyWidgetSession} from '../../lib/widgetSession.js';
 import {getUserPermissions, hasPermission} from '../../lib/permissions.js';
 
 async function canReadTicketsAll(userId: string): Promise<boolean> {
@@ -23,12 +24,16 @@ export interface TicketsRouteDeps {
     authenticate: (req: any) => Promise<string | null | undefined>;
     getPermissions: (userId: string) => Promise<string[]>;
     findTicketByChannelId: (channelId: string) => Promise<{assignedUserId: string | null} | null>;
+    findTicketById: (id: number) => Promise<{assignedUserId: string | null; channelId: string | null} | null>;
+    updateTicket: (id: number, data: {categories?: string[]; feedback?: object}) => Promise<unknown>;
 }
 
 const defaultDeps: TicketsRouteDeps = {
     authenticate,
     getPermissions: getUserPermissions,
     findTicketByChannelId: (channelId) => prisma.ticket.findUnique({where: {channelId}}),
+    findTicketById: (id) => prisma.ticket.findUnique({where: {id}}),
+    updateTicket: (id, data) => prisma.ticket.update({where: {id}, data: {...data, updatedAt: new Date()}}),
 };
 
 /** Roles able to handle tickets: a ticket may only be assigned to a user holding one of these. */
@@ -183,7 +188,7 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
                 data: {
                     statusName: status.name,
                     statusLabel: status.label,
-                    discordUserID: createHash('sha256').update(ticket.discordUserID).digest('hex'),
+                    discordUserID: pseudonymize(ticket.discordUserID),
                 },
             });
 
@@ -381,7 +386,7 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
 
     // POST /v1/tickets/update-categories
     app.post('/v1/tickets/update-categories', async (req, reply) => {
-        const userId = await authenticate(req);
+        const userId = await deps.authenticate(req);
         if (!userId) return reply.status(401).send('unauthorized');
 
         const bodySchema = z.object({
@@ -391,13 +396,12 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
 
         try {
             const {ticketID, categories} = bodySchema.parse((req.body ?? {}) as any);
-            const update = await prisma.ticket.update({
-                where: {id: ticketID},
-                data: {
-                    categories,
-                    updatedAt: new Date(),
-                },
-            });
+            const ticket = await deps.findTicketById(ticketID);
+            const canReadAll = hasPermission(await deps.getPermissions(userId), 'tickets.read_all');
+            if (!canReadAll && ticket?.assignedUserId !== userId) return reply.status(403).send('forbidden');
+            if (!ticket) return reply.status(404).send({success: false, error: 'No ticket found'});
+
+            const update = await deps.updateTicket(ticketID, {categories});
             return reply.send({success: true, update});
         } catch (e) {
             if (e instanceof z.ZodError) return reply.status(400).send({success: false, error: e.flatten()});
@@ -422,14 +426,22 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
 
         try {
             const {ticketID, feedback} = bodySchema.parse((req.body ?? {}) as any);
-            const update = await prisma.ticket.update({
-                where: {id: ticketID},
-                data: {
-                    feedback,
-                    updatedAt: new Date(),
-                },
-            });
-            return reply.send({success: true, update});
+            const ticket = await deps.findTicketById(ticketID);
+
+            // Either the visitor who owns the ticket (signed widget cookies), or staff with access to it.
+            const isVisitor = !!ticket?.channelId
+                && verifyWidgetSession(req.cookies ?? {})?.channelId === ticket.channelId;
+            if (!isVisitor) {
+                const userId = await deps.authenticate(req);
+                if (!userId) return reply.status(401).send('unauthorized');
+                const canReadAll = hasPermission(await deps.getPermissions(userId), 'tickets.read_all');
+                if (!canReadAll && ticket?.assignedUserId !== userId) return reply.status(403).send('forbidden');
+            }
+            if (!ticket) return reply.status(404).send({success: false, error: 'No ticket found'});
+
+            await deps.updateTicket(ticketID, {feedback});
+            // The ticket is not echoed back: it holds staff notes the visitor must not see.
+            return reply.send({success: true});
         } catch (e) {
             if (e instanceof z.ZodError) return reply.status(400).send({success: false, error: e.flatten()});
             return reply.status(500).send({success: false, error: String(e)});

@@ -1,6 +1,6 @@
 import type {FastifyInstance} from 'fastify';
 import {z} from 'zod';
-import {createHash} from 'crypto';
+import {requesterIdVariants} from '../../lib/pseudonym.js';
 import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
 import {getUserPermissions, hasPermission} from '../../lib/permissions.js';
@@ -100,8 +100,7 @@ export async function registerEventsRoutes(app: FastifyInstance) {
                 return reply.send(users);
             }
 
-            const requesterIdPlain = ticket.discordUserID;
-            const requesterIdHash = createHash("sha256").update(requesterIdPlain).digest("hex");
+            const requesterIds = requesterIdVariants(ticket.discordUserID);
 
             // If specifically asking for ineligibility lists, compute both (text and voice)
             if (lists === "ineligible") {
@@ -113,7 +112,7 @@ export async function registerEventsRoutes(app: FastifyInstance) {
                     where: {
                         createdAt: {gte: textWindowStart},
                         voice: false,
-                        discordUserID: {in: [requesterIdPlain, requesterIdHash]},
+                        discordUserID: {in: requesterIds},
                     },
                     select: {assignedUserId: true},
                 });
@@ -128,7 +127,7 @@ export async function registerEventsRoutes(app: FastifyInstance) {
                     where: {
                         createdAt: {gte: voiceWindowStart},
                         voice: true,
-                        discordUserID: {in: [requesterIdPlain, requesterIdHash]},
+                        discordUserID: {in: requesterIds},
                     },
                     select: {assignedUserId: true},
                 });
@@ -149,7 +148,7 @@ export async function registerEventsRoutes(app: FastifyInstance) {
                 where: {
                     createdAt: {gte: windowStart},
                     voice: isVoice,
-                    discordUserID: {in: [requesterIdPlain, requesterIdHash]},
+                    discordUserID: {in: requesterIds},
                 },
                 select: {assignedUserId: true}
             });

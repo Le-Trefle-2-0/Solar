@@ -31,8 +31,9 @@ jobs:
         env:
           WS_GUEST_SECRET: ${{ secrets.WS_GUEST_SECRET }}
           INTERNAL_API_SECRET: ${{ secrets.INTERNAL_API_SECRET }}
+          DISCORD_ID_HASH_SECRET: ${{ secrets.DISCORD_ID_HASH_SECRET }}
         run: |
-          for name in WS_GUEST_SECRET INTERNAL_API_SECRET; do
+          for name in WS_GUEST_SECRET INTERNAL_API_SECRET DISCORD_ID_HASH_SECRET; do
             if [ -z "${!name}" ]; then
               echo "::error::$name is missing from GitHub Secrets"
               exit 1

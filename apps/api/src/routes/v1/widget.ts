@@ -2,6 +2,7 @@ import type {FastifyInstance} from 'fastify';
 import {prisma} from '../../prisma.js';
 import crypto from 'crypto';
 import {broadcast} from '../../lib/broadcast.js';
+import {pseudonymize} from '../../lib/pseudonym.js';
 import {signWidgetSession, verifyWidgetSession} from '../../lib/widgetSession.js';
 
 const WIDGET_COOKIES = ['widget_channel', 'widget_uid', 'widget_exp', 'widget_sig', 'widget_public'];
@@ -164,7 +165,7 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
                     statusName: status.name,
                     statusLabel: status.label,
                     // Anonymize the ticket on close to prevent linkage on reopen
-                    discordUserID: crypto.createHash('sha256').update(ticket.discordUserID).digest('hex'),
+                    discordUserID: pseudonymize(ticket.discordUserID),
                 },
             });
 
