@@ -32,8 +32,10 @@ jobs:
           WS_GUEST_SECRET: ${{ secrets.WS_GUEST_SECRET }}
           INTERNAL_API_SECRET: ${{ secrets.INTERNAL_API_SECRET }}
           DISCORD_ID_HASH_SECRET: ${{ secrets.DISCORD_ID_HASH_SECRET }}
+          WS_BROADCAST_SECRET: ${{ secrets.WS_BROADCAST_SECRET }}
+          STORAGE_SECRET: ${{ secrets.STORAGE_SECRET }}
         run: |
-          for name in WS_GUEST_SECRET INTERNAL_API_SECRET DISCORD_ID_HASH_SECRET; do
+          for name in WS_GUEST_SECRET INTERNAL_API_SECRET DISCORD_ID_HASH_SECRET WS_BROADCAST_SECRET STORAGE_SECRET; do
             if [ -z "${!name}" ]; then
               echo "::error::$name is missing from GitHub Secrets"
               exit 1
@@ -68,6 +70,29 @@ jobs:
           name: build-logs
           path: .build-logs/
           retention-days: 7
+
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Tests de chaque workspace
+        run: |
+          status=0
+          for ws in api ws storage web; do
+            echo "::group::tests apps/$ws"
+            npm test -w "apps/$ws" || status=1
+            echo "::endgroup::"
+          done
+          exit $status
 
   lint:
     name: Lint

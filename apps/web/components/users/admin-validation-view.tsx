@@ -345,14 +345,15 @@ export function AdminValidationView({account, onClose, onUpdate}: AdminValidatio
 function DocumentFrame({fileId, filename}: {fileId: string, filename: string}) {
     const [isLoading, setIsLoading] = useState(true);
     const [mimeType, setMimeType] = useState<string | null>(null);
-    const storageUrl = process.env.NEXT_PUBLIC_STORAGE_URL || 'http://localhost:7001';
-    const fileUrl = `${storageUrl}/v1/files/${fileId}`;
+    // Same-origin proxy with access control; storage is not reachable from the browser
+    const storageUrl = '/api/files';
+    const fileUrl = `${storageUrl}/${encodeURIComponent(fileId)}`;
 
     useEffect(() => {
         setIsLoading(true);
         const fetchMetadata = async () => {
             try {
-                const res = await fetch(`${storageUrl}/v1/files/${fileId}/meta`);
+                const res = await fetch(`${storageUrl}/${encodeURIComponent(fileId)}/meta`);
                 if (!res.ok) throw new Error("Metadata error");
                 const data = await res.json();
                 setMimeType(data.mime);

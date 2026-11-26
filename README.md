@@ -46,13 +46,19 @@ DATABASE_URL="mysql://utilisateur:motdepasse@localhost:3306/solar"
 # Clé secrète pour l'authentification
 BETTER_AUTH_SECRET=une_cle_secrete_tres_longue
 
-# Secrets obligatoires : l'API et le serveur WebSocket refusent de démarrer sans eux
+# Secrets obligatoires : l'API et le serveur WebSocket refusent de démarrer sans eux (le web les vérifie aussi au démarrage)
 # Signature des connexions invitées du widget
 WS_GUEST_SECRET=une_cle_secrete_aleatoire_pour_les_ws
 # Communications internes entre services (/v1/keys/check)
 INTERNAL_API_SECRET=une_autre_cle_secrete_aleatoire
 # Pseudonymisation des identifiants Discord (API uniquement). Ne jamais la changer ensuite.
 DISCORD_ID_HASH_SECRET=encore_une_cle_secrete_aleatoire
+# Diffusion d'événements de l'API et du web vers le serveur WebSocket (/broadcast)
+WS_BROADCAST_SECRET=une_cle_secrete_aleatoire_pour_la_diffusion
+# Accès du web au service de stockage (pièces d'identité, casiers). Le stockage refuse de démarrer sans elle.
+STORAGE_SECRET=une_cle_secrete_aleatoire_pour_le_stockage
+# Adresse interne du stockage vue par le web (jamais exposée au navigateur, qui passe par /api/files)
+STORAGE_INTERNAL_URL=http://127.0.0.1:3004
 
 # Derrière un reverse proxy : "true", un nombre de sauts ou les adresses des proxys (limitation de débit par IP)
 TRUST_PROXY=1

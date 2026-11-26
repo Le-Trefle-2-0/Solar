@@ -83,8 +83,9 @@ services:
     image: node:20-alpine
     working_dir: /app
     command: sh -c "npm ci && npm run dev:storage"
-    ports:
-      - "3004:3004"
+    # Internal only: the browser goes through the web app's /api/files (STORAGE_SECRET comes from .env)
+    expose:
+      - "3004"
     environment:
       STORAGE_HOST: 0.0.0.0
       STORAGE_PORT: 3004
@@ -104,7 +105,7 @@ services:
       PORT: 3000
       NEXT_PUBLIC_APP_URL: http://web:3000
       NEXT_PUBLIC_API_URL: http://api:3001
-      NEXT_PUBLIC_STORAGE_URL: http://storage:3004
+      STORAGE_INTERNAL_URL: http://storage:3004
       NEXT_PUBLIC_WS_URL: ws://localhost:3002
       DATABASE_URL: mysql://root:password@mysql:3306/solar
     volumes:

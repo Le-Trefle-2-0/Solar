@@ -65,6 +65,18 @@ async function main() {
             }
         });
 
+        // Role without any permission, used to remove all access (empty roles are refused)
+        await prisma.role.upsert({
+            where: {name: "none"},
+            update: {},
+            create: {
+                name: "none",
+                weight: 0,
+                permissions: JSON.stringify([]),
+                icon: "Ban"
+            }
+        });
+
         await prisma.user.create({
             data: {
                 id: userId,
@@ -87,7 +99,7 @@ async function main() {
             },
         });
 
-        console.log(`Successfully created admin user: ${email} and ensured default roles (admin, volunteer) exist.`);
+        console.log(`Successfully created admin user: ${email} and ensured default roles (admin, volunteer, none) exist.`);
     } catch (error) {
         console.error("Error creating admin user:", error);
     } finally {

@@ -99,7 +99,8 @@ export function DocumentSubmissionDialog({
         const watermarkedFile = await watermarkDocument(file);
         const formData = new FormData();
         formData.append('file', watermarkedFile);
-        const res = await fetch(`${process.env.NEXT_PUBLIC_STORAGE_URL || 'http://localhost:7001'}/v1/files`, {
+        // Same-origin proxy: the web app checks the session and forwards to the internal storage
+        const res = await fetch(`/api/files`, {
             method: 'POST',
             body: formData,
         });

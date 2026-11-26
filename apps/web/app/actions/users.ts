@@ -10,6 +10,7 @@ import {renderEmailTemplate} from "@/lib/email-template";
 
 import {truncateEmail} from "@/lib/utils";
 import {broadcast} from "@/lib/broadcast";
+import {canLinkFile} from "@/lib/security/fileAccess";
 
 const inviteSchema = z.object({
     name: z.string().min(1),
@@ -39,7 +40,8 @@ export async function inviteUserAction(formData: z.infer<typeof inviteSchema>) {
     // Same rule as POST /v1/admin/users/:id/role: only existing roles, and below the inviter's own.
     const knownRoles = await prisma.role.findMany({select: {name: true, weight: true}});
     const weights = new Map(knownRoles.map((r) => [r.name, r.weight]));
-    if (!roles.every((r) => !r.includes(",") && r === r.trim() && weights.has(r))) {
+    // An empty name would be read back as the default role
+    if (!roles.every((r) => r.length > 0 && !r.includes(",") && r === r.trim() && weights.has(r))) {
         return {error: "Invalid data"};
     }
     const inviterRoles: string[] = userRole.split(",").map((r: string) => r.trim());
@@ -174,6 +176,17 @@ export async function submitDocumentsAction(data: {
 
     if (!session) {
         return {error: "Unauthorized"};
+    }
+
+    // Only files this user uploaded may be attached to their profile (#211)
+    for (const fileId of [data.idCardFileId, data.casierFileId]) {
+        if (fileId === undefined) continue;
+        const file = typeof fileId === "string"
+            ? await prisma.file.findUnique({where: {id: fileId}, select: {uploadedById: true}})
+            : null;
+        if (!canLinkFile(session.user.id, file)) {
+            return {error: "Invalid file"};
+        }
     }
 
     try {

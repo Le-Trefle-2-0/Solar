@@ -14,13 +14,14 @@ export function SecureDocumentPreview({fileId, filename, onClose}: SecureDocumen
     const [isLoading, setIsLoading] = useState(true);
     const [mimeType, setMimeType] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
-    const storageUrl = process.env.NEXT_PUBLIC_STORAGE_URL || 'http://localhost:7001';
-    const fileUrl = `${storageUrl}/v1/files/${fileId}`;
+    // Same-origin proxy with access control; storage is not reachable from the browser
+    const storageUrl = '/api/files';
+    const fileUrl = `${storageUrl}/${encodeURIComponent(fileId)}`;
 
     useEffect(() => {
         const fetchMetadata = async () => {
             try {
-                const res = await fetch(`${storageUrl}/v1/files/${fileId}/meta`);
+                const res = await fetch(`${storageUrl}/${encodeURIComponent(fileId)}/meta`);
                 if (!res.ok) throw new Error("Impossible de charger les métadonnées");
                 const data = await res.json();
                 setMimeType(data.mime);

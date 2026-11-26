@@ -106,7 +106,10 @@ model File {
   mime      String   @db.Text
   size      Int
   createdAt DateTime @default(now())
+  /// User who uploaded the file, checked before it can be read or linked (#211)
+  uploadedById String?
 
+  @@index([uploadedById])
   @@map("file")
 }
 
