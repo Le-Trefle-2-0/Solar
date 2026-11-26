@@ -27,18 +27,20 @@ export interface ChannelAccess {
     permissions: string[];
     /** Volunteer assigned to the ticket behind this channel; null if none or no ticket. */
     assignedUserId: string | null;
+    /** The channel of a permanence (planning event): open to every signed-in member. */
+    isPermanence?: boolean;
 }
 
 /** Read rule shared with GET /v1/messages/:channelId. */
-export function canReadChannel({channelId, userId, permissions, assignedUserId}: ChannelAccess): boolean {
-    if (channelId === PUBLIC_CHANNEL_ID) return true;
+export function canReadChannel({channelId, userId, permissions, assignedUserId, isPermanence}: ChannelAccess): boolean {
+    if (channelId === PUBLIC_CHANNEL_ID || isPermanence) return true;
     if (has(permissions, "tickets.read_all")) return true;
     return assignedUserId !== null && assignedUserId === userId;
 }
 
-/** Write rule: the public channel, tickets.send_message_all, or the assigned volunteer with tickets.send_message. */
-export function canWriteChannel({channelId, userId, permissions, assignedUserId}: ChannelAccess): boolean {
-    if (channelId === PUBLIC_CHANNEL_ID) return true;
+/** Write rule: open channels, tickets.send_message_all, or the assigned volunteer with tickets.send_message. */
+export function canWriteChannel({channelId, userId, permissions, assignedUserId, isPermanence}: ChannelAccess): boolean {
+    if (channelId === PUBLIC_CHANNEL_ID || isPermanence) return true;
     if (has(permissions, "tickets.send_message_all")) return true;
     return assignedUserId !== null && assignedUserId === userId && has(permissions, "tickets.send_message");
 }

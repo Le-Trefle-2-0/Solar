@@ -53,3 +53,8 @@ test('neutralizeHtml defuses a simple XSS payload and keeps plain text', () => {
     assert.equal(neutralizeHtml('a < b <3'), 'a < b <3');
     assert.equal(neutralizeHtml(out), out);
 });
+
+test('permanence channels are open to every member', () => {
+    assert.equal(canReadChannel({...base, channelId: 'perm', isPermanence: true}), true);
+    assert.equal(canWriteChannel({...base, channelId: 'perm', isPermanence: true}), true);
+});

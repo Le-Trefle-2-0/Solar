@@ -10,6 +10,7 @@ async function get(id: string, authedAs: string | null, perms: string[] = [], as
         authenticate: async () => authedAs,
         getPermissions: async () => perms,
         findTicketByChannelId: async (channelId) => channelId === 'c' ? {assignedUserId} : null,
+        isPermanenceChannel: async (channelId) => channelId === 'perm',
         findMessages: async (where) => {
             read.push(where.channelId);
             return [];
@@ -37,4 +38,8 @@ test('200 for the assigned user, tickets.read_all and the public channel', async
 
 test('an empty channel never falls back to another one', async () => {
     assert.deepEqual((await get('1', 'user1')).read, ['1']);
+});
+
+test('a permanence channel is open to every member, without any permission', async () => {
+    assert.deepEqual(await get('perm', 'user1'), {status: 200, read: ['perm']});
 });

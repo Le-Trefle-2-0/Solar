@@ -6,7 +6,7 @@ import {authenticate} from '../../auth.js';
 import {getUserPermissions, hasPermission} from '../../lib/permissions.js';
 
 import {broadcast} from '../../lib/broadcast.js';
-import {canReadChannel, PUBLIC_CHANNEL_ID} from '../../lib/channelAccess.js';
+import {canReadChannel, describeChannel, isPermanenceChannel} from '../../lib/channelAccess.js';
 
 async function canReadTicketsAll(userId: string): Promise<boolean> {
     const perms = await getUserPermissions(userId);
@@ -18,6 +18,7 @@ export interface ChannelsRouteDeps {
     getPermissions: (userId: string) => Promise<string[]>;
     findChannel: (id: string) => Promise<{id: string; name: string} | null>;
     findTicketByChannelId: (channelId: string) => Promise<{assignedUserId: string | null} | null>;
+    isPermanenceChannel: (channelId: string) => Promise<boolean>;
 }
 
 const defaultDeps: ChannelsRouteDeps = {
@@ -25,9 +26,18 @@ const defaultDeps: ChannelsRouteDeps = {
     getPermissions: getUserPermissions,
     findChannel: (id) => prisma.channel.findUnique({where: {id}}),
     findTicketByChannelId: (channelId) => prisma.ticket.findUnique({where: {channelId}}),
+    isPermanenceChannel,
 };
 
 export async function registerChannelsRoutes(app: FastifyInstance, deps: ChannelsRouteDeps = defaultDeps) {
+    // Shared channel rule (info, read markers): open channels, tickets.read_all, or assigned
+    const canRead = async (userId: string, channelId: string) => canReadChannel({
+        channelId,
+        userId,
+        permissions: await deps.getPermissions(userId),
+        ...await describeChannel(channelId, deps.findTicketByChannelId, deps.isPermanenceChannel),
+    });
+
     const bodySchema = z.object({id: z.string().min(1)});
 
     // POST /v1/channels – returns channels the user can access
@@ -75,10 +85,7 @@ export async function registerChannelsRoutes(app: FastifyInstance, deps: Channel
         const {id} = req.params as {id: string};
 
         // Checked before the channel lookup, so existence is not disclosed.
-        if (id !== '1' && !hasPermission(await deps.getPermissions(userId), 'tickets.read_all')) {
-            const ticket = await deps.findTicketByChannelId(id);
-            if (ticket?.assignedUserId !== userId) return reply.status(403).send('forbidden');
-        }
+        if (!(await canRead(userId, id))) return reply.status(403).send('forbidden');
 
         const channel = await deps.findChannel(id);
         if (!channel) return reply.status(404).send({error: 'not_found'});
@@ -184,13 +191,6 @@ export async function registerChannelsRoutes(app: FastifyInstance, deps: Channel
     });
 
     // GET /v1/channel/:id/read – get last read timestamp
-    // Read markers follow the channel read rule (#228)
-    const canRead = async (userId: string, channelId: string) => canReadChannel({
-        channelId,
-        userId,
-        permissions: await deps.getPermissions(userId),
-        assignedUserId: channelId === PUBLIC_CHANNEL_ID ? null : (await deps.findTicketByChannelId(channelId))?.assignedUserId ?? null,
-    });
 
     app.get('/v1/channel/:id/read', async (req, reply) => {
         try {

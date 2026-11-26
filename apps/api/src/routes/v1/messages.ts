@@ -1,13 +1,15 @@
 import type {FastifyInstance} from 'fastify';
 import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
-import {getUserPermissions, hasPermission} from '../../lib/permissions.js';
+import {getUserPermissions} from '../../lib/permissions.js';
+import {canReadChannel, describeChannel, isPermanenceChannel} from '../../lib/channelAccess.js';
 import {neutralizeHtml} from '../../lib/sanitize.js';
 
 export interface MessagesRouteDeps {
     authenticate: (req: any) => Promise<string | null | undefined>;
     getPermissions: (userId: string) => Promise<string[]>;
     findTicketByChannelId: (channelId: string) => Promise<{assignedUserId: string | null} | null>;
+    isPermanenceChannel: (channelId: string) => Promise<boolean>;
     findMessages: (where: {channelId: string; createdAt?: {lt: Date}}, take: number) => Promise<any[]>;
 }
 
@@ -15,6 +17,7 @@ const defaultDeps: MessagesRouteDeps = {
     authenticate,
     getPermissions: getUserPermissions,
     findTicketByChannelId: (channelId) => prisma.ticket.findUnique({where: {channelId}}),
+    isPermanenceChannel,
     findMessages: (where, take) => prisma.message.findMany({where, orderBy: {createdAt: 'desc'}, take}),
 };
 
@@ -26,10 +29,11 @@ export async function registerMessagesRoutes(app: FastifyInstance, deps: Message
 
         const {channelId} = req.params as any;
 
-        // Same rule as the other channel routes: public channel '1', tickets.read_all, or assigned.
-        if (channelId !== '1' && !hasPermission(await deps.getPermissions(userId), 'tickets.read_all')) {
-            const ticket = await deps.findTicketByChannelId(channelId);
-            if (ticket?.assignedUserId !== userId) return reply.status(403).send('forbidden');
+        // Shared channel rule: open channels (public, permanences), tickets.read_all, or assigned
+        if (typeof channelId !== 'string') return reply.status(400).send('invalid channel');
+        const channel = await describeChannel(channelId, deps.findTicketByChannelId, deps.isPermanenceChannel);
+        if (!canReadChannel({channelId, userId, permissions: await deps.getPermissions(userId), ...channel})) {
+            return reply.status(403).send('forbidden');
         }
 
         const {limit: limitStr, before: beforeStr} = req.query as any;

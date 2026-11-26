@@ -22,3 +22,8 @@ test('channel write (#217): public channel, send_message_all, or assigned with s
     // Reading everything does not mean writing everywhere
     assert.equal(canWriteChannel({...base, permissions: ['tickets.read_all']}), false);
 });
+
+test('permanence channels: read and write for every member, no permission or sign-up needed', () => {
+    assert.equal(canReadChannel({...base, channelId: 'perm', isPermanence: true}), true);
+    assert.equal(canWriteChannel({...base, channelId: 'perm', isPermanence: true}), true);
+});

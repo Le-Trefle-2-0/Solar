@@ -3,7 +3,7 @@ import {prisma} from '../../prisma.js';
 import {isInternal} from '../../lib/internalAuth.js';
 import {getActor} from '../../lib/permissions.js';
 import {hasPermission} from '../../lib/roleAssignment.js';
-import {canReadChannel, canWriteChannel, PUBLIC_CHANNEL_ID} from '../../lib/channelAccess.js';
+import {canReadChannel, canWriteChannel, describeChannel, isPermanenceChannel, PUBLIC_CHANNEL_ID} from '../../lib/channelAccess.js';
 
 /**
  * Service-to-service routes for the WebSocket service (Authorization: Bearer INTERNAL_API_SECRET).
@@ -15,8 +15,11 @@ export interface InternalWsDeps {
     getActor: (userId: string) => Promise<{id: string; permissions: string[]} | null>;
     findUser: (userId: string) => Promise<{id: string; name: string; displayUsername: string | null; image: string | null; role: string | null; banned: boolean | null} | null>;
     findTicketByChannelId: (channelId: string) => Promise<{assignedUserId: string | null} | null>;
+    isPermanenceChannel: (channelId: string) => Promise<boolean>;
     /** Channels of the tickets assigned to the user that are still in progress. */
     findAssignedChannelIds: (userId: string) => Promise<string[]>;
+    /** Channels of the permanences running now or starting within a day. */
+    findCurrentPermanenceChannelIds: () => Promise<string[]>;
 }
 
 const defaultDeps: InternalWsDeps = {
@@ -27,12 +30,21 @@ const defaultDeps: InternalWsDeps = {
         select: {id: true, name: true, displayUsername: true, image: true, role: true, banned: true},
     }),
     findTicketByChannelId: (channelId) => prisma.ticket.findUnique({where: {channelId}, select: {assignedUserId: true}}),
+    isPermanenceChannel,
     findAssignedChannelIds: async (userId) => {
         const tickets = await prisma.ticket.findMany({
             where: {assignedUserId: userId, statusName: {not: 'commented'}, channelId: {not: null}},
             select: {channelId: true},
         });
         return tickets.map(t => t.channelId!).filter(Boolean);
+    },
+    findCurrentPermanenceChannelIds: async () => {
+        const now = Date.now();
+        const events = await prisma.event.findMany({
+            where: {end: {gte: new Date(now - 2 * 3600_000)}, start: {lte: new Date(now + 24 * 3600_000)}},
+            select: {channelID: true},
+        });
+        return events.map(e => e.channelID);
     },
 };
 
@@ -56,7 +68,12 @@ export async function registerInternalRoutes(app: FastifyInstance, deps: Interna
         if (!user || !actor || user.banned) return reply.status(404).send({error: 'not_found'});
 
         const readAll = hasPermission(actor.permissions, 'tickets.read_all');
-        const channels = [PUBLIC_CHANNEL_ID, ...(readAll ? [] : await deps.findAssignedChannelIds(userId))];
+        // Open channels (shared channel, current permanences) for everyone, plus assigned tickets
+        const channels = [
+            PUBLIC_CHANNEL_ID,
+            ...await deps.findCurrentPermanenceChannelIds(),
+            ...(readAll ? [] : await deps.findAssignedChannelIds(userId)),
+        ];
         return reply.send({
             user: {
                 id: user.id,
@@ -80,8 +97,8 @@ export async function registerInternalRoutes(app: FastifyInstance, deps: Interna
 
         const actor = await deps.getActor(userId);
         if (!actor) return reply.send({read: false, write: false});
-        const ticket = channelId === PUBLIC_CHANNEL_ID ? null : await deps.findTicketByChannelId(channelId);
-        const input = {channelId, userId, permissions: actor.permissions, assignedUserId: ticket?.assignedUserId ?? null};
+        const channel = await describeChannel(channelId, deps.findTicketByChannelId, deps.isPermanenceChannel);
+        const input = {channelId, userId, permissions: actor.permissions, ...channel};
         return reply.send({read: canReadChannel(input), write: canWriteChannel(input)});
     });
 }

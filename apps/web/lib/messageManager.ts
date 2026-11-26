@@ -25,7 +25,9 @@ export const saveMessage = async (input: unknown) => {
         select: {id: true, assignedUserId: true},
     });
     const permissions = await getRolePermissions((session.user as {role?: string | null}).role, userId);
-    if (!canWriteChannel({channelId, userId, permissions, assignedUserId: ticket?.assignedUserId ?? null})) {
+    // A permanence's channel is open to every member, signed up or not
+    const isPermanence = !ticket && !!(await prisma.event.findFirst({where: {channelID: channelId}, select: {id: true}}));
+    if (!canWriteChannel({channelId, userId, permissions, assignedUserId: ticket?.assignedUserId ?? null, isPermanence})) {
         throw new Error("Forbidden");
     }
 

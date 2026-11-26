@@ -10,6 +10,7 @@ async function get(id: string, authedAs: string | null, perms: string[] = [], as
         getPermissions: async () => perms,
         findChannel: async (channelId) => channelId === 'missing' ? null : {id: channelId, name: 'n'},
         findTicketByChannelId: async (channelId) => channelId === 'c' ? {assignedUserId} : null,
+        isPermanenceChannel: async (channelId) => channelId === 'perm',
     });
     return (await app.inject(`/v1/channel/${id}`)).statusCode;
 }
@@ -50,7 +51,12 @@ test('read markers (#228): refused for a channel the caller cannot read', async 
         getPermissions: async () => [],
         findChannel: async (id) => ({id, name: 'n'}),
         findTicketByChannelId: async () => ({assignedUserId: 'someone-else'}),
+        isPermanenceChannel: async () => false,
     });
     assert.equal((await app.inject('/v1/channel/c/read')).statusCode, 403);
     assert.equal((await app.inject({method: 'POST', url: '/v1/channel/c/read'})).statusCode, 403);
+});
+
+test('a permanence channel is open to every member, without any permission', async () => {
+    assert.equal(await get('perm', 'user1'), 200);
 });

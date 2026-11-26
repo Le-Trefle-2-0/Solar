@@ -5,9 +5,13 @@ import {hasPermission} from './roleAssignment.js';
 /**
  * Who may read or write a channel. Same rules as apps/web/lib/security/channelAccess.ts,
  * used by every channel route and by the WebSocket service (through /v1/internal/ws/*).
+ *
+ * Open channels (the shared volunteers' channel and every permanence's channel) are for every
+ * signed-in member, whatever their permissions and whether or not they signed up for the
+ * permanence. Ticket channels are for the assigned volunteer and those who may read every ticket.
  */
 
-/** The shared volunteers' channel, open to every signed-in member. */
+/** The shared volunteers' channel. */
 export const PUBLIC_CHANNEL_ID = '1';
 
 export interface ChannelAccessInput {
@@ -16,27 +20,52 @@ export interface ChannelAccessInput {
     permissions: string[];
     /** Volunteer assigned to the ticket behind this channel; null if none or no ticket. */
     assignedUserId: string | null;
+    /** The channel of a permanence (planning event). */
+    isPermanence?: boolean;
 }
 
-export function canReadChannel({channelId, userId, permissions, assignedUserId}: ChannelAccessInput): boolean {
-    if (channelId === PUBLIC_CHANNEL_ID) return true;
-    if (hasPermission(permissions, 'tickets.read_all')) return true;
-    return assignedUserId !== null && assignedUserId === userId;
+const isOpen = ({channelId, isPermanence}: ChannelAccessInput) => channelId === PUBLIC_CHANNEL_ID || !!isPermanence;
+
+export function canReadChannel(input: ChannelAccessInput): boolean {
+    if (isOpen(input)) return true;
+    if (hasPermission(input.permissions, 'tickets.read_all')) return true;
+    return input.assignedUserId !== null && input.assignedUserId === input.userId;
 }
 
-export function canWriteChannel({channelId, userId, permissions, assignedUserId}: ChannelAccessInput): boolean {
-    if (channelId === PUBLIC_CHANNEL_ID) return true;
-    if (hasPermission(permissions, 'tickets.send_message_all')) return true;
-    return assignedUserId !== null && assignedUserId === userId && hasPermission(permissions, 'tickets.send_message');
+export function canWriteChannel(input: ChannelAccessInput): boolean {
+    if (isOpen(input)) return true;
+    if (hasPermission(input.permissions, 'tickets.send_message_all')) return true;
+    return input.assignedUserId !== null && input.assignedUserId === input.userId
+        && hasPermission(input.permissions, 'tickets.send_message');
+}
+
+/** A permanence's text channel (Event.channelID). */
+export async function isPermanenceChannel(channelId: string): Promise<boolean> {
+    if (channelId === PUBLIC_CHANNEL_ID) return false;
+    return !!(await prisma.event.findFirst({where: {channelID: channelId}, select: {id: true}}));
+}
+
+/** What a channel is, for the access rules: its ticket's assignee, or a permanence channel. */
+export async function describeChannel(
+    channelId: string,
+    findTicket: (channelId: string) => Promise<{assignedUserId: string | null} | null>,
+    isPermanence: (channelId: string) => Promise<boolean>,
+): Promise<{assignedUserId: string | null; isPermanence: boolean}> {
+    if (channelId === PUBLIC_CHANNEL_ID) return {assignedUserId: null, isPermanence: false};
+    const ticket = await findTicket(channelId);
+    if (ticket) return {assignedUserId: ticket.assignedUserId, isPermanence: false};
+    return {assignedUserId: null, isPermanence: await isPermanence(channelId)};
 }
 
 export async function getChannelAccess(userId: string, channelId: string, permissions?: string[]) {
-    const [perms, ticket] = await Promise.all([
+    const [perms, channel] = await Promise.all([
         permissions ? Promise.resolve(permissions) : getUserPermissions(userId),
-        channelId === PUBLIC_CHANNEL_ID
-            ? Promise.resolve(null)
-            : prisma.ticket.findUnique({where: {channelId}, select: {assignedUserId: true}}),
+        describeChannel(
+            channelId,
+            (id) => prisma.ticket.findUnique({where: {channelId: id}, select: {assignedUserId: true}}),
+            isPermanenceChannel,
+        ),
     ]);
-    const input = {channelId, userId, permissions: perms, assignedUserId: ticket?.assignedUserId ?? null};
+    const input = {channelId, userId, permissions: perms, ...channel};
     return {read: canReadChannel(input), write: canWriteChannel(input)};
 }
