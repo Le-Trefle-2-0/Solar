@@ -153,13 +153,18 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({childre
             }
         };
 
+        // A ticket was created or (re)assigned: let the server re-check which channels we follow
+        const onUpdateRequest = () => socket.emit('syncRooms');
+
         socket.on('connect', onConnect);
         socket.on('connect_error', onConnectError);
         socket.on('disconnect', onDisconnect);
+        socket.on('updateRequest', onUpdateRequest);
         socket.io.on('reconnect_attempt', onReconnectAttempt);
         socket.io.on('reconnect', onReconnect);
 
         return () => {
+            socket.off('updateRequest', onUpdateRequest);
             socket.off('connect', onConnect);
             socket.off('connect_error', onConnectError);
             socket.off('disconnect', onDisconnect);

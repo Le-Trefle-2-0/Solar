@@ -384,7 +384,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
             messageSchema.parse(currentMsg);
         } catch (error) {
             if (error instanceof ZodError) {
-                return toast.error(error.errors[0].message);
+                return toast.error(error.issues[0].message);
             }
         }
         if (currentMsg !== "") {
@@ -408,13 +408,24 @@ export function Chat(props: { channelID: string, statusID: number }) {
         });
     }
 
-    const {peerInstance, callColor, startCall, stopCall} = usePeer();
+    const {peerInstance, callColor, callLink, startCall, stopCall} = usePeer();
 
     const handleCall = () => {
         if (peerInstance) {
             stopCall();
         } else {
-            startCall(myAudioRef, remoteAudioRef);
+            // The call is tied to this ticket: the API checks access and signs the visitor link
+            startCall(myAudioRef, remoteAudioRef, channelID);
+        }
+    };
+
+    const copyCallLink = async () => {
+        if (!callLink) return;
+        try {
+            await navigator.clipboard.writeText(callLink);
+            toast.success("Lien d'appel copié (valable 30 minutes)");
+        } catch {
+            toast.error("Impossible de copier le lien");
         }
     };
 
@@ -945,8 +956,9 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
     const FormSchema = z.object({
         volunteer: z.object({
+            // `message` works with zod 3 and 4
             id: z.string({
-                required_error: "Merci de sélectionner un Bénévole Écoutant",
+                message: "Merci de sélectionner un Bénévole Écoutant",
             }),
             name: z.string(),
         }),
@@ -1272,6 +1284,12 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                 <audio ref={remoteAudioRef} autoPlay/>
                                 {/* the other user's audio */}
                             </Button>
+                            {callLink && (
+                                <Button variant='outline' onClick={copyCallLink}
+                                        title="Lien à transmettre au visiteur pour rejoindre l'appel">
+                                    Copier le lien d'appel
+                                </Button>
+                            )}
 
                             <AlertDialog>
                                 <AlertDialogTrigger asChild>

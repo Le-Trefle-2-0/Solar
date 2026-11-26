@@ -48,7 +48,10 @@ export async function registerBotRoutes(app: FastifyInstance) {
             if (base.startsWith('ws://')) base = 'http://' + base.slice('ws://'.length);
             if (base.startsWith('wss://')) base = 'https://' + base.slice('wss://'.length);
 
-            const wsRes = await fetch(`${base}/bot-status?userId=${botUser.id}`).then(r => r.json());
+            // The WebSocket service only answers internal callers (#216)
+            const wsRes = await fetch(`${base}/bot-status?userId=${encodeURIComponent(botUser.id)}`, {
+                headers: {Authorization: `Bearer ${process.env.INTERNAL_API_SECRET}`},
+            }).then(r => r.json());
             isConnected = !!wsRes.isConnected;
         } catch (e) {
             // fallback to updatedAt if WS check fails

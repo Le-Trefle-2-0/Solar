@@ -14,6 +14,8 @@ import {registerWidgetRoutes} from './widget.js';
 import {registerWsRoutes} from './ws.js';
 import {registerAuthRoutes} from './auth.js';
 import {registerNewslettersRoutes} from './newsletters.js';
+import {registerInternalRoutes} from './internal.js';
+import {registerCallsRoutes} from './calls.js';
 
 export async function registerV1Routes(app: FastifyInstance) {
     await registerUsersRoutes(app);
@@ -31,4 +33,6 @@ export async function registerV1Routes(app: FastifyInstance) {
     await registerWsRoutes(app);
     await registerAuthRoutes(app);
     await registerNewslettersRoutes(app);
+    await registerInternalRoutes(app);
+    await registerCallsRoutes(app);
 }
