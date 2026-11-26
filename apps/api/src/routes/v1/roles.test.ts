@@ -48,6 +48,9 @@ function setup(actor: Actor | null) {
         notify: async () => {
             log.push('notify');
         },
+        resetRoles: async () => {
+            log.push('reset');
+        },
     };
     const app = Fastify();
     return {app, deps, log, ready: registerRolesRoutes(app, deps)};
@@ -133,4 +136,15 @@ test('roles: an empty selection removes every role (stored as the default role)'
     const ok = await call(manager, 'POST', '/v1/admin/users/v1/role', {roles: []});
     assert.equal(ok.status, 200);
     assert.deepEqual(ok.log, ['assign:v1=none', 'notify']);
+});
+
+test('roles: only the owner can reset to the default configuration', async () => {
+    assert.equal((await call(null, 'POST', '/v1/admin/roles/reset')).status, 401);
+    const admin: Actor = {id: 'adm', isOwner: false, roles: ['admin'], permissions: ['admin.sudo']};
+    const refused = await call(admin, 'POST', '/v1/admin/roles/reset');
+    assert.equal(refused.status, 403);
+    assert.deepEqual(refused.log, []);
+    const ok = await call(owner, 'POST', '/v1/admin/roles/reset');
+    assert.equal(ok.status, 200);
+    assert.deepEqual(ok.log, ['reset', 'notify']);
 });

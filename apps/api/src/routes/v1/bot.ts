@@ -2,17 +2,17 @@ import type {FastifyInstance} from 'fastify';
 import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
 import {randomBytes} from 'crypto';
-import {getActor} from '../../lib/permissions.js';
+import {getActor, hasPermission} from '../../lib/permissions.js';
 
-/** Bot management requires admin.sudo (held by the owner too). */
+/** Bot management is technical configuration: settings.manage (held by admin.sudo and the owner too). */
 async function checkAdmin(req: any, reply: any) {
     const userId = await authenticate(req);
     const actor = userId ? await getActor(userId) : null;
     if (!actor) {
         return reply.status(401).send('unauthorized');
     }
-    if (!actor.permissions.includes('admin.sudo')) {
-        return reply.status(403).send('forbidden: admin.sudo required');
+    if (!hasPermission(actor.permissions, 'settings.manage')) {
+        return reply.status(403).send('forbidden: settings.manage required');
     }
     return actor;
 }
@@ -23,11 +23,8 @@ export async function registerBotRoutes(app: FastifyInstance) {
         if (!admin) return;
 
         const botUser = await prisma.user.findFirst({
-            where: {
-                role: {
-                    contains: 'bot'
-                }
-            }
+            // The bot account is recognised by its id, not by a role name that can be renamed
+            where: {id: {startsWith: 'bot_'}}
         });
 
         if (!botUser) {
@@ -77,11 +74,8 @@ export async function registerBotRoutes(app: FastifyInstance) {
         if (!admin) return;
 
         let botUser = await prisma.user.findFirst({
-            where: {
-                role: {
-                    contains: 'bot'
-                }
-            }
+            // The bot account is recognised by its id, not by a role name that can be renamed
+            where: {id: {startsWith: 'bot_'}}
         });
 
         if (!botUser) {

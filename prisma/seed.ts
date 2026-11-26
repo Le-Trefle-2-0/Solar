@@ -1,4 +1,5 @@
 import {PrismaClient} from '../generated/prisma'
+import {DEFAULT_ROLES} from '../apps/api/src/lib/defaultRoles'
 
 const prisma = new PrismaClient()
 
@@ -19,6 +20,16 @@ async function main() {
             {name: "commented", label: "Terminée"},
         ]
     })
+
+    // Default roles, so the first account (the owner) gets the top one at sign-up.
+    // The API seeds them too on start; upsert keeps both idempotent.
+    for (const role of DEFAULT_ROLES) {
+        await prisma.role.upsert({
+            where: {name: role.name},
+            update: {},
+            create: {name: role.name, weight: role.weight, icon: role.icon, permissions: JSON.stringify(role.permissions)},
+        });
+    }
 }
 
 main()

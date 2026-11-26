@@ -8,7 +8,7 @@ import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {Switch} from "@/components/ui/switch";
 import * as Icons from "lucide-react";
-import {Crown, GripVertical, Lock, Plus, Shield, Trash2} from "lucide-react";
+import {Crown, GripVertical, Lock, Plus, RotateCcw, Shield, Trash2} from "lucide-react";
 import {IconPicker} from "@/components/ui/icon-picker";
 import {ALL_PERMISSIONS, PERMISSION_METADATA} from "@/lib/permissions";
 import {toast} from "sonner";
@@ -84,7 +84,6 @@ export function RolesManager() {
 
     useEffect(() => {
         fetchRoles(false);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleSave = async (role: Partial<Role>) => {
@@ -167,6 +166,22 @@ export function RolesManager() {
         }
     };
 
+    const handleReset = async () => {
+        if (!confirm(
+            "Rétablir la configuration par défaut des rôles ?\n\n" +
+            "Les rôles par défaut retrouvent leur nom, leur ordre, leur icône et leurs permissions. " +
+            "Tous les autres rôles sont supprimés et retirés de leurs membres. " +
+            "Les membres gardent les rôles par défaut qu'ils ont déjà."
+        )) return;
+        try {
+            await apiFetch("/v1/admin/roles/reset", {method: "POST"});
+            toast.success("Rôles réinitialisés");
+            fetchRoles(false);
+        } catch (error: any) {
+            toast.error(error.message || "Erreur lors de la réinitialisation");
+        }
+    };
+
     const togglePermission = (permId: string) => {
         if (!editingRole) return;
         const currentPerms = parsePerms(editingRole.permissions);
@@ -229,11 +244,19 @@ export function RolesManager() {
                 <CardHeader>
                     <div className="flex items-center justify-between">
                         <CardTitle>Rôles</CardTitle>
-                        {canEditRoles && (
-                            <Button size="sm" onClick={createRole}>
-                                <Plus className="h-4 w-4 mr-2"/> Nouveau
-                            </Button>
-                        )}
+                        <div className="flex items-center gap-2">
+                            {me?.isOwner && (
+                                <Button size="sm" variant="outline" onClick={handleReset}
+                                        title="Rétablir les rôles par défaut">
+                                    <RotateCcw className="h-4 w-4 mr-2"/> Réinitialiser
+                                </Button>
+                            )}
+                            {canEditRoles && (
+                                <Button size="sm" onClick={createRole}>
+                                    <Plus className="h-4 w-4 mr-2"/> Nouveau
+                                </Button>
+                            )}
+                        </div>
                     </div>
                     <CardDescription>
                         Du plus haut au plus bas. Vous pouvez modifier, déplacer et supprimer les rôles placés

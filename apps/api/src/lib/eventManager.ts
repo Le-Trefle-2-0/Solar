@@ -195,7 +195,8 @@ export async function registerUserToEvent(eventId: string, userId: string, part?
         if (!userRoles.includes(targetSlot.role)) {
             throw new Error("Vous n'êtes pas autorisé à vous inscrire à ce créneau.");
         }
-        if (targetSlot.role === 'volunteer' && targetSlot.part && part && targetSlot.part !== part) {
+        // Split slots (first/second part) must match the requested part, whatever the role is called
+        if (targetSlot.part && part && targetSlot.part !== part) {
             throw new Error("Sélection de partie invalide pour ce créneau.");
         }
     } else {
@@ -204,10 +205,9 @@ export async function registerUserToEvent(eventId: string, userId: string, part?
             role: {in: userRoles},
         };
 
-        if (userRoles.includes('volunteer')) {
-            if (part) {
-                roleSlotWhere.part = part;
-            }
+        // A requested part picks among split slots; slots that are not split stay eligible
+        if (part) {
+            roleSlotWhere.OR = [{part}, {part: null}];
         }
 
         const matchingSlots = await prisma.roleSlot.findMany({
@@ -328,10 +328,10 @@ export async function unregisterUserToEvent(eventId: string, userId: string, par
             },
         };
 
-        if (userRoles.includes('volunteer') && part) {
+        if (part) {
             where.roleSlot = {
                 ...(where.roleSlot as any),
-                part
+                OR: [{part}, {part: null}],
             };
         }
 

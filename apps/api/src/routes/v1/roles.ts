@@ -3,6 +3,7 @@ import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
 import {broadcast} from '../../lib/broadcast.js';
 import {DEFAULT_ROLE} from '../../lib/permissionCatalogue.js';
+import {resetRolesToDefaults} from '../../lib/seed.js';
 import {getActor, getKnownRoles, getOwnerId} from '../../lib/permissions.js';
 import {
     type Actor,
@@ -30,6 +31,8 @@ export interface RolesRouteDeps {
     deleteRole: (role: StoredRole) => Promise<void>;
     setWeights: (updates: {id: string; weight: number}[]) => Promise<void>;
     setUserRoles: (userId: string, roles: string[]) => Promise<{id: string; role: string | null}>;
+    /** Restores the default roles and deletes every other role (see resetRolesToDefaults). */
+    resetRoles: () => Promise<void>;
     notify: (role: {id: string; name: string; permissions: string[]} | null) => Promise<void>;
 }
 
@@ -63,6 +66,20 @@ const defaultDeps: RolesRouteDeps = {
                     if (!splitRoles(u.role).includes(existing.name)) continue;
                     await tx.user.update({where: {id: u.id}, data: {role: renameInRoleString(u.role, existing.name, data.name)}});
                 }
+                // Planning slots name the role that may fill them
+                await tx.roleSlot.updateMany({where: {role: existing.name}, data: {role: data.name}});
+                const defaults = await tx.settings.findUnique({where: {key: 'planning_default_slots'}});
+                if (defaults) {
+                    try {
+                        const slots = JSON.parse(defaults.value);
+                        if (Array.isArray(slots)) {
+                            const renamed = slots.map((s: any) => s?.role === existing.name ? {...s, role: data.name} : s);
+                            await tx.settings.update({where: {key: defaults.key}, data: {value: JSON.stringify(renamed)}});
+                        }
+                    } catch {
+                        // Malformed setting: left as is
+                    }
+                }
             }
             return saved;
         });
@@ -81,6 +98,7 @@ const defaultDeps: RolesRouteDeps = {
     setWeights: async (updates) => {
         await prisma.$transaction(updates.map(u => prisma.role.update({where: {id: u.id}, data: {weight: u.weight}})));
     },
+    resetRoles: resetRolesToDefaults,
     setUserRoles: (userId, roles) => prisma.user.update({where: {id: userId}, data: {role: roles.join(',')}, select: {id: true, role: true}}),
     notify: async (role) => {
         await broadcast(null, 'permissionsUpdate', role
@@ -170,6 +188,17 @@ export async function registerRolesRoutes(app: FastifyInstance, deps: RolesRoute
         await deps.setWeights(plan.updates);
         await deps.notify(null);
         return reply.send({success: true, updates: plan.updates});
+    });
+
+    // Back to the default configuration. Owner only: it deletes every custom role and can
+    // change roles above anyone else's rank.
+    app.post('/v1/admin/roles/reset', async (req, reply) => {
+        const actor = await requireActor(req, reply);
+        if (!actor) return;
+        if (!actor.isOwner) return reply.status(403).send('forbidden: only the owner can reset the roles');
+        await deps.resetRoles();
+        await deps.notify(null);
+        return reply.send({success: true});
     });
 
     app.delete('/v1/admin/roles/:id', async (req, reply) => {

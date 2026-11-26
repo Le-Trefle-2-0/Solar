@@ -219,9 +219,11 @@ export default function Event({event}: EventProps) {
     const slotsToUse = eventDetails?.roleSlots || event.roleSlots;
 
     if (slotsToUse) {
-        const managerSlot = slotsToUse.find(slot => slot.role === 'manager');
-        const part1Slot = slotsToUse.find(slot => slot.role === 'volunteer' && slot.part === 'first');
-        const part2Slot = slotsToUse.find(slot => slot.role === 'volunteer' && slot.part === 'second');
+        // Role names are configurable: the whole-evening slot (no part) is the manager's,
+        // the split slots (first/second part) are the volunteers'
+        const managerSlot = slotsToUse.find(slot => !slot.part);
+        const part1Slot = slotsToUse.find(slot => slot.part === 'first');
+        const part2Slot = slotsToUse.find(slot => slot.part === 'second');
 
         const hasManager = managerSlot && managerSlot.registrationsCount >= 1;
         const part1Count = part1Slot?.registrationsCount ?? 0;

@@ -45,11 +45,14 @@ async function main() {
         const hashedPassword = await hashPassword(password);
         const userId = generateRandomString(32);
 
-        // Default roles, on a fresh install only (the roles page owns them afterwards)
-        if (await prisma.role.count() === 0) {
+        // Default roles, on a fresh install only (the roles page owns them afterwards).
+        // A migration creates the hidden "none" role, so it does not count.
+        if (await prisma.role.count({where: {name: {not: "none"}}}) === 0) {
             for (const role of DEFAULT_ROLES) {
-                await prisma.role.create({
-                    data: {name: role.name, weight: role.weight, icon: role.icon, permissions: JSON.stringify(role.permissions)},
+                await prisma.role.upsert({
+                    where: {name: role.name},
+                    update: {},
+                    create: {name: role.name, weight: role.weight, icon: role.icon, permissions: JSON.stringify(role.permissions)},
                 });
             }
         }

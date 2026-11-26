@@ -573,7 +573,7 @@ export function UsersTable({data, availableRoles}: DataTableProps) {
         defaultValues: {
             name: "",
             email: "",
-            roles: ["volunteer"],
+            roles: [],
         },
     });
 
