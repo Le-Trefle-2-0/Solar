@@ -1,11 +1,12 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {checkRoleAssignment, checkRoleChange, type RoleAssignment} from './roleAssignment.js';
+import {checkRoleAssignment, checkRoleChange, isValidRoleName, type RoleAssignment} from './roleAssignment.js';
 
 const knownRoles = [
     {name: 'admin', weight: 100},
     {name: 'manager', weight: 50},
     {name: 'volunteer', weight: 10},
+    {name: 'none', weight: 0},
 ];
 
 const status = (over: Partial<RoleAssignment>) => checkRoleAssignment({
@@ -23,7 +24,7 @@ test('a manager cannot assign a role of equal or higher weight', () => {
 });
 
 test('a manager cannot change the roles of an admin or another manager', () => {
-    assert.equal(status({targetRole: 'admin', requested: []}), 403);
+    assert.equal(status({targetRole: 'admin', requested: ['volunteer']}), 403);
     assert.equal(status({targetRole: 'manager', requested: ['volunteer']}), 403);
 });
 
@@ -40,7 +41,7 @@ test('a caller without any known role is refused', () => {
 
 test('allowed assignments', () => {
     assert.equal(status({}), 200);
-    assert.equal(status({requested: []}), 200);
+    assert.equal(status({requested: ['none']}), 200);
     assert.equal(status({isSelf: true, targetRole: 'manager', requested: ['volunteer']}), 200);
     assert.equal(status({callerRole: 'admin', targetRole: 'manager', requested: ['admin']}), 200);
 });
@@ -69,3 +70,27 @@ test('a manager can manage lower roles', () => {
     assert.equal(checkRoleChange(50, null, {name: 'intern', weight: 5}), null);
 });
 
+
+test('an empty role list is refused (read back as the default role)', () => {
+    assert.equal(status({requested: []}), 400);
+    assert.equal(status({callerRole: 'admin', requested: []}), 400);
+    assert.equal(status({isSelf: true, targetRole: 'manager', requested: []}), 400);
+});
+
+test('an empty role name is refused', () => {
+    assert.equal(status({requested: ['']}), 400);
+    assert.equal(status({callerRole: 'admin', requested: ['']}), 400);
+});
+
+test('a manager can remove access by assigning the none role', () => {
+    assert.equal(status({requested: ['none']}), 200);
+});
+
+test('role names must be non-empty, trimmed and comma-free', () => {
+    for (const bad of ['', ' ', ' x', 'x ', 'a,b', 'x'.repeat(65), null, 3]) assert.equal(isValidRoleName(bad), false);
+    for (const good of ['volunteer', 'none', 'Référent']) assert.equal(isValidRoleName(good), true);
+});
+
+test('a non-admin cannot create or overwrite the none role', () => {
+    assert.notEqual(checkRoleChange(50, null, {name: 'none', weight: 1}), null);
+});

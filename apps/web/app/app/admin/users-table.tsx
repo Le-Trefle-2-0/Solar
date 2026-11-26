@@ -104,7 +104,8 @@ interface DataTableProps {
 }
 
 const RolesFormSchema = z.object({
-    roles: z.array(z.string())
+    // An empty list is refused by the API: assign "none" to remove all access
+    roles: z.array(z.string()).min(1, "Choisissez au moins un rôle (« none » pour retirer tous les accès)")
 });
 
 interface UserActionsCellProps {

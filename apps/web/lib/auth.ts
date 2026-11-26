@@ -3,7 +3,7 @@ import {prismaAdapter} from "better-auth/adapters/prisma";
 import prisma from "@/lib/prisma";
 import {getResendClient} from "@/lib/resend";
 import {renderEmailTemplate} from "@/lib/email-template";
-import {ac, admin, bot, manager, newsletterManager, training, volunteer} from "./permissions";
+import {ac, admin, bot, manager, newsletterManager, none, training, volunteer} from "./permissions";
 // Namespace import to access optional plugins that may not exist in older versions
 import {
     admin as adminPlugin,
@@ -16,10 +16,13 @@ import {
     username
 } from "better-auth/plugins";
 import {apiKey} from "@better-auth/api-key";
+import {userAdditionalFields} from "./security/userFields";
 import {passkey} from "@better-auth/passkey";
 
 const pluginList: any[] = [
     emailOTP({
+        // Accounts are created by invitation only
+        disableSignUp: true,
         async sendVerificationOTP({email, otp, type}) {
             const resend = getResendClient();
             const {html} = renderEmailTemplate({
@@ -47,10 +50,11 @@ const pluginList: any[] = [
     }),
     adminPlugin({
         ac, roles: {
-            training, volunteer, manager, bot, admin, newsletterManager
+            training, volunteer, manager, bot, admin, newsletterManager, none
         },
         adminRoles: ['admin', 'manager'],
-        defaultRole: 'admin',
+        // Also applied when a stored role is empty, so it must grant nothing
+        defaultRole: 'none',
     }),
     organization(),
     twoFactor(),
@@ -87,88 +91,7 @@ export const auth = betterAuth({
         trustProxy: true,
     },
     user: {
-        additionalFields: {
-            documentsStatus: {
-                type: "string",
-                required: false,
-                defaultValue: "missing",
-            },
-            documentsSentAt: {
-                type: "date",
-                required: false,
-            },
-            documentsValidatedAt: {
-                type: "date",
-                required: false,
-            },
-            documentsRenewalAt: {
-                type: "date",
-                required: false,
-            },
-            documentsText: {
-                type: "string",
-                required: false,
-            },
-            firstName: {
-                type: "string",
-                required: false,
-            },
-            lastName: {
-                type: "string",
-                required: false,
-            },
-            birthDate: {
-                type: "date",
-                required: false,
-            },
-            addressStreet: {
-                type: "string",
-                required: false,
-            },
-            addressNumber: {
-                type: "string",
-                required: false,
-            },
-            addressPostalCode: {
-                type: "string",
-                required: false,
-            },
-            addressCity: {
-                type: "string",
-                required: false,
-            },
-            idCardFileId: {
-                type: "string",
-                required: false,
-            },
-            idCardStatus: {
-                type: "string",
-                required: false,
-                defaultValue: "missing",
-            },
-            idCardRejectReason: {
-                type: "string",
-                required: false,
-            },
-            casierFileId: {
-                type: "string",
-                required: false,
-            },
-            casierStatus: {
-                type: "string",
-                required: false,
-                defaultValue: "missing",
-            },
-            casierRejectReason: {
-                type: "string",
-                required: false,
-            },
-            newsletterSubscription: {
-                type: "boolean",
-                required: false,
-                defaultValue: false,
-            },
-        }
+        additionalFields: userAdditionalFields,
     },
     database: prismaAdapter(prisma, {
         provider: "mysql", // or "mysql", "postgresql", ...etc
@@ -235,6 +158,8 @@ export const auth = betterAuth({
         discord: {
             clientId: process.env.DISCORD_CLIENT_ID as string,
             clientSecret: process.env.DISCORD_CLIENT_SECRET as string,
+            // Discord can only be linked to an existing (invited) account
+            disableSignUp: true,
         }
     }
 });

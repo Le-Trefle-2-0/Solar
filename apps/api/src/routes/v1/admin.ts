@@ -3,7 +3,7 @@ import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
 
 import {broadcast} from '../../lib/broadcast.js';
-import {checkRoleAssignment, checkRoleChange} from '../../lib/roleAssignment.js';
+import {checkRoleAssignment, checkRoleChange, isValidRoleName} from '../../lib/roleAssignment.js';
 import {parseStatsRange} from '../../lib/statsRange.js';
 
 async function checkAdmin(req: any, reply: any) {
@@ -49,6 +49,9 @@ export async function registerAdminRoutes(app: FastifyInstance) {
             weight: number,
             icon?: string
         };
+
+        // An empty name is read by Better Auth as its default role
+        if (!isValidRoleName(name)) return reply.status(400).send('Invalid role name');
 
         // Hierarchy check: Non-admins can only manage roles with lower weight than their own highest role
         const userRoles = (admin.role || "").split(",").map((r: string) => r.trim());

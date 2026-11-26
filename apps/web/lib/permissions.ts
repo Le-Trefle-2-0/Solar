@@ -186,6 +186,12 @@ export function hasPermission(userPermissions: string[], permission: string): bo
     return userPermissions.includes(permission);
 }
 
+/**
+ * Role with no permission. Better Auth falls back to the default role when a
+ * user's role is empty, so the default must not grant anything.
+ */
+export const none = ac.newRole({tickets: []});
+
 export const newsletterManager = ac.newRole({
     newsletters: ['manage']
 });

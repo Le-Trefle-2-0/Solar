@@ -43,7 +43,19 @@ export async function seedDefaultRoles() {
             }
         });
 
-        console.log("[db] Default roles (admin, volunteer) verified.");
+        // Role without any permission, used to remove all access (empty roles are refused)
+        await prisma.role.upsert({
+            where: {name: "none"},
+            update: {},
+            create: {
+                name: "none",
+                weight: 0,
+                permissions: JSON.stringify([]),
+                icon: "Ban"
+            }
+        });
+
+        console.log("[db] Default roles (admin, volunteer, none) verified.");
     } catch (error) {
         console.error("[db] Error seeding default roles:", error);
     }

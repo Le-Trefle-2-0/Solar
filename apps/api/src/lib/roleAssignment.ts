@@ -16,6 +16,8 @@ export function checkRoleAssignment({callerRole, targetRole, requested, knownRol
     : {status: 400 | 403; message: string} | null {
     const weights = new Map(knownRoles.map(r => [r.name, r.weight]));
 
+    // An empty role is read by Better Auth as its default role.
+    if (requested.length === 0) return {status: 400, message: 'Invalid roles'};
     // Roles are stored comma-joined, so only exact existing names may be written:
     // "x,admin" or "admin " would otherwise be read back as "admin".
     if (!requested.every((r): r is string => typeof r === 'string' && !r.includes(',') && r === r.trim() && weights.has(r))) {
@@ -39,6 +41,12 @@ export function checkRoleAssignment({callerRole, targetRole, requested, knownRol
     return null;
 }
 
+/** Role names that would be stored or read back as something else. */
+export function isValidRoleName(name: unknown): name is string {
+    return typeof name === 'string' && name.length > 0 && name.length <= 64
+        && name === name.trim() && !name.includes(',');
+}
+
 /** Returns why a non-admin may not create or update a role, or null if allowed. */
 export function checkRoleChange(
     callerWeight: number,
@@ -49,7 +57,7 @@ export function checkRoleChange(
     const tooHigh = 'forbidden: cannot manage roles of equal or higher weight';
     if (existing && (existing.name === 'admin' || existing.weight >= callerWeight)) return tooHigh;
     // A missing or non-numeric weight would pass a plain ">=" comparison.
-    if (requested.name === 'admin' || typeof requested.weight !== 'number' || !(requested.weight < callerWeight)) {
+    if (requested.name === 'admin' || requested.name === 'none' || typeof requested.weight !== 'number' || !(requested.weight < callerWeight)) {
         return tooHigh;
     }
     return null;
