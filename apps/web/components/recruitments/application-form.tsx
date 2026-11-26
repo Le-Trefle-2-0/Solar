@@ -1,7 +1,7 @@
 "use client";
 
 import {useState} from "react";
-import {useForm} from "react-hook-form";
+import {type Resolver, useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {z} from "zod";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
@@ -24,7 +24,7 @@ export function ApplicationForm({recruitmentId, fields, onSuccess}: ApplicationF
     // Dynamic Zod Schema
     const schemaShape: Record<string, any> = {};
     fields.forEach((field) => {
-        let fieldSchema: z.ZodTypeAny = z.string();
+        let fieldSchema: z.ZodType<string | undefined> = z.string();
 
         if (field.type === "email") {
             fieldSchema = (fieldSchema as z.ZodString).email("Email invalide");
@@ -38,7 +38,7 @@ export function ApplicationForm({recruitmentId, fields, onSuccess}: ApplicationF
         if (field.min) {
             if (field.minUnit === "words") {
                 fieldSchema = fieldSchema.refine(
-                    (val) => val.trim().split(/\s+/).filter(Boolean).length >= (field.min || 0),
+                    (val) => (val ?? "").trim().split(/\s+/).filter(Boolean).length >= (field.min || 0),
                     {message: `Minimum ${field.min} mots`}
                 );
             } else {
@@ -60,7 +60,8 @@ export function ApplicationForm({recruitmentId, fields, onSuccess}: ApplicationF
     });
 
     const applicationSchema = z.object(schemaShape);
-    type ApplicationValues = z.infer<typeof applicationSchema>;
+    // Fields are built at runtime: every value is a string
+    type ApplicationValues = Record<string, string>;
 
     const defaultValues: Record<string, string> = {};
     fields.forEach(field => {
@@ -68,7 +69,7 @@ export function ApplicationForm({recruitmentId, fields, onSuccess}: ApplicationF
     });
 
     const form = useForm<ApplicationValues>({
-        resolver: zodResolver(applicationSchema),
+        resolver: zodResolver(applicationSchema) as unknown as Resolver<ApplicationValues>,
         defaultValues,
     });
 

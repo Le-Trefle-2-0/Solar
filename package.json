@@ -42,11 +42,11 @@
     "seed": "tsx prisma/seed.ts"
   },
   "overrides": {
-    "zod": "3.25.76"
+    "@sveltejs/kit": "^2.70.4"
   },
   "dependencies": {
-    "@better-auth/api-key": "^1.6.2",
-    "@better-auth/passkey": "^1.6.2",
+    "@better-auth/api-key": "1.7.26",
+    "@better-auth/passkey": "1.7.26",
     "@blocknote/core": "^0.45.0",
     "@blocknote/mantine": "^0.45.0",
     "@blocknote/react": "^0.45.0",
@@ -89,7 +89,7 @@
     "@radix-ui/react-tooltip": "^1.2.7",
     "@tanstack/react-table": "^8.21.3",
     "@tiptap/extensions": "^3.22.3",
-    "better-auth": "1.6.2",
+    "better-auth": "1.7.26",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -109,7 +109,7 @@
     "jspdf-autotable": "^5.0.7",
     "lucide-react": "^1.8.0",
     "mime-types": "^3.0.2",
-    "next": "^16.2.3",
+    "next": "^16.4.6",
     "next-themes": "^1.0.0-beta.0",
     "pdf-lib": "^1.17.1",
     "peer": "^1.0.2",
@@ -136,7 +136,7 @@
     "wa": "^0.0.0",
     "y-protocols": "^1.0.7",
     "yjs": "^13.6.28",
-    "zod": "3.25.76"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.10",

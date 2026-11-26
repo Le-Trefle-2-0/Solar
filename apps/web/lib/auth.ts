@@ -67,7 +67,10 @@ const pluginList: any[] = [
     apiKey({
         rateLimit: {
             enabled: false
-        }
+        },
+        // better-auth 1.7 calls the owner column `referenceId`; keep the existing `userId`
+        // column, which the API reads (#244)
+        schema: {apikey: {fields: {referenceId: "userId"}}},
     }),
     jwt(),
     bearer(),

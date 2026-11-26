@@ -555,7 +555,7 @@ export async function joinWaitlist(recruitmentId: string, email: string) {
     const validatedEmail = emailSchema.safeParse(email);
 
     if (!validatedEmail.success) {
-        return {error: validatedEmail.error.errors[0].message};
+        return {error: validatedEmail.error.issues[0].message};
     }
 
     try {

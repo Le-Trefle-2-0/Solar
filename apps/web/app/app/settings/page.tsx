@@ -222,7 +222,7 @@ export default function SettingsPage() {
                 setConfirmPassword("");
                 setTwoFactorStep("password");
             }
-        } else if (data) {
+        } else if (data && "totpURI" in data) {
             setQrCode(data.totpURI);
             setTwoFactorStep("qr");
             setLoading(false);
@@ -390,8 +390,15 @@ export default function SettingsPage() {
 
     const handleUnlinkDiscord = async () => {
         setLoading(true);
+        // better-auth 1.7 unlinks by account id
+        const discord = accounts.find((a) => a.providerId === "discord");
+        if (!discord) {
+            setLoading(false);
+            toast.error("Aucun compte Discord associé");
+            return;
+        }
         const {error} = await authClient.unlinkAccount({
-            providerId: "discord",
+            accountId: discord.accountId,
         });
         setLoading(false);
 

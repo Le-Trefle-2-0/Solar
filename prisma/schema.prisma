@@ -195,6 +195,7 @@ model Invitation {
   role           String?      @db.Text
   status         String       @db.Text
   expiresAt      DateTime
+  createdAt      DateTime     @default(now())
   inviterId      String
   user           User         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
@@ -210,6 +211,9 @@ model TwoFactor {
   backupCodes String  @db.Text
   userId      String
   verified    Boolean
+  /// better-auth 1.7: wrong-code counter and lockout
+  failedVerificationCount Int       @default(0)
+  lockedUntil             DateTime?
   user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId], map: "two_factor_userId_fkey")
@@ -365,6 +369,8 @@ model TicketStatus {
 
 model Apikey {
   id                  String    @id
+  /// better-auth 1.7: key configuration ("default" for keys created before)
+  configId            String    @default("default") @db.VarChar(191)
   name                String?   @db.Text
   start               String?   @db.Text
   prefix              String?   @db.Text
@@ -388,6 +394,7 @@ model Apikey {
   user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId], map: "apikey_userId_fkey")
+  @@index([configId])
   @@map("apikey")
 }
 
@@ -396,6 +403,9 @@ model Jwks {
   publicKey  String   @db.Text
   privateKey String   @db.Text
   createdAt  DateTime
+  expiresAt  DateTime?
+  alg        String?
+  crv        String?
 
   @@map("jwks")
 }

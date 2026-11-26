@@ -61,6 +61,7 @@ apps/api/dist/
 /apps/api/dist/
 /apps/voice/node_modules/
 /apps/api/node_modules/
+/apps/web/node_modules/
 /.idea/*
 /.ai/mcp/mcp.json
 
