@@ -155,8 +155,9 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
             const user = await prisma.user.findUnique({where: {id: userId}});
             if (!user) return reply.status(401).send('unauthorized');
 
-            const canManage = await canReadTicketsAll(userId);
-            if (!canManage) return reply.status(403).send('forbidden');
+            // Closing needs tickets.close (#267), on a ticket assigned to you unless you may read them all
+            const perms = await deps.getPermissions(userId);
+            if (!hasPermission(perms, 'tickets.close')) return reply.status(403).send('forbidden');
 
             const {channelID, discordUserID} = bodySchema.parse((req.body ?? {}) as any);
             console.log(`[api] Closing ticket for channel=${channelID} discordUserID=${discordUserID}`);
@@ -174,6 +175,9 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
             if (!ticket) {
                 console.warn(`[api] No active ticket found for identifier(s) provided`);
                 return reply.status(404).send({success: false, error: 'Ticket not found or already closed'});
+            }
+            if (!hasPermission(perms, 'tickets.read_all') && ticket.assignedUserId !== userId) {
+                return reply.status(403).send('forbidden');
             }
 
             const status = await prisma.ticketStatus.findUnique({where: {name: 'closed'}});
@@ -227,16 +231,24 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
         }
 
         const bodySchema = z.object({
-            channelID: z.string(),
-            problematic: z.string(),
-            observations: z.string(),
-            info: z.string().optional(),
-            categories: z.array(z.string()).optional(),
+            channelID: z.string().min(1).max(64),
+            problematic: z.string().max(10_000),
+            observations: z.string().max(10_000),
+            info: z.string().max(10_000).optional(),
+            categories: z.array(z.string().max(100)).max(30).optional(),
         });
         try {
             const {channelID, problematic, observations, info, categories} = bodySchema.parse((req.body ?? {}) as any);
             const ticket = await prisma.ticket.findUnique({where: {channelId: channelID}});
             if (!ticket) return reply.status(400).send({success: false, error: 'No ticket found'});
+            // Only the assigned volunteer (or someone who may read every ticket), and only once
+            // the ticket waits for its transmission: notes of other tickets stay untouched (#242)
+            if (!hasPermission(await deps.getPermissions(userId), 'tickets.read_all') && ticket.assignedUserId !== userId) {
+                return reply.status(403).send('forbidden');
+            }
+            if (ticket.statusName !== 'closed') {
+                return reply.status(409).send({success: false, error: 'Ticket is not waiting for a transmission'});
+            }
             const status = await prisma.ticketStatus.findUnique({where: {name: 'commented'}});
             if (!status) return reply.status(500).send({success: false, error: 'status_missing'});
             const update = await prisma.ticket.update({
@@ -252,7 +264,8 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
                 },
             });
             await broadcastStatusUpdate(channelID, status.id, status.name);
-            return reply.send({success: true, update});
+            // Only what the client needs: no notes, feedback or requester id echoed back
+            return reply.send({success: true, update: {id: update.id, statusName: update.statusName, statusLabel: update.statusLabel}});
         } catch (e) {
             if (e instanceof z.ZodError) return reply.status(400).send({success: false, error: e.flatten()});
             req.log.error(e);
@@ -419,18 +432,20 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
     });
 
     // POST /v1/tickets/submit-feedback
-    app.post('/v1/tickets/submit-feedback', limitPerMinute(10), async (req, reply) => {
+    // Visitor feedback: the form's fixed choices only, and a tiny body (#243)
+    app.post('/v1/tickets/submit-feedback', {...limitPerMinute(10), bodyLimit: 4096}, async (req, reply) => {
+        const yesNo = z.enum(['Oui', 'Non']);
         const bodySchema = z.object({
-            ticketID: z.number(),
+            ticketID: z.number().int().positive(),
             feedback: z.object({
-                age: z.string().optional(),
-                feeling: z.string().optional(),
-                gender: z.string().optional(),
-                previouslyOpened: z.string().optional(),
-                previouslyAtTrefle: z.string().optional(),
-                location: z.string().optional(),
-                region: z.string().optional(),
-            }),
+                age: z.enum(['<12', '12-14', '15-18', '19-25', '>25']).optional(),
+                feeling: z.enum(['Oui vraiment', 'un peu', 'moyennement', 'pas vraiment', 'pas du tout']).optional(),
+                gender: z.enum(['Homme', 'Femme', 'Autre']).optional(),
+                previouslyOpened: yesNo.optional(),
+                previouslyAtTrefle: yesNo.optional(),
+                location: z.enum(['France', 'Autre pays Francophone', 'Autre']).optional(),
+                region: z.string().max(64).optional(),
+            }).strict(),
         });
 
         try {

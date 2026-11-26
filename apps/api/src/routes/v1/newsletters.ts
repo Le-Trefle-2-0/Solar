@@ -1,49 +1,80 @@
-import type {FastifyInstance} from 'fastify';
+import type {FastifyInstance, FastifyReply, FastifyRequest} from 'fastify';
+import {z} from 'zod';
 import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
 import {decodeBytes, sendNewsletter} from '../../lib/newsletter-service.js';
 import {getUserPermissions, hasPermission} from '../../lib/permissions.js';
 
-export async function registerNewslettersRoutes(app: FastifyInstance) {
+/** Editor JSON and rendered HTML; images are inlined, hence the generous but finite limit. */
+const MAX_CONTENT = 2 * 1024 * 1024;
 
-    // Middleware-like role check helper
-    const checkNewsletterRole = async (req: any, reply: any) => {
+const writableFields = {
+    title: z.string().max(200),
+    content: z.string().max(MAX_CONTENT),
+    htmlContent: z.string().max(MAX_CONTENT).nullable(),
+    target: z.enum(['private', 'public']),
+};
+
+const createSchema = z.object({
+    title: writableFields.title.optional(),
+    content: writableFields.content.optional(),
+    htmlContent: writableFields.htmlContent.optional(),
+    target: writableFields.target.optional(),
+}).strict();
+
+const updateSchema = createSchema.extend({
+    // "sent" is only ever set by sendNewsletter
+    status: z.enum(['draft', 'scheduled']).optional(),
+    scheduledAt: z.string().datetime({offset: true}).nullable().optional(),
+}).strict();
+
+const idParams = z.object({id: z.string().min(1).max(64)});
+
+export async function registerNewslettersRoutes(app: FastifyInstance) {
+    /**
+     * Runs before every newsletter route. Replying here ends the request: the old helper sent
+     * a 403 and let the handler carry on (#240).
+     */
+    const requireNewsletterRole = async (req: FastifyRequest, reply: FastifyReply) => {
         const userId = await authenticate(req);
         if (!userId) return reply.status(401).send({error: 'unauthorized'});
-
-        const perms = await getUserPermissions(userId);
-        if (!hasPermission(perms, 'newsletters.manage')) {
+        if (!hasPermission(await getUserPermissions(userId), 'newsletters.manage')) {
             return reply.status(403).send({error: 'forbidden'});
         }
-        return userId;
+        (req as FastifyRequest & {userId?: string}).userId = userId;
+    };
+    const guarded = {preHandler: requireNewsletterRole, bodyLimit: 5 * MAX_CONTENT};
+    const userIdOf = (req: FastifyRequest) => (req as FastifyRequest & {userId?: string}).userId!;
+
+    const parse = <T>(schema: z.ZodType<T>, value: unknown, reply: FastifyReply): T | null => {
+        const result = schema.safeParse(value ?? {});
+        if (!result.success) {
+            reply.status(400).send({error: 'invalid_request', details: result.error.flatten()});
+            return null;
+        }
+        return result.data;
     };
 
     // Get counts
-    app.get('/v1/newsletters/counts', async (req, reply) => {
-        await checkNewsletterRole(req, reply);
-        const volunteers = await prisma.user.count({
-            where: {newsletterSubscription: true}
-        });
+    app.get('/v1/newsletters/counts', guarded, async () => {
+        const volunteers = await prisma.user.count({where: {newsletterSubscription: true}});
         const subscribers = await prisma.newsletterSubscriber.count();
         return {volunteers, subscribers};
     });
 
     // List all newsletters
-    app.get('/v1/newsletters', async (req, reply) => {
-        await checkNewsletterRole(req, reply);
-        return prisma.newsletter.findMany({
-            orderBy: {updatedAt: 'desc'},
-            include: {author: {select: {name: true, displayUsername: true}}}
-        });
-    });
+    app.get('/v1/newsletters', guarded, async () => prisma.newsletter.findMany({
+        orderBy: {updatedAt: 'desc'},
+        include: {author: {select: {name: true, displayUsername: true}}},
+    }));
 
     // Get single newsletter
-    app.get('/v1/newsletters/:id', async (req, reply) => {
-        await checkNewsletterRole(req, reply);
-        const {id} = req.params as any;
+    app.get('/v1/newsletters/:id', guarded, async (req, reply) => {
+        const params = parse(idParams, req.params, reply);
+        if (!params) return;
         const newsletter = await prisma.newsletter.findUnique({
-            where: {id},
-            include: {author: {select: {name: true, displayUsername: true}}}
+            where: {id: params.id},
+            include: {author: {select: {name: true, displayUsername: true}}},
         });
         if (!newsletter) return reply.status(404).send({error: 'not_found'});
 
@@ -51,90 +82,87 @@ export async function registerNewslettersRoutes(app: FastifyInstance) {
         return {
             ...newsletter,
             content: decodeBytes(newsletter.content),
-            htmlContent: newsletter.htmlContent ? decodeBytes(newsletter.htmlContent) : null
+            htmlContent: newsletter.htmlContent ? decodeBytes(newsletter.htmlContent) : null,
         };
     });
 
     // Create newsletter
-    app.post('/v1/newsletters', async (req, reply) => {
-        const userId = await checkNewsletterRole(req, reply);
-        const {title, content, htmlContent, target} = req.body as any;
-
-        const newsletter = await prisma.newsletter.create({
+    app.post('/v1/newsletters', guarded, async (req, reply) => {
+        const body = parse(createSchema, req.body, reply);
+        if (!body) return;
+        return prisma.newsletter.create({
             data: {
-                title: title || 'Sans titre',
-                content: Buffer.from(content || '', 'utf8'),
-                htmlContent: htmlContent ? Buffer.from(htmlContent, 'utf8') : null,
-                target: target || 'private',
-                authorId: userId as string,
-                status: 'draft'
-            }
+                title: body.title || 'Sans titre',
+                content: Buffer.from(body.content ?? '', 'utf8'),
+                htmlContent: body.htmlContent ? Buffer.from(body.htmlContent, 'utf8') : null,
+                target: body.target ?? 'private',
+                authorId: userIdOf(req),
+                status: 'draft',
+            },
         });
-        return newsletter;
     });
 
     // Update newsletter
-    app.put('/v1/newsletters/:id', async (req, reply) => {
-        await checkNewsletterRole(req, reply);
-        const {id} = req.params as any;
-        const {title, content, htmlContent, status, scheduledAt, target} = req.body as any;
+    app.put('/v1/newsletters/:id', guarded, async (req, reply) => {
+        const params = parse(idParams, req.params, reply);
+        const body = params && parse(updateSchema, req.body, reply);
+        if (!params || !body) return;
 
-        const existing = await prisma.newsletter.findUnique({where: {id}});
+        const existing = await prisma.newsletter.findUnique({where: {id: params.id}});
         if (!existing) return reply.status(404).send({error: 'not_found'});
 
         if (existing.status === 'sent') {
             return reply.status(400).send({error: 'already_sent'});
         }
-        if (existing.status === 'scheduled' && status !== 'draft') {
+        if (existing.status === 'scheduled' && body.status !== 'draft') {
             return reply.status(400).send({error: 'already_scheduled_unschedule_first'});
         }
+        if (body.status === 'scheduled' && !body.scheduledAt && !existing.scheduledAt) {
+            return reply.status(400).send({error: 'scheduled_at_required'});
+        }
 
-        const updateData: any = {};
-        if (title !== undefined) updateData.title = title;
-        if (content !== undefined) updateData.content = Buffer.from(content || '', 'utf8');
-        if (htmlContent !== undefined) updateData.htmlContent = htmlContent ? Buffer.from(htmlContent, 'utf8') : null;
-        if (status !== undefined) updateData.status = status;
-        if (scheduledAt !== undefined) updateData.scheduledAt = scheduledAt ? new Date(scheduledAt) : null;
-        if (target !== undefined) updateData.target = target;
+        const updateData: Record<string, unknown> = {};
+        if (body.title !== undefined) updateData.title = body.title;
+        if (body.content !== undefined) updateData.content = Buffer.from(body.content, 'utf8');
+        if (body.htmlContent !== undefined) updateData.htmlContent = body.htmlContent ? Buffer.from(body.htmlContent, 'utf8') : null;
+        if (body.status !== undefined) updateData.status = body.status;
+        if (body.scheduledAt !== undefined) updateData.scheduledAt = body.scheduledAt ? new Date(body.scheduledAt) : null;
+        if (body.target !== undefined) updateData.target = body.target;
 
-        const newsletter = await prisma.newsletter.update({
-            where: {id},
-            data: updateData
-        });
-        return newsletter;
+        return prisma.newsletter.update({where: {id: params.id}, data: updateData});
     });
 
     // Unschedule newsletter
-    app.post('/v1/newsletters/:id/unschedule', async (req, reply) => {
-        await checkNewsletterRole(req, reply);
-        const {id} = req.params as any;
+    app.post('/v1/newsletters/:id/unschedule', guarded, async (req, reply) => {
+        const params = parse(idParams, req.params, reply);
+        if (!params) return;
 
-        const existing = await prisma.newsletter.findUnique({where: {id}});
+        const existing = await prisma.newsletter.findUnique({where: {id: params.id}});
         if (!existing) return reply.status(404).send({error: 'not_found'});
         if (existing.status !== 'scheduled') return reply.status(400).send({error: 'not_scheduled'});
 
-        const newsletter = await prisma.newsletter.update({
-            where: {id},
-            data: {status: 'draft', scheduledAt: null}
+        return prisma.newsletter.update({
+            where: {id: params.id},
+            data: {status: 'draft', scheduledAt: null},
         });
-        return newsletter;
     });
 
     // Delete newsletter
-    app.delete('/v1/newsletters/:id', async (req, reply) => {
-        await checkNewsletterRole(req, reply);
-        const {id} = req.params as any;
-        await prisma.newsletter.delete({where: {id}});
+    app.delete('/v1/newsletters/:id', guarded, async (req, reply) => {
+        const params = parse(idParams, req.params, reply);
+        if (!params) return;
+        const deleted = await prisma.newsletter.deleteMany({where: {id: params.id}});
+        if (!deleted.count) return reply.status(404).send({error: 'not_found'});
         return {success: true};
     });
 
     // Send newsletter
-    app.post('/v1/newsletters/:id/send', async (req, reply) => {
-        await checkNewsletterRole(req, reply);
-        const {id} = req.params as any;
+    app.post('/v1/newsletters/:id/send', guarded, async (req, reply) => {
+        const params = parse(idParams, req.params, reply);
+        if (!params) return;
 
         try {
-            const data = await sendNewsletter(id);
+            const data = await sendNewsletter(params.id);
             return {success: true, data};
         } catch (e: any) {
             if (e.message === 'not_found') return reply.status(404).send({error: 'not_found'});

@@ -103,3 +103,15 @@ test('submit-feedback: a visitor may only rate their own ticket', async () => {
     assert.equal((await send('other')).statusCode, 401);
 });
 
+
+test('submit-feedback: only the form choices, and a tiny body (#243)', async () => {
+    const app = await build(['tickets.read_all'], 'user1');
+    const send = (feedback: unknown) => app.inject({method: 'POST', url: '/v1/tickets/submit-feedback', payload: {ticketID: 1, feedback}});
+    assert.equal((await send({age: '19-25', feeling: 'un peu', location: 'France', region: 'Bretagne'})).statusCode, 200);
+    assert.equal((await send({age: 'x'.repeat(50)})).statusCode, 400);
+    assert.equal((await send({gender: 'anything'})).statusCode, 400);
+    assert.equal((await send({extra: 'field'})).statusCode, 400);
+    assert.equal((await send({region: 'x'.repeat(65)})).statusCode, 400);
+    // ~50 MB payloads are cut off by the body limit before any parsing
+    assert.equal((await send({region: 'x'.repeat(10_000)})).statusCode, 413);
+});
