@@ -356,9 +356,11 @@ export function Chat(props: { channelID: string, statusID: number }) {
         };
 
         try {
-            const savedMessage = await saveMessage(msg);
+            // The server takes the author from the session and returns the stored (sanitised) content
+            const savedMessage = await saveMessage({channelId: channelID, content, replyID: msg.replyID ?? null});
             const msgWithID: MsgWithID = {
                 ...msg,
+                content: savedMessage.content,
                 id: savedMessage.id,
                 replyID: msg.replyID ?? null,
             };

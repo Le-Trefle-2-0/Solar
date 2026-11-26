@@ -1,62 +1,47 @@
 "use server"
+import {headers} from "next/headers";
 import prisma from "@/lib/prisma";
-import {Msg, MsgWithID} from '@/lib/interface'
+import {auth} from "@/lib/auth";
+import {canWriteChannel, MessageInputSchema} from "@/lib/security/channelAccess";
+import {neutralizeHtml} from "@/lib/security/sanitize";
+import {getRolePermissions} from "@/lib/userPermissions";
 
-export const saveMessage = async (msg: Msg) => {
+/**
+ * Server action: anyone can call it with any argument, so nothing from the
+ * client is trusted (#238). The author is the session user, the channel rule is
+ * checked and the content is validated before being touched.
+ */
+export const saveMessage = async (input: unknown) => {
+    const parsed = MessageInputSchema.safeParse(input);
+    if (!parsed.success) throw new Error("Invalid message");
+    const {channelId, replyID} = parsed.data;
+
+    const session = await auth.api.getSession({headers: await headers()});
+    if (!session) throw new Error("Unauthorized");
+    const userId = session.user.id;
+
+    const ticket = await prisma.ticket.findUnique({
+        where: {channelId},
+        select: {id: true, assignedUserId: true},
+    });
+    const permissions = await getRolePermissions((session.user as {role?: string | null}).role);
+    if (!canWriteChannel({channelId, userId, permissions, assignedUserId: ticket?.assignedUserId ?? null})) {
+        throw new Error("Forbidden");
+    }
+
+    // Defence in depth against stored XSS, as in the API (#163)
+    const content = neutralizeHtml(parsed.data.content);
     const message = await prisma.message.create({
         data: {
             createdAt: new Date(),
-            userId: msg.author.id,
-            channelId: msg.channel.id,
-            content: Buffer.from(msg.content, "utf8"),
-            discordID: msg.discordID ?? undefined,
-            replyID: msg.replyID ?? undefined,
-        }
+            userId,
+            channelId,
+            ticketId: ticket?.id,
+            content: Buffer.from(content, "utf8"),
+            replyID: replyID ?? undefined,
+        },
+        select: {id: true},
     });
 
-    return (message);
-}
-
-export const getMessages = async (
-    channelId: string,
-    opts?: { limit?: number; before?: number }
-) => {
-    const limit = Math.max(1, Math.min(100, opts?.limit ?? 60));
-    const beforeDate = opts?.before ? new Date(opts.before) : null;
-
-    const prismaWhere = beforeDate
-        ? {channelId, createdAt: {lt: beforeDate}}
-        : {channelId};
-
-    const raw = await prisma.message.findMany({
-        where: prismaWhere,
-        orderBy: {createdAt: 'desc'},
-        take: limit,
-    });
-
-    const out: MsgWithID[] = [];
-    for (const msg of raw) {
-        if (!msg.userId) continue;
-        const user = await prisma.user.findUnique({where: {id: msg.userId}});
-        const reactions = await prisma.reaction.findMany({where: {messageID: msg.id}});
-        if (user) {
-            out.push({
-                id: msg.id,
-                author: {
-                    id: user.id,
-                    image: user.image as string,
-                    name: (user.displayUsername || user.name) as string,
-                    role: user.role as string,
-                },
-                content: Buffer.from(new Uint8Array(Object.values(msg.content))).toString('utf8'),
-                timestamp: new Date(msg.createdAt).getTime(),
-                channel: {id: channelId},
-                discordID: msg.discordID,
-                reactions,
-                replyID: msg.replyID ?? null,
-                edited: msg.edited,
-            });
-        }
-    }
-    return out.reverse();
+    return {id: message.id, content};
 }
