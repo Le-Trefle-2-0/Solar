@@ -87,7 +87,7 @@ jobs:
       - name: Tests de chaque workspace
         run: |
           status=0
-          for ws in api ws storage web; do
+          for ws in api ws voice storage web; do
             echo "::group::tests apps/$ws"
             npm test -w "apps/$ws" || status=1
             echo "::endgroup::"

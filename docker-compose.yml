@@ -39,6 +39,8 @@ services:
       NEXT_PUBLIC_APP_URL: http://web:3000
       INTERNAL_AUTH_URL: http://web:3000
       DATABASE_URL: mysql://root:${MYSQL_ROOT_PASSWORD}@mysql:3306/solar
+      VOICE_INTERNAL_URL: http://voice:3003
+      WS_INTERNAL_URL: http://ws:3002
     volumes:
       - ./:/app
     depends_on:
@@ -77,6 +79,9 @@ services:
       VOICE_HOST: 0.0.0.0
       VOICE_PORT: 3003
       NEXT_PUBLIC_APP_URL: http://web:3000
+      INTERNAL_AUTH_URL: http://web:3000
+      API_BASE_URL: http://api:3001
+      WS_INTERNAL_URL: http://ws:3002
       MEDIASOUP_MIN_PORT: 40000
       MEDIASOUP_MAX_PORT: 40050
       MEDIASOUP_ANNOUNCED_IP: 127.0.0.1

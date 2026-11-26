@@ -69,11 +69,11 @@ function collect(c: ClientSocket, event: string, ms = 150) {
     }, ms));
 }
 
-async function broadcast(room: string | null, event: string, data: unknown, secret = SECRETS.broadcast) {
+async function broadcast(room: string | null, event: string, data: unknown, secret = SECRETS.broadcast, extra: object = {}) {
     const res = await fetch(`${base}/broadcast`, {
         method: 'POST',
         headers: {'x-ws-secret': secret, 'content-type': 'application/json'},
-        body: JSON.stringify({room, event, data}),
+        body: JSON.stringify({room, event, data, ...extra}),
     });
     return res.status;
 }
@@ -222,4 +222,13 @@ test('ws: odd HTTP requests are answered once and do not crash', async () => {
     assert.equal(bad.status, 400);
     assert.equal(await broadcast('../x', 'message', {}), 400);
     assert.equal(await health(), 200);
+});
+
+test('ws: bot-only events reach bot sockets and no volunteer', async () => {
+    const [bot, vol] = await Promise.all([client({token: 'bot-key'}), client({jwt: 'jwt-vol'})]);
+    const got = Promise.all([collect(bot, 'voiceInvite'), collect(vol, 'voiceInvite')]);
+    assert.equal(await broadcast('c1', 'voiceInvite', {url: 'https://x'}, SECRETS.broadcast, {audience: 'bots'}), 200);
+    const [b, v] = await got;
+    assert.equal(b.length, 1);
+    assert.equal(v.length, 0);
 });

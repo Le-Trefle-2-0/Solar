@@ -313,3 +313,15 @@ html, body {
     }
 }
 
+
+/* Voice call: the volunteer's marker breathes while they speak (disabled with reduced motion) */
+@keyframes voice-breathe {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.55;
+    }
+    50% {
+        transform: scale(1.45);
+        opacity: 0;
+    }
+}

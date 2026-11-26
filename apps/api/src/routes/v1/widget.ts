@@ -7,6 +7,7 @@ import {signWidgetSession, verifyWidgetSession} from '../../lib/widgetSession.js
 import {neutralizeHtml} from '../../lib/sanitize.js';
 import {createChallenge, verifyPow} from '../../lib/pow.js';
 import {limitPerMinute} from '../../lib/rateLimit.js';
+import {endVoiceCall} from '../../lib/voiceControl.js';
 
 const WIDGET_COOKIES = ['widget_channel', 'widget_uid', 'widget_exp', 'widget_sig', 'widget_public'];
 
@@ -137,7 +138,7 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
 
             const ticket = await prisma.ticket.findUnique({
                 where: {channelId},
-                select: {id: true, statusName: true},
+                select: {id: true, statusName: true, voice: true},
             });
             if (!ticket) return reply.status(404).send({success: false, error: 'ticket_not_found'});
 
@@ -178,6 +179,8 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
             });
 
             // Broadcast status update
+            // A closed écoute has no call any more
+            await endVoiceCall(channelId);
             await broadcast(channelId, 'ticketStatusUpdate', {
                 channelId,
                 statusId: status.id,

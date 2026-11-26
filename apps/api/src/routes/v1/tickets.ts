@@ -8,6 +8,7 @@ import {verifyWidgetSession} from '../../lib/widgetSession.js';
 import {getUserPermissions, hasPermission} from '../../lib/permissions.js';
 import {verifyPow} from '../../lib/pow.js';
 import {limitPerMinute} from '../../lib/rateLimit.js';
+import {endVoiceCall} from '../../lib/voiceControl.js';
 
 async function canReadTicketsAll(userId: string): Promise<boolean> {
     const perms = await getUserPermissions(userId);
@@ -201,6 +202,8 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
             console.log(`[api] Ticket ${ticket.id} closed by ${user.name}, original user: ${originalDiscordUserID}`);
 
             await broadcastStatusUpdate(cid, status.id, status.name);
+            // A closed écoute has no call any more
+            await endVoiceCall(cid);
 
             // Broadcast ticketClosed to both global and channel rooms to be safe
             const closePayload = {

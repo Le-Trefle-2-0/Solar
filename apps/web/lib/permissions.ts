@@ -26,51 +26,51 @@ export const PERMISSION_METADATA: Record<string, PermissionInfo> = {
     // Tickets
     'tickets.open': {
         id: 'tickets.open',
-        label: 'Ouvrir des tickets',
-        description: 'Permet de créer de nouveaux tickets d\'écoute',
-        category: 'Tickets'
+        label: 'Ouvrir des écoutes',
+        description: 'Permet de créer de nouvelles écoutes',
+        category: 'Écoutes'
     },
     'tickets.close': {
         id: 'tickets.close',
-        label: 'Fermer des tickets',
+        label: 'Fermer des écoutes',
         description: 'Permet de clôturer une session d\'écoute terminée',
-        category: 'Tickets'
+        category: 'Écoutes'
     },
     'tickets.read_all': {
         id: 'tickets.read_all',
-        label: 'Voir tous les tickets',
-        description: 'Accès en lecture à l\'ensemble des tickets de l\'organisation',
-        category: 'Tickets'
+        label: 'Voir toutes les écoutes',
+        description: 'Accès en lecture à l\'ensemble des écoutes de l\'association',
+        category: 'Écoutes'
     },
     'tickets.attribute': {
         id: 'tickets.attribute',
-        label: 'Attribuer des tickets',
-        description: 'Permet d\'assigner un ticket à un membre spécifique',
-        category: 'Tickets'
+        label: 'Attribuer des écoutes',
+        description: 'Permet d\'assigner une écoute à un bénévole',
+        category: 'Écoutes'
     },
     'tickets.launch_voice': {
         id: 'tickets.launch_voice',
         label: 'Lancer des appels voix',
-        description: 'Permet d\'initier une communication vocale via le widget',
-        category: 'Tickets'
+        description: 'Permet de passer une écoute en vocal et de rejoindre l\'appel',
+        category: 'Écoutes'
     },
     'tickets.send_message_all': {
         id: 'tickets.send_message_all',
         label: 'Envoyer messages à tous',
         description: 'Permet d\'écrire dans toutes les écoutes',
-        category: 'Tickets'
+        category: 'Écoutes'
     },
     'tickets.send_message': {
         id: 'tickets.send_message',
         label: 'Envoyer des messages',
         description: 'Permet d\'écrire dans une écoute',
-        category: 'Tickets'
+        category: 'Écoutes'
     },
     'tickets.transmission': {
         id: 'tickets.transmission',
         label: 'Faire des transmissions',
         description: 'Permet de rédiger le compte-rendu final de l\'écoute',
-        category: 'Tickets'
+        category: 'Écoutes'
     },
 
     // Management
@@ -82,7 +82,7 @@ export const PERMISSION_METADATA: Record<string, PermissionInfo> = {
     },
     'management.ticket_history': {
         id: 'management.ticket_history',
-        label: 'Historique des tickets',
+        label: 'Historique des écoutes',
         description: 'Accès aux archives et transcriptions des anciennes écoutes',
         category: 'Gestion'
     },
@@ -110,7 +110,7 @@ export const PERMISSION_METADATA: Record<string, PermissionInfo> = {
     'permanence.open': {
         id: 'permanence.open',
         label: 'Ouvrir la permanence',
-        description: 'Permet d\'activer la réception de nouveaux tickets',
+        description: 'Permet d\'activer la réception de nouvelles écoutes',
         category: 'Permanence'
     },
     'permanence.close': {

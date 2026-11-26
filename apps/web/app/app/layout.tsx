@@ -5,7 +5,7 @@ import {redirect} from "next/navigation";
 import {auth} from "@/lib/auth";
 import {headers} from "next/headers";
 import {SocketProvider} from "@/context/Socket";
-import {PeerProvider} from "@/context/VoicePeer";
+import {VoiceProvider} from "@/context/Voice";
 import {DocumentSubmissionDialog} from "@/components/users/document-submission-dialog";
 import {addDays, differenceInDays, format} from "date-fns";
 import {fr} from "date-fns/locale";
@@ -123,7 +123,7 @@ export default async function RootLayout({
 
     return (
         <SocketProvider>
-            <PeerProvider>
+            <VoiceProvider>
                 <SidebarProvider>
                     <AppSidebar
                         className="border-r-main border-r"
@@ -145,7 +145,7 @@ export default async function RootLayout({
                         />
                     )}
                 </SidebarProvider>
-            </PeerProvider>
+            </VoiceProvider>
         </SocketProvider>
     );
 }

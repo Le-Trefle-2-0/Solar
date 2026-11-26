@@ -108,23 +108,23 @@ export default async function Home() {
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>Ticket assigné</CardTitle>
+                            <CardTitle>Écoute assignée</CardTitle>
                             <CardDescription>Si une demande vous est assignée, elle apparaît ici</CardDescription>
                         </CardHeader>
                         <CardContent>
                             {assignedTicket ? (
                                 <div className="flex flex-col gap-2">
-                                    <div className="font-medium">Ticket #{assignedTicket.id}</div>
+                                    <div className="font-medium">Écoute {String(assignedTicket.id).padStart(5, "0")}</div>
                                     <div
                                         className="text-sm text-muted-foreground">Statut: {assignedTicket.statusName}</div>
                                     <div className="text-sm text-muted-foreground">Source: {assignedTicket.source}</div>
                                     <div className="pt-2">
                                         <Link href={`/app/ticket/${assignedTicket.id}`}
-                                              className="text-sm text-primary">Ouvrir le ticket</Link>
+                                              className="text-sm text-primary">Ouvrir l&apos;écoute</Link>
                                     </div>
                                 </div>
                             ) : (
-                                <p className="text-sm text-muted-foreground">Aucun ticket actif assigné.</p>
+                                <p className="text-sm text-muted-foreground">Aucune écoute en cours ne vous est assignée.</p>
                             )}
                         </CardContent>
                         <CardFooter/>

@@ -60,6 +60,15 @@ STORAGE_SECRET=une_cle_secrete_aleatoire_pour_le_stockage
 # Adresse interne du stockage vue par le web (jamais exposée au navigateur, qui passe par /api/files)
 STORAGE_INTERNAL_URL=http://127.0.0.1:3004
 
+# Service vocal (salon vocal de la permanence, tickets vocaux)
+# Adresse du service vocal pour le navigateur, et pour l'API (interne)
+NEXT_PUBLIC_VOICE_URL=http://localhost:3003
+VOICE_INTERNAL_URL=http://127.0.0.1:3003
+# Adresse publique du serveur vocal (celle que les navigateurs joignent) et ports audio UDP/TCP à ouvrir
+MEDIASOUP_ANNOUNCED_IP=127.0.0.1
+MEDIASOUP_MIN_PORT=40000
+MEDIASOUP_MAX_PORT=40100
+
 # docker-compose (développement local uniquement) : mots de passe MySQL et Redis
 MYSQL_ROOT_PASSWORD=un_mot_de_passe_mysql_local
 REDIS_PASSWORD=un_mot_de_passe_redis_local

@@ -377,7 +377,10 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
                         if (typeof event !== 'string' || !event || event.length > 64 || typeof eventData === 'undefined') {
                             return send(res, 400, 'invalid payload');
                         }
-                        if (room === null || room === '') {
+                        if (payload.audience === 'bots') {
+                            // For the bot accounts only (e.g. a voice link to forward on Discord)
+                            io.to(BOTS).emit(event, eventData);
+                        } else if (room === null || room === '') {
                             // Room-less events are notifications (ids, statuses), for volunteers
                             io.to(VOLUNTEERS).emit(event, eventData);
                         } else if (isChannelId(room)) {

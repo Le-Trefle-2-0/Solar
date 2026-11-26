@@ -12,6 +12,8 @@ export function NavProjects({
         url: string
         icon: LucideIcon
         hasNotification?: boolean
+        /** A voice call is going on (green dot). */
+        live?: boolean
     }[]
 }) {
     const router = useRouter()
@@ -34,6 +36,10 @@ export function NavProjects({
                                         <item.icon className="size-4 shrink-0" />
                                         {item.hasNotification && (
                                             <span className="absolute -top-1 -right-1 flex h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                                        )}
+                                        {item.live && (
+                                            <span className="absolute -bottom-1 -right-1 flex h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-sidebar"
+                                                  title="Appel en cours" aria-label="Appel en cours"/>
                                         )}
                                     </div>
                                     <span>{item.name}</span>

@@ -382,7 +382,7 @@ export function StatsView() {
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{data?.volume || 0}</div>
-                        <p className="text-xs text-muted-foreground">Tickets terminés</p>
+                        <p className="text-xs text-muted-foreground">Écoutes terminées</p>
                     </CardContent>
                 </Card>
                 <Card>

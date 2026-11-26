@@ -14,7 +14,6 @@ import {
     MessageCircleOff,
     MicOff,
     NotebookPen,
-    PhoneCall,
     ScanFace,
     Send,
     TvMinimalPlay,
@@ -67,7 +66,7 @@ import type {Reaction, Ticket} from "../../../generated/prisma"
 import {useRouter} from "next/navigation";
 import {Message} from "@/components/message";
 import {useSocket} from "@/context/Socket";
-import {usePeer} from "@/context/VoicePeer";
+import {PermanenceVoiceControls, TicketVoiceControls} from "@/components/voice/chat-voice-controls";
 import {VisuallyHidden} from "@radix-ui/react-visually-hidden";
 import {apiFetch} from "@/lib/api";
 import {markChannelAsRead} from "@/app/actions/chat";
@@ -142,8 +141,6 @@ export function Chat(props: { channelID: string, statusID: number }) {
         }
     };
 
-    const myAudioRef = useRef<HTMLAudioElement>(null);
-
     // LanguageTool (French) spellcheck state for chat input
     const [ltMatches, setLtMatches] = useState<{
         offset: number;
@@ -160,7 +157,6 @@ export function Chat(props: { channelID: string, statusID: number }) {
         length: 0,
         suggestions: []
     });
-    const remoteAudioRef = useRef<HTMLAudioElement>(null);
     const initialAutoScrollPending = useRef(false);
     const isAtBottomRef = useRef(true);
 
@@ -407,27 +403,6 @@ export function Chat(props: { channelID: string, statusID: number }) {
             }
         });
     }
-
-    const {peerInstance, callColor, callLink, startCall, stopCall} = usePeer();
-
-    const handleCall = () => {
-        if (peerInstance) {
-            stopCall();
-        } else {
-            // The call is tied to this ticket: the API checks access and signs the visitor link
-            startCall(myAudioRef, remoteAudioRef, channelID);
-        }
-    };
-
-    const copyCallLink = async () => {
-        if (!callLink) return;
-        try {
-            await navigator.clipboard.writeText(callLink);
-            toast.success("Lien d'appel copié (valable 30 minutes)");
-        } catch {
-            toast.error("Impossible de copier le lien");
-        }
-    };
 
     type UserFromList = {
         id: string;
@@ -1175,7 +1150,12 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
 
                 {
-                    status === 0 ? null :
+                    // Permanence chat (status 0): only its voice channel. Other channels: the écoute toolbar.
+                    status === 0 ? (channelID !== "1" && (
+                        <div className="absolute top-6 right-6 flex flex-row gap-2 z-20">
+                            <PermanenceVoiceControls channelId={channelID}/>
+                        </div>
+                    )) :
                         <div className="absolute top-6 right-6 flex flex-row gap-2 z-20">
                             <AlertDialog>
                                 <AlertDialogTrigger asChild>
@@ -1271,24 +1251,16 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                 </AlertDialogContent>
                             </AlertDialog>
 
-                            <Button
-                                className={channelID == "1" || status !== 2 ? "hidden" : "flex"}
-                                variant='outline'
-                                color={callColor}
-                                onClick={handleCall}
-                                disabled={status !== 2}
-                            >
-                                <PhoneCall color={callColor}/> Démarrer un vocal
-                                <audio ref={myAudioRef} autoPlay
-                                       muted/>  {/* my own voice (muted so I don't hear myself) */}
-                                <audio ref={remoteAudioRef} autoPlay/>
-                                {/* the other user's audio */}
-                            </Button>
-                            {callLink && (
-                                <Button variant='outline' onClick={copyCallLink}
-                                        title="Lien à transmettre au visiteur pour rejoindre l'appel">
-                                    Copier le lien d'appel
-                                </Button>
+                            {/* Voice: the écoute's one-to-one call */}
+                            {channelID !== "1" && ticket && (
+                                <TicketVoiceControls
+                                    channelId={channelID}
+                                    status={status}
+                                    voice={!!ticket.voice}
+                                    assignedUserId={ticket.assignedUserId}
+                                    currentUserId={session?.user?.id}
+                                    label={`Écoute ${String(ticket.id).padStart(5, "0")}`}
+                                />
                             )}
 
                             <AlertDialog>

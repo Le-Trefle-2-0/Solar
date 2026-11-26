@@ -1,4 +1,9 @@
-export async function broadcast(room: string | null, event: string, data: any) {
+/**
+ * Sends an event through the WebSocket service. `room` targets a channel (its members and
+ * those who may read every ticket); null targets every volunteer. `audience: 'bots'` targets
+ * the sockets authenticated with a bot API key instead.
+ */
+export async function broadcast(room: string | null, event: string, data: any, options: {audience?: 'bots'} = {}) {
     try {
         let base = process.env.WS_INTERNAL_URL || process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:5000';
         if (base.startsWith('ws://')) base = 'http://' + base.slice('ws://'.length);
@@ -20,7 +25,8 @@ export async function broadcast(room: string | null, event: string, data: any) {
             body: JSON.stringify({
                 room,
                 event,
-                data
+                data,
+                ...(options.audience ? {audience: options.audience} : {}),
             }),
         });
 
