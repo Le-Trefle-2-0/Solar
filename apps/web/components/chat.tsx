@@ -22,6 +22,7 @@ import {
     UserRoundX,
     X
 } from "lucide-react";
+import * as LucideIcons from "lucide-react";
 import React, {FormEvent, useEffect, useLayoutEffect, useRef, useState} from "react";
 import {EventData, formVolunteer, Msg, MsgWithID, ticketInfo} from "@/lib/interface";
 import {z, ZodError} from "zod";
@@ -427,25 +428,23 @@ export function Chat(props: { channelID: string, statusID: number }) {
     const [onlineUsers, setOnlineUsers] = useState<UserFromList[]>([]);
     const [allMembers, setAllMembers] = useState<UserFromList[]>([]);
 
-    const roleOrder = ['admin', 'bot', 'manager', 'volunteer', 'training'] as const;
-    const getHighestRole = (role: string | string[] | undefined | null): string => {
-        const toKey = (r: string) => (r || '').toLowerCase();
-        if (!role) return 'training';
-        if (Array.isArray(role)) {
-            // pick the role with the LOWEST index (admin highest rank)
-            const normalized = role.map(r => toKey(r as any)).filter(r => (roleOrder as readonly string[]).includes(r));
-            if (normalized.length === 0) return 'training';
-            let best = normalized[0];
-            for (const r of normalized) {
-                if ((roleOrder as readonly string[]).indexOf(r) < (roleOrder as readonly string[]).indexOf(best)) {
-                    best = r;
-                }
-            }
-            return best;
-        }
-        const r = toKey(role as string);
-        return (roleOrder as readonly string[]).includes(r) ? r : 'training';
-    };
+    // Roles as configured on the roles page (name, order, icon); refreshed when they change.
+    const [configuredRoles, setConfiguredRoles] = useState<{ name: string; weight: number; icon?: string | null }[]>([]);
+    useEffect(() => {
+        const load = () => apiFetch('/v1/admin/roles')
+            .then((res: any) => setConfiguredRoles(Array.isArray(res?.roles) ? res.roles : []))
+            .catch(() => undefined);
+        load();
+        if (!socket) return;
+        socket.on('permissionsUpdate', load);
+        return () => {
+            socket.off('permissionsUpdate', load);
+        };
+    }, [socket]);
+
+    // Members keep their whole role list (comma-joined); grouping happens at display time.
+    const getHighestRole = (role: string | string[] | undefined | null): string =>
+        (Array.isArray(role) ? role.join(',') : role || '');
 
 
     useEffect(() => {
@@ -1038,7 +1037,22 @@ export function Chat(props: { channelID: string, statusID: number }) {
         volunteer: "Bénévole Écoutant",
         training: "Bénévole en formation"
     };
-    const displayRoleOrder = ['admin', 'bot', 'manager', 'volunteer', 'training'] as const;
+    // Member list: each member sits under their highest configured role. The labels above are kept
+    // for the default role names; any other (custom or renamed) role shows its own name.
+    const NO_ROLE_GROUP = '';
+    const roleWeight = new Map(configuredRoles.map(r => [r.name, r.weight]));
+    const memberGroup = (role: string | string[]): string => {
+        const names = (Array.isArray(role) ? role : String(role || '').split(','))
+            .map(r => r.trim())
+            .filter(r => roleWeight.has(r) && r !== 'none');
+        if (!names.length) return NO_ROLE_GROUP;
+        return names.reduce((best, r) => (roleWeight.get(r)! > roleWeight.get(best)! ? r : best));
+    };
+    const groupLabel = (group: string) => group === NO_ROLE_GROUP ? 'Membres' : (roleOrderAndLabels[group] || group);
+    const groupIcon = (group: string) => {
+        const name = configuredRoles.find(r => r.name === group)?.icon;
+        return name ? (LucideIcons as any)[name] as React.ComponentType<{ className?: string }> | undefined : undefined;
+    };
 
     return (
         <div className="flex flex-row items-center justify-center w-full">
@@ -1857,7 +1871,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                             const offline = merged.filter(m => !m.isOnline);
 
                             const grouped = online.reduce((acc, user) => {
-                                const roleKey = Array.isArray(user.role) ? (user.role[0] as string) : (user.role as string);
+                                const roleKey = memberGroup(user.role);
                                 (acc[roleKey] ||= []).push(user);
                                 return acc;
                             }, {} as Record<string, (UserFromList & { isOnline?: boolean })[]>);
@@ -1870,18 +1884,22 @@ export function Chat(props: { channelID: string, statusID: number }) {
                         })()
                     ).sort(
                         ([roleA], [roleB]) => {
+                            // Highest role first, then members without a role, then offline
                             if (roleA === 'offline') return 1;
                             if (roleB === 'offline') return -1;
-                            return (displayRoleOrder as readonly string[]).indexOf(roleA) -
-                                (displayRoleOrder as readonly string[]).indexOf(roleB);
+                            const wA = roleWeight.get(roleA) ?? -Infinity;
+                            const wB = roleWeight.get(roleB) ?? -Infinity;
+                            return wA === wB ? 0 : wB > wA ? 1 : -1;
                         }
                     ).map(([role, users]) => {
                         const sortedUsers = [...users].sort((a, b) => a.username.localeCompare(b.username));
+                        const GroupIcon = role === 'offline' ? undefined : groupIcon(role);
 
                         return (
                             <div key={role} className="mb-4">
-                                <h4 className="text-md font-semibold text-gray-700 mb-2 capitalize">
-                                    {role === 'offline' ? 'Hors ligne' : (roleOrderAndLabels[role] || role)} — {users.length}
+                                <h4 className="flex items-center gap-1.5 text-md font-semibold text-gray-700 mb-2 capitalize">
+                                    {GroupIcon && <GroupIcon className="h-4 w-4 text-muted-foreground"/>}
+                                    {role === 'offline' ? 'Hors ligne' : groupLabel(role)} — {users.length}
                                 </h4>
                                 <div className="flex flex-col gap-2">
                                     {sortedUsers.map(user => (
