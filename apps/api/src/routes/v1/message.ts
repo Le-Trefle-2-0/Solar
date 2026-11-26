@@ -6,6 +6,7 @@ import {z} from "zod";
 
 import {getUserPermissions, hasPermission} from '../../lib/permissions.js';
 import {neutralizeHtml} from '../../lib/sanitize.js';
+import {getChannelAccess} from '../../lib/channelAccess.js';
 
 async function checkAuth(req: any, reply: any) {
     const userId = await authenticate(req);
@@ -27,7 +28,7 @@ export async function registerMessageRoutes(app: FastifyInstance) {
         if (!userId) return;
 
         const bodySchema = z.object({
-            channelId: z.string().min(1),
+            channelId: z.string().min(1).max(64),
             content: z.string().min(1).max(2000),
             discordID: z.string().optional().nullable(),
             replyID: z.number().optional().nullable(),
@@ -35,6 +36,10 @@ export async function registerMessageRoutes(app: FastifyInstance) {
 
         try {
             const body = bodySchema.parse(req.body);
+            // Same rule as reading, for writing (#217)
+            if (!(await getChannelAccess(userId, body.channelId)).write) {
+                return reply.status(403).send({success: false, error: 'forbidden'});
+            }
             body.content = neutralizeHtml(body.content);
             const user = await prisma.user.findUnique({where: {id: userId}});
             if (!user) return reply.status(404).send({success: false, error: 'User not found'});

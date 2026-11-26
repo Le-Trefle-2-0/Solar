@@ -42,3 +42,15 @@ test('200 on the public channel for any signed-in user', async () => {
 test('404 for an unknown channel with tickets.read_all', async () => {
     assert.equal(await get('missing', 'user1', ['tickets.read_all']), 404);
 });
+
+test('read markers (#228): refused for a channel the caller cannot read', async () => {
+    const app = Fastify();
+    await registerChannelsRoutes(app, {
+        authenticate: async () => 'user1',
+        getPermissions: async () => [],
+        findChannel: async (id) => ({id, name: 'n'}),
+        findTicketByChannelId: async () => ({assignedUserId: 'someone-else'}),
+    });
+    assert.equal((await app.inject('/v1/channel/c/read')).statusCode, 403);
+    assert.equal((await app.inject({method: 'POST', url: '/v1/channel/c/read'})).statusCode, 403);
+});

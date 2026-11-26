@@ -6,6 +6,7 @@ import {authenticate} from '../../auth.js';
 import {getUserPermissions, hasPermission} from '../../lib/permissions.js';
 
 import {broadcast} from '../../lib/broadcast.js';
+import {canReadChannel, PUBLIC_CHANNEL_ID} from '../../lib/channelAccess.js';
 
 async function canReadTicketsAll(userId: string): Promise<boolean> {
     const perms = await getUserPermissions(userId);
@@ -183,11 +184,20 @@ export async function registerChannelsRoutes(app: FastifyInstance, deps: Channel
     });
 
     // GET /v1/channel/:id/read – get last read timestamp
+    // Read markers follow the channel read rule (#228)
+    const canRead = async (userId: string, channelId: string) => canReadChannel({
+        channelId,
+        userId,
+        permissions: await deps.getPermissions(userId),
+        assignedUserId: channelId === PUBLIC_CHANNEL_ID ? null : (await deps.findTicketByChannelId(channelId))?.assignedUserId ?? null,
+    });
+
     app.get('/v1/channel/:id/read', async (req, reply) => {
         try {
             const {id: channelId} = req.params as any;
-            const userId = await authenticate(req);
+            const userId = await deps.authenticate(req);
             if (!userId) return reply.status(401).send('unauthorized');
+            if (typeof channelId !== 'string' || !(await canRead(userId, channelId))) return reply.status(403).send('forbidden');
 
             const read = await prisma.userChannelRead.findUnique({
                 where: {
@@ -209,8 +219,9 @@ export async function registerChannelsRoutes(app: FastifyInstance, deps: Channel
     app.post('/v1/channel/:id/read', async (req, reply) => {
         try {
             const {id: channelId} = req.params as any;
-            const userId = await authenticate(req);
+            const userId = await deps.authenticate(req);
             if (!userId) return reply.status(401).send('unauthorized');
+            if (typeof channelId !== 'string' || !(await canRead(userId, channelId))) return reply.status(403).send('forbidden');
 
             const channel = await prisma.channel.findUnique({where: {id: channelId}});
             if (!channel) return reply.status(404).send({error: 'not_found'});
