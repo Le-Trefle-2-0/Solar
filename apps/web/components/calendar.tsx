@@ -82,27 +82,11 @@ export default function PlanningCalendar({events, userId, onRefresh}: {
     const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
-        apiFetch('/v1/admin/settings').then((res: any) => {
-            if (res.settings && Array.isArray(res.settings)) {
-                const planningDefault = res.settings.find((s: any) => s.key === 'planning_default_slots');
-                if (planningDefault) {
-                    try {
-                        const slots = typeof planningDefault.value === 'string'
-                            ? JSON.parse(planningDefault.value)
-                            : planningDefault.value;
-                        setDefaultSlots(slots);
-                    } catch (e) {
-                        console.error("Failed to parse default slots", e);
-                    }
-                }
-            }
-        });
-
         apiFetch('/v1/admin/roles').then((res: any) => {
             if (res.roles) {
                 setAvailableRoles(res.roles);
             }
-        });
+        }).catch((e) => console.error("Failed to load roles", e));
     }, []);
 
     const createEventForm = useForm<z.infer<typeof permSchema>>({
@@ -122,6 +106,14 @@ export default function PlanningCalendar({events, userId, onRefresh}: {
     // Same permission as POST /v1/events
     const {can} = usePermissions();
     const canCreate = can('permanence.open');
+
+    // Default slots only matter when creating an event, so only those who can create events load them
+    useEffect(() => {
+        if (!canCreate) return;
+        apiFetch('/v1/events/default-slots')
+            .then((res: any) => setDefaultSlots(Array.isArray(res?.slots) ? res.slots : []))
+            .catch((e) => console.error("Failed to load default slots", e));
+    }, [canCreate]);
 
 
     const daysOfWeek = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];

@@ -26,6 +26,21 @@ export async function registerAdminRoutes(app: FastifyInstance) {
     // Roles and role assignment: see roles.ts
     await registerRolesRoutes(app);
 
+    // Ticket categories, needed by everyone who handles or reviews tickets (the rest of the
+    // settings stays behind settings.manage)
+    app.get('/v1/settings/ticket-categories', async (req, reply) => {
+        const userId = await authenticate(req);
+        if (!userId) return reply.status(401).send('unauthorized');
+        const setting = await prisma.settings.findUnique({where: {key: 'monitoring_categories'}});
+        let categories: unknown = [];
+        try {
+            categories = setting ? JSON.parse(setting.value) : [];
+        } catch {
+            categories = [];
+        }
+        return reply.send({categories: Array.isArray(categories) ? categories : []});
+    });
+
     app.get('/v1/admin/settings', async (req, reply) => {
         const admin = await requirePermission(req, reply, 'settings.manage');
         if (!admin) return;

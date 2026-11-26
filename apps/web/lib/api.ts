@@ -74,8 +74,9 @@ export async function apiFetch(path: string, init: RequestInit = {}) {
 
     const ct = res.headers.get('content-type') || '';
     if (!ct.includes('application/json')) {
-        // Return raw text for debugging if needed
         const txt = await res.text();
+        // Many API refusals (401/403/400) are plain text: surface them as they are
+        if (!res.ok) throw new Error(txt.slice(0, 200) || `HTTP ${res.status}`);
         throw new Error(`API responded with non-JSON (${res.status}): ${txt.slice(0, 200)}`);
     }
     const data = await res.json();

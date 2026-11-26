@@ -70,7 +70,8 @@ export default async function AdminSettingsPage() {
 
     return (
         <Page title="Paramètres globaux" description="Configurez les options générales de l'application">
-            <AdminSettingsView initialSettings={initialSettings} roles={roles}/>
+            <AdminSettingsView initialSettings={initialSettings} roles={roles}
+                               canManageNewsletters={can(access!.permissions, 'newsletters.manage')}/>
         </Page>
     );
 }

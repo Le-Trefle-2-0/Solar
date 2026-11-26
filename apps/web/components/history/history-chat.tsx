@@ -53,18 +53,16 @@ export function HistoryChat({channelId}: HistoryChatProps) {
                         body: JSON.stringify({channelID: channelId})
                     }),
                     apiFetch(`/v1/messages/${channelId}?limit=1000`),
-                    apiFetch('/v1/admin/settings')
+                    // Categories only; a failure must not prevent the history from showing
+                    apiFetch('/v1/settings/ticket-categories').catch(() => ({categories: []}))
                 ]);
 
                 if (ticketRes.success) {
                     setTicket(ticketRes.ticket);
                 }
                 setMessages(messagesRes);
-                if (settingsRes.settings) {
-                    const monitoringCategories = settingsRes.settings.find((s: any) => s.key === 'monitoring_categories');
-                    if (monitoringCategories) {
-                        setAvailableCategories(JSON.parse(monitoringCategories.value));
-                    }
+                if (Array.isArray(settingsRes.categories)) {
+                    setAvailableCategories(settingsRes.categories);
                 }
             } catch (e: any) {
                 console.error("Failed to fetch history data", e);

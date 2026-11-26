@@ -41,6 +41,24 @@ async function checkAuth(req: any, reply: any) {
 }
 
 export async function registerEventsRoutes(app: FastifyInstance) {
+    // Default slots pre-filled when creating an event. Only what the planning needs, for those who
+    // can create events: the rest of the settings stays behind settings.manage.
+    app.get('/v1/events/default-slots', async (req, reply) => {
+        const userId = await checkAuth(req, reply);
+        if (!userId) return;
+        if (!hasPermission(await getUserPermissions(userId), 'permanence.open')) {
+            return reply.status(403).send({success: false, message: "Accès refusé : permission permanence.open requise"});
+        }
+        const setting = await prisma.settings.findUnique({where: {key: 'planning_default_slots'}});
+        let slots: unknown = [];
+        try {
+            slots = setting ? JSON.parse(setting.value) : [];
+        } catch {
+            slots = [];
+        }
+        return reply.send({success: true, slots: Array.isArray(slots) ? slots : []});
+    });
+
     app.get('/v1/events', async (req, reply) => {
         const userId = await checkAuth(req, reply);
         if (!userId) return;

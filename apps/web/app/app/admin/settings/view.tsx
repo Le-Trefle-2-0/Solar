@@ -41,7 +41,11 @@ interface NewsletterSubscriber {
     createdAt: string;
 }
 
-export default function AdminSettingsView({initialSettings, roles}: { initialSettings: Settings, roles: any[] }) {
+export default function AdminSettingsView({initialSettings, roles, canManageNewsletters}: {
+    initialSettings: Settings,
+    roles: any[],
+    canManageNewsletters: boolean
+}) {
     const [settings, setSettings] = useState<Settings>(initialSettings);
     const [loading, setLoading] = useState(false);
     const [newCategory, setNewCategory] = useState("");
@@ -63,6 +67,7 @@ export default function AdminSettingsView({initialSettings, roles}: { initialSet
     };
 
     useEffect(() => {
+        if (!canManageNewsletters) return;
         fetchSubscribers();
     }, []);
 
@@ -383,69 +388,72 @@ export default function AdminSettingsView({initialSettings, roles}: { initialSet
 
             <TeamSettings/>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>Liste de diffusion Newsletter</CardTitle>
-                    <CardDescription>
-                        Gérez manuellement les inscrits à la newsletter publique.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="flex space-x-2">
-                        <Input
-                            placeholder="Email de l'abonné"
-                            type="email"
-                            value={newSubscriberEmail}
-                            onChange={(e) => setNewSubscriberEmail(e.target.value)}
-                            onKeyDown={(e) => e.key === "Enter" && handleAddSubscriber()}
-                            disabled={loading}
-                        />
-                        <Button onClick={handleAddSubscriber} disabled={loading || !newSubscriberEmail.trim()}>
-                            <Plus className="h-4 w-4 mr-2"/> Ajouter
-                        </Button>
-                    </div>
-
-                    <div className="border rounded-md">
-                        <div className="max-h-[400px] overflow-y-auto">
-                            {loadingSubscribers ? (
-                                <div className="flex justify-center py-8">
-                                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground"/>
-                                </div>
-                            ) : (
-                                <div className="divide-y">
-                                    {subscribers.map((subscriber) => (
-                                        <div
-                                            key={subscriber.id}
-                                            className="flex items-center justify-between p-3 hover:bg-muted/30 transition-colors"
-                                        >
-                                            <div className="flex flex-col">
-                                                <span className="text-sm font-medium">{subscriber.email}</span>
-                                                <span className="text-xs text-muted-foreground">
-                                                    Inscrit le {new Date(subscriber.createdAt).toLocaleDateString()}
-                                                </span>
-                                            </div>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                                                onClick={() => handleRemoveSubscriber(subscriber.id)}
-                                                disabled={loading}
-                                            >
-                                                <Trash2 className="h-4 w-4"/>
-                                            </Button>
-                                        </div>
-                                    ))}
-                                    {subscribers.length === 0 && (
-                                        <p className="text-sm text-muted-foreground text-center py-8">
-                                            Aucun abonné trouvé.
-                                        </p>
-                                    )}
-                                </div>
-                            )}
+            {/* Subscribers need newsletters.manage, on top of settings.manage */}
+            {canManageNewsletters && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Liste de diffusion Newsletter</CardTitle>
+                        <CardDescription>
+                            Gérez manuellement les inscrits à la newsletter publique.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="flex space-x-2">
+                            <Input
+                                placeholder="Email de l'abonné"
+                                type="email"
+                                value={newSubscriberEmail}
+                                onChange={(e) => setNewSubscriberEmail(e.target.value)}
+                                onKeyDown={(e) => e.key === "Enter" && handleAddSubscriber()}
+                                disabled={loading}
+                            />
+                            <Button onClick={handleAddSubscriber} disabled={loading || !newSubscriberEmail.trim()}>
+                                <Plus className="h-4 w-4 mr-2"/> Ajouter
+                            </Button>
                         </div>
-                    </div>
-                </CardContent>
-            </Card>
+
+                        <div className="border rounded-md">
+                            <div className="max-h-[400px] overflow-y-auto">
+                                {loadingSubscribers ? (
+                                    <div className="flex justify-center py-8">
+                                        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground"/>
+                                    </div>
+                                ) : (
+                                    <div className="divide-y">
+                                        {subscribers.map((subscriber) => (
+                                            <div
+                                                key={subscriber.id}
+                                                className="flex items-center justify-between p-3 hover:bg-muted/30 transition-colors"
+                                            >
+                                                <div className="flex flex-col">
+                                                    <span className="text-sm font-medium">{subscriber.email}</span>
+                                                    <span className="text-xs text-muted-foreground">
+                                                        Inscrit le {new Date(subscriber.createdAt).toLocaleDateString()}
+                                                    </span>
+                                                </div>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                                    onClick={() => handleRemoveSubscriber(subscriber.id)}
+                                                    disabled={loading}
+                                                >
+                                                    <Trash2 className="h-4 w-4"/>
+                                                </Button>
+                                            </div>
+                                        ))}
+                                        {subscribers.length === 0 && (
+                                            <p className="text-sm text-muted-foreground text-center py-8">
+                                                Aucun abonné trouvé.
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
         </div>
     );
 }

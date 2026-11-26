@@ -715,16 +715,9 @@ export function Chat(props: { channelID: string, statusID: number }) {
                     });
                 }
 
-                apiFetch(`/v1/admin/settings`)
-                    .then((data: { settings: { key: string, value: string }[] }) => {
-                        const catSetting = data.settings?.find(s => s.key === "monitoring_categories");
-                        if (catSetting && !cancelled) {
-                            try {
-                                setAvailableCategories(JSON.parse(catSetting.value));
-                            } catch (e) {
-                                console.error("Failed to parse categories", e);
-                            }
-                        }
+                apiFetch(`/v1/settings/ticket-categories`)
+                    .then((data: { categories?: any[] }) => {
+                        if (!cancelled && Array.isArray(data.categories)) setAvailableCategories(data.categories);
                     })
                     .catch(() => {
                     });
