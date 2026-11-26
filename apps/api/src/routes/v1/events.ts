@@ -1,6 +1,5 @@
 import type {FastifyInstance} from 'fastify';
 import {z} from 'zod';
-import {requesterIdVariants} from '../../lib/pseudonym.js';
 import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
 import {getUserPermissions, hasPermission} from '../../lib/permissions.js';
@@ -15,6 +14,7 @@ import {
     updateRegistrationStatus
 } from '../../lib/eventManager.js';
 import {publicMessage} from '../../lib/errors.js';
+import {registerAvailableUsersRoutes} from './availableUsers.js';
 
 const EventSchema = z.object({
     title: z.string().min(1),
@@ -81,93 +81,8 @@ export async function registerEventsRoutes(app: FastifyInstance) {
         }
     });
 
-    app.get('/v1/events/getAvailable', async (req, reply) => {
-        try {
-            const {channelID, lists} = req.query as { channelID?: string, lists?: string };
-
-            // If no channelID provided, return all users (backward compatible)
-            if (!channelID) {
-                const users = await prisma.user.findMany();
-                return reply.send(users);
-            }
-
-            // Find the ticket by channelID to determine requester
-            const ticket = await prisma.ticket.findUnique({
-                where: {channelId: channelID}
-            });
-
-            if (!ticket) {
-                const users = await prisma.user.findMany();
-                return reply.send(users);
-            }
-
-            const requesterIds = requesterIdVariants(ticket.discordUserID);
-
-            // If specifically asking for ineligibility lists, compute both (text and voice)
-            if (lists === "ineligible") {
-                const users = await prisma.user.findMany();
-
-                // Text: 20 days, voice = false
-                const textWindowStart = new Date(Date.now() - 20 * 24 * 60 * 60 * 1000);
-                const textTickets = await prisma.ticket.findMany({
-                    where: {
-                        createdAt: {gte: textWindowStart},
-                        voice: false,
-                        discordUserID: {in: requesterIds},
-                    },
-                    select: {assignedUserId: true},
-                });
-                const textIds = new Set(
-                    textTickets.map(t => t.assignedUserId).filter((id): id is string => !!id)
-                );
-                const ineligibleText = users.filter(u => textIds.has(u.id));
-
-                // Voice: 30 days, voice = true
-                const voiceWindowStart = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-                const voiceTickets = await prisma.ticket.findMany({
-                    where: {
-                        createdAt: {gte: voiceWindowStart},
-                        voice: true,
-                        discordUserID: {in: requesterIds},
-                    },
-                    select: {assignedUserId: true},
-                });
-                const voiceIds = new Set(
-                    voiceTickets.map(t => t.assignedUserId).filter((id): id is string => !!id)
-                );
-                const ineligibleVoice = users.filter(u => voiceIds.has(u.id));
-
-                return reply.send({ineligibleText, ineligibleVoice});
-            }
-
-            // Default behavior: compute eligible users for the current ticket modality
-            const isVoice = !!ticket.voice;
-            const windowDays = isVoice ? 30 : 20;
-            const windowStart = new Date(Date.now() - windowDays * 24 * 60 * 60 * 1000);
-
-            const recentTickets = await prisma.ticket.findMany({
-                where: {
-                    createdAt: {gte: windowStart},
-                    voice: isVoice,
-                    discordUserID: {in: requesterIds},
-                },
-                select: {assignedUserId: true}
-            });
-
-            const excludedUserIds = new Set(
-                recentTickets
-                    .map(t => t.assignedUserId)
-                    .filter((id): id is string => !!id)
-            );
-
-            const users = await prisma.user.findMany();
-            const eligible = users.filter(u => !excludedUserIds.has(u.id));
-            return reply.send(eligible);
-        } catch (e) {
-            console.error("Failed to compute available users:", e);
-            return reply.status(500).send({success: false, error: "Failed to compute available users"});
-        }
-    });
+    // GET /v1/events/getAvailable lives in availableUsers.ts
+    await registerAvailableUsersRoutes(app);
 
     app.get('/v1/events/channel/:channelId', async (req, reply) => {
         const userId = await checkAuth(req, reply);
