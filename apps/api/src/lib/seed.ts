@@ -1,61 +1,24 @@
 import {prisma} from '../prisma.js';
+import {DEFAULT_ROLES} from './defaultRoles.js';
+import {DEFAULT_ROLE} from './permissionCatalogue.js';
 
+/**
+ * On a fresh install (no role at all), creates the default roles. Once roles exist they are
+ * managed from the roles page, so a deleted or renamed default role is not brought back;
+ * only the "none" default role is always ensured.
+ */
 export async function seedDefaultRoles() {
-    console.log("[db] Ensuring default roles exist...");
-
-    const adminPermissions = [
-        "tickets.open", "tickets.close", "tickets.read_all", "tickets.attribute", "tickets.launch_voice",
-        "tickets.send_message_all", "tickets.send_message", "tickets.transmission",
-        "management.create_account", "management.delete_account", "management.ticket_history",
-        "management.view_transmission", "management.view_stats", "management.reset_password",
-        "permanence.open", "permanence.close", "permanence.register", "permanence.unregister",
-        "permanence.unregister_other_all", "permanence.unregister_other_user", "permanence.register_other_all", "permanence.register_other_user",
-        "messages.manage", "newsletters.manage",
-        "user.create", "user.update", "user.delete", "user.read", "session.delete", "session.read", "impersonate.create"
-    ];
-
-    const volunteerPermissions = [
-        "tickets.close", "tickets.launch_voice", "tickets.send_message", "tickets.transmission",
-        "management.view_stats",
-        "permanence.register", "permanence.unregister"
-    ];
-
     try {
-        await prisma.role.upsert({
-            where: {name: "admin"},
-            update: {},
-            create: {
-                name: "admin",
-                weight: 100,
-                permissions: JSON.stringify(adminPermissions),
-                icon: "Shield"
-            }
-        });
-
-        await prisma.role.upsert({
-            where: {name: "volunteer"},
-            update: {},
-            create: {
-                name: "volunteer",
-                weight: 10,
-                permissions: JSON.stringify(volunteerPermissions),
-                icon: "Ear"
-            }
-        });
-
-        // Role without any permission, used to remove all access (empty roles are refused)
-        await prisma.role.upsert({
-            where: {name: "none"},
-            update: {},
-            create: {
-                name: "none",
-                weight: 0,
-                permissions: JSON.stringify([]),
-                icon: "Ban"
-            }
-        });
-
-        console.log("[db] Default roles (admin, volunteer, none) verified.");
+        const count = await prisma.role.count();
+        const toCreate = count === 0 ? DEFAULT_ROLES : DEFAULT_ROLES.filter(r => r.name === DEFAULT_ROLE);
+        for (const role of toCreate) {
+            await prisma.role.upsert({
+                where: {name: role.name},
+                update: {},
+                create: {name: role.name, weight: role.weight, icon: role.icon, permissions: JSON.stringify(role.permissions)},
+            });
+        }
+        console.log(`[db] Default roles verified (${toCreate.map(r => r.name).join(', ')}).`);
     } catch (error) {
         console.error("[db] Error seeding default roles:", error);
     }

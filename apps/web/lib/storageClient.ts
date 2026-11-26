@@ -45,7 +45,7 @@ export async function getViewer(): Promise<Viewer | null> {
     const session = await auth.api.getSession({headers: await headers()});
     if (!session) return null;
     const role = (session.user as {role?: string | null}).role;
-    return {userId: session.user.id, role, permissions: await getRolePermissions(role)};
+    return {userId: session.user.id, role, permissions: await getRolePermissions(role, session.user.id)};
 }
 
 export async function getFileOwnership(meta: StorageMeta): Promise<FileOwnership> {

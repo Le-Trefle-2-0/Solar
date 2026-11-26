@@ -1,6 +1,7 @@
 'use client';
 
 import React, {useEffect, useState} from 'react';
+import {usePermissions} from "@/hooks/use-permissions";
 import {
     addDays,
     addMonths,
@@ -49,7 +50,6 @@ import {Calendar} from "@/components/ui/calendar";
 import {toast} from 'sonner';
 import {apiFetch} from "@/lib/api";
 import {useRouter} from "next/navigation";
-import {useSession} from "@/lib/auth-client";
 
 const permSchema = z.object({
     startDate: z.date(),
@@ -119,12 +119,9 @@ export default function PlanningCalendar({events, userId, onRefresh}: {
     const router = useRouter();
     const [roleSlots, setRoleSlots] = useState<RoleSlotForm[]>([]);
     const [currentMonth, setCurrentMonth] = useState(new Date());
-    const {data: session} = useSession();
-    const userRoles: string[] = (session?.user?.role || '')
-        .split(',')
-        .map((r: string) => r.trim())
-        .filter(Boolean);
-    const canCreate = userRoles.includes('admin') || userRoles.includes('manager');
+    // Same permission as POST /v1/events
+    const {can} = usePermissions();
+    const canCreate = can('permanence.open');
 
 
     const daysOfWeek = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];

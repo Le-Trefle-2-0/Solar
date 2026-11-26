@@ -13,13 +13,8 @@ export interface Viewer {
     permissions: string[];
 }
 
-/**
- * Same people as validateDocumentsAction (admin or manager role), plus anyone
- * holding management.manage_accounts or admin.sudo.
- */
-export function isDocumentReviewer({role, permissions}: Viewer): boolean {
-    const roles = (role || "").split(",").map(r => r.trim());
-    if (roles.includes("admin") || roles.includes("manager")) return true;
+/** Same people as validateDocumentsAction: management.manage_accounts (or admin.sudo, held by the owner too). */
+export function isDocumentReviewer({permissions}: Viewer): boolean {
     return permissions.includes("admin.sudo") || permissions.includes("management.manage_accounts");
 }
 

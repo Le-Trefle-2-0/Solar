@@ -156,44 +156,44 @@ export function AppSidebar({pendingDocsCount = 0, unreadChannelIds = [], pending
             name: "Recrutement",
             url: "/app/recruitments",
             icon: Users,
-            adminOnly: true,
+            permission: "recruitments.manage",
         },
         {
             name: "Historique",
             url: "/app/admin/history",
             icon: History,
-            adminOnly: true,
+            permission: "management.ticket_history",
         },
         {
             name: "Utilisateurs",
             url: "/app/admin/users",
             icon: ShieldUser,
-            adminOnly: true,
+            permission: "management.manage_accounts",
             hasNotification: pendingDocsCount > 0
         },
         {
             name: "Statistiques",
             url: "/app/admin/stats",
             icon: ChartLine,
-            adminOnly: true,
+            permission: "management.view_stats",
         },
         {
             name: "Rôles",
             url: "/app/admin/roles",
             icon: Shield,
-            adminOnly: true,
+            permission: "roles.manage",
         },
         {
             name: "Paramètres",
             url: "/app/admin/settings",
             icon: Settings,
-            adminOnly: true,
+            permission: "settings.manage",
         },
         {
             name: "Newsletter",
             url: "/app/newsletters",
             icon: Mail,
-            newsletterOnly: true,
+            permission: "newsletters.manage",
         },
     ]
     const [tickets, setTickets] = useState<any[]>([]);
@@ -210,29 +210,13 @@ export function AppSidebar({pendingDocsCount = 0, unreadChannelIds = [], pending
     }, [socket]);
 
     const filteredBaseData = React.useMemo(() => {
-        if (!session) return baseData.filter(item => !(item as any).adminOnly);
-        const roles = (session.user.role || "").split(",").map((r: string) => r.trim());
-        const permissions = (session.user as any).permissions || [];
-
-        const isAdmin = roles.includes("admin") || permissions.includes("admin.sudo");
-        const isManager = roles.includes("manager");
-        const isNewsletterManager = roles.includes("newsletterManager") || permissions.includes("newsletters.manage");
+        // Each restricted link names the permission its page requires (the owner holds them all)
+        const permissions: string[] = (session?.user as any)?.permissions || [];
+        const can = (p: string) => permissions.includes("admin.sudo") || permissions.includes(p);
 
         return baseData.filter(item => {
-            if (!(item as any).adminOnly && !(item as any).newsletterOnly) return true;
-            if (isAdmin) return true;
-
-            if (item.name === "Utilisateurs") {
-                return permissions.includes("management.manage_accounts") || isManager;
-            }
-
-            if (isManager && (item.name === "Historique" || item.name === "Recrutement" || item.name === "Paramètres" || item.name === "Statistiques")) return true;
-            if (isNewsletterManager && (item as any).newsletterOnly) return true;
-
-            // Allow access to Roles if the user has a manager role (limited to lower weights)
-            if (isManager && item.name === "Rôles") return true;
-
-            return false;
+            const required = (item as any).permission as string | undefined;
+            return !required || can(required);
         }).map(item => {
             if (item.name === "Discussion BE libre") {
                 return { ...item, hasNotification: unreadIds.has('1') && activeChannelId !== '1' };

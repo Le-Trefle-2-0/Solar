@@ -17,6 +17,10 @@ import {
 } from "better-auth/plugins";
 import {apiKey} from "@better-auth/api-key";
 import {userAdditionalFields} from "./security/userFields";
+import {APIError} from "better-auth/api";
+
+/** Same key as OWNER_SETTING_KEY in lib/userPermissions.ts and the API. */
+const OWNER_SETTING_KEY = "owner_user_id";
 import {passkey} from "@better-auth/passkey";
 
 const pluginList: any[] = [
@@ -52,7 +56,8 @@ const pluginList: any[] = [
         ac, roles: {
             training, volunteer, manager, bot, admin, newsletterManager, none
         },
-        adminRoles: ['admin', 'manager'],
+        // Its endpoints are blocked in hooks.before; kept for the role/ban columns it manages
+        adminRoles: ['admin'],
         // Also applied when a stored role is empty, so it must grant nothing
         defaultRole: 'none',
     }),
@@ -138,6 +143,13 @@ export const auth = betterAuth({
     hooks: {
         before: async (context) => {
             const path = (context as any)?.request?.url || (context as any)?.path || "";
+            // Better Auth's admin endpoints (set-role, ban, remove-user, impersonate...) only know
+            // role names and would bypass the owner and the role hierarchy. Users and roles are
+            // managed through the API and server actions instead.
+            const endpoint = (context as any)?.path || "";
+            if (endpoint.startsWith("/admin/") || path.includes("/api/auth/admin/")) {
+                throw new APIError("FORBIDDEN", {message: "Not available"});
+            }
             if (path.includes("sign-up")) {
                 const userCount = await prisma.user.count();
                 if (userCount > 0) {
@@ -146,6 +158,22 @@ export const auth = betterAuth({
             }
             return context;
         }
+    },
+    databaseHooks: {
+        user: {
+            create: {
+                // The very first account (created at setup, sign-up is closed afterwards) owns the app
+                after: async (user) => {
+                    const owner = await prisma.settings.findUnique({where: {key: OWNER_SETTING_KEY}});
+                    if (owner?.value) return;
+                    const topRole = await prisma.role.findFirst({orderBy: {weight: "desc"}, select: {name: true}});
+                    await prisma.$transaction([
+                        prisma.settings.create({data: {key: OWNER_SETTING_KEY, value: user.id}}),
+                        prisma.user.update({where: {id: user.id}, data: {role: topRole?.name ?? "none"}}),
+                    ]);
+                },
+            },
+        },
     },
     plugins: pluginList as any,
     account: {

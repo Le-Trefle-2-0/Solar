@@ -19,24 +19,25 @@ test('another volunteer cannot read it', () => {
     assert.equal(canReadFile(volunteer('u2'), linked), false);
 });
 
+const reviewer = {userId: 'm', role: 'référent', permissions: ['management.manage_accounts']};
+
 test('a file with no known owner is only readable by reviewers', () => {
     const unknown = {uploadedById: null, linkedUserIds: []};
     assert.equal(canReadFile(volunteer('u1'), unknown), false);
-    assert.equal(canReadFile({userId: 'm', role: 'manager', permissions: []}, unknown), true);
+    assert.equal(canReadFile(reviewer, unknown), true);
 });
 
-test('reviewers: admin or manager role, manage_accounts or sudo', () => {
-    assert.equal(isDocumentReviewer({userId: 'a', role: 'volunteer,admin', permissions: []}), true);
-    assert.equal(isDocumentReviewer({userId: 'a', role: 'referent', permissions: ['management.manage_accounts']}), true);
+test('reviewers: manage_accounts or sudo, whatever the role is called', () => {
+    assert.equal(isDocumentReviewer(reviewer), true);
     assert.equal(isDocumentReviewer({userId: 'a', role: 'x', permissions: ['admin.sudo']}), true);
     assert.equal(isDocumentReviewer({userId: 'a', role: 'volunteer', permissions: ['tickets.read_all']}), false);
-    assert.equal(isDocumentReviewer({userId: 'a', role: 'administrator', permissions: []}), false);
-    assert.equal(isDocumentReviewer({userId: 'a', role: '', permissions: []}), false);
+    // A role name alone grants nothing
+    assert.equal(isDocumentReviewer({userId: 'a', role: 'admin,manager', permissions: []}), false);
 });
 
 test('only reviewers can delete', () => {
     assert.equal(canDeleteFile(volunteer('u1')), false);
-    assert.equal(canDeleteFile({userId: 'm', role: 'manager', permissions: []}), true);
+    assert.equal(canDeleteFile(reviewer), true);
 });
 
 test("a user cannot link someone else's file to their profile", () => {

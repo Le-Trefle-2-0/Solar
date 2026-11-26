@@ -1,4 +1,5 @@
 import {auth} from "@/lib/auth";
+import {can, getAccess} from "@/lib/userPermissions";
 import {headers} from "next/headers";
 import {redirect} from "next/navigation";
 import prisma from "@/lib/prisma";
@@ -18,9 +19,9 @@ export default async function AdminSettingsPage() {
 
     if (!session) redirect('/auth/sign-in');
 
-    const userRoles = ((session.user as any).role || "").split(",").map((r: string) => r.trim());
-    const userPermissions = (session.user as any).permissions || [];
-    if (!userRoles.includes("admin") && !userRoles.includes("manager") && !userPermissions.includes("admin.sudo")) {
+    // Permission-based: role names grant nothing by themselves
+    const access = await getAccess();
+    if (!access || !can(access.permissions, 'settings.manage')) {
         redirect("/app");
     }
 

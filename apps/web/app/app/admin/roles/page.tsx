@@ -1,4 +1,5 @@
 import {RolesManager} from "@/components/admin/roles-manager";
+import {can, getAccess} from "@/lib/userPermissions";
 import {Page} from "@/components/ui";
 import {auth} from "@/lib/auth";
 import {headers} from "next/headers";
@@ -11,11 +12,9 @@ export default async function RolesPage() {
 
     if (!session) redirect('/auth/sign-in');
 
-    const userRoles = ((session.user as any).role || "").split(",").map((r: string) => r.trim());
-    const userPermissions = (session.user as any).permissions || [];
-    const isAllowed = userRoles.includes("admin") || userRoles.includes("manager") || userPermissions.includes("admin.sudo");
-
-    if (!isAllowed) {
+    // Permission-based: role names grant nothing by themselves
+    const access = await getAccess();
+    if (!access || !can(access.permissions, 'roles.manage')) {
         redirect("/app");
     }
 

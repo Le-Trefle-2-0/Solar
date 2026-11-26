@@ -1,6 +1,10 @@
 import {PrismaClient} from "../generated/prisma";
 import {generateRandomString, hashPassword} from "better-auth/crypto";
 import * as readline from "readline";
+import {DEFAULT_ROLES} from "../apps/api/src/lib/defaultRoles";
+
+/** Same key as OWNER_SETTING_KEY in apps/api/src/lib/permissions.ts. */
+const OWNER_SETTING_KEY = "owner_user_id";
 
 const prisma = new PrismaClient();
 
@@ -13,12 +17,24 @@ const question = (query: string): Promise<string> => {
     return new Promise((resolve) => rl.question(query, resolve));
 };
 
+/**
+ * First-time setup: creates the owner account (holds every permission, sits above every
+ * role and cannot be managed by anyone else) and the default roles.
+ */
 async function main() {
-    console.log("--- Solar Admin Setup Tool ---");
+    console.log("--- Solar Owner Setup Tool ---");
 
-    const name = await question("Admin Name: ");
-    const email = await question("Admin Email: ");
-    const password = await question("Admin Password: ");
+    const existingOwner = await prisma.settings.findUnique({where: {key: OWNER_SETTING_KEY}});
+    if (existingOwner?.value) {
+        console.error("An owner account already exists. Ownership transfer is not supported yet.");
+        await prisma.$disconnect();
+        rl.close();
+        process.exit(1);
+    }
+
+    const name = await question("Owner Name: ");
+    const email = await question("Owner Email: ");
+    const password = await question("Owner Password: ");
 
     if (!name || !email || !password) {
         console.error("All fields are required.");
@@ -29,79 +45,45 @@ async function main() {
         const hashedPassword = await hashPassword(password);
         const userId = generateRandomString(32);
 
-        // Ensure default roles exist
-        const adminRole = await prisma.role.upsert({
-            where: {name: "admin"},
-            update: {},
-            create: {
-                name: "admin",
-                weight: 100,
-                permissions: JSON.stringify([
-                    "tickets.open", "tickets.close", "tickets.read_all", "tickets.attribute", "tickets.launch_voice",
-                    "tickets.send_message_all", "tickets.send_message", "tickets.transmission",
-                    "management.create_account", "management.delete_account", "management.ticket_history",
-                    "management.view_transmission", "management.view_stats", "management.reset_password",
-                    "permanence.open", "permanence.close", "permanence.register", "permanence.unregister",
-                    "permanence.unregister_other_all", "permanence.unregister_other_user", "permanence.register_other_all", "permanence.register_other_user",
-                    "messages.manage", "newsletters.manage", "users.read_all",
-                    "user.create", "user.update", "user.delete", "user.read", "session.delete", "session.read", "impersonate.create"
-                ]),
-                icon: "Shield"
+        // Default roles, on a fresh install only (the roles page owns them afterwards)
+        if (await prisma.role.count() === 0) {
+            for (const role of DEFAULT_ROLES) {
+                await prisma.role.create({
+                    data: {name: role.name, weight: role.weight, icon: role.icon, permissions: JSON.stringify(role.permissions)},
+                });
             }
-        });
+        }
+        const topRole = await prisma.role.findFirst({orderBy: {weight: "desc"}, select: {name: true}});
 
-        const volunteerRole = await prisma.role.upsert({
-            where: {name: "volunteer"},
-            update: {},
-            create: {
-                name: "volunteer",
-                weight: 10,
-                permissions: JSON.stringify([
-                    "tickets.close", "tickets.launch_voice", "tickets.send_message", "tickets.transmission",
-                    "management.view_stats",
-                    "permanence.register", "permanence.unregister"
-                ]),
-                icon: "Ear"
-            }
-        });
-
-        // Role without any permission, used to remove all access (empty roles are refused)
-        await prisma.role.upsert({
-            where: {name: "none"},
-            update: {},
-            create: {
-                name: "none",
-                weight: 0,
-                permissions: JSON.stringify([]),
-                icon: "Ban"
-            }
-        });
-
-        await prisma.user.create({
-            data: {
-                id: userId,
-                name: name,
-                email: email.toLowerCase(),
-                emailVerified: true,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                role: "admin",
-                accounts: {
-                    create: {
-                        id: generateRandomString(32),
-                        accountId: userId,
-                        providerId: "credential",
-                        password: hashedPassword,
-                        createdAt: new Date(),
-                        updatedAt: new Date(),
+        await prisma.$transaction([
+            prisma.user.create({
+                data: {
+                    id: userId,
+                    name: name,
+                    email: email.toLowerCase(),
+                    emailVerified: true,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    // Cosmetic: the owner holds every permission whatever their roles
+                    role: topRole?.name ?? "none",
+                    accounts: {
+                        create: {
+                            id: generateRandomString(32),
+                            accountId: userId,
+                            providerId: "credential",
+                            password: hashedPassword,
+                            createdAt: new Date(),
+                            updatedAt: new Date(),
+                        },
                     },
                 },
-            },
-        });
+            }),
+            prisma.settings.create({data: {key: OWNER_SETTING_KEY, value: userId}}),
+        ]);
 
-        console.log(`Successfully created admin user: ${email} and ensured default roles (admin, volunteer, none) exist.`);
+        console.log(`Owner account created: ${email}.`);
     } catch (error) {
-        console.error("Error creating admin user:", error);
+        console.error("Error creating the owner account:", error);
     } finally {
         await prisma.$disconnect();
         rl.close();

@@ -1,6 +1,7 @@
 'use client';
 
 import React, {useEffect, useState} from 'react';
+import {usePermissions} from "@/hooks/use-permissions";
 import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
 import {
     AlertDialog,
@@ -31,6 +32,7 @@ interface EventProps {
 export default function Event({event}: EventProps) {
     const time = `${format(new Date(event.start), 'HH:mm', {locale: fr})} - ${format(new Date(event.end), 'HH:mm', {locale: fr})}`;
     const {data: session} = useSession();
+    const {can} = usePermissions();
     const router = useRouter();
 
     const [open, setOpen] = useState(false);
@@ -203,13 +205,15 @@ export default function Event({event}: EventProps) {
     }
 
     const userId = session?.user?.id;
+    // Slot eligibility: a slot is for members holding the role it names
     const userRoles: string[] = (session?.user?.role || '')
         .split(',')
         .map((r: string) => r.trim())
         .filter(Boolean);
 
-    const isManagerOrAdmin = userRoles.includes('manager') || userRoles.includes('admin');
-    const isAdmin = userRoles.includes('admin');
+    // Same permissions as the API: removing someone / approving registrations, and deleting the event
+    const isManagerOrAdmin = can('permanence.unregister_other_all') || can('permanence.register_other_user');
+    const isAdmin = can('permanence.close');
 
     let badgeColor = 'bg-gray-300 text-gray-800';
     const slotsToUse = eventDetails?.roleSlots || event.roleSlots;

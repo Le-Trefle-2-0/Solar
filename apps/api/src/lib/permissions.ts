@@ -1,34 +1,55 @@
 import {prisma} from '../prisma.js';
+import {ALL_PERMISSIONS, isKnownPermission} from './permissionCatalogue.js';
+import {splitRoles, type Actor, type KnownRole} from './roleAssignment.js';
 
-export async function getUserPermissions(userId: string): Promise<string[]> {
-    const user = await prisma.user.findUnique({where: {id: userId}});
-    if (!user || !user.role) return [];
+export {hasPermission} from './roleAssignment.js';
 
-    // Supports multiple roles separated by comma
-    const roleNames = user.role.split(',').map(r => r.trim());
+/** Settings key holding the id of the owner account (the one created at setup). */
+export const OWNER_SETTING_KEY = 'owner_user_id';
 
-    const roles = await prisma.role.findMany({
-        where: {
-            name: {in: roleNames}
-        }
-    });
-
-    const permissions = new Set<string>();
-    for (const role of roles) {
-        if (role.permissions) {
-            try {
-                const perms = JSON.parse(role.permissions) as string[];
-                perms.forEach(p => permissions.add(p));
-            } catch (e) {
-                console.error(`Failed to parse permissions for role ${role.name}`, e);
-            }
-        }
-    }
-
-    return Array.from(permissions);
+export async function getOwnerId(): Promise<string | null> {
+    const setting = await prisma.settings.findUnique({where: {key: OWNER_SETTING_KEY}});
+    return setting?.value || null;
 }
 
-export function hasPermission(userPermissions: string[], permission: string): boolean {
-    if (userPermissions.includes('admin.sudo')) return true;
-    return userPermissions.includes(permission);
+export function parsePermissions(json: string | null | undefined, roleName = '?'): string[] {
+    try {
+        const parsed = JSON.parse(json || '[]');
+        // Ids no longer in the catalogue (renamed or removed permissions) grant nothing
+        return Array.isArray(parsed) ? [...new Set(parsed.filter(isKnownPermission))] : [];
+    } catch (e) {
+        console.error(`Failed to parse permissions for role ${roleName}`, e);
+        return [];
+    }
+}
+
+export async function getKnownRoles(): Promise<KnownRole[]> {
+    const roles = await prisma.role.findMany({select: {id: true, name: true, weight: true, permissions: true}});
+    return roles.map(r => ({...r, permissions: parsePermissions(r.permissions, r.name)}));
+}
+
+/**
+ * Who the user is for authorization: their roles, effective permissions and owner status.
+ * The owner holds every permission, whatever their roles say.
+ */
+export async function getActor(userId: string): Promise<Actor | null> {
+    const [user, ownerId] = await Promise.all([
+        prisma.user.findUnique({where: {id: userId}, select: {id: true, role: true}}),
+        getOwnerId(),
+    ]);
+    if (!user) return null;
+    const isOwner = ownerId === user.id;
+    const roles = splitRoles(user.role);
+    if (isOwner) return {id: user.id, isOwner, roles, permissions: [...ALL_PERMISSIONS]};
+
+    const rows = roles.length
+        ? await prisma.role.findMany({where: {name: {in: roles}}, select: {name: true, permissions: true}})
+        : [];
+    const permissions = new Set<string>();
+    for (const row of rows) parsePermissions(row.permissions, row.name).forEach(p => permissions.add(p));
+    return {id: user.id, isOwner, roles, permissions: [...permissions]};
+}
+
+export async function getUserPermissions(userId: string): Promise<string[]> {
+    return (await getActor(userId))?.permissions ?? [];
 }

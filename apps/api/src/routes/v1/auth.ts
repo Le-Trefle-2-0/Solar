@@ -2,7 +2,7 @@ import type {FastifyInstance} from 'fastify';
 import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
 
-import {getUserPermissions} from '../../lib/permissions.js';
+import {getActor} from '../../lib/permissions.js';
 
 export async function registerAuthRoutes(app: FastifyInstance) {
     app.get('/v1/auth/get-session', async (req, reply) => {
@@ -12,8 +12,11 @@ export async function registerAuthRoutes(app: FastifyInstance) {
             return reply.status(401).send({session: null});
         }
 
-        const user = await prisma.user.findUnique({where: {id: userId}});
-        if (!user) {
+        const [user, actor] = await Promise.all([
+            prisma.user.findUnique({where: {id: userId}}),
+            getActor(userId),
+        ]);
+        if (!user || !actor) {
             return reply.status(401).send({session: null});
         }
 
@@ -24,7 +27,9 @@ export async function registerAuthRoutes(app: FastifyInstance) {
                 email: user.email,
                 role: user.role,
                 image: user.image,
-                // Add any other fields needed by the frontend
+                // Effective permissions (the owner holds them all) for UI gating; the API re-checks
+                permissions: actor.permissions,
+                isOwner: actor.isOwner,
             }
         };
     });
@@ -36,7 +41,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
             return reply.status(401).send({permissions: []});
         }
 
-        const permissions = await getUserPermissions(userId);
-        return {permissions};
+        const actor = await getActor(userId);
+        return {permissions: actor?.permissions ?? [], isOwner: actor?.isOwner ?? false};
     });
 }

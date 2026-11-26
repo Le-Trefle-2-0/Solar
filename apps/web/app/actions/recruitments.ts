@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import {can, getAccess} from "@/lib/userPermissions";
 import {z} from "zod";
 import {auth} from "@/lib/auth";
 import {headers} from "next/headers";
@@ -289,8 +290,8 @@ export async function createRecruitment(data: z.infer<typeof recruitmentSchema>)
         headers: await headers(),
     });
 
-    const userRole = (session?.user as any)?.role || "";
-    const isAuthorized = userRole.split(",").some((r: string) => r === "admin" || r === "manager");
+    const access = await getAccess();
+    const isAuthorized = !!access && can(access.permissions, "recruitments.manage");
 
     if (!session || !isAuthorized) {
         throw new Error("Non autorisé");
@@ -325,8 +326,8 @@ export async function updateRecruitment(id: string, data: z.infer<typeof recruit
         headers: await headers(),
     });
 
-    const userRole = (session?.user as any)?.role || "";
-    const isAuthorized = userRole.split(",").some((r: string) => r === "admin" || r === "manager");
+    const access = await getAccess();
+    const isAuthorized = !!access && can(access.permissions, "recruitments.manage");
 
     if (!session || !isAuthorized) {
         throw new Error("Non autorisé");
@@ -437,8 +438,8 @@ export async function deleteRecruitment(id: string) {
         headers: await headers(),
     });
 
-    const userRole = (session?.user as any)?.role || "";
-    const isAuthorized = userRole.split(",").some((r: string) => r === "admin" || r === "manager");
+    const access = await getAccess();
+    const isAuthorized = !!access && can(access.permissions, "recruitments.manage");
 
     if (!session || !isAuthorized) {
         throw new Error("Non autorisé");
@@ -457,8 +458,8 @@ export async function toggleRecruitment(id: string, enabled: boolean) {
         headers: await headers(),
     });
 
-    const userRole = (session?.user as any)?.role || "";
-    const isAuthorized = userRole.split(",").some((r: string) => r === "admin" || r === "manager");
+    const access = await getAccess();
+    const isAuthorized = !!access && can(access.permissions, "recruitments.manage");
 
     if (!session || !isAuthorized) {
         throw new Error("Non autorisé");

@@ -1,4 +1,5 @@
 import {UsersTable} from "../users-table";
+import {can, getAccess} from "@/lib/userPermissions";
 import {DisplayAccount} from "@/lib/interface";
 import prisma from "@/lib/prisma";
 import {subDays} from "date-fns";
@@ -103,14 +104,9 @@ export default async function AdminUsersPage() {
 
     if (!session) redirect('/auth/sign-in');
 
-    const userRoles = ((session.user as any).role || "").split(",").map((r: string) => r.trim());
-    const userPermissions = (session.user as any).permissions || [];
-    const hasAccess = userRoles.includes("admin") ||
-        userRoles.includes("manager") ||
-        userPermissions.includes("management.manage_accounts") ||
-        userPermissions.includes("admin.sudo");
-
-    if (!hasAccess) {
+    // Permission-based: role names grant nothing by themselves
+    const access = await getAccess();
+    if (!access || !can(access.permissions, 'management.manage_accounts')) {
         redirect("/app");
     }
 

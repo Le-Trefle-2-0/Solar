@@ -1,4 +1,5 @@
 import {SidebarProvider, SidebarTrigger} from "@/components/ui";
+import {can, getAccess} from "@/lib/userPermissions";
 import {AppSidebar} from "@/components/app-sidebar";
 import {redirect} from "next/navigation";
 import {auth} from "@/lib/auth";
@@ -29,8 +30,9 @@ export default async function RootLayout({
     if (!session) redirect('/auth/sign-in');
 
     const user = session.user as any;
-    const userRoles = (user.role || "").split(",").map((r: string) => r.trim());
-    const isAdmin = userRoles.includes("admin") || userRoles.includes("manager");
+    // Account managers (and the owner) may dismiss their own document reminder
+    const access = await getAccess();
+    const isAdmin = !!access && can(access.permissions, "management.manage_accounts");
 
     let showDocDialog = false;
     let isRenewal = false;

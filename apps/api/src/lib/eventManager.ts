@@ -352,19 +352,10 @@ export async function unregisterUserToEvent(eventId: string, userId: string, par
 }
 
 export async function removeUserFromEvent(eventId: string, targetUserId: string, adminUserId: string, roleSlotId?: string) {
-    // Check if the admin user has the right permissions
-    const adminUser = await prisma.user.findUnique({
-        where: {id: adminUserId},
-        select: {role: true},
-    });
-
-    if (!adminUser || !adminUser.role) {
-        throw new Error("Utilisateur administrateur introuvable.");
-    }
-
-    const adminRoles = adminUser.role.split(',').map(r => r.trim()).filter(Boolean);
-    if (!adminRoles.includes('admin') && !adminRoles.includes('manager')) {
-        throw new Error("Permissions insuffisantes. Seuls les administrateurs et responsables peuvent retirer des utilisateurs des événements.");
+    // Removing someone else from an event (same rule as unregistering another user)
+    const perms = await getUserPermissions(adminUserId);
+    if (!hasPermission(perms, 'permanence.unregister_other_all')) {
+        throw new Error("Permissions insuffisantes pour retirer des utilisateurs des événements.");
     }
 
     // Find the event to verify it exists

@@ -1,6 +1,7 @@
 "use server";
 
 import {auth} from "@/lib/auth";
+import {can, getAccess, getOwnerId, getRank, splitRoles} from "@/lib/userPermissions";
 import {headers} from "next/headers";
 import {z} from "zod";
 import prisma from "@/lib/prisma";
@@ -23,8 +24,8 @@ export async function inviteUserAction(formData: z.infer<typeof inviteSchema>) {
         headers: await headers(),
     });
 
-    const userRole = (session?.user as any)?.role || "";
-    const isAuthorized = userRole.split(",").some((r: string) => r === "admin" || r === "manager");
+    const access = await getAccess();
+    const isAuthorized = !!access && can(access.permissions, "management.manage_accounts");
 
     if (!session || !isAuthorized) {
         return {error: "Unauthorized"};
@@ -44,12 +45,14 @@ export async function inviteUserAction(formData: z.infer<typeof inviteSchema>) {
     if (!roles.every((r) => r.length > 0 && !r.includes(",") && r === r.trim() && weights.has(r))) {
         return {error: "Invalid data"};
     }
-    const inviterRoles: string[] = userRole.split(",").map((r: string) => r.trim());
-    if (!inviterRoles.includes("admin")) {
-        const inviterWeight = Math.max(-Infinity, ...inviterRoles.flatMap((r) => weights.get(r) ?? []));
-        if (roles.some((r) => r === "admin" || weights.get(r)! >= inviterWeight)) {
-            return {error: "Unauthorized"};
-        }
+    // Handing out roles needs roles.manage, and only roles strictly below the inviter's rank
+    // (the owner ranks above every role). Same rule as POST /v1/admin/users/:id/role.
+    if (roles.some((r) => r !== "none") && !can(access!.permissions, "roles.manage")) {
+        return {error: "Unauthorized"};
+    }
+    const inviterRank = await getRank(access!.userId, access!.role);
+    if (roles.some((r) => weights.get(r)! >= inviterRank)) {
+        return {error: "Unauthorized"};
     }
 
     const primaryRole = roles[0];
@@ -236,8 +239,8 @@ export async function validateDocumentsAction(userId: string, type: 'idCard' | '
         headers: await headers(),
     });
 
-    const userRole = (session?.user as any)?.role || "";
-    const isAuthorized = userRole.split(",").some((r: string) => r === "admin" || r === "manager");
+    const access = await getAccess();
+    const isAuthorized = !!access && can(access.permissions, "management.manage_accounts");
 
     if (!session || !isAuthorized) {
         return {error: "Unauthorized"};
@@ -288,8 +291,8 @@ export async function rejectDocumentAction(userId: string, type: 'idCard' | 'cas
         headers: await headers(),
     });
 
-    const userRole = (session?.user as any)?.role || "";
-    const isAuthorized = userRole.split(",").some((r: string) => r === "admin" || r === "manager");
+    const access = await getAccess();
+    const isAuthorized = !!access && can(access.permissions, "management.manage_accounts");
 
     if (!session || !isAuthorized) {
         return {error: "Unauthorized"};
@@ -329,8 +332,8 @@ export async function requestRenewalAction(userId: string) {
         headers: await headers(),
     });
 
-    const userRole = (session?.user as any)?.role || "";
-    const isAuthorized = userRole.split(",").some((r: string) => r === "admin" || r === "manager");
+    const access = await getAccess();
+    const isAuthorized = !!access && can(access.permissions, "management.manage_accounts");
 
     if (!session || !isAuthorized) {
         return {error: "Unauthorized"};
@@ -368,23 +371,34 @@ export async function requestAllRenewalAction() {
         headers: await headers(),
     });
 
-    const userRole = (session?.user as any)?.role || "";
-    const isAuthorized = userRole.split(",").some((r: string) => r === "admin" || r === "manager");
+    const access = await getAccess();
+    const isAuthorized = !!access && can(access.permissions, "management.manage_accounts");
 
     if (!session || !isAuthorized) {
         return {error: "Unauthorized"};
     }
 
     try {
-        // Update all users who are not admins
+        // Everyone except the owner and holders of a role with admin.sudo
+        // (decided by permission, not by a role being called "admin")
+        const [users, roleRows, ownerId] = await Promise.all([
+            prisma.user.findMany({select: {id: true, role: true}}),
+            prisma.role.findMany({select: {name: true, permissions: true}}),
+            getOwnerId(),
+        ]);
+        const sudoRoles = new Set(roleRows.filter((r) => {
+            try {
+                return (JSON.parse(r.permissions || "[]") as unknown[]).includes("admin.sudo");
+            } catch {
+                return false;
+            }
+        }).map((r) => r.name));
+        const targets = users
+            .filter((u) => u.id !== ownerId && !splitRoles(u.role).some((r) => sudoRoles.has(r)))
+            .map((u) => u.id);
+
         await prisma.user.updateMany({
-            where: {
-                role: {
-                    not: {
-                        contains: 'admin'
-                    }
-                }
-            },
+            where: {id: {in: targets}},
             data: {
                 documentsRenewalAt: new Date(),
                 documentsStatus: "missing",
@@ -400,5 +414,31 @@ export async function requestAllRenewalAction() {
     } catch (e: any) {
         console.error("[requestAllRenewalAction] Error:", e);
         return {error: e.message || "Failed to request all renewal"};
+    }
+}
+
+/**
+ * Deletes an account. Requires management.manage_accounts; the owner, yourself and anyone
+ * at or above your rank cannot be deleted (Better Auth's own admin endpoints are disabled).
+ */
+export async function deleteUserAction(userId: string) {
+    const access = await getAccess();
+    if (!access || !can(access.permissions, "management.manage_accounts")) return {error: "Unauthorized"};
+    if (typeof userId !== "string" || !userId) return {error: "Invalid data"};
+    if (userId === access.userId) return {error: "Vous ne pouvez pas supprimer votre propre compte."};
+
+    const target = await prisma.user.findUnique({where: {id: userId}, select: {id: true, role: true}});
+    if (!target) return {error: "Utilisateur introuvable."};
+    if (target.id === await getOwnerId()) return {error: "Le propriétaire de l'application ne peut pas être supprimé."};
+    if (await getRank(target.id, target.role) >= await getRank(access.userId, access.role)) {
+        return {error: "Vous ne pouvez pas supprimer un membre de rang égal ou supérieur."};
+    }
+
+    try {
+        await prisma.user.delete({where: {id: userId}});
+        return {success: true};
+    } catch (e) {
+        console.error("[deleteUserAction] Error:", e);
+        return {error: "La suppression a échoué."};
     }
 }

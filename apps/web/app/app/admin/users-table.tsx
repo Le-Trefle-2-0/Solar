@@ -77,10 +77,10 @@ import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {toast} from "sonner";
 import {cn} from "@/lib/utils";
-import {authClient} from "@/lib/auth-client";
 import {useRouter} from "next/navigation";
 import {apiFetch} from "@/lib/api";
 import {
+    deleteUserAction,
     inviteUserAction,
     rejectDocumentAction,
     requestAllRenewalAction,
@@ -221,7 +221,11 @@ function UserActionsCell({account, availableRoles, setUsers, setDialogOpen, setV
                         <AlertDialogCancel>Annuler</AlertDialogCancel>
                         <Button
                             onClick={async () => {
-                                await authClient.admin.removeUser({userId: account.id});
+                                const res = await deleteUserAction(account.id);
+                                if (res.error) {
+                                    toast.error(res.error);
+                                    return;
+                                }
                                 setUsers(prev => prev.filter(user => user.id !== account.id));
                                 toast("Utilisateur supprimé");
                                 setDialogOpen(false);

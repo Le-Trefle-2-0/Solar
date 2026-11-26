@@ -2,26 +2,19 @@ import type {FastifyInstance} from 'fastify';
 import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
 import {randomBytes} from 'crypto';
+import {getActor} from '../../lib/permissions.js';
 
+/** Bot management requires admin.sudo (held by the owner too). */
 async function checkAdmin(req: any, reply: any) {
     const userId = await authenticate(req);
-
-    if (!userId) {
+    const actor = userId ? await getActor(userId) : null;
+    if (!actor) {
         return reply.status(401).send('unauthorized');
     }
-
-    const user = await prisma.user.findUnique({where: {id: userId}});
-    if (!user) {
-        return reply.status(401).send('unauthorized');
+    if (!actor.permissions.includes('admin.sudo')) {
+        return reply.status(403).send('forbidden: admin.sudo required');
     }
-
-    const userRoles = (user.role || "").split(",").map((r: string) => r.trim());
-    const isAuthorized = userRoles.includes("admin");
-
-    if (!isAuthorized) {
-        return reply.status(401).send('unauthorized');
-    }
-    return user;
+    return actor;
 }
 
 export async function registerBotRoutes(app: FastifyInstance) {

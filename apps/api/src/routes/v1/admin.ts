@@ -3,173 +3,31 @@ import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
 
 import {broadcast} from '../../lib/broadcast.js';
-import {checkRoleAssignment, checkRoleChange, isValidRoleName} from '../../lib/roleAssignment.js';
+import {getActor, hasPermission, OWNER_SETTING_KEY} from '../../lib/permissions.js';
+import {registerRolesRoutes} from './roles.js';
 import {parseStatsRange} from '../../lib/statsRange.js';
 
-async function checkAdmin(req: any, reply: any) {
+/** Authenticated user holding `permission` (admin.sudo and the owner hold every permission). */
+async function requirePermission(req: any, reply: any, permission: string) {
     const userId = await authenticate(req);
-
-    if (!userId) {
-        return reply.status(401).send('unauthorized');
+    const actor = userId ? await getActor(userId) : null;
+    if (!actor) {
+        reply.status(401).send('unauthorized');
+        return null;
     }
-
-    const user = await prisma.user.findUnique({where: {id: userId}});
-    if (!user) {
-        return reply.status(401).send('unauthorized');
+    if (!hasPermission(actor.permissions, permission)) {
+        reply.status(403).send(`forbidden: ${permission} required`);
+        return null;
     }
-
-    const userRoles = (user.role || "").split(",").map((r: string) => r.trim());
-    const isAuthorized = userRoles.includes("admin") || userRoles.includes("manager");
-
-    if (!isAuthorized) {
-        return reply.status(401).send('unauthorized');
-    }
-    return user;
+    return actor;
 }
 
 export async function registerAdminRoutes(app: FastifyInstance) {
-    app.get('/v1/admin/roles', async (req, reply) => {
-        const admin = await checkAdmin(req, reply);
-        if (!admin) return;
-
-        const roles = await prisma.role.findMany({
-            orderBy: {weight: 'desc'}
-        });
-        return reply.send({roles});
-    });
-
-    app.post('/v1/admin/roles', async (req, reply) => {
-        const admin = await checkAdmin(req, reply);
-        if (!admin) return;
-
-        const {id, name, permissions, weight, icon} = req.body as {
-            id?: string,
-            name: string,
-            permissions: string,
-            weight: number,
-            icon?: string
-        };
-
-        // An empty name is read by Better Auth as its default role
-        if (!isValidRoleName(name)) return reply.status(400).send('Invalid role name');
-
-        // Hierarchy check: Non-admins can only manage roles with lower weight than their own highest role
-        const userRoles = (admin.role || "").split(",").map((r: string) => r.trim());
-        if (!userRoles.includes("admin")) {
-            const adminHighestRole = await prisma.role.findFirst({
-                where: {name: {in: userRoles}},
-                orderBy: {weight: 'desc'}
-            });
-
-            if (!adminHighestRole) {
-                return reply.status(403).send('forbidden: cannot manage roles of equal or higher weight');
-            }
-
-            // Compare with the weight stored in the database, not only the one sent by the caller
-            const existing = await prisma.role.findUnique({where: id ? {id} : {name}});
-            const refusal = checkRoleChange(adminHighestRole.weight, existing, {name, weight});
-            if (refusal) return reply.status(403).send(refusal);
-
-            // Check permissions: cannot grant permissions the admin doesn't have
-            const adminPerms = JSON.parse(adminHighestRole.permissions || "[]") as string[];
-            const requestedPerms = JSON.parse(permissions || "[]") as string[];
-            if (requestedPerms.some(p => !adminPerms.includes(p))) {
-                return reply.status(403).send('forbidden: cannot grant permissions you do not have');
-            }
-        }
-
-        const role = await prisma.role.upsert({
-            where: id ? {id} : {name},
-            update: {name, permissions, weight, icon},
-            create: {name, permissions, weight, icon}
-        });
-
-        // Broadcast permissions update to all connected volunteers
-        await broadcast(null, 'permissionsUpdate', {
-            roleId: role.id,
-            roleName: role.name,
-            permissions: JSON.parse(role.permissions || "[]")
-        });
-
-        return reply.send({role});
-    });
-
-    app.delete('/v1/admin/roles/:id', async (req, reply) => {
-        const admin = await checkAdmin(req, reply);
-        if (!admin) return;
-
-        const {id} = req.params as { id: string };
-
-        const roleToDelete = await prisma.role.findUnique({where: {id}});
-        if (!roleToDelete) return reply.status(404).send('role not found');
-
-        // Hierarchy check
-        const userRoles = (admin.role || "").split(",");
-        if (!userRoles.includes("admin")) {
-            const adminHighestRole = await prisma.role.findFirst({
-                where: {name: {in: userRoles}},
-                orderBy: {weight: 'desc'}
-            });
-
-            if (!adminHighestRole || roleToDelete.weight >= adminHighestRole.weight) {
-                return reply.status(403).send('forbidden: cannot delete roles of equal or higher weight');
-            }
-        }
-
-        await prisma.role.delete({where: {id}});
-        return reply.send({success: true});
-    });
-    app.post('/v1/admin/users/:id/role', async (req, reply) => {
-        const admin = await checkAdmin(req, reply);
-        if (!admin) return;
-
-        const {id} = req.params as { id: string };
-        const {roles} = (req.body ?? {}) as { roles: string[] };
-
-        if (!Array.isArray(roles)) {
-            return reply.status(400).send('Invalid roles');
-        }
-
-        const target = await prisma.user.findUnique({where: {id}, select: {role: true}});
-        if (!target) return reply.status(404).send('user not found');
-
-        const refusal = checkRoleAssignment({
-            callerRole: admin.role,
-            targetRole: target.role,
-            requested: roles,
-            knownRoles: await prisma.role.findMany({select: {name: true, weight: true}}),
-            isSelf: id === admin.id,
-        });
-        if (refusal) return reply.status(refusal.status).send(refusal.message);
-
-        const user = await prisma.user.update({
-            where: {id},
-            data: {
-                role: roles.join(',')
-            }
-        });
-
-        const hideEmails = process.env.HIDE_EMAILS_IN_ADMIN === "true";
-        if (hideEmails && user.email) {
-            const [localPart, domain] = user.email.split('@');
-            if (localPart && domain) {
-                const visibleLength = Math.min(3, Math.floor(localPart.length / 2));
-                user.email = `${localPart.substring(0, visibleLength)}***@${domain}`;
-            } else {
-                user.email = "***";
-            }
-        }
-
-        // @ts-ignore
-        delete user.password;
-        // @ts-ignore
-        delete user.twoFactorSecret;
-
-        return reply.send({user});
-    });
+    // Roles and role assignment: see roles.ts
+    await registerRolesRoutes(app);
 
     app.get('/v1/admin/settings', async (req, reply) => {
-        const admin = await checkAdmin(req, reply);
+        const admin = await requirePermission(req, reply, 'settings.manage');
         if (!admin) return;
 
         try {
@@ -183,10 +41,13 @@ export async function registerAdminRoutes(app: FastifyInstance) {
     });
 
     app.post('/v1/admin/settings', async (req, reply) => {
-        const admin = await checkAdmin(req, reply);
+        const admin = await requirePermission(req, reply, 'settings.manage');
         if (!admin) return;
 
         const {key, value} = req.body as { key: string, value: string };
+        if (typeof key !== 'string' || !key || typeof value !== 'string') return reply.status(400).send('invalid setting');
+        // Ownership is not a setting anyone with settings.manage may change
+        if (key === OWNER_SETTING_KEY) return reply.status(403).send('forbidden: reserved setting');
 
         try {
             // @ts-ignore
@@ -204,7 +65,7 @@ export async function registerAdminRoutes(app: FastifyInstance) {
     });
 
     app.get('/v1/admin/newsletter/subscribers', async (req, reply) => {
-        const admin = await checkAdmin(req, reply);
+        const admin = await requirePermission(req, reply, 'newsletters.manage');
         if (!admin) return;
 
         const subscribers = await prisma.newsletterSubscriber.findMany({
@@ -214,7 +75,7 @@ export async function registerAdminRoutes(app: FastifyInstance) {
     });
 
     app.post('/v1/admin/newsletter/subscribers', async (req, reply) => {
-        const admin = await checkAdmin(req, reply);
+        const admin = await requirePermission(req, reply, 'newsletters.manage');
         if (!admin) return;
 
         const {email} = req.body as { email: string };
@@ -234,7 +95,7 @@ export async function registerAdminRoutes(app: FastifyInstance) {
     });
 
     app.delete('/v1/admin/newsletter/subscribers/:id', async (req, reply) => {
-        const admin = await checkAdmin(req, reply);
+        const admin = await requirePermission(req, reply, 'newsletters.manage');
         if (!admin) return;
 
         const {id} = req.params as { id: string };
@@ -251,7 +112,7 @@ export async function registerAdminRoutes(app: FastifyInstance) {
     });
 
     app.get('/v1/admin/team/categories', async (req, reply) => {
-        const admin = await checkAdmin(req, reply);
+        const admin = await requirePermission(req, reply, 'settings.manage');
         if (!admin) return;
 
         const categories = await prisma.teamCategory.findMany({
@@ -273,7 +134,7 @@ export async function registerAdminRoutes(app: FastifyInstance) {
     });
 
     app.post('/v1/admin/team/categories', async (req, reply) => {
-        const admin = await checkAdmin(req, reply);
+        const admin = await requirePermission(req, reply, 'settings.manage');
         if (!admin) return;
 
         const {id, name, icon, type, color, order} = req.body as {
@@ -299,7 +160,7 @@ export async function registerAdminRoutes(app: FastifyInstance) {
     });
 
     app.delete('/v1/admin/team/categories/:id', async (req, reply) => {
-        const admin = await checkAdmin(req, reply);
+        const admin = await requirePermission(req, reply, 'settings.manage');
         if (!admin) return;
 
         const {id} = req.params as { id: string };
@@ -314,7 +175,7 @@ export async function registerAdminRoutes(app: FastifyInstance) {
     });
 
     app.post('/v1/admin/team/members', async (req, reply) => {
-        const admin = await checkAdmin(req, reply);
+        const admin = await requirePermission(req, reply, 'settings.manage');
         if (!admin) return;
 
         const {id, role, isLead, teamName, categoryId, personId} = req.body as {
@@ -340,7 +201,7 @@ export async function registerAdminRoutes(app: FastifyInstance) {
     });
 
     app.get('/v1/admin/team/people', async (req, reply) => {
-        const admin = await checkAdmin(req, reply);
+        const admin = await requirePermission(req, reply, 'settings.manage');
         if (!admin) return;
 
         const people = await prisma.teamPerson.findMany({
@@ -350,7 +211,7 @@ export async function registerAdminRoutes(app: FastifyInstance) {
     });
 
     app.post('/v1/admin/team/people', async (req, reply) => {
-        const admin = await checkAdmin(req, reply);
+        const admin = await requirePermission(req, reply, 'settings.manage');
         if (!admin) return;
 
         const {id, name, image, bio} = req.body as {
@@ -374,7 +235,7 @@ export async function registerAdminRoutes(app: FastifyInstance) {
     });
 
     app.delete('/v1/admin/team/people/:id', async (req, reply) => {
-        const admin = await checkAdmin(req, reply);
+        const admin = await requirePermission(req, reply, 'settings.manage');
         if (!admin) return;
 
         const {id} = req.params as { id: string };
@@ -389,7 +250,7 @@ export async function registerAdminRoutes(app: FastifyInstance) {
     });
 
     app.delete('/v1/admin/team/members/:id', async (req, reply) => {
-        const admin = await checkAdmin(req, reply);
+        const admin = await requirePermission(req, reply, 'settings.manage');
         if (!admin) return;
 
         const {id} = req.params as { id: string };
@@ -404,7 +265,7 @@ export async function registerAdminRoutes(app: FastifyInstance) {
     });
 
     app.get('/v1/admin/stats', async (req, reply) => {
-        const admin = await checkAdmin(req, reply);
+        const admin = await requirePermission(req, reply, 'management.view_stats');
         if (!admin) return;
 
         const range = parseStatsRange(req.query as {start?: string, end?: string, interval?: string});

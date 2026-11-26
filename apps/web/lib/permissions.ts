@@ -9,6 +9,9 @@ export const statement = {
     messages: ['manage'],
     newsletters: ['manage'],
     users: ['read_all'],
+    roles: ['manage'],
+    settings: ['manage'],
+    recruitments: ['manage'],
     admin: ['sudo']
 } as const;
 
@@ -167,14 +170,35 @@ export const PERMISSION_METADATA: Record<string, PermissionInfo> = {
         category: 'Communication'
     },
 
-    // Admin
+    // Administration
+    'roles.manage': {
+        id: 'roles.manage',
+        label: 'Gérer les rôles',
+        description: "Créer, renommer, réordonner et supprimer les rôles placés sous son propre rôle le plus haut, et les attribuer aux membres. Ne permet de donner que des permissions que l'on possède.",
+        category: 'Administration'
+    },
+    'settings.manage': {
+        id: 'settings.manage',
+        label: 'Gérer les paramètres',
+        description: "Accès aux paramètres de l'application et à la page équipe du site",
+        category: 'Administration'
+    },
+    'recruitments.manage': {
+        id: 'recruitments.manage',
+        label: 'Gérer les recrutements',
+        description: 'Consulter et traiter les candidatures',
+        category: 'Administration'
+    },
     'admin.sudo': {
         id: 'admin.sudo',
         label: 'Super-administrateur (Sudo)',
-        description: 'Outrepasse toutes les restrictions de permissions',
+        description: 'Donne toutes les permissions. Reste soumis à la hiérarchie des rôles.',
         category: 'Administration'
     },
 };
+
+/** Every permission a role can hold (Better Auth's own user/session statements are not role permissions). */
+export const ALL_PERMISSIONS = Object.keys(PERMISSION_METADATA);
 
 export const ac = createAccessControl(statement);
 
@@ -227,5 +251,8 @@ export const admin = ac.newRole({
     permanence: ['open', 'close', 'register', 'unregister', 'unregister_other_all', 'unregister_other_user', 'register_other_all', 'register_other_user'],
     messages: ['manage'],
     users: ['read_all'],
+    roles: ['manage'],
+    settings: ['manage'],
+    recruitments: ['manage'],
     admin: ['sudo']
 });

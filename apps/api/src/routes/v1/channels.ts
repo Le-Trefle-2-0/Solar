@@ -141,12 +141,11 @@ export async function registerChannelsRoutes(app: FastifyInstance, deps: Channel
 
                 const staff = await prisma.user.findMany({
                     where: {
-                        OR: [
-                            {role: {contains: 'admin'}},
-                            {role: {contains: 'manager'}},
-                            {role: {contains: 'volunteer'}},
-                            {role: {contains: 'training'}},
-                            {role: {contains: 'bot'}},
+                        // Every member with a role other than the default one (role names are configurable)
+                        AND: [
+                            {role: {not: null}},
+                            {role: {notIn: ['', 'none']}},
+                            {OR: [{banned: null}, {banned: false}]},
                         ]
                     },
                     select: {

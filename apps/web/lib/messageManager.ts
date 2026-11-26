@@ -24,7 +24,7 @@ export const saveMessage = async (input: unknown) => {
         where: {channelId},
         select: {id: true, assignedUserId: true},
     });
-    const permissions = await getRolePermissions((session.user as {role?: string | null}).role);
+    const permissions = await getRolePermissions((session.user as {role?: string | null}).role, userId);
     if (!canWriteChannel({channelId, userId, permissions, assignedUserId: ticket?.assignedUserId ?? null})) {
         throw new Error("Forbidden");
     }
