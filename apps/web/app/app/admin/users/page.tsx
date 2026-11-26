@@ -1,4 +1,5 @@
 import {UsersTable} from "../users-table";
+import {DEFAULT_ROLE} from "@/lib/permissions";
 import {can, getAccess} from "@/lib/userPermissions";
 import {DisplayAccount} from "@/lib/interface";
 import prisma from "@/lib/prisma";
@@ -55,7 +56,9 @@ async function getData(): Promise<{ users: DisplayAccount[], roles: any[] }> {
         },
     });
 
+    // The default role is never offered: no role selected means no access
     const roles = await prisma.role.findMany({
+        where: {name: {not: DEFAULT_ROLE}},
         orderBy: {weight: 'desc'}
     });
 

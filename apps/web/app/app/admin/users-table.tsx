@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import {DEFAULT_ROLE} from "@/lib/permissions";
 import {useState} from "react";
 import {
     ColumnDef,
@@ -95,7 +96,8 @@ import {AdminValidationView} from "@/components/users/admin-validation-view";
 const FormSchema = z.object({
     name: z.string(),
     email: z.string(),
-    roles: z.array(z.string()).min(1),
+    // No role = no access (stored as the hidden default role)
+    roles: z.array(z.string()),
 });
 
 interface DataTableProps {
@@ -104,9 +106,13 @@ interface DataTableProps {
 }
 
 const RolesFormSchema = z.object({
-    // An empty list is refused by the API: assign "none" to remove all access
-    roles: z.array(z.string()).min(1, "Choisissez au moins un rôle (« none » pour retirer tous les accès)")
+    // No role selected removes every access (the API stores the hidden default role)
+    roles: z.array(z.string())
 });
+
+/** A member's roles as shown in the UI: the hidden default role is left out. */
+const visibleRoles = (role: string | null | undefined) =>
+    (role || '').split(',').map(r => r.trim()).filter(r => r && r !== DEFAULT_ROLE);
 
 interface UserActionsCellProps {
     account: DisplayAccount;
@@ -158,7 +164,7 @@ function UserActionsCell({account, availableRoles, setUsers, setDialogOpen, setV
     const form = useForm<z.infer<typeof RolesFormSchema>>({
         resolver: zodResolver(RolesFormSchema),
         defaultValues: {
-            roles: (account.role || '').split(',').map(r => r.trim()).filter(Boolean),
+            roles: visibleRoles(account.role),
         },
     });
 
@@ -268,7 +274,7 @@ function UserActionsCell({account, availableRoles, setUsers, setDialogOpen, setV
                                                                     .filter((r) => (field.value as string[]).includes(r.name))
                                                                     .map((r) => r.name)
                                                                     .join(', ')
-                                                                : "Sélectionner un ou plusieurs rôles"}
+                                                                : "Aucun rôle (aucun accès)"}
                                                             <ChevronsUpDown className="opacity-50"/>
                                                         </Button>
                                                     </FormControl>
@@ -474,10 +480,7 @@ export function UsersTable({data, availableRoles}: DataTableProps) {
             accessorKey: "role",
             header: () => <div className="text-center">Rôles</div>,
             cell: ({row}) => {
-                const roles = String(row.getValue("role") || "")
-                    .split(",")
-                    .map((r) => r.trim())
-                    .filter(Boolean);
+                const roles = visibleRoles(String(row.getValue("role") || ""));
                 return (
                     <div className="flex items-center justify-center gap-2">
                         {roles.map((r, idx) => (
@@ -762,7 +765,7 @@ export function UsersTable({data, availableRoles}: DataTableProps) {
                                                                             .filter((r) => ((field.value as string[]) || []).includes(r.name))
                                                                             .map((r) => r.name)
                                                                             .join(', ')
-                                                                        : "Sélectionner un ou plusieurs rôles"}
+                                                                        : "Aucun rôle (aucun accès)"}
                                                                     <ChevronsUpDown className="opacity-50"/>
                                                                 </Button>
                                                             </FormControl>

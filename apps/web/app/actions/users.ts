@@ -16,7 +16,8 @@ import {canLinkFile} from "@/lib/security/fileAccess";
 const inviteSchema = z.object({
     name: z.string().min(1),
     email: z.string().email(),
-    roles: z.array(z.string()).min(1),
+    // No role = no access: stored as the hidden default role
+    roles: z.array(z.string()),
 });
 
 export async function inviteUserAction(formData: z.infer<typeof inviteSchema>) {
@@ -36,7 +37,9 @@ export async function inviteUserAction(formData: z.infer<typeof inviteSchema>) {
         return {error: "Invalid data"};
     }
 
-    const {name, email, roles} = validated.data;
+    const {name, email} = validated.data;
+    const chosen = validated.data.roles.filter((r) => r !== "none");
+    const roles = chosen.length ? chosen : ["none"];
 
     // Same rule as POST /v1/admin/users/:id/role: only existing roles, and below the inviter's own.
     const knownRoles = await prisma.role.findMany({select: {name: true, weight: true}});

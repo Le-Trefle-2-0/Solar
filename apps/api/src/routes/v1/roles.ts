@@ -2,6 +2,7 @@ import type {FastifyInstance} from 'fastify';
 import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
 import {broadcast} from '../../lib/broadcast.js';
+import {DEFAULT_ROLE} from '../../lib/permissionCatalogue.js';
 import {getActor, getKnownRoles, getOwnerId} from '../../lib/permissions.js';
 import {
     type Actor,
@@ -9,6 +10,7 @@ import {
     checkRoleDelete,
     checkRoleEdit,
     type KnownRole,
+    withDefaultRole,
     planReorder,
     rankOf,
     renameInRoleString,
@@ -116,7 +118,8 @@ export async function registerRolesRoutes(app: FastifyInstance, deps: RolesRoute
         const roles = await deps.listRoles();
         const rank = rankOf(actor.isOwner, actor.roles, roles);
         return reply.send({
-            roles: roles.map(serialize),
+            // The default role ("none") is an implementation detail: never listed, edited or assigned by hand
+            roles: roles.filter(r => r.name !== DEFAULT_ROLE).map(serialize),
             me: {
                 isOwner: actor.isOwner,
                 // Weight of the caller's highest role; null for the owner (above all) or without any role.
@@ -196,7 +199,8 @@ export async function registerRolesRoutes(app: FastifyInstance, deps: RolesRoute
         const target = await deps.findUser(id);
         if (!target) return reply.status(404).send('user not found');
 
-        const requested = (req.body as {roles?: unknown} | undefined)?.roles;
+        // An empty selection removes every role (stored as the default role)
+        const requested = withDefaultRole((req.body as {roles?: unknown} | undefined)?.roles);
         const refusal = checkRoleAssignment({
             actor,
             target: {id: target.id, isOwner: target.isOwner, roles: splitRoles(target.role)},

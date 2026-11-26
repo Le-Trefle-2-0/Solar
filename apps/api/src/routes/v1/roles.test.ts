@@ -11,6 +11,7 @@ function setup(actor: Actor | null) {
         {id: 'r-admin', name: 'admin', weight: 100, permissions: ['admin.sudo'], icon: null},
         {id: 'r-manager', name: 'manager', weight: 50, permissions: ['roles.manage', 'tickets.read_all'], icon: null},
         {id: 'r-volunteer', name: 'volunteer', weight: 10, permissions: ['tickets.send_message'], icon: null},
+        {id: 'r-training', name: 'training', weight: 5, permissions: [], icon: null},
         {id: 'r-none', name: 'none', weight: 0, permissions: [], icon: 'Ban'},
     ];
     const users = new Map([
@@ -71,7 +72,8 @@ test('roles: 401 without a session', async () => {
 test('roles: any member can list roles and sees what they may manage', async () => {
     const {status, body} = await call(volunteer, 'GET', '/v1/admin/roles');
     assert.equal(status, 200);
-    assert.equal(body.roles.length, 4);
+    // The hidden default role is not listed
+    assert.deepEqual(body.roles.map((r: {name: string}) => r.name), ['admin', 'manager', 'volunteer', 'training']);
     assert.deepEqual(body.me, {isOwner: false, rank: 10, permissions: ['tickets.send_message']});
     assert.equal((await call(owner, 'GET', '/v1/admin/roles')).body.me.rank, null);
 });
@@ -110,19 +112,25 @@ test('roles: delete respects the hierarchy and protects the default role', async
 });
 
 test('roles: reorder only within the roles below the caller', async () => {
-    const ok = await call(manager, 'POST', '/v1/admin/roles/reorder', {ids: ['r-none', 'r-volunteer']});
+    const ok = await call(manager, 'POST', '/v1/admin/roles/reorder', {ids: ['r-training', 'r-volunteer']});
     assert.equal(ok.status, 200);
-    assert.deepEqual(ok.log, ['weights:r-none=10,r-volunteer=0', 'notify']);
-    assert.equal((await call(manager, 'POST', '/v1/admin/roles/reorder', {ids: ['r-volunteer', 'r-manager', 'r-none']})).status, 403);
+    assert.deepEqual(ok.log, ['weights:r-training=10,r-volunteer=5', 'notify']);
+    assert.equal((await call(manager, 'POST', '/v1/admin/roles/reorder', {ids: ['r-volunteer', 'r-manager', 'r-training']})).status, 403);
 });
 
 test('roles: assigning requires roles.manage and respects ranks and ownership', async () => {
     assert.equal((await call(volunteer, 'POST', '/v1/admin/users/v1/role', {roles: ['none']})).status, 403);
     assert.equal((await call(manager, 'POST', '/v1/admin/users/m2/role', {roles: ['volunteer']})).status, 403);
     assert.equal((await call(manager, 'POST', '/v1/admin/users/owner/role', {roles: ['volunteer']})).status, 403);
-    assert.equal((await call(manager, 'POST', '/v1/admin/users/v1/role', {roles: []})).status, 400);
+    assert.equal((await call(manager, 'POST', '/v1/admin/users/v1/role', {roles: 'volunteer'})).status, 400);
     assert.equal((await call(manager, 'POST', '/v1/admin/users/ghost/role', {roles: ['none']})).status, 404);
     const ok = await call(manager, 'POST', '/v1/admin/users/v1/role', {roles: ['none']});
+    assert.equal(ok.status, 200);
+    assert.deepEqual(ok.log, ['assign:v1=none', 'notify']);
+});
+
+test('roles: an empty selection removes every role (stored as the default role)', async () => {
+    const ok = await call(manager, 'POST', '/v1/admin/users/v1/role', {roles: []});
     assert.equal(ok.status, 200);
     assert.deepEqual(ok.log, ['assign:v1=none', 'notify']);
 });

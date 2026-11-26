@@ -1,4 +1,5 @@
 import {auth} from "@/lib/auth";
+import {DEFAULT_ROLE} from "@/lib/permissions";
 import {can, getAccess} from "@/lib/userPermissions";
 import {headers} from "next/headers";
 import {redirect} from "next/navigation";
@@ -35,6 +36,7 @@ export default async function AdminSettingsPage() {
 
     try {
         roles = await prisma.role.findMany({
+            where: {name: {not: DEFAULT_ROLE}},
             orderBy: {
                 weight: 'desc'
             }

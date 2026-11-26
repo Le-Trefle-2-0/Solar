@@ -143,13 +143,14 @@ export function planReorder(actor: Actor, knownRoles: KnownRole[], orderedIds: u
     : {refusal: Refusal} | {updates: {id: string; weight: number}[]} {
     if (!hasPermission(actor.permissions, 'roles.manage')) return {refusal: forbidden('roles.manage required')};
     const rank = rankOf(actor.isOwner, actor.roles, knownRoles);
-    const manageable = knownRoles.filter(r => r.id && r.weight < rank);
+    const manageable = knownRoles.filter(r => r.id && r.weight < rank && r.name !== DEFAULT_ROLE);
 
     if (!Array.isArray(orderedIds) || !orderedIds.every(id => typeof id === 'string')
         || new Set(orderedIds).size !== orderedIds.length) {
         return {refusal: invalid('Invalid order')};
     }
-    const byId = new Map(knownRoles.filter(r => r.id).map(r => [r.id!, r]));
+    // The default role is hidden from the roles page and always stays where it is
+    const byId = new Map(knownRoles.filter(r => r.id && r.name !== DEFAULT_ROLE).map(r => [r.id!, r]));
     if (orderedIds.some(id => !byId.has(id))) return {refusal: invalid('Unknown role')};
     if (orderedIds.some(id => byId.get(id)!.weight >= rank)) {
         return {refusal: forbidden('cannot manage roles of equal or higher rank')};
@@ -165,6 +166,17 @@ export function planReorder(actor: Actor, knownRoles: KnownRole[], orderedIds: u
         previous = weight;
     });
     return {updates};
+}
+
+/**
+ * The default role is never shown or picked: an empty selection means "no access" and is stored
+ * as the default role, and the default role is dropped as soon as another role is chosen.
+ * Anything that is not an array is returned untouched (and refused by checkRoleAssignment).
+ */
+export function withDefaultRole(requested: unknown): unknown {
+    if (!Array.isArray(requested)) return requested;
+    const others = requested.filter(r => r !== DEFAULT_ROLE);
+    return others.length ? others : [DEFAULT_ROLE];
 }
 
 /** Replaces or removes a role name inside every comma-joined role string. Empty results become the default role. */

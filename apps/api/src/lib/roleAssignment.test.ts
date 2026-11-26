@@ -10,12 +10,14 @@ import {
     planReorder,
     rankOf,
     renameInRoleString,
+    withDefaultRole,
 } from './roleAssignment.js';
 
 const knownRoles: KnownRole[] = [
     {id: 'r-admin', name: 'admin', weight: 100, permissions: ['admin.sudo']},
     {id: 'r-manager', name: 'manager', weight: 50, permissions: ['roles.manage', 'tickets.read_all', 'management.manage_accounts']},
     {id: 'r-volunteer', name: 'volunteer', weight: 10, permissions: ['tickets.send_message']},
+    {id: 'r-training', name: 'training', weight: 5, permissions: []},
     {id: 'r-none', name: 'none', weight: 0, permissions: []},
 ];
 
@@ -95,9 +97,10 @@ const edit = (actor: Actor, existing: KnownRole | null, requested: {name?: unkno
         requested: {name: 'helper', weight: 20, permissions: [], ...requested},
     })?.status ?? 200;
 
-const volunteerRole = knownRoles[2];
-const managerRole = knownRoles[1];
-const noneRole = knownRoles[3];
+const byName = (name: string) => knownRoles.find(r => r.name === name)!;
+const volunteerRole = byName('volunteer');
+const managerRole = byName('manager');
+const noneRole = byName('none');
 
 test('edit: roles.manage is required', () => {
     assert.equal(edit(volunteer, null, {weight: 5}), 403);
@@ -168,16 +171,23 @@ test('delete: below your rank only, with roles.manage, never the default role', 
 // ---- reorder ----
 
 test('reorder: reuses the weights already below the actor', () => {
-    const plan = planReorder(manager, knownRoles, ['r-none', 'r-volunteer']);
+    const plan = planReorder(manager, knownRoles, ['r-training', 'r-volunteer']);
     assert.ok('updates' in plan);
-    assert.deepEqual(plan.updates, [{id: 'r-none', weight: 10}, {id: 'r-volunteer', weight: 0}]);
+    assert.deepEqual(plan.updates, [{id: 'r-training', weight: 10}, {id: 'r-volunteer', weight: 5}]);
 });
 
 test('reorder: refuses roles at or above the actor, missing or unknown roles', () => {
-    assert.ok('refusal' in planReorder(manager, knownRoles, ['r-manager', 'r-volunteer', 'r-none']));
+    assert.ok('refusal' in planReorder(manager, knownRoles, ['r-manager', 'r-volunteer', 'r-training']));
     assert.ok('refusal' in planReorder(manager, knownRoles, ['r-volunteer']));
     assert.ok('refusal' in planReorder(manager, knownRoles, ['r-volunteer', 'r-ghost']));
-    assert.ok('refusal' in planReorder(volunteer, knownRoles, ['r-none']));
+    assert.ok('refusal' in planReorder(volunteer, knownRoles, ['r-training']));
+});
+
+test('reorder: the hidden default role is never listed nor moved', () => {
+    assert.ok('refusal' in planReorder(manager, knownRoles, ['r-training', 'r-volunteer', 'r-none']));
+    const plan = planReorder(owner, knownRoles, ['r-admin', 'r-manager', 'r-volunteer', 'r-training']);
+    assert.ok('updates' in plan);
+    assert.equal(plan.updates.some(u => u.id === 'r-none'), false);
 });
 
 test('reorder: ties are broken so the order is kept', () => {
@@ -190,9 +200,9 @@ test('reorder: ties are broken so the order is kept', () => {
 });
 
 test('reorder: the owner reorders every role', () => {
-    const plan = planReorder(owner, knownRoles, ['r-manager', 'r-admin', 'r-volunteer', 'r-none']);
+    const plan = planReorder(owner, knownRoles, ['r-manager', 'r-admin', 'r-volunteer', 'r-training']);
     assert.ok('updates' in plan);
-    assert.deepEqual(plan.updates.map(u => u.weight), [100, 50, 10, 0]);
+    assert.deepEqual(plan.updates.map(u => u.weight), [100, 50, 10, 5]);
 });
 
 // ---- helpers ----
@@ -200,6 +210,13 @@ test('reorder: the owner reorders every role', () => {
 test('role names must be non-empty, trimmed and comma-free', () => {
     for (const bad of ['', ' ', ' x', 'x ', 'a,b', 'x'.repeat(65), null, 3]) assert.equal(isValidRoleName(bad), false);
     for (const good of ['volunteer', 'none', 'Référent']) assert.equal(isValidRoleName(good), true);
+});
+
+test('an empty selection becomes the default role; the default role is dropped next to others', () => {
+    assert.deepEqual(withDefaultRole([]), ['none']);
+    assert.deepEqual(withDefaultRole(['none']), ['none']);
+    assert.deepEqual(withDefaultRole(['none', 'volunteer']), ['volunteer']);
+    assert.equal(withDefaultRole('volunteer'), 'volunteer');
 });
 
 test('renaming or removing a role inside role strings', () => {

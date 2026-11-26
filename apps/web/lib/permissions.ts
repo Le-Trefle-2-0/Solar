@@ -197,6 +197,12 @@ export const PERMISSION_METADATA: Record<string, PermissionInfo> = {
     },
 };
 
+/**
+ * Default role of members without any other role: no permission. Never shown in role lists,
+ * pickers or badges; choosing no role stores it.
+ */
+export const DEFAULT_ROLE = "none";
+
 /** Every permission a role can hold (Better Auth's own user/session statements are not role permissions). */
 export const ALL_PERMISSIONS = Object.keys(PERMISSION_METADATA);
 
