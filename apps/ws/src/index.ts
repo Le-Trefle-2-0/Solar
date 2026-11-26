@@ -7,6 +7,7 @@ import Redis from 'ioredis';
 import {createAdapter} from '@socket.io/redis-adapter';
 import {createRemoteJWKSet, jwtVerify} from 'jose';
 import {createHmac, timingSafeEqual} from 'crypto';
+import {safeEqual} from './lib/safeEqual.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,8 +15,8 @@ const __dirname = path.dirname(__filename);
 // Load .env from project root
 config({path: path.resolve(__dirname, '../../../.env')});
 
-// Fail closed: guest signatures and API key checks depend on these
-const missingSecrets = ['WS_GUEST_SECRET', 'INTERNAL_API_SECRET'].filter(name => !process.env[name]);
+// Fail closed: guest signatures, API key checks and /broadcast depend on these
+const missingSecrets = ['WS_GUEST_SECRET', 'INTERNAL_API_SECRET', 'WS_BROADCAST_SECRET'].filter(name => !process.env[name]);
 if (missingSecrets.length) {
     console.error(`[ws] Missing required environment variables: ${missingSecrets.join(', ')}. Aborting startup.`);
     process.exit(1);
@@ -310,9 +311,9 @@ httpServer.on('request', async (req: IncomingMessage, res: ServerResponse) => {
     if (req.method !== 'POST' || url.pathname !== '/broadcast') return;
 
     // Auth via shared secret header
-    const expected = process.env.WS_BROADCAST_SECRET || 'fallback_broadcast_secret_for_dev_only';
-    const provided = (req.headers['x-ws-secret'] as string) || '';
-    if (provided !== expected) {
+    const expected = process.env.WS_BROADCAST_SECRET!;
+    const provided = req.headers['x-ws-secret'];
+    if (typeof provided !== 'string' || !safeEqual(provided, expected)) {
         res.statusCode = 401;
         res.end('unauthorized');
         return;

@@ -3,7 +3,11 @@ export async function broadcast(room: string | null, event: string, data: any) {
         let base = process.env.WS_INTERNAL_URL || process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:5000';
         if (base.startsWith('ws://')) base = 'http://' + base.slice('ws://'.length);
         if (base.startsWith('wss://')) base = 'https://' + base.slice('wss://'.length);
-        const secret = process.env.WS_BROADCAST_SECRET || 'fallback_broadcast_secret_for_dev_only';
+        const secret = process.env.WS_BROADCAST_SECRET;
+        if (!secret) {
+            console.error('[web] WS_BROADCAST_SECRET is not set, broadcast skipped');
+            return;
+        }
 
         console.log(`[web] Broadcasting event "${event}" to room "${room}"`);
 

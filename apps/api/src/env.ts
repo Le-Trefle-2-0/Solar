@@ -23,7 +23,7 @@ if (!process.env.API_BASE_URL) {
 
 /** Called at startup (not on import, so tests can load modules without secrets). */
 export function assertRequiredSecrets() {
-    const missing = ['WS_GUEST_SECRET', 'INTERNAL_API_SECRET', 'DISCORD_ID_HASH_SECRET'].filter(name => !process.env[name]);
+    const missing = ['WS_GUEST_SECRET', 'INTERNAL_API_SECRET', 'DISCORD_ID_HASH_SECRET', 'WS_BROADCAST_SECRET'].filter(name => !process.env[name]);
     if (missing.length) {
         console.error(`Missing required environment variables: ${missing.join(', ')}. Aborting startup.`);
         process.exit(1);
