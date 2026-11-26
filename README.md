@@ -60,6 +60,10 @@ STORAGE_SECRET=une_cle_secrete_aleatoire_pour_le_stockage
 # Adresse interne du stockage vue par le web (jamais exposée au navigateur, qui passe par /api/files)
 STORAGE_INTERNAL_URL=http://127.0.0.1:3004
 
+# docker-compose (développement local uniquement) : mots de passe MySQL et Redis
+MYSQL_ROOT_PASSWORD=un_mot_de_passe_mysql_local
+REDIS_PASSWORD=un_mot_de_passe_redis_local
+
 # Derrière un reverse proxy : "true", un nombre de sauts ou les adresses des proxys (limitation de débit par IP)
 TRUST_PROXY=1
 # Hôtes autorisés pour les images distantes (POST /v1/image), séparés par des virgules
@@ -130,6 +134,8 @@ Pour lancer toute la stack avec Docker :
 ```bash
 npm run compose:up
 ```
+
+Ce fichier sert uniquement au développement local : serveurs de développement, dépôt monté, ports limités à `127.0.0.1`. Il demande `MYSQL_ROOT_PASSWORD` et `REDIS_PASSWORD` dans le `.env`. Ne jamais l'utiliser pour déployer.
 
 ---
 

@@ -1,38 +1,44 @@
+# LOCAL DEVELOPMENT ONLY (npm run compose:up). Never deploy with this file: it runs the
+# development servers with the repository mounted (#245).
+# - every published port is bound to 127.0.0.1 (not reachable from the network);
+# - MYSQL_ROOT_PASSWORD and REDIS_PASSWORD come from the untracked root .env and are required.
 version: '3.9'
 
 services:
   mysql:
     image: mysql:8.4
     environment:
-      MYSQL_ROOT_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}
       MYSQL_DATABASE: solar
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-ppassword" ]
+      test: [ "CMD-SHELL", "mysqladmin ping -p\"$$MYSQL_ROOT_PASSWORD\"" ]
       interval: 10s
       timeout: 5s
       retries: 10
 
   redis:
     image: redis:7-alpine
-    ports:
-      - "6379:6379"
+    # Password required; only reachable by the other containers
+    command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD:?Set REDIS_PASSWORD in .env}" ]
+    expose:
+      - "6379"
 
   api:
     image: node:20-alpine
     working_dir: /app
     command: sh -c "npm ci && npm run dev:api"
     ports:
-      - "3001:3001"
+      - "127.0.0.1:3001:3001"
     environment:
       API_HOST: 0.0.0.0
       API_PORT: 3001
       NEXT_PUBLIC_APP_URL: http://web:3000
       INTERNAL_AUTH_URL: http://web:3000
-      DATABASE_URL: mysql://root:password@mysql:3306/solar
+      DATABASE_URL: mysql://root:${MYSQL_ROOT_PASSWORD}@mysql:3306/solar
     volumes:
       - ./:/app
     depends_on:
@@ -44,13 +50,13 @@ services:
     working_dir: /app
     command: sh -c "npm ci && npm run dev:ws"
     ports:
-      - "3002:3002"
+      - "127.0.0.1:3002:3002"
     environment:
       WS_HOST: 0.0.0.0
       WS_PORT: 3002
       NEXT_PUBLIC_APP_URL: http://web:3000
       INTERNAL_AUTH_URL: http://web:3000
-      REDIS_URL: redis://redis:6379
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
       API_BASE_URL: http://api:3001
     volumes:
       - ./:/app
@@ -63,10 +69,10 @@ services:
     working_dir: /app
     command: sh -c "npm ci && npm run dev:voice"
     ports:
-      - "3003:3003"
+      - "127.0.0.1:3003:3003"
       # Mediasoup UDP/TCP ports (adjust as needed)
-      - "40000-40050:40000-40050/udp"
-      - "40000-40050:40000-40050/tcp"
+      - "127.0.0.1:40000-40050:40000-40050/udp"
+      - "127.0.0.1:40000-40050:40000-40050/tcp"
     environment:
       VOICE_HOST: 0.0.0.0
       VOICE_PORT: 3003
@@ -100,14 +106,14 @@ services:
     working_dir: /app
     command: sh -c "npm ci && npm run dev:web"
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     environment:
       PORT: 3000
       NEXT_PUBLIC_APP_URL: http://web:3000
       NEXT_PUBLIC_API_URL: http://api:3001
       STORAGE_INTERNAL_URL: http://storage:3004
       NEXT_PUBLIC_WS_URL: ws://localhost:3002
-      DATABASE_URL: mysql://root:password@mysql:3306/solar
+      DATABASE_URL: mysql://root:${MYSQL_ROOT_PASSWORD}@mysql:3306/solar
     volumes:
       - ./:/app
     depends_on:
