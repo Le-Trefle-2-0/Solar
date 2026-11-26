@@ -8,6 +8,8 @@ import {registerV1Routes} from './routes/v1/index.js';
 import {API_HOST, API_PORT, assertRequiredSecrets} from './env.js';
 import {startNewsletterScheduler} from './lib/scheduler.js';
 import {seedDefaultRoles} from './lib/seed.js';
+import {ensureBaseData} from './lib/baseData.js';
+import {prisma} from './prisma.js';
 import {redactUrl} from './lib/redact.js';
 import {GLOBAL_RATE_LIMIT, trustProxySetting} from './lib/rateLimit.js';
 import {errorHandler} from './lib/errors.js';
@@ -85,7 +87,12 @@ app.get('/health', async () => ({status: 'ok'}));
 // v1 routes (modular)
 await registerV1Routes(app);
 
-// Seed default roles
+// Rows the app needs (ticket statuses, public channel, #233), then the default roles
+try {
+    await ensureBaseData(prisma);
+} catch (e) {
+    console.error('[db] Error creating base data:', e);
+}
 await seedDefaultRoles();
 
 // Start background tasks
