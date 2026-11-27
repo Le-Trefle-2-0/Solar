@@ -2,7 +2,7 @@ import {after, before, test} from 'node:test';
 import assert from 'node:assert/strict';
 import type {AddressInfo} from 'node:net';
 import {io as connect, type Socket as ClientSocket} from 'socket.io-client';
-import {createVoiceServer, type Grant, type RoomState, type RouterLike} from './server.js';
+import {createVoiceServer, MAX_JOINS_PER_MINUTE, type Grant, type RoomState, type RouterLike} from './server.js';
 
 // ---- a fake mediasoup: enough to exercise signalling and rules ----
 let seq = 0;
@@ -27,6 +27,11 @@ function fakeRouter(): RouterLike {
     };
 }
 
+// Visitor tokens shaped as the API issues them; the fake API accepts GOOD's signature only
+const GOOD = 'a'.repeat(64);
+const BAD = 'b'.repeat(64);
+const token = (t: string, channelId = 'live') => ({channelId, exp: Date.now() + 30 * 60_000, t});
+
 // Fake API: "perm" is a permanence channel, "live" a voice ticket handled by "vol".
 const authorize = async ({room, userId, token}: {room: {type: string; channelId: string}; userId?: string; token?: unknown}): Promise<Grant> => {
     if (room.type === 'permanence') {
@@ -34,7 +39,7 @@ const authorize = async ({room, userId, token}: {room: {type: string; channelId:
     }
     if (room.channelId !== 'live') return {allowed: false, reason: 'no_voice_call'};
     if (userId === 'vol' || userId === 'vol2') return {allowed: true, role: 'volunteer', userId, name: userId};
-    if (!userId && (token as {t?: string})?.t === 'good') return {allowed: true, role: 'visitor', userId: null, name: 'Visiteur'};
+    if (!userId && (token as {t?: string})?.t === GOOD) return {allowed: true, role: 'visitor', userId: null, name: 'Visiteur'};
     return {allowed: false, reason: 'forbidden'};
 };
 
@@ -94,7 +99,7 @@ test('voice: every member can join the permanence room and sees the others by na
 
 test('voice: a ticket call is one volunteer and one visitor, who only see aliases', async () => {
     const vol = await client({jwt: 'jwt-vol'});
-    const visitor = await client({voiceToken: {channelId: 'live', exp: 1, t: 'good'}});
+    const visitor = await client({voiceToken: token(GOOD)});
     const vol2 = await client({jwt: 'jwt-vol2'});
     const rv = await ask(vol, 'join', {room: {type: 'ticket', channelId: 'live'}});
     assert.deepEqual(rv.peers, []);
@@ -113,7 +118,7 @@ test('voice: a ticket call is one volunteer and one visitor, who only see aliase
 });
 
 test('voice: refused joins, and visitors never enter a permanence room', async () => {
-    const visitor = await client({voiceToken: {channelId: 'live', exp: 1, t: 'bad'}});
+    const visitor = await client({voiceToken: token(BAD)});
     assert.deepEqual(await ask(visitor, 'join', {room: {type: 'ticket', channelId: 'live'}}), {error: 'forbidden'});
     assert.deepEqual(await ask(visitor, 'join', {room: {type: 'permanence', channelId: 'perm'}}), {error: 'forbidden'});
     const vol = await client({jwt: 'jwt-vol'});
@@ -166,7 +171,7 @@ test('voice: malformed events and requests do not break the service', async () =
 
 test('voice: the API can close a room, which disconnects everyone in it', async () => {
     const vol = await client({jwt: 'jwt-vol'});
-    const visitor = await client({voiceToken: {channelId: 'live', exp: 1, t: 'good'}});
+    const visitor = await client({voiceToken: token(GOOD)});
     await ask(vol, 'join', {room: {type: 'ticket', channelId: 'live'}});
     await ask(visitor, 'join', {room: {type: 'ticket', channelId: 'live'}});
     const closed = new Promise(r => visitor.once('roomClosed', r));
@@ -182,4 +187,19 @@ test('voice: the API can close a room, which disconnects everyone in it', async 
     assert.equal(visitor.connected, false);
     assert.equal(vol.connected, false);
     assert.deepEqual(states.filter(s => s.channelId === 'live').at(-1), {type: 'ticket', channelId: 'live', volunteer: false, visitor: false});
+});
+
+test('voice: malformed or expired visitor tokens are refused at connection', async () => {
+    await assert.rejects(client({voiceToken: {}}));
+    await assert.rejects(client({voiceToken: {channelId: 'live', exp: Date.now() + 60_000, t: 'short'}}));
+    await assert.rejects(client({voiceToken: {channelId: 'live', exp: Date.now() - 1, t: GOOD}}));
+    await assert.rejects(client({voiceToken: {channelId: '../x', exp: Date.now() + 60_000, t: GOOD}}));
+});
+
+test('voice: joins are limited per connection, so the API is not asked in a loop', async () => {
+    const visitor = await client({voiceToken: token(BAD)});
+    const answers = [];
+    for (let i = 0; i <= MAX_JOINS_PER_MINUTE; i++) answers.push(await ask(visitor, 'join', {room: {type: 'ticket', channelId: 'live'}}));
+    assert.deepEqual(answers.at(-1), {error: 'rate_limited'});
+    assert.equal(answers.filter(a => (a as {error?: string}).error === 'rate_limited').length, 1);
 });

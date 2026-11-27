@@ -73,6 +73,24 @@ const ID_RE = /^[A-Za-z0-9_-]{1,128}$/;
 const isId = (v: unknown): v is string => typeof v === 'string' && ID_RE.test(v);
 export const MAX_PERMANENCE_PEERS = 25;
 
+/** Per connection: a burst of EVENT_BURST events, then EVENT_RATE per second (as in the realtime service). */
+export const EVENT_BURST = 30;
+export const EVENT_RATE = 10;
+/** Dropped events before the connection is closed. */
+export const MAX_DROPPED_EVENTS = 200;
+/** Joins per connection and per minute: each one asks the API, which does not rate-limit us. */
+export const MAX_JOINS_PER_MINUTE = 10;
+
+/** A visitor voice token as the API issues it (signature checked by the API at join). */
+export function isWellFormedVoiceToken(token: unknown, now = Date.now()): boolean {
+    if (!token || typeof token !== 'object') return false;
+    const {channelId, exp, t} = token as Record<string, unknown>;
+    const expiry = Number(exp);
+    return typeof channelId === 'string' && CHANNEL_RE.test(channelId)
+        && Number.isFinite(expiry) && expiry > now && expiry <= now + 60 * 60 * 1000
+        && typeof t === 'string' && /^[a-f0-9]{64}$/.test(t);
+}
+
 /** Name shown to the other side of a ticket call: neither learns who the other is. */
 const ticketAlias = (role: 'volunteer' | 'visitor') => (role === 'volunteer' ? 'Bénévole Écoutant' : 'Visiteur');
 
@@ -193,7 +211,8 @@ export function createVoiceServer(deps: VoiceDeps): {httpServer: HttpServer; io:
                     return next();
                 }
             }
-            if (auth.voiceToken && typeof auth.voiceToken === 'object') {
+            // Malformed or expired tokens are refused here, without asking the API
+            if (isWellFormedVoiceToken(auth.voiceToken)) {
                 socket.data.voiceToken = auth.voiceToken;
                 return next();
             }
@@ -204,10 +223,41 @@ export function createVoiceServer(deps: VoiceDeps): {httpServer: HttpServer; io:
     });
 
     io.on('connection', (socket) => {
+        // Token bucket per connection: a flood of events is cut down, then the connection closed
+        let tokens = EVENT_BURST;
+        let refilledAt = Date.now();
+        let dropped = 0;
+        const allowEvent = () => {
+            const now = Date.now();
+            tokens = Math.min(EVENT_BURST, tokens + ((now - refilledAt) / 1000) * EVENT_RATE);
+            refilledAt = now;
+            if (tokens >= 1) {
+                tokens -= 1;
+                return true;
+            }
+            if (++dropped >= MAX_DROPPED_EVENTS) socket.disconnect(true);
+            return false;
+        };
+        const joins: number[] = [];
+        const allowJoin = (now = Date.now()) => {
+            while (joins.length && now - joins[0] >= 60_000) joins.shift();
+            if (joins.length >= MAX_JOINS_PER_MINUTE) return false;
+            joins.push(now);
+            return true;
+        };
+
         const on = (event: string, handler: (payload: any, ack: (r: unknown) => void) => unknown) => {
             socket.on(event, async (...args: unknown[]) => {
                 const last = args[args.length - 1];
                 const ack = typeof last === 'function' ? (args.pop() as (r: unknown) => void) : () => undefined;
+                if (!allowEvent()) {
+                    try {
+                        ack({error: 'rate_limited'});
+                    } catch {
+                        // nothing else to do
+                    }
+                    return;
+                }
                 try {
                     await handler(args[0], ack);
                 } catch (e) {
@@ -228,6 +278,7 @@ export function createVoiceServer(deps: VoiceDeps): {httpServer: HttpServer; io:
             if ((type !== 'permanence' && type !== 'ticket') || typeof channelId !== 'string' || !CHANNEL_RE.test(channelId)) {
                 return ack({error: 'invalid_room'});
             }
+            if (!allowJoin()) return ack({error: 'rate_limited'});
             const grant = await deps.authorize({
                 room: {type, channelId},
                 ...(socket.data.userId ? {userId: socket.data.userId, sid: socket.data.sid} : {token: socket.data.voiceToken}),
