@@ -56,6 +56,12 @@ export default function ChatWidget() {
     /** New écoutes can only be opened while a permanence is running. */
     const [availability, setAvailability] = useState<Availability | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    // Keyboard focus: into the window when it opens, kept inside it, back to the button when it closes
+    const dialogRef = useRef<HTMLDivElement>(null);
+    const launcherRef = useRef<HTMLButtonElement>(null);
+    const wasOpen = useRef(false);
+    /** What went wrong with the last action, read out to the visitor (sending, closing). */
+    const [actionError, setActionError] = useState<string | null>(null);
 
     const clearLocalStorage = useCallback(() => {
         try {
@@ -333,17 +339,21 @@ export default function ChatWidget() {
     const handleCloseTicket = useCallback(async () => {
         if (!channelId) return;
         if (!confirm('Voulez-vous vraiment fermer cette écoute ?')) return;
+        setActionError(null);
         try {
             const res = await apiFetch('/v1/widget/close', {method: 'POST'});
             if (res.success) setTicketStatus('closed');
+            else setActionError("L'écoute n'a pas pu être terminée. Réessayez dans un instant.");
         } catch (e) {
             console.error('[widget] Error closing ticket:', e);
+            setActionError("L'écoute n'a pas pu être terminée. Réessayez dans un instant.");
         }
     }, [channelId]);
 
     const handleSend = useCallback(async () => {
         const text = input.trim();
         if (!channelId || !text || isEnded(ticketStatus)) return;
+        setActionError(null);
         try {
             const data = await apiFetch(`/v1/messages/widget/${channelId}`, {
                 method: 'POST',
@@ -375,7 +385,10 @@ export default function ChatWidget() {
                 clearLocalStorage();
                 resetState();
                 await loadAvailability();
+                return;
             }
+            // The text stays in the field: nothing written is lost
+            setActionError("Votre message n'a pas pu être envoyé. Vérifiez votre connexion et réessayez.");
         }
     }, [channelId, input, ticketStatus, loadMessages, visitorUserId, visitorCreds, wsConnected, clearLocalStorage, resetState, loadAvailability]);
 
@@ -411,6 +424,42 @@ export default function ChatWidget() {
     const line = statusLine(ticketStatus);
     const ended = isEnded(ticketStatus);
 
+    useEffect(() => {
+        if (open) {
+            wasOpen.current = true;
+            // The message field once the conversation is open, otherwise the window itself
+            const target = dialogRef.current?.querySelector<HTMLElement>('#widget-input') ?? dialogRef.current;
+            target?.focus();
+        } else if (wasOpen.current) {
+            wasOpen.current = false;
+            launcherRef.current?.focus();
+        }
+    }, [open, consented]);
+
+    /** Escape closes the window; Tab and Shift+Tab stay inside it (it is modal). */
+    const onDialogKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        if (e.key === 'Escape') {
+            e.stopPropagation();
+            setOpen(false);
+            if (ended) resetState();
+            return;
+        }
+        if (e.key !== 'Tab' || !dialogRef.current) return;
+        const focusable = Array.from(dialogRef.current.querySelectorAll<HTMLElement>(
+            'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        )).filter(el => el.offsetParent !== null);
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && (document.activeElement === first || document.activeElement === dialogRef.current)) {
+            e.preventDefault();
+            last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+        }
+    };
+
     const ui = (
         <>
             {open && (
@@ -423,12 +472,14 @@ export default function ChatWidget() {
 
             {!open && (
                 <button
+                    ref={launcherRef}
                     aria-label="Parler à un bénévole écoutant"
+                    aria-haspopup="dialog"
                     onClick={() => setOpen(true)}
                     // At rest only the icon; hovering or focusing it reveals the label
                     className="group fixed bottom-5 right-5 z-50 flex h-14 cursor-pointer items-center rounded-full bg-primary px-4 text-primary-foreground shadow-lg pointer-events-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                 >
-                    <MessageCircle className="size-6 shrink-0"/>
+                    <MessageCircle className="size-6 shrink-0" aria-hidden="true"/>
                     <span
                         aria-hidden="true"
                         className="max-w-0 overflow-hidden whitespace-nowrap text-sm font-medium opacity-0 transition-all duration-300 ease-out group-hover:ml-2 group-hover:max-w-56 group-hover:opacity-100 group-focus-visible:ml-2 group-focus-visible:max-w-56 group-focus-visible:opacity-100 motion-reduce:transition-none"
@@ -440,18 +491,21 @@ export default function ChatWidget() {
 
             {open && (
                 <div
+                    ref={dialogRef}
+                    tabIndex={-1}
+                    onKeyDown={onDialogKeyDown}
                     role="dialog"
                     aria-modal="true"
-                    aria-label="Écoute"
+                    aria-labelledby="widget-title"
                     className="fixed inset-0 z-[10000] flex flex-col overflow-hidden bg-background pointer-events-auto sm:inset-auto sm:bottom-5 sm:right-5 sm:h-[min(80vh,760px)] sm:w-[440px] sm:rounded-3xl sm:border sm:shadow-2xl"
                 >
                     {/* Header: who you are talking to, and where the conversation stands */}
                     <header className="flex items-center justify-between gap-3 border-b px-5 py-4">
                         <div className="min-w-0">
-                            <h2 className="text-base font-semibold leading-tight">Écoute</h2>
+                            <h2 id="widget-title" className="text-base font-semibold leading-tight">Écoute</h2>
                             {consented ? (
                                 <p className="mt-0.5 flex items-center gap-2 text-sm text-muted-foreground" aria-live="polite">
-                                    <span className={cn(
+                                    <span aria-hidden="true" className={cn(
                                         "size-2 shrink-0 rounded-full",
                                         line.tone === 'live' && "bg-emerald-500",
                                         line.tone === 'wait' && "bg-amber-400",
@@ -471,7 +525,7 @@ export default function ChatWidget() {
                                     onClick={handleCloseTicket}
                                     className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                                 >
-                                    <LogOut className="size-3.5"/>
+                                    <LogOut className="size-3.5" aria-hidden="true"/>
                                     Terminer
                                 </button>
                             )}
@@ -483,7 +537,7 @@ export default function ChatWidget() {
                                 aria-label="Fermer la fenêtre"
                                 className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                             >
-                                <X className="size-5"/>
+                                <X className="size-5" aria-hidden="true"/>
                             </button>
                         </div>
                     </header>
@@ -534,15 +588,15 @@ export default function ChatWidget() {
                             </h3>
                             <ul className="mt-6 space-y-4 text-sm leading-relaxed">
                                 <li className="flex gap-3">
-                                    <EyeOff className="mt-0.5 size-5 shrink-0 text-primary"/>
+                                    <EyeOff className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true"/>
                                     <span>Vous restez anonyme : pas besoin de donner votre nom, et le bénévole ne voit pas qui vous êtes.</span>
                                 </li>
                                 <li className="flex gap-3">
-                                    <Lock className="mt-0.5 size-5 shrink-0 text-primary"/>
+                                    <Lock className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true"/>
                                     <span>Ce que vous dites reste confidentiel. Les bénévoles sont tenus au secret.</span>
                                 </li>
                                 <li className="flex gap-3">
-                                    <Heart className="mt-0.5 size-5 shrink-0 text-primary"/>
+                                    <Heart className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true"/>
                                     <span>Ce service est fait pour celles et ceux qui en ont besoin : merci de le respecter.</span>
                                 </li>
                             </ul>
@@ -551,6 +605,7 @@ export default function ChatWidget() {
                                 <a href="/confidentialite" target="_blank" rel="noreferrer"
                                    className="underline underline-offset-2 hover:text-foreground">
                                     Notre politique de confidentialité
+                                    <span className="sr-only"> (s&apos;ouvre dans un nouvel onglet)</span>
                                 </a>
                             </p>
                             <div className="mt-auto flex flex-col gap-2 pt-8">
@@ -577,7 +632,8 @@ export default function ChatWidget() {
                         </div>
                     ) : (
                         <>
-                            <div className="flex-1 space-y-3 overflow-y-auto px-5 py-5" aria-live="polite">
+                            <div className="flex-1 space-y-3 overflow-y-auto px-5 py-5"
+                                 role="log" aria-live="polite" aria-relevant="additions" aria-label="Conversation">
                                 {loading && <p className="text-sm text-muted-foreground">Connexion…</p>}
                                 {!loading && messages.length === 0 && !ended && (
                                     <div className="rounded-2xl bg-muted/60 px-4 py-3 text-sm leading-relaxed">
@@ -612,7 +668,9 @@ export default function ChatWidget() {
                                                     ? "rounded-2xl rounded-br-md bg-primary text-primary-foreground"
                                                     : "rounded-2xl rounded-bl-md border border-primary/30 bg-primary/15 text-foreground",
                                             )}>
-                                                {!mine && <p className="mb-0.5 text-xs font-semibold text-foreground/70">Bénévole Écoutant</p>}
+                                                {mine
+                                                    ? <p className="sr-only">Vous :</p>
+                                                    : <p className="mb-0.5 text-xs font-semibold text-foreground/70">Bénévole Écoutant</p>}
                                                 <p className="whitespace-pre-wrap break-words text-sm leading-relaxed">{m.content}</p>
                                                 <p className={cn("mt-1 text-right text-[11px]", mine ? "text-primary-foreground/75" : "text-muted-foreground")}>
                                                     {new Date(m.timestamp).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}
@@ -638,6 +696,11 @@ export default function ChatWidget() {
                             )}
 
                             <div className="border-t p-3">
+                                {actionError && (
+                                    <p role="alert" className="mb-2 rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                                        {actionError}
+                                    </p>
+                                )}
                                 {ended ? (
                                     <p className="py-2 text-center text-sm text-muted-foreground">
                                         Cette écoute est terminée.
@@ -658,7 +721,8 @@ export default function ChatWidget() {
                                             value={input}
                                             onChange={(e) => setInput(e.target.value)}
                                             onKeyDown={(e) => {
-                                                if (e.key === 'Enter' && !e.shiftKey) {
+                                                // Enter sends, Shift+Enter adds a line; not while a word is being composed
+                                                if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
                                                     e.preventDefault();
                                                     handleSend();
                                                 }
@@ -672,7 +736,7 @@ export default function ChatWidget() {
                                             className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground transition-opacity disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                                             aria-label="Envoyer"
                                         >
-                                            <Send className="size-4"/>
+                                            <Send className="size-4" aria-hidden="true"/>
                                         </button>
                                     </form>
                                 )}
