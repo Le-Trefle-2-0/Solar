@@ -1,6 +1,8 @@
 import {subHours} from 'date-fns';
+import {redirect} from "next/navigation";
 import {Chat} from "@/components/chat";
 import prisma from "@/lib/prisma";
+import {getAccess} from "@/lib/userPermissions";
 
 import {constructMetadata} from "@/lib/metadata";
 
@@ -10,6 +12,9 @@ export const metadata = constructMetadata({
 });
 
 export default async function MainChat() {
+    // Its own check: a partial render can reach this page without running the layout's
+    if (!await getAccess()) redirect('/auth/sign-in');
+
     const now = new Date();
     const twoHoursAgo = subHours(now, 2);
 
