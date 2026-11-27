@@ -87,9 +87,9 @@ export async function initSocket(jwt: string): Promise<Socket | null> {
          
         console.log('[ws] connected', socket?.id);
     });
+    // A warning, not an error: the client retries by itself (service restarting, expired token)
     const onConnectError = (err: any) => {
-         
-        console.error('[ws] connect_error', err?.message || err, {
+        console.warn('[ws] connect_error', err?.message || err, {
             base,
             transport: socket?.io?.engine?.transport?.name,
             auth: !!jwt

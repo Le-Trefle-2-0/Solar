@@ -7,6 +7,7 @@ import {headers} from "next/headers";
 import {SocketProvider} from "@/context/Socket";
 import {VoiceProvider} from "@/context/Voice";
 import {DocumentSubmissionDialog} from "@/components/users/document-submission-dialog";
+import {AccountOnHold} from "@/components/users/account-on-hold";
 import {addDays, differenceInDays, format} from "date-fns";
 import {fr} from "date-fns/locale";
 import prisma from "@/lib/prisma";
@@ -67,6 +68,19 @@ export default async function RootLayout({
         isDismissible = true;
     }
 
+    // Refused by the API (documents missing or refused, suspended): the app would only collect
+    // "unauthorized" answers, so only the document dialog is shown, without sidebar nor realtime
+    if (!access) {
+        return (
+            <>
+                <AccountOnHold reason={showDocDialog ? "documents" : "suspended"}/>
+                {showDocDialog && (
+                    <DocumentSubmissionDialog open={true} isRenewal={isRenewal} deadline={deadlineStr} isDismissible={false}/>
+                )}
+            </>
+        );
+    }
+
     let pendingDocsCount = 0;
     if (isAdmin) {
         pendingDocsCount = await prisma.user.count({
@@ -94,9 +108,6 @@ export default async function RootLayout({
         }
     });
 
-    console.log('[Layout] Channels with latest messages:', JSON.stringify(channels, null, 2));
-    console.log('[Layout] User ID:', user.id);
-    console.log('[Layout] Channel last read map:', JSON.stringify(Array.from(channelLastReadMap.entries()), null, 2));
 
     const unreadChannelIds = channels
         .filter(c => {
@@ -113,13 +124,10 @@ export default async function RootLayout({
         })
         .map(c => c.id);
 
-    console.log('[Layout] Calculated unreadChannelIds:', unreadChannelIds);
-
-    const pendingDocs = await prisma.user.findMany({
-        where: { documentsStatus: 'submitted' },
-        select: { id: true }
-    });
-    const pendingDocsIds = pendingDocs.map(u => u.id);
+    // Accounts waiting for document review: only for those who review them
+    const pendingDocsIds = isAdmin
+        ? (await prisma.user.findMany({where: {documentsStatus: 'submitted'}, select: {id: true}})).map(u => u.id)
+        : [];
 
     return (
         <SocketProvider>
