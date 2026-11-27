@@ -92,7 +92,11 @@ export function signGuest(secret: string, channelId: string, uid: string, exp: n
     return createHmac('sha256', secret).update(`${channelId}.${uid}.${exp}`).digest('hex');
 }
 
-export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Server} {
+/** Sent between instances so each re-checks its own sockets (#249 with REDIS_URL). */
+const RECHECK_EVENT = 'solar:recheck';
+type Recheck = {room?: string; all?: boolean};
+
+export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Server; enableCluster: () => void} {
     const log = deps.log ?? console;
     const httpServer = createServer();
     const corsOrigin = deps.corsOrigin || '*';
@@ -398,6 +402,14 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
         }
     }
 
+    /** Several instances (Redis adapter): broadcasts reach one instance, which tells the others. */
+    let clustered = false;
+    async function runRecheck(recheck: Recheck) {
+        if (recheck.all) await refreshAllVolunteers();
+        else if (isChannelId(recheck.room)) await recheckRoom(recheck.room);
+    }
+    io.on(RECHECK_EVENT, (recheck: Recheck) => void runRecheck(recheck ?? {}).catch(e => log.error('[ws] recheck failed', e)));
+
     // Signed out, reset password, removed account: sockets close within a few minutes even
     // without any other event (#276)
     const sessionCheck = setInterval(() => void refreshAllVolunteers(), deps.sessionCheckMs ?? 2 * 60_000);
@@ -493,9 +505,14 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
                         }
                         send(res, 200, {success: true});
 
-                        // Keep room membership in line with assignments and roles
-                        if (event === 'updateRequest' && isChannelId(eventData?.channelId)) await recheckRoom(eventData.channelId);
-                        if (event === 'permissionsUpdate') await refreshAllVolunteers();
+                        // Keep room membership in line with assignments and roles, on every
+                        // instance: each one can only re-check its own sockets
+                        const recheck: Recheck | null = event === 'updateRequest' && isChannelId(eventData?.channelId)
+                            ? {room: eventData.channelId} : event === 'permissionsUpdate' ? {all: true} : null;
+                        if (recheck) {
+                            if (clustered) io.serverSideEmit(RECHECK_EVENT, recheck);
+                            await runRecheck(recheck);
+                        }
                     } catch {
                         send(res, 400, 'bad json');
                     }
@@ -510,5 +527,11 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
         }
     });
 
-    return {httpServer, io};
+    return {
+        httpServer,
+        io,
+        enableCluster: () => {
+            clustered = true;
+        },
+    };
 }

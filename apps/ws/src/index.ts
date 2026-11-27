@@ -70,7 +70,7 @@ async function internalPost<T>(route: string, body: unknown): Promise<T | null> 
     }
 }
 
-const {httpServer, io} = createWsServer({
+const {httpServer, io, enableCluster} = createWsServer({
     verifyJwt,
     checkApiKey: async (key) => {
         const data = await internalPost<{valid?: boolean; user?: {id: string}}>('/v1/keys/check', {key});
@@ -100,6 +100,9 @@ if (process.env.REDIS_URL) {
     const pub = new Redis(process.env.REDIS_URL);
     const sub = pub.duplicate();
     io.adapter(createAdapter(pub, sub));
+    // Revocations and reassignments are re-checked on every instance, not only the one that
+    // received the broadcast
+    enableCluster();
 }
 
 // Last line of defence: log instead of crashing on a stray rejected promise (#239)
