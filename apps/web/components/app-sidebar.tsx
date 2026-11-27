@@ -7,10 +7,13 @@ import {
     ChevronRight,
     Ear,
     History,
+    Hourglass,
     House,
+    type LucideIcon,
     Mail,
     MessageSquareMore,
     MessagesSquare,
+    NotebookPen,
     Phone,
     Settings,
     Shield,
@@ -41,6 +44,25 @@ import {useSocket} from "@/context/Socket";
 import {VoiceDock} from "@/components/voice/voice-dock";
 import {isTicketCallLive, useVoiceStatus} from "@/hooks/use-voice-status";
 import {UserButton} from "@/components/user-button";
+
+/**
+ * Where an open écoute stands, from the viewer's side: waiting for a volunteer, assigned to
+ * the viewer, in progress with someone else (supervisors), or waiting for its transmission.
+ */
+type TicketState = "waiting" | "mine" | "in_progress" | "report";
+
+function ticketState(ticket: { statusName?: string; assignedUserId?: string | null }, userId?: string): TicketState {
+    if (ticket.statusName === "waiting") return "waiting";
+    if (ticket.statusName === "closed") return "report";
+    return userId && ticket.assignedUserId === userId ? "mine" : "in_progress";
+}
+
+const TICKET_STATES: Record<TicketState, { label: string; icon: LucideIcon; className: string; voiceIcon: boolean }> = {
+    waiting: {label: "en attente d'attribution", icon: Hourglass, className: "text-amber-600 dark:text-amber-400", voiceIcon: false},
+    mine: {label: "attribuée à vous", icon: Ear, className: "text-primary", voiceIcon: true},
+    in_progress: {label: "en cours avec un autre bénévole", icon: Ear, className: "text-muted-foreground", voiceIcon: true},
+    report: {label: "transmission à rédiger", icon: NotebookPen, className: "text-sky-600 dark:text-sky-400", voiceIcon: false},
+};
 
 export function AppSidebar({pendingDocsCount = 0, unreadChannelIds = [], pendingDocsIds = [], ...props}: React.ComponentProps<typeof Sidebar> & { pendingDocsCount?: number, unreadChannelIds?: string[], pendingDocsIds?: string[] }) {
     const {rooms: voiceRooms} = useVoiceStatus();
@@ -245,12 +267,16 @@ export function AppSidebar({pendingDocsCount = 0, unreadChannelIds = [], pending
                     const items = ticketList.map((ticket: any) => {
                         const idStr = String(ticket.id).padStart(5, '0');
                         const displayName = `Écoute ${idStr}`;
+                        const state = TICKET_STATES[ticketState(ticket, session?.user?.id)];
                         return {
                             name: displayName,
                             url: '/app/ticket/' + ticket.channelId,
                             channelId: ticket.channelId,
-                            // Voice tickets show a phone; a green dot while the call is going on
-                            icon: ticket.voice ? Phone : Ear,
+                            // The icon tells the status; voice écoutes show a phone while in progress,
+                            // and a green dot while the call is going on
+                            icon: ticket.voice && state.voiceIcon ? Phone : state.icon,
+                            iconClassName: state.className,
+                            status: state.label,
                             live: false,
                             hasNotification: unreadIds.has(ticket.channelId) && activeChannelId !== ticket.channelId
                         };
@@ -295,7 +321,8 @@ export function AppSidebar({pendingDocsCount = 0, unreadChannelIds = [], pending
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarHeader>
-            <SidebarContent>
+            {/* Vertical scroll only: nothing in the list may push the sidebar sideways */}
+            <SidebarContent className="overflow-x-hidden overflow-y-auto">
                 <NavProjects projects={filteredBaseData}/>
                 {tickets.length > 0 && (
                     <>
@@ -319,9 +346,11 @@ export function AppSidebar({pendingDocsCount = 0, unreadChannelIds = [], pending
                                             <SidebarMenuSub>
                                                 {ticketsWithVoice.map((ticket: any) => (
                                                     <SidebarMenuSubItem key={ticket.name}>
-                                                        <SidebarMenuSubButton asChild className="relative">
-                                                            <a href={ticket.url}>
-                                                                <span>{ticket.name}</span>
+                                                        <SidebarMenuSubButton asChild className="relative pr-6">
+                                                            <a href={ticket.url} title={`${ticket.name} : ${ticket.status}`}>
+                                                                <ticket.icon className={ticket.iconClassName} aria-hidden/>
+                                                                <span className="truncate">{ticket.name}</span>
+                                                                <span className="sr-only">, {ticket.status}</span>
                                                                 {ticket.live && (
                                                                     <Phone className="size-3 text-emerald-600" aria-label="Appel en cours"/>
                                                                 )}
