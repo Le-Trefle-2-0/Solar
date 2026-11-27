@@ -2,6 +2,7 @@ import {createServer, type IncomingMessage, type Server as HttpServer, type Serv
 import {Server, type Socket} from 'socket.io';
 import {createHmac} from 'crypto';
 import {safeEqual} from './lib/safeEqual.js';
+import {visitorView} from './visitorView.js';
 
 /**
  * Realtime service. Access is never decided here: the API says who a volunteer is and which
@@ -42,8 +43,16 @@ export interface WsDeps {
 export const VOLUNTEERS = 'volunteers';
 export const READERS = 'readers';
 export const BOTS = 'bots';
+/** Visitors' widgets: they get an anonymised copy of the room's events (#255). */
+export const GUESTS = 'guests';
 const userRoom = (id: string) => `user:${id}`;
-const RESERVED = new Set([VOLUNTEERS, READERS, BOTS]);
+const RESERVED = new Set([VOLUNTEERS, READERS, BOTS, GUESTS]);
+
+/** Per connection: a burst of EVENT_BURST events, then EVENT_RATE per second (#258). */
+export const EVENT_BURST = 30;
+export const EVENT_RATE = 10;
+/** Dropped events before the connection is closed. */
+export const MAX_DROPPED_EVENTS = 200;
 
 const ROOM_RE = /^[A-Za-z0-9_-]{1,64}$/;
 export const isChannelId = (v: unknown): v is string => typeof v === 'string' && ROOM_RE.test(v) && !RESERVED.has(v);
@@ -104,6 +113,24 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
         return data(socket).user ?? null;
     }
 
+    /**
+     * An event for a channel's members (and readers): volunteers and the bot get it as is,
+     * visitors an anonymised copy, or nothing for team-only events (#255, #257).
+     */
+    async function emitToRoom(room: string, event: string, payload: unknown, opts: {readers?: boolean; except?: string} = {}) {
+        let target = io.to(room);
+        if (opts.readers) target = target.to(READERS);
+        target = target.except(GUESTS);
+        if (opts.except) target = target.except(opts.except);
+        target.emit(event, payload);
+        for (const s of await io.in(room).fetchSockets()) {
+            const sd = s.data as SocketData;
+            if (sd.kind !== 'guest' || s.id === opts.except) continue;
+            const view = visitorView(event, payload, sd.guestUid ?? '');
+            if (view !== null) s.emit(event, view);
+        }
+    }
+
     // ---- authentication ----
     io.use(async (socket, next) => {
         try {
@@ -153,10 +180,37 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
         const d = data(socket);
 
         /** Registers a handler that cannot throw and always gets a callable ack. */
+        // Token bucket per connection (#258)
+        let tokens = EVENT_BURST;
+        let refilledAt = Date.now();
+        let dropped = 0;
+        const allowEvent = () => {
+            const now = Date.now();
+            tokens = Math.min(EVENT_BURST, tokens + ((now - refilledAt) / 1000) * EVENT_RATE);
+            refilledAt = now;
+            if (tokens >= 1) {
+                tokens -= 1;
+                return true;
+            }
+            if (++dropped >= MAX_DROPPED_EVENTS) {
+                log.warn('[ws] too many events, closing', socket.id);
+                socket.disconnect(true);
+            }
+            return false;
+        };
+
         const on = (event: string, handler: (payload: any, ack: (...args: unknown[]) => void) => unknown) => {
             socket.on(event, async (...args: unknown[]) => {
                 const last = args[args.length - 1];
                 const ack = typeof last === 'function' ? (args.pop() as (...a: unknown[]) => void) : () => undefined;
+                if (!allowEvent()) {
+                    try {
+                        ack(false);
+                    } catch {
+                        // nothing else to do
+                    }
+                    return;
+                }
                 try {
                     await handler(args[0], ack);
                 } catch (e) {
@@ -190,6 +244,7 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
             }
         }
         if (d.kind === 'bot') socket.join(BOTS);
+        if (d.kind === 'guest') socket.join(GUESTS);
 
         on('ping', (_p, ack) => ack());
         on('heartbeat', () => socket.emit('heartbeat'));
@@ -203,7 +258,7 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
             }
             socket.join(room);
             const user = publicUser(socket);
-            if (user) io.to(room).emit('userJoined', {channelId: room, user});
+            if (user) await emitToRoom(room, 'userJoined', {channelId: room, user});
             ack(true);
         });
 
@@ -212,7 +267,7 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
             if (!isChannelId(room) || !socket.rooms.has(room)) return;
             socket.leave(room);
             const user = publicUser(socket);
-            if (user) io.to(room).emit('userLeft', {channelId: room, user});
+            if (user) void emitToRoom(room, 'userLeft', {channelId: room, user});
         });
 
         // Who is connected to Solar (any page): volunteers only, never visitors. The member list
@@ -239,7 +294,7 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
 
             const id = typeof payload.id === 'number' && Number.isInteger(payload.id) ? payload.id : null;
             const replyID = typeof payload.replyID === 'number' && Number.isInteger(payload.replyID) ? payload.replyID : null;
-            io.to(room).to(READERS).emit('message', {
+            await emitToRoom(room, 'message', {
                 id,
                 author: d.user,
                 content: neutralizeHtml(content),
@@ -249,7 +304,7 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
                 reactions: [],
                 replyID,
                 edited: false,
-            });
+            }, {readers: true});
             ack(true);
         });
 
@@ -260,7 +315,7 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
             const user = d.kind === 'guest' ? {id: d.guestUid, name: 'Visiteur', image: null}
                 : d.kind === 'bot' ? {id: 'guest', name: 'Visiteur', image: null} : d.user
                 ? {id: d.user.id, name: d.user.username, image: d.user.image} : null;
-            if (user) socket.to(room).emit('typingIndicator', {id: room, user});
+            if (user) void emitToRoom(room, 'typingIndicator', {id: room, user}, {except: socket.id});
         });
 
         // Re-read identity and followed channels (after an assignment or a role change)
@@ -280,7 +335,7 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
             const user = publicUser(socket);
             if (!user) return;
             for (const room of socket.rooms) {
-                if (isChannelId(room)) io.to(room).emit('userLeft', {channelId: room, user});
+                if (isChannelId(room)) void emitToRoom(room, 'userLeft', {channelId: room, user}, {except: socket.id});
             }
         });
     });
@@ -424,7 +479,7 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
                             io.to(VOLUNTEERS).emit(event, eventData);
                         } else if (isChannelId(room)) {
                             // Channel content: members of the channel and those who may read every ticket
-                            io.to(room).to(READERS).emit(event, eventData);
+                            await emitToRoom(room, event, eventData, {readers: true});
                         } else {
                             return send(res, 400, 'invalid room');
                         }

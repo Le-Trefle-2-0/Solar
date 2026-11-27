@@ -314,3 +314,34 @@ test('signing out closes the volunteer sockets of that session (#276)', async ()
         await new Promise(r => httpServer.close(() => r(undefined)));
     }
 });
+
+test('ws: visitors get the room\'s events without the volunteers\' identity (#255)', async () => {
+    const exp = Date.now() + 60_000;
+    const [vol, guest] = await Promise.all([
+        client({jwt: 'jwt-vol'}),
+        client({guest: {uid: 'g7', channelId: 'c1', exp, sig: signGuest(SECRETS.guest, 'c1', 'g7', exp)}}),
+    ]);
+    assert.equal(await ack(guest, 'listen', {id: 'c1'}), true);
+    const author = {id: 'vol', name: 'Vol', image: 'https://cdn.example/vol.png', role: 'Bénévole Écoutant'};
+    const [toVolunteer, toGuest, joined] = [collect(vol, 'message'), collect(guest, 'message'), collect(guest, 'userJoined')];
+    assert.equal(await broadcast('c1', 'message', {id: 5, author, content: 'Bonjour'}), 200);
+    assert.equal(await ack(vol, 'listen', {id: 'c1'}), true);
+    assert.deepEqual((await toVolunteer)[0].author, author);
+    const seen = (await toGuest)[0];
+    assert.equal(seen.content, 'Bonjour');
+    assert.deepEqual(seen.author, {id: 'staff', name: 'Bénévole Écoutant', username: 'Bénévole Écoutant', image: null, role: null});
+    assert.deepEqual(await joined, [], 'who joins the channel is not told to the visitor');
+
+    const typing = collect(guest, 'typingIndicator');
+    vol.emit('typing', {id: 'c1'});
+    assert.equal((await typing)[0].user.name, 'Bénévole Écoutant');
+});
+
+test('ws: a flood of events is cut down, then the connection is closed (#258)', async () => {
+    const c = await client({jwt: 'jwt-solo'});
+    const answers = await Promise.all(Array.from({length: 60}, () => ack<boolean>(c, 'listen', {id: '1'})));
+    assert.ok(answers.filter(a => a === false).length >= 20, 'events beyond the burst are refused');
+    const closed = new Promise(r => c.once('disconnect', r));
+    for (let i = 0; i < 400; i++) c.emit('ping');
+    await closed;
+});

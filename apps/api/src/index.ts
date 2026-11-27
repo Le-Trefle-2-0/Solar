@@ -1,5 +1,6 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
+import {allowedOrigins, isSameSiteRequest} from './lib/requestOrigin.js';
 import cookie from '@fastify/cookie';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
@@ -28,20 +29,13 @@ const app = Fastify({
     bodyLimit: 50 * 1024 * 1024 // 50MB
 });
 
-const corsOriginEnv = process.env.API_CORS_ORIGIN || '';
-const corsOriginList = corsOriginEnv
-    .split(',')
-    .map((value) => value.trim())
-    .filter(Boolean);
-const corsOrigin = corsOriginList.length
-    ? (origin: string | undefined, cb: (err: Error | null, allow: boolean) => void) => {
-        if (!origin) return cb(null, true);
-        if (corsOriginList.includes('*') || corsOriginList.includes(origin)) {
-            return cb(null, true);
-        }
-        return cb(new Error(`CORS origin not allowed: ${origin}`), false);
-    }
-    : true;
+// Only the web app and API_CORS_ORIGIN, never any origin by default (#259)
+const corsOriginList = allowedOrigins();
+const corsOrigin = (origin: string | undefined, cb: (err: Error | null, allow: boolean) => void) => {
+    // No Origin: not a cross-origin browser request (server-to-server, same origin)
+    if (!origin) return cb(null, true);
+    return cb(null, isSameSiteRequest(origin, corsOriginList));
+};
 
 await app.register(cors, {origin: corsOrigin, credentials: true});
 await app.register(cookie);

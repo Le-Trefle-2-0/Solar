@@ -149,9 +149,11 @@ export function Message(props: {
     const [reactionMap, setReactionMap] = useState<{ [emoji: string]: Reaction[] }>();
 
     useEffect(() => {
-        const map: { [emoji: string]: Reaction[] } = {};
+        // No prototype: an "emoji" named "__proto__" or "constructor" is just a key (#257)
+        const map: { [emoji: string]: Reaction[] } = Object.create(null);
         (reactionList ?? []).forEach(r => {
-            if (!map[r.emoji]) map[r.emoji] = [];
+            if (typeof r?.emoji !== "string") return;
+            if (!Object.hasOwn(map, r.emoji)) map[r.emoji] = [];
             map[r.emoji].push(r);
         });
         setReactionMap(map);

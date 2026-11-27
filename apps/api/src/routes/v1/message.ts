@@ -7,6 +7,7 @@ import {z} from "zod";
 import {getUserPermissions, hasPermission} from '../../lib/permissions.js';
 import {neutralizeHtml} from '../../lib/sanitize.js';
 import {getChannelAccess} from '../../lib/channelAccess.js';
+import {isTicketWritable} from '../../lib/ticketWrites.js';
 
 async function checkAuth(req: any, reply: any) {
     const userId = await authenticate(req);
@@ -20,6 +21,12 @@ async function checkAuth(req: any, reply: any) {
 async function hasManagePermission(userId: string) {
     const perms = await getUserPermissions(userId);
     return hasPermission(perms, 'messages.manage');
+}
+
+/** The écoute a message belongs to is still open (#266). */
+async function messageWritable(ticketId: number | null): Promise<boolean> {
+    if (!ticketId) return true;
+    return isTicketWritable(await prisma.ticket.findUnique({where: {id: ticketId}, select: {statusName: true}}));
 }
 
 export async function registerMessageRoutes(app: FastifyInstance) {
@@ -47,6 +54,7 @@ export async function registerMessageRoutes(app: FastifyInstance) {
             const ticket = await prisma.ticket.findFirst({
                 where: {channelId: body.channelId}
             });
+            if (!isTicketWritable(ticket)) return reply.status(409).send({success: false, error: 'ticket_closed'});
 
             const message = await prisma.message.create({
                 data: {
@@ -108,6 +116,7 @@ export async function registerMessageRoutes(app: FastifyInstance) {
         }
 
         if (!authorized) return reply.status(403).send({success: false, error: 'Forbidden'});
+        if (!(await messageWritable(message.ticketId))) return reply.status(409).send({success: false, error: 'ticket_closed'});
 
         await prisma.reaction.deleteMany({where: {messageID: messageIdNum}});
         await prisma.message.delete({where: {id: messageIdNum}});
@@ -142,6 +151,7 @@ export async function registerMessageRoutes(app: FastifyInstance) {
         }
 
         if (!authorized) return reply.status(403).send({success: false, error: 'Forbidden'});
+        if (!(await messageWritable(message.ticketId))) return reply.status(409).send({success: false, error: 'ticket_closed'});
 
         const updated = await prisma.message.update({
             where: {id: messageIdNum},

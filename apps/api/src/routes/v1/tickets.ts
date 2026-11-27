@@ -6,6 +6,7 @@ import {broadcast} from '../../lib/broadcast.js';
 import {verifyWidgetSession} from '../../lib/widgetSession.js';
 import {getUserPermissions, hasPermission} from '../../lib/permissions.js';
 import {canAccessTicket} from '../../lib/channelAccess.js';
+import {publicTicket} from '../../lib/publicTicket.js';
 import {verifyPow} from '../../lib/pow.js';
 import {limitPerMinute} from '../../lib/rateLimit.js';
 import {archiveNote, canArchiveWithoutTransmission, closeTicket, broadcastStatusUpdate} from '../../lib/ticketClosing.js';
@@ -60,13 +61,13 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
                     })
                     : Promise.resolve([]),
             ]);
-            return reply.send({success: true, tickets: [...tickets, ...observed.map(t => ({...t, spectating: true}))]});
+            return reply.send({success: true, tickets: [...tickets.map(publicTicket), ...observed.map(t => ({...t, spectating: true}))]});
         }
 
         const tickets = await prisma.ticket.findMany({
             where: {statusName: {in: ['waiting', 'started', 'closed']}},
         });
-        return reply.send({success: true, tickets});
+        return reply.send({success: true, tickets: tickets.map(publicTicket)});
     });
 
     // GET /v1/tickets/history – list closed/commented tickets
@@ -95,7 +96,7 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
         const history = tickets.map(t => {
             const duration = Math.floor((t.updatedAt.getTime() - t.createdAt.getTime()) / 1000);
             return {
-                ...t,
+                ...publicTicket(t),
                 duration
             };
         });
@@ -143,7 +144,7 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
                 },
             });
             await broadcastStatusUpdate(ticket.channelId as string, status.id, status.name);
-            return reply.send({success: true, update});
+            return reply.send({success: true, update: publicTicket(update)});
         } catch (err) {
             if (err instanceof z.ZodError) return reply.status(400).send({success: false, errors: err.flatten()});
             return reply.status(500).send({success: false, message: 'Internal server error'});
@@ -217,7 +218,7 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
                 if (ticket.channelId) await broadcastStatusUpdate(ticket.channelId, archived.id, archived.name);
             }
 
-            return reply.send({success: true, update});
+            return reply.send({success: true, update: publicTicket(update)});
         } catch (e) {
             console.error('[api] Error closing ticket:', e);
             if (e instanceof z.ZodError) return reply.status(400).send({success: false, error: e.flatten()});
@@ -323,7 +324,7 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
 
             await broadcast(null, 'updateRequest', {channelId: updatedTicket.channelId});
 
-            return reply.send({success: true, ticket: updatedTicket});
+            return reply.send({success: true, ticket: publicTicket(updatedTicket)});
         } catch (e) {
             return reply.status(500).send({success: false, message: 'Internal server error'});
         }
@@ -350,7 +351,7 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
             if (!ticket) {
                 return reply.status(404).send({success: false, message: 'No ticket found'});
             }
-            return reply.send({success: true, ticket});
+            return reply.send({success: true, ticket: publicTicket(ticket)});
         } catch (e) {
             console.error('[API] Error in findBy/channelID:', e);
             if (e instanceof z.ZodError) return reply.status(400).send({success: false, error: e.flatten()});

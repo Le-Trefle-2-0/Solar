@@ -9,6 +9,8 @@ import {createChallenge, verifyPow} from '../../lib/pow.js';
 import {limitPerMinute} from '../../lib/rateLimit.js';
 import {getPermanenceStatus} from '../../lib/permanenceStatus.js';
 import {endVoiceCall} from '../../lib/voiceControl.js';
+import {isTicketWritable} from '../../lib/ticketWrites.js';
+import {isSameSiteRequest} from '../../lib/requestOrigin.js';
 
 const WIDGET_COOKIES = ['widget_channel', 'widget_uid', 'widget_exp', 'widget_sig', 'widget_public'];
 
@@ -34,6 +36,14 @@ function clearWidgetCookies(reply: any) {
 }
 
 export async function registerWidgetRoutes(app: FastifyInstance) {
+    // Starting, closing or writing in a visitor's écoute: only from our own pages (#271)
+    app.addHook('preHandler', async (req, reply) => {
+        const widgetWrite = req.method === 'POST' && (req.url.startsWith('/v1/widget/') || req.url.startsWith('/v1/messages/widget/'));
+        if (widgetWrite && !isSameSiteRequest(req.headers.origin)) {
+            return reply.status(403).send({success: false, error: 'forbidden_origin'});
+        }
+    });
+
     app.get('/v1/widget/challenge', limitPerMinute(20), async () => createChallenge());
 
     // Is the listening service open right now (a permanence is running), and when does it reopen?
@@ -199,8 +209,9 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
             });
             await broadcast(null, 'updateRequest', {channelId});
 
-            // We do NOT clear cookies here anymore, so the user can still read the chat until they clear it
-            return reply.send({success: true, ticket: updated});
+            // We do NOT clear cookies here anymore, so the user can still read the chat until they clear it.
+            // Only the status: never the ticket's internal fields (#271)
+            return reply.send({success: true, status: updated.statusName});
         } catch (e) {
             console.error('[widget] close error:', e);
             return reply.status(500).send({success: false, error: 'internal_error'});
@@ -295,6 +306,8 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
             const ticket = await prisma.ticket.findFirst({
                 where: {channelId}
             });
+            // The écoute ended: the visitor reads it, no longer writes in it (#266)
+            if (!ticket || !isTicketWritable(ticket)) return reply.status(409).send({success: false, error: 'ticket_closed'});
 
             const message = await prisma.message.create({
                 data: {
