@@ -17,7 +17,7 @@ import {
     X
 } from "lucide-react";
 import * as LucideIcons from "lucide-react";
-import React, {FormEvent, useEffect, useLayoutEffect, useRef, useState} from "react";
+import React, {FormEvent, useEffect, useRef, useState} from "react";
 import {EventData, formVolunteer, Msg, MsgWithID} from "@/lib/interface";
 import {TicketInfoDialog} from "@/components/ticket-info-dialog";
 import {PermanencePresence} from "@/components/permanence-presence";
@@ -60,7 +60,6 @@ import {cn} from "@/lib/utils"
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,} from "@/components/ui/command"
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form"
 import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover"
-import {ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger} from "@/components/ui/context-menu"
 import type {Reaction, Ticket} from "../../../generated/prisma"
 import {useRouter} from "next/navigation";
 import {Message} from "@/components/message";
@@ -68,6 +67,36 @@ import {useSocket} from "@/context/Socket";
 import {PermanenceVoiceControls, TicketVoiceControls} from "@/components/voice/chat-voice-controls";
 import {apiFetch} from "@/lib/api";
 import {markChannelAsRead} from "@/app/actions/chat";
+
+/** "Nouveaux messages" divider: cleared once it has been fully on screen. One observer, cleaned up. */
+function UnreadSeparator({onSeen}: { onSeen: () => void }) {
+    const ref = useRef<HTMLDivElement>(null);
+    const seen = useRef(onSeen);
+    useEffect(() => {
+        seen.current = onSeen;
+    }, [onSeen]);
+    useEffect(() => {
+        const el = ref.current;
+        if (!el) return;
+        const observer = new IntersectionObserver(([entry]) => {
+            if (entry.isIntersecting) {
+                seen.current();
+                observer.disconnect();
+            }
+        }, {threshold: 1.0});
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, []);
+    return (
+        <div ref={ref} role="separator" aria-label="Nouveaux messages" className="flex items-center my-4 unread-separator">
+            <div className="flex-grow h-px bg-red-500/50" aria-hidden/>
+            <span className="mx-4 text-xs font-bold text-red-700 dark:text-red-400 uppercase tracking-wider bg-background px-2" aria-hidden>
+                Nouveaux messages
+            </span>
+            <div className="flex-grow h-px bg-red-500/50" aria-hidden/>
+        </div>
+    );
+}
 
 export function Chat(props: { channelID: string, statusID: number }) {
     const {channelID, statusID} = props;
@@ -105,7 +134,6 @@ export function Chat(props: { channelID: string, statusID: number }) {
     const [chat, setChat] = useState<MsgWithID[]>([])
     const [availableCategories, setAvailableCategories] = useState<string[]>([]);
     const [loadingMessages, setLoadingMessages] = useState(true)
-    const [retryMs, setRetryMs] = useState(1000)
     const [skeletonItems, setSkeletonItems] = useState<{ nameW: number; line1W: number; line2W: number }[]>([])
     const INITIAL_LIMIT = 60
     const [hasMore, setHasMore] = useState(true)
@@ -148,122 +176,8 @@ export function Chat(props: { channelID: string, statusID: number }) {
         }
     };
 
-    // LanguageTool (French) spellcheck state for chat input
-    const [ltMatches, setLtMatches] = useState<{
-        offset: number;
-        length: number;
-        message: string;
-        replacements?: string[]
-    }[]>([]);
-    const [highlightHtml, setHighlightHtml] = useState<string>("");
-    const ltAbortRef = useRef<AbortController | null>(null);
-    const overlayRef = useRef<HTMLDivElement>(null);
-    const inputWrapperRef = useRef<HTMLDivElement>(null);
-    const [ctxData, setCtxData] = useState<{ offset: number; length: number; suggestions: string[] }>({
-        offset: 0,
-        length: 0,
-        suggestions: []
-    });
     const initialAutoScrollPending = useRef(false);
     const isAtBottomRef = useRef(true);
-
-    // Escape HTML to safely build overlay content
-    const escapeHtml = (s: string) => s
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;");
-
-    // Build highlighted HTML using LanguageTool matches (underline errors)
-    const buildHighlightHtml = (text: string, matches: { offset: number; length: number; message: string }[]) => {
-        if (!text) return "";
-        const safe = escapeHtml(text);
-        if (!matches || matches.length === 0) return safe;
-        // Map through original indices; since we escaped, indices still align as we only replaced single chars
-        let result = "";
-        let cursor = 0;
-        // Merge overlapping matches and sort
-        const sorted = [...matches]
-            .filter(m => m.length > 0)
-            .sort((a, b) => a.offset - b.offset);
-        const merged: { offset: number; length: number; message: string }[] = [];
-        for (const m of sorted) {
-            if (merged.length === 0) {
-                merged.push({...m});
-                continue;
-            }
-            const last = merged[merged.length - 1];
-            const lastEnd = last.offset + last.length;
-            if (m.offset <= lastEnd) {
-                // overlap, extend
-                const newEnd = Math.max(lastEnd, m.offset + m.length);
-                merged[merged.length - 1] = {offset: last.offset, length: newEnd - last.offset, message: last.message};
-            } else {
-                merged.push({...m});
-            }
-        }
-        for (const m of merged) {
-            const start = m.offset;
-            const end = m.offset + m.length;
-            if (start > safe.length) break;
-            if (cursor < start) result += safe.slice(cursor, start);
-            const frag = safe.slice(start, Math.min(end, safe.length));
-            result += `<span class="lt-err" data-offset="${start}" data-length="${m.length}" title="${escapeHtml(m.message)}">${frag}</span>`;
-            cursor = end;
-        }
-        if (cursor < safe.length) result += safe.slice(cursor);
-        return result;
-    };
-
-    // No third-party spell checker: écoute drafts never leave Solar (#260). The browser's own
-    // checker (spellCheck on the textarea) underlines mistakes locally.
-
-    // Rebuild highlight HTML when text or matches change
-    useEffect(() => {
-        setHighlightHtml(buildHighlightHtml(currentMsg, ltMatches));
-    }, [currentMsg, ltMatches]);
-
-    // Mirror textarea's computed styles into the overlay to ensure exact underline placement
-    useLayoutEffect(() => {
-        const ta = textRef.current;
-        const ov = overlayRef.current;
-        if (!ta || !ov) return;
-
-        const sync = () => {
-            const cs = window.getComputedStyle(ta);
-            const props = [
-                "fontFamily",
-                "fontSize",
-                "fontWeight",
-                "fontStyle",
-                "letterSpacing",
-                "textTransform",
-                "textIndent",
-                "wordSpacing",
-                "lineHeight",
-                "paddingTop",
-                "paddingRight",
-                "paddingBottom",
-                "paddingLeft",
-                "boxSizing",
-                "tabSize",
-            ] as const;
-            props.forEach((p) => {
-                ov.style[p] = (cs as any)[p] || "";
-            });
-            // Ensure wrapping behavior matches textarea
-            ov.style.whiteSpace = "pre-wrap";
-        };
-
-        sync();
-        const ro = new ResizeObserver(() => sync());
-        ro.observe(ta);
-        window.addEventListener("resize", sync);
-        return () => {
-            ro.disconnect();
-            window.removeEventListener("resize", sync);
-        };
-    }, []);
-
 
     const messageSchema = z
         .string()
@@ -273,7 +187,8 @@ export function Chat(props: { channelID: string, statusID: number }) {
         });
 
 
-    const sendMessage = async (content: string) => {
+    /** True once saved; on failure the user is told and nothing is lost (see sendForm). */
+    const sendMessage = async (content: string): Promise<boolean> => {
         const msg: Msg = {
             author: {
                 id: session?.user.id as string,
@@ -307,8 +222,11 @@ export function Chat(props: { channelID: string, statusID: number }) {
                 if (savedMessage.id && pre.some(m => m.id === savedMessage.id)) return pre;
                 return [...pre, msgWithID];
             });
+            return true;
         } catch (error) {
             console.error("Error saving message:", error);
+            toast.error((error as Error)?.message || "Le message n'a pas pu être envoyé. Réessayez.");
+            return false;
         }
     };
 
@@ -323,9 +241,15 @@ export function Chat(props: { channelID: string, statusID: number }) {
             }
         }
         if (currentMsg !== "") {
-            sendMessage(currentMsg);
+            const draft = currentMsg;
+            const reply = replyTo;
             setCurrentMsg("");
             setReplyTo(null);
+            // Not saved: the text and the reply come back, so nothing typed is lost
+            if (!await sendMessage(draft)) {
+                setCurrentMsg(current => current || draft);
+                setReplyTo(current => current ?? reply);
+            }
         }
     }
 
@@ -486,7 +410,6 @@ export function Chat(props: { channelID: string, statusID: number }) {
         };
 
         const onReactionAdd = (data: any) => {
-            console.log("REACTION ADD", data);
             setChat(prev =>
                 prev.map(message => {
                     if (message.id === data.messageID) {
@@ -526,7 +449,6 @@ export function Chat(props: { channelID: string, statusID: number }) {
         };
 
         const onReactionRemove = (data: any) => {
-            console.log("REACTION REMOVE", data);
             const {messageID, reactionID} = data;
 
             setChat(prev =>
@@ -598,9 +520,29 @@ export function Chat(props: { channelID: string, statusID: number }) {
         return () => window.removeEventListener('focus', onFocus);
     }, [channelID]);
 
+    // The écoute behind the channel: fetched again when its status changes, without reloading
+    // the messages (they do not depend on it)
+    const isTicket = status !== 0;
+    useEffect(() => {
+        if (!isTicket) return;
+        let cancelled = false;
+        apiFetch(`/v1/tickets/findBy/channelID`, {
+            method: "POST",
+            body: JSON.stringify({channelID}),
+        }).then((d) => {
+            if (!cancelled) setTicket(d.ticket);
+        }).catch(() => {
+        });
+        return () => {
+            cancelled = true;
+        };
+    }, [channelID, isTicket, status]);
+
     useEffect(() => {
         let cancelled = false;
         let timer: NodeJS.Timeout | null = null;
+        // Backoff between failed loads: doubles up to 10 s (local, so each retry sees the last value)
+        let delay = 1000;
 
         const load = async () => {
             if (cancelled) return;
@@ -621,7 +563,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                 setChat(data);
                 setHasMore(Array.isArray(data) && data.length >= INITIAL_LIMIT);
                 setLoadingMessages(false);
-                setRetryMs(1000);
+                delay = 1000;
 
                 // Fetch supplemental data after messages succeed (best-effort)
                 apiFetch(`/v1/channel/${channelID}`)
@@ -630,16 +572,6 @@ export function Chat(props: { channelID: string, statusID: number }) {
                     })
                     .catch(() => {
                     });
-
-                if (status !== 0) {
-                    apiFetch(`/v1/tickets/findBy/channelID`, {
-                        method: "POST",
-                        body: JSON.stringify({channelID}),
-                    }).then((d) => {
-                        if (!cancelled) setTicket(d.ticket);
-                    }).catch(() => {
-                    });
-                }
 
                 apiFetch(`/v1/settings/ticket-categories`)
                     .then((data: { categories?: any[] }) => {
@@ -653,11 +585,10 @@ export function Chat(props: { channelID: string, statusID: number }) {
             } catch (e) {
                 if (cancelled) return;
                 // Keep skeleton visible and retry with exponential backoff
-                const next = Math.min(retryMs * 2, 10000);
                 timer = setTimeout(() => {
                     if (!cancelled) load();
-                }, retryMs);
-                setRetryMs(next);
+                }, delay);
+                delay = Math.min(delay * 2, 10000);
             }
         };
 
@@ -678,7 +609,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
             cancelled = true;
             if (timer) clearTimeout(timer);
         }
-    }, [channelID, status]);
+    }, [channelID]);
 
     useEffect(() => {
         try {
@@ -815,46 +746,6 @@ export function Chat(props: { channelID: string, statusID: number }) {
         }
     }, [loadingMessages]);
 
-    const nonChar = [
-        "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight",
-        "Home", "End", "PageUp", "PageDown",
-
-        "Escape", "Enter", "Tab",
-        "ContextMenu", "PrintScreen", "Pause", "ScrollLock",
-
-        "Alt", "AltGraph", "CapsLock", "Control", "Fn", "FnLock",
-        "Meta", "Shift", "NumLock", "Symbol", "SymbolLock", "Hyper",
-
-        "F1", "F2", "F3", "F4", "F5", "F6",
-        "F7", "F8", "F9", "F10", "F11", "F12",
-        "Soft1", "Soft2", "Soft3", "Soft4",
-
-        "Clear",
-        "Copy",
-
-        "MediaPlay", "MediaPause", "MediaStop",
-        "MediaTrackNext", "MediaTrackPrevious", "MediaSelect",
-
-        "VolumeMute", "VolumeDown", "VolumeUp",
-        "AudioVolumeMute", "AudioVolumeDown", "AudioVolumeUp",
-
-        "LaunchMail", "LaunchMediaPlayer",
-
-        "SpeechToggle", "SpeechDictation",
-
-        "NumpadEnter",
-        "NumpadAdd", "NumpadSubtract", "NumpadMultiply", "NumpadDivide",
-        "NumpadDecimal",
-        "NumpadEqual",
-        "NumpadParenLeft", "NumpadParenRight",
-        "NumpadMemoryAdd", "NumpadMemoryClear", "NumpadMemoryRecall",
-        "NumpadMemoryStore", "NumpadMemorySubtract",
-
-        "Help", "Insert", "Clear",
-
-        "Unidentified"
-    ];
-
     const FormSchema = z.object({
         volunteer: z.object({
             // `message` works with zod 3 and 4
@@ -974,9 +865,11 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
     return (
         <div className="flex flex-row items-center justify-center w-full">
-            <div className="flex flex-col relative h-svh p-3 gap-4 w-full" tabIndex={0} ref={rootDivRef}>
-                {/*<video className='w-0 h-0' playsInline ref={callingVideoRef} autoPlay/>*/}
-                <div className="flex flex-col flex-grow overflow-y-auto" ref={messagesContainerRef}>
+            <div className="flex flex-col relative h-svh p-3 gap-4 w-full" ref={rootDivRef}>
+                {/* The conversation: a live log, so screen readers announce new messages */}
+                <div className="flex flex-col flex-grow overflow-y-auto" ref={messagesContainerRef}
+                     role="log" aria-live="polite" aria-relevant="additions" aria-label={`Messages${channelName ? ` : ${channelName}` : ""}`}
+                     aria-busy={loadingMessages || loadingOlder}>
                     <div className="h-28 shrink-0"/>
                     {loadingMessages ? (
                         <div className="flex flex-col gap-4 px-2 py-2">
@@ -1038,29 +931,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                 return (
                                     <React.Fragment key={id}>
                                         {showUnreadBar && (
-                                            <div 
-                                                className="flex items-center my-4 unread-separator"
-                                                ref={(el) => {
-                                                    if (el && lastReadTimestamp) {
-                                                        const observer = new IntersectionObserver(
-                                                            ([entry]) => {
-                                                                if (entry.isIntersecting) {
-                                                                    setLastReadTimestamp(null);
-                                                                    observer.disconnect();
-                                                                }
-                                                            },
-                                                            { threshold: 1.0 }
-                                                        );
-                                                        observer.observe(el);
-                                                    }
-                                                }}
-                                            >
-                                                <div className="flex-grow h-px bg-red-500/50" />
-                                                <span className="mx-4 text-xs font-bold text-red-500 uppercase tracking-wider bg-background px-2">
-                                                    Nouveaux messages
-                                                </span>
-                                                <div className="flex-grow h-px bg-red-500/50" />
-                                            </div>
+                                            <UnreadSeparator onSeen={() => setLastReadTimestamp(null)}/>
                                         )}
                                         <Message
                                             prevDate={prevDate as number}
@@ -1501,116 +1372,36 @@ export function Chat(props: { channelID: string, statusID: number }) {
                     ) : (
                     <form ref={formRef} onSubmit={(e) => sendForm(e)}
                           className='flex flex-row w-full gap-2 items-center'>
-                        <ContextMenu>
-                            <ContextMenuTrigger asChild>
-                                <div
-                                    className="relative w-full"
-                                    ref={inputWrapperRef}
-                                    onContextMenuCapture={(e) => {
-                                        const target = e.target as HTMLElement | null;
-                                        if (target && target.classList && target.classList.contains('lt-err')) {
-                                            // allow Radix to open; data will be set by overlay handler
-                                        } else {
-                                            // prevent opening when right-clicking outside errors
-                                            e.preventDefault();
-                                        }
-                                    }}
-                                >
-                                    {/* Overlay showing highlights */}
-                                    <div
-                                        ref={overlayRef}
-                                        className="absolute inset-0 pointer-events-none whitespace-pre-wrap rounded-lg lt-overlay"
-                                        onContextMenu={(e) => {
-                                            const target = e.target as HTMLElement | null;
-                                            if (target && target.classList && target.classList.contains('lt-err')) {
-                                                const off = Number(target.getAttribute('data-offset') || '0');
-                                                const len = Number(target.getAttribute('data-length') || '0');
-                                                const match = ltMatches.find(m => m.offset === off && m.length === len);
-                                                setCtxData({
-                                                    offset: off,
-                                                    length: len,
-                                                    suggestions: match?.replacements?.slice(0, 6) || []
-                                                });
-                                            }
-                                        }}
-                                        dangerouslySetInnerHTML={{__html: highlightHtml || ''}}
-                                    />
-                                    {/* Actual textarea capturing input */}
-                                    <Textarea
-                                        placeholder={`Envoyer un message dans ${channelName}`}
-                                        onChange={(e) => {
-                                            setCurrentMsg(e.target.value)
-                                            sendTyping()
-                                        }}
-                                        disabled={status == 3 || status == 4}
-                                        ref={textRef}
-                                        onScroll={(e) => {
-                                            if (overlayRef.current) {
-                                                overlayRef.current.scrollTop = (e.target as HTMLTextAreaElement).scrollTop;
-                                                overlayRef.current.scrollLeft = (e.target as HTMLTextAreaElement).scrollLeft;
-                                            }
-                                        }}
-                                        onKeyDown={(e) => {
-                                            if (e.key === "Enter" && !e.shiftKey) {
-                                                e.preventDefault();
-                                                formRef.current?.requestSubmit();
-                                            }
-                                        }}
-                                        spellCheck
-                                        lang="fr"
-                                        data-ms-editor="false"
-                                        value={currentMsg}
-                                        className={cn(
-                                            "w-full flex flex-row outline-main outline-1 p-2 rounded-lg resize-none"
-                                        )}
-                                    />
-                                    {/* Inline styles for LanguageTool highlighting */}
-                                    <style jsx global>{`
-                                .lt-overlay {
-                                  color: transparent; /* hide overlay text while keeping underline color */
-                                  overflow: hidden; /* will follow textarea scroll via JS */
-                                }
-                                .lt-err {
-                                  text-decoration-line: underline;
-                                  text-decoration-style: wavy;
-                                  text-decoration-color: #ef4444; /* red-500 */
-                                  text-underline-offset: 2px;
-                                  pointer-events: auto; /* allow right-click on errors */
-                                  cursor: context-menu;
-                                }
-                              `}</style>
-                                </div>
-                            </ContextMenuTrigger>
-                            <ContextMenuContent className="min-w-[180px] max-w-[260px]">
-                                {ctxData.suggestions && ctxData.suggestions.length > 0 ? (
-                                    ctxData.suggestions.map((s, i) => (
-                                        <ContextMenuItem
-                                            key={i}
-                                            onSelect={() => {
-                                                const before = currentMsg.slice(0, ctxData.offset);
-                                                const after = currentMsg.slice(ctxData.offset + ctxData.length);
-                                                const newText = before + s + after;
-                                                setCurrentMsg(newText);
-                                                setTimeout(() => {
-                                                    const pos = before.length + s.length;
-                                                    textRef.current?.focus();
-                                                    textRef.current?.setSelectionRange(pos, pos);
-                                                }, 0);
-                                            }}
-                                        >
-                                            {s}
-                                        </ContextMenuItem>
-                                    ))
-                                ) : (
-                                    <ContextMenuItem disabled>Aucune suggestion</ContextMenuItem>
-                                )}
-                            </ContextMenuContent>
-                        </ContextMenu>
+                        <div className="relative w-full">
+                            {/* The browser's own spell checker underlines mistakes: drafts never leave Solar (#260) */}
+                            <Textarea
+                                placeholder={`Envoyer un message dans ${channelName}`}
+                                aria-label={`Message${channelName ? ` dans ${channelName}` : ""}`}
+                                onChange={(e) => {
+                                    setCurrentMsg(e.target.value)
+                                    sendTyping()
+                                }}
+                                disabled={status == 3 || status == 4}
+                                ref={textRef}
+                                onKeyDown={(e) => {
+                                    // Enter sends, Shift+Enter goes to a new line; never while an input
+                                    // method is still composing a word
+                                    if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
+                                        e.preventDefault();
+                                        formRef.current?.requestSubmit();
+                                    }
+                                }}
+                                spellCheck
+                                lang="fr"
+                                value={currentMsg}
+                                className="w-full flex flex-row outline-main outline-1 p-2 rounded-lg resize-none"
+                            />
+                        </div>
 
                         <Popover onOpenChange={setEmojiOpen} open={emojiOpen}>
                             <PopoverTrigger asChild>
-                                <Button variant="ghost" size="icon" disabled={status == 3 || status == 4}>
-                                    <Laugh/>
+                                <Button type="button" variant="ghost" size="icon" aria-label="Insérer un emoji" disabled={status == 3 || status == 4}>
+                                    <Laugh aria-hidden/>
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-fit p-0">
@@ -1621,7 +1412,6 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                         else setCurrentMsg(emoji);
                                         setEmojiOpen(false);
                                         textRef.current?.focus();
-                                        console.log(emoji);
                                     }}
                                     locale="fr"
                                 >
@@ -1634,8 +1424,8 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
                         <Popover onOpenChange={setGifOpen} open={gifOpen}>
                             <PopoverTrigger asChild>
-                                <Button variant="ghost" size="icon" disabled={status == 3 || status == 4}>
-                                    <TvMinimalPlay/>
+                                <Button type="button" variant="ghost" size="icon" aria-label="Insérer un GIF" disabled={status == 3 || status == 4}>
+                                    <TvMinimalPlay aria-hidden/>
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-fit p-0">
@@ -1647,10 +1437,9 @@ export function Chat(props: { channelID: string, statusID: number }) {
                             </PopoverContent>
                         </Popover>
 
-                        <Button variant="ghost" size="icon" disabled={status == 3 || status == 4}>
-                            <Send/>
+                        <Button type="submit" variant="ghost" size="icon" aria-label="Envoyer le message" disabled={status == 3 || status == 4}>
+                            <Send aria-hidden/>
                         </Button>
-                        {/*<button className='cursor-pointer'><Send width={42}/></button>*/}
                     </form>
                     )}
                 </div>
@@ -1665,8 +1454,8 @@ export function Chat(props: { channelID: string, statusID: number }) {
                             if (open) fetchEventInfo();
                         }}>
                             <DialogTrigger asChild>
-                                <Button variant="ghost" size="icon" className="shrink-0 h-8 w-8">
-                                    <Info className="h-4 w-4"/>
+                                <Button variant="ghost" size="icon" className="shrink-0 h-8 w-8" aria-label="Planning de l'événement">
+                                    <Info className="h-4 w-4" aria-hidden/>
                                 </Button>
                             </DialogTrigger>
                             <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
