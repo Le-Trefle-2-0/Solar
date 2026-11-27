@@ -11,6 +11,7 @@ import {constructMetadata} from "@/lib/metadata"
 import ChatWidget from "@/components/chat-widget";
 import prisma from "@/lib/prisma";
 import CounterDevTracker from "@/components/counter-dev-tracker";
+import {SkipLink} from "@/components/skip-link";
 
 config.autoAddCss = false
 
@@ -58,10 +59,11 @@ export default async function RootLayout({
     }
 
     return (
-        <html lang="en" suppressHydrationWarning>
+        <html lang="fr" suppressHydrationWarning>
         <head />
         <body className={`${geistSans.variable} ${geistMono.variable} ${barlowCondensed.variable} antialiased`}
               suppressHydrationWarning>
+        <SkipLink/>
         <Providers>
             <CounterDevTracker />
             <div className="flex min-h-svh flex-col">

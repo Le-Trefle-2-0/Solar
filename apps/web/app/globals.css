@@ -28,11 +28,16 @@ html, body {
     --secondary: #8cc088;
     --secondary-foreground: #202020;
     --muted: #f6f6f6;
-    --muted-foreground: #202020 !important;
+    /* Secondary text: 7:1 on the background, so it stays readable while standing apart */
+    --muted-foreground: #525252 !important;
+    /* The brand green as text: #8cc088 is 2:1 on the light background, this one 5:1 (WCAG AA) */
+    --primary-text: #3a7536;
     --destructive: oklch(0.577 0.245 27.325);
     --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
+    /* Fields' borders: 3:1 against the background (WCAG 1.4.11) */
+    --input: #8f8f8f;
+    /* Keyboard focus: visible against every background (WCAG 2.4.7, 1.4.11) */
+    --ring: #2f6b2c;
     --chart-1: oklch(0.646 0.222 41.116);
     --chart-2: oklch(0.6 0.118 184.704);
     --chart-3: oklch(0.398 0.07 227.392);
@@ -107,13 +112,14 @@ html, body {
     --secondary: #8cc088;
     --secondary-foreground: #202020;
     --muted: #2a2a2a;
-    --muted-foreground: #f6f6f6 !important;
+    --muted-foreground: #bdbdbd !important;
+    --primary-text: #8cc088;
     --accent: #8cc088;
     --accent-foreground: #202020;
     --destructive: oklch(0.704 0.191 22.216);
     --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
+    --input: oklch(1 0 0 / 35%);
+    --ring: #8cc088;
     --chart-1: oklch(0.488 0.243 264.376);
     --chart-2: oklch(0.696 0.17 162.48);
     --chart-3: oklch(0.769 0.188 70.08);
@@ -131,7 +137,13 @@ html, body {
 
 @layer base {
     * {
-        @apply border-border outline-ring/50;
+        @apply border-border outline-ring;
+    }
+
+    /* Keyboard focus is always visible, on elements without their own focus style too */
+    :focus-visible {
+        outline: 2px solid var(--ring);
+        outline-offset: 2px;
     }
 
     body {
@@ -324,4 +336,28 @@ html, body {
         transform: scale(1.45);
         opacity: 0;
     }
+}
+
+/* Reduced motion asked by the system: no pulsing, sliding or scrolling animations (WCAG 2.3.3) */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    html, body {
+        scroll-behavior: auto;
+    }
+}
+
+/*
+ * The brand green used as text or icon colour: the readable shade (see --primary-text). Outside
+ * any layer so it wins over the utility; backgrounds and borders keep the brand green.
+ */
+.text-primary,
+.hover\:text-primary:hover,
+.group:focus-within .group-focus-within\:text-primary {
+    color: var(--primary-text);
 }

@@ -152,7 +152,10 @@ export default async function RootLayout({
                         <SidebarTrigger
                             className="absolute top-2 left-2 z-50 bg-background/50 backdrop-blur shadow-sm border rounded-md"/>
                         {access.needsTwoFactor && <TwoFactorRequired/>}
-                        {children}
+                        {/* The page's main region: target of the "Aller au contenu" link */}
+                        <main id="contenu" className="flex flex-col flex-1 min-h-0 w-full focus:outline-none">
+                            {children}
+                        </main>
                     </div>
                     {showTour && (
                         <WelcomeTour steps={tourSteps(access.permissions, access.needsTwoFactor)}
