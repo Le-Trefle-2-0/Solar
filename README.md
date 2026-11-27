@@ -159,7 +159,8 @@ messages à remettre sont lus dans Solar, ce qui lui permet de reprendre après 
 - **Ouverture et fermeture** : elles suivent le planning de Solar (une écoute ne peut être ouverte que pendant une
   permanence). Le bot modifie le même message du salon d'ouverture (texte et bouton « Ouvrir une écoute »), et annonce
   l'ouverture si un salon d'annonce est choisi.
-- **Écoute** : messages privés relayés dans les deux sens, sans identifier le bénévole ; indicateur de saisie ;
+- **Écoute** : messages privés relayés dans les deux sens, sans identifier le bénévole, avec les réponses à un message
+  et les réactions (emojis Unicode ; les réactions des bénévoles apparaissent comme celles du bot) ; indicateur de saisie ;
   fermeture par l'usager (bouton « Fermer l'écoute ») ou par le bénévole ; lien d'appel quand le bénévole passe en vocal.
 - **Non pris en charge pour l'instant** : images (#301), signalements et levée d'anonymat (#302).
 

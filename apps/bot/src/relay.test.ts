@@ -1,8 +1,8 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import type {MessageCreateOptions} from 'discord.js';
-import {TicketRelay, type DmResult} from './relay.js';
-import type {ActiveTicket, OpenResult, PendingMessage, SolarApi} from './solar.js';
+import {TicketRelay} from './relay.js';
+import type {ActiveTicket, OpenResult, PendingMessage, ReactionState, SolarApi} from './solar.js';
 
 const USER = '123456789012345678';
 const links = {helpChannelId: '1', siteUrl: 'https://example.org', inviteUrl: 'https://example.org/discord'};
@@ -17,6 +17,10 @@ function fakeSolar(overrides: Partial<SolarApi> = {}) {
         relayed: [] as number[],
         undelivered: [] as number[],
         posted: [] as string[],
+        replies: [] as (string | null)[],
+        relayedAs: [] as (string | undefined)[],
+        userReactions: [] as string[],
+        reactionState: null as ReactionState | null,
         closed: [] as {channelId: string; withdraw: boolean}[],
         open: {kind: 'opened', ticket: ref, waitingAhead: 0} as OpenResult,
     };
@@ -24,15 +28,21 @@ function fakeSolar(overrides: Partial<SolarApi> = {}) {
         permanence: async () => ({open: true, closesAt: new Date(0).toISOString()}),
         activeTickets: async () => state.active,
         openTicket: async () => state.open,
-        postUserMessage: async (_c, id) => {
+        postUserMessage: async (_c, id, _content, replyTo) => {
             if (state.posted.includes(id)) return 'duplicate';
             state.posted.push(id);
+            state.replies.push(replyTo ?? null);
             return 'saved';
         },
         pending: async (channelId) => state.active.some(t => t.channelId === channelId)
             ? state.pending.filter(m => !state.relayed.includes(m.id) && !state.undelivered.includes(m.id))
             : null,
-        markRelayed: async (id) => void state.relayed.push(id),
+        markRelayed: async (id, discordMessageId) => {
+            state.relayed.push(id);
+            state.relayedAs.push(discordMessageId);
+        },
+        userReaction: async (channelId, messageId, emoji, added) => void state.userReactions.push(`${channelId}:${messageId}:${added ? '+' : '-'}${emoji}`),
+        reactionState: async () => state.reactionState,
         markUndelivered: async (id) => void state.undelivered.push(id),
         close: async (channelId, withdraw = false) => {
             state.closed.push({channelId, withdraw});
@@ -43,18 +53,25 @@ function fakeSolar(overrides: Partial<SolarApi> = {}) {
     return {api, state};
 }
 
-function fakeDiscord(result: () => DmResult | Promise<DmResult> = () => 'sent') {
-    const sent: {userId: string; text: string}[] = [];
+type Outcome = 'sent' | 'unreachable';
+
+function fakeDiscord(result: () => Outcome | Promise<Outcome> = () => 'sent') {
+    const sent: {userId: string; text: string; id: string; replyTo?: string}[] = [];
+    const synced: {messageId: string; emojis: string[]}[] = [];
     return {
         sent,
+        synced,
         port: {
             sendDm: async (userId: string, payload: MessageCreateOptions) => {
                 const r = await result();
+                if (r === 'unreachable') return r;
                 const embed = (payload.embeds?.[0] as {data?: {description?: string}} | undefined)?.data;
-                if (r === 'sent') sent.push({userId, text: embed?.description ?? ''});
-                return r;
+                const id = `d${sent.length + 1}`;
+                sent.push({userId, text: embed?.description ?? '', id, replyTo: payload.reply?.messageReference as string | undefined});
+                return {sent: id};
             },
             typing: async () => undefined,
+            syncReactions: async (_userId: string, messageId: string, emojis: string[]) => void synced.push({messageId, emojis}),
         },
     };
 }
@@ -118,6 +135,49 @@ test('volunteer messages: delivered in order, marked, never twice; visitor echoe
     await relay.onSolarMessage('chan42', 'guest');
     assert.deepEqual(discord.sent.map(s => s.text), ['Bonsoir, je suis là', 'Comment vas-tu ?']);
     assert.deepEqual(state.relayed, [1, 2]);
+    // Solar learns what each message became on Discord
+    assert.deepEqual(state.relayedAs, ['d1', 'd2']);
+});
+
+test('replies: both ways, through the Discord messages', async () => {
+    const {api, state} = fakeSolar();
+    state.active = [{...ref, discordUserId: USER}];
+    state.pending = [{id: 1, content: 'Tu parlais de ça ?', timestamp: 1, replyToDiscordId: '900'}];
+    const discord = fakeDiscord();
+    const relay = new TicketRelay(api, discord.port, fakeRooms().port, links, quiet);
+    await relay.resync();
+    assert.equal(discord.sent[0].replyTo, '900');
+
+    await relay.onUserMessage(USER, {id: '901', content: 'Oui', attachments: 0, replyTo: 'd1'});
+    await relay.onUserMessage(USER, {id: '902', content: 'Et aussi…', attachments: 0});
+    assert.deepEqual(state.replies, ['d1', null]);
+});
+
+test('reactions: the user\'s go to Solar, the volunteers\' ones are mirrored on Discord', async () => {
+    const {api, state} = fakeSolar();
+    state.active = [{...ref, discordUserId: USER}];
+    const discord = fakeDiscord();
+    const relay = new TicketRelay(api, discord.port, fakeRooms().port, links, quiet);
+
+    await relay.onUserReaction(USER, '901', '❤️', true);
+    assert.deepEqual(state.userReactions, []);
+    await relay.resync();
+    await relay.onUserReaction(USER, '901', '❤️', true);
+    await relay.onUserReaction(USER, '901', '❤️', false);
+    assert.deepEqual(state.userReactions, ['chan42:901:+❤️', 'chan42:901:-❤️']);
+
+    state.reactionState = {channelId: 'chan42', discordMessageId: '901', emojis: ['👍']};
+    await relay.onSolarReaction(12);
+    state.reactionState = {channelId: 'chan42', discordMessageId: '901', emojis: []};
+    await relay.onSolarReaction(12);
+    assert.deepEqual(discord.synced, [{messageId: '901', emojis: ['👍']}, {messageId: '901', emojis: []}]);
+
+    // Not delivered on Discord, or another écoute: nothing to show
+    state.reactionState = {channelId: 'chan42', discordMessageId: null, emojis: ['👍']};
+    await relay.onSolarReaction(13);
+    state.reactionState = {channelId: 'other', discordMessageId: '903', emojis: ['👍']};
+    await relay.onSolarReaction(14);
+    assert.equal(discord.synced.length, 2);
 });
 
 test('volunteer messages: a Discord outage keeps them for the next attempt', async () => {

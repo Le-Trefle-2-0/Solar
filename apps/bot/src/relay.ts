@@ -12,12 +12,15 @@ import {busy, dm, volunteerMessage, welcome, type Links} from './texts.js';
  * between both) it is sent twice. Deliveries of one écoute are sent one after the other.
  */
 
-export type DmResult = 'sent' | 'unreachable';
+/** `sent`: the id of the Discord message. */
+export type DmResult = {sent: string} | 'unreachable';
 
 export interface DiscordPort {
     /** 'unreachable' when the person closed their private messages or left Discord. */
     sendDm(userId: string, payload: MessageCreateOptions): Promise<DmResult>;
     typing(userId: string): Promise<void>;
+    /** Makes the bot's own reactions on a private message exactly `emojis` (the volunteers' ones). */
+    syncReactions(userId: string, messageId: string, emojis: string[]): Promise<void>;
 }
 
 export interface RoomsPort {
@@ -129,19 +132,44 @@ export class TicketRelay {
         return true;
     }
 
-    /** A private message of the user. Text only for now (images: #301). */
-    async onUserMessage(discordUserId: string, message: {id: string; content: string; attachments: number}): Promise<UserMessageOutcome> {
+    /** A private message of the user, possibly a reply to another one. Text only for now (images: #301). */
+    async onUserMessage(
+        discordUserId: string,
+        message: {id: string; content: string; attachments: number; replyTo?: string | null},
+    ): Promise<UserMessageOutcome> {
         const t = this.ticketOf(discordUserId);
         if (!t) return 'no_ticket';
         const content = message.content.trim();
         if (!content) return 'unsupported';
-        const result = await this.api.postUserMessage(t.channelId, message.id, content.slice(0, 2000));
+        const result = await this.api.postUserMessage(t.channelId, message.id, content.slice(0, 2000), message.replyTo ?? null);
         if (result === 'ticket_closed') {
             await this.onTicketClosed(t.channelId, 'volunteer');
             return 'closed';
         }
         if (result === 'duplicate') return 'duplicate';
         return message.attachments > 0 ? 'unsupported' : 'relayed';
+    }
+
+    /** The user reacted (or took a reaction back) on a message of their écoute. Unicode emojis only. */
+    async onUserReaction(discordUserId: string, discordMessageId: string, emoji: string, added: boolean) {
+        const t = this.ticketOf(discordUserId);
+        if (!t) return;
+        await this.api.userReaction(t.channelId, discordMessageId, emoji, added);
+    }
+
+    /**
+     * A reaction changed in Solar: the bot's reactions on the Discord message follow the
+     * volunteers' ones. Run after pending deliveries, so a message reacted to right after being
+     * sent already has its Discord id.
+     */
+    async onSolarReaction(messageId: number | undefined) {
+        if (!Number.isInteger(messageId) || !this.byChannel.size) return;
+        await Promise.all([...this.queues.values()]);
+        const state = await this.api.reactionState(messageId!).catch(() => null);
+        const t = state && this.byChannel.get(state.channelId);
+        if (!t || !state.discordMessageId) return;
+        const discordMessageId = state.discordMessageId;
+        await this.enqueue(state.channelId, () => this.discord.syncReactions(t.discordUserId, discordMessageId, state.emojis));
     }
 
     /** The user is typing: shown in Solar (sent by index.ts on the realtime service). */
@@ -180,9 +208,14 @@ export class TicketRelay {
 
     /** Sends the volunteers' messages Solar has not seen delivered, in order, one écoute at a time. */
     flush(channelId: string): Promise<void> {
+        return this.enqueue(channelId, () => this.deliver(channelId), 'delivery postponed');
+    }
+
+    /** Discord actions of one écoute run one after the other. */
+    private enqueue(channelId: string, task: () => Promise<void>, failure = 'reaction not shown on Discord'): Promise<void> {
         const previous = this.queues.get(channelId) ?? Promise.resolve();
-        const next = previous.then(() => this.deliver(channelId)).catch(e => {
-            this.log.warn(`[bot] delivery postponed: ${(e as Error).message}`);
+        const next = previous.then(task).catch(e => {
+            this.log.warn(`[bot] ${failure}: ${(e as Error).message}`);
         });
         this.queues.set(channelId, next);
         void next.finally(() => {
@@ -204,12 +237,15 @@ export class TicketRelay {
             let result = t.sent.get(m.id);
             if (!result) {
                 // A Discord outage throws here: the rest waits for the next attempt
-                result = await this.discord.sendDm(t.discordUserId, volunteerMessage(m.content, t.reference, m.timestamp));
+                const payload = volunteerMessage(m.content, t.reference, m.timestamp);
+                // An answer to a given message shows as a reply on Discord too
+                if (m.replyToDiscordId) payload.reply = {messageReference: m.replyToDiscordId, failIfNotExists: false};
+                result = await this.discord.sendDm(t.discordUserId, payload);
                 t.sent.set(m.id, result);
                 if (result === 'unreachable') this.log.warn(`[bot] écoute ${t.reference}: message not delivered (private messages closed)`);
             }
-            if (result === 'sent') await this.api.markRelayed(m.id);
-            else await this.api.markUndelivered(m.id);
+            if (result === 'unreachable') await this.api.markUndelivered(m.id);
+            else await this.api.markRelayed(m.id, result.sent);
             t.sent.delete(m.id);
         }
     }

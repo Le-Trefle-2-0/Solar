@@ -7,6 +7,10 @@ import {
     GatewayIntentBits,
     type Message,
     MessageFlags,
+    type MessageReaction,
+    type PartialMessageReaction,
+    type PartialUser,
+    type User,
     Partials,
     PresenceUpdateStatus,
     RESTJSONErrorCodes,
@@ -31,9 +35,15 @@ export async function startBot(cfg: BotConfig): Promise<() => Promise<void>> {
     const api = createSolarApi(cfg.apiBaseUrl, cfg.apiKey);
 
     const client = new Client({
-        intents: [GatewayIntentBits.Guilds, GatewayIntentBits.DirectMessages, GatewayIntentBits.DirectMessageTyping],
-        // Private message channels are not cached before their first event
-        partials: [Partials.Channel, Partials.Message],
+        // None of them is privileged
+        intents: [
+            GatewayIntentBits.Guilds,
+            GatewayIntentBits.DirectMessages,
+            GatewayIntentBits.DirectMessageTyping,
+            GatewayIntentBits.DirectMessageReactions,
+        ],
+        // Private message channels, their messages and reactions are not cached before their first event
+        partials: [Partials.Channel, Partials.Message, Partials.Reaction, Partials.User],
     });
 
     // ---- Realtime service (Solar) ----
@@ -55,8 +65,8 @@ export async function startBot(cfg: BotConfig): Promise<() => Promise<void>> {
     const discord: DiscordPort = {
         async sendDm(userId, payload) {
             try {
-                await client.users.send(userId, payload);
-                return 'sent';
+                const message = await client.users.send(userId, payload);
+                return {sent: message.id};
             } catch (e) {
                 if (e instanceof DiscordAPIError && typeof e.code === 'number' && UNREACHABLE.has(e.code)) return 'unreachable';
                 throw e;
@@ -65,6 +75,20 @@ export async function startBot(cfg: BotConfig): Promise<() => Promise<void>> {
         async typing(userId) {
             const channel = await client.users.createDM(userId);
             await channel.sendTyping();
+        },
+        async syncReactions(userId, messageId, emojis) {
+            const channel = await client.users.createDM(userId);
+            const message = await channel.messages.fetch(messageId);
+            const wanted = new Set(emojis);
+            const mine = new Set(message.reactions.cache.filter(r => r.me).map(r => r.emoji.name ?? ''));
+            for (const emoji of wanted) {
+                if (mine.has(emoji)) continue;
+                // An emoji Discord does not know is skipped, the others still show
+                await message.react(emoji).catch(e => console.warn(`[bot] reaction not shown on Discord: ${(e as Error).message}`));
+            }
+            for (const reaction of message.reactions.cache.values()) {
+                if (reaction.me && !wanted.has(reaction.emoji.name ?? '')) await reaction.users.remove(client.user!.id);
+            }
         },
     };
 
@@ -89,7 +113,10 @@ export async function startBot(cfg: BotConfig): Promise<() => Promise<void>> {
     socket.on('typingIndicator', (e: {id?: string; user?: {id?: string}}) => {
         if (e?.id) void relay.onVolunteerTyping(e.id, e.user?.id);
     });
-    socket.on('voiceInvite', (e: {channelId?: string; url?: string; expiresAt?: number}) => {
+    // Volunteers' reactions: the bot's reactions on Discord follow them
+    socket.on('reactionAdd', (e: {messageID?: number}) => void relay.onSolarReaction(e?.messageID));
+    socket.on('reactionRemove', (e: {messageID?: number}) => void relay.onSolarReaction(e?.messageID));
+    socket.on('voiceInvite',(e: {channelId?: string; url?: string; expiresAt?: number}) => {
         if (e?.channelId && e.url && e.expiresAt) {
             relay.onVoiceInvite(e.channelId, e.url, e.expiresAt).catch(err => console.warn(`[bot] voice invite not sent: ${(err as Error).message}`));
         }
@@ -228,6 +255,8 @@ export async function startBot(cfg: BotConfig): Promise<() => Promise<void>> {
                 id: message.id,
                 content: message.content,
                 attachments: message.attachments.size + message.stickers.size,
+                // Discord "Répondre": shown as a reply in Solar
+                replyTo: message.reference?.messageId ?? null,
             });
             if (outcome === 'unsupported') await message.reply(dm.unsupported());
             if (outcome === 'no_ticket') {
@@ -242,6 +271,25 @@ export async function startBot(cfg: BotConfig): Promise<() => Promise<void>> {
             await message.reply(dm.notDelivered()).catch(() => undefined);
         }
     });
+
+    /** The user's reactions in their private messages, shown in Solar. Server emojis do not exist there. */
+    async function onDiscordReaction(
+        reaction: MessageReaction | PartialMessageReaction,
+        user: User | PartialUser,
+        added: boolean,
+    ) {
+        if (user.bot) return;
+        try {
+            const full = reaction.partial ? await reaction.fetch() : reaction;
+            if (full.message.channel.type !== ChannelType.DM || full.emoji.id || !full.emoji.name) return;
+            await relay.onUserReaction(user.id, full.message.id, full.emoji.name, added);
+        } catch (e) {
+            console.warn(`[bot] reaction not relayed: ${(e as Error).message}`);
+        }
+    }
+
+    client.on(Events.MessageReactionAdd, (reaction, user) => void onDiscordReaction(reaction, user, true));
+    client.on(Events.MessageReactionRemove, (reaction, user) => void onDiscordReaction(reaction, user, false));
 
     /** The user is typing: shown in Solar, at most every 5 seconds. */
     const typingSent = new Map<string, number>();
