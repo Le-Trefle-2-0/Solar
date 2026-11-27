@@ -138,22 +138,6 @@ async function sendApplicationToDiscord(webhook: string, title: string, answers:
     }
 }
 
-export async function getRecruitments() {
-
-    return prisma.recruitment.findMany({
-        orderBy: [
-            {enabled: "desc"},
-            {createdAt: "desc"}
-        ],
-    });
-}
-
-export async function getRecruitmentById(id: string) {
-    return prisma.recruitment.findUnique({
-        where: {id},
-    });
-}
-
 export async function applyToRecruitment(recruitmentId: string, data: Record<string, any>) {
     if (!await allowPublicAction("application")) return {error: TOO_MANY_REQUESTS};
     const recruitment = await prisma.recruitment.findUnique({

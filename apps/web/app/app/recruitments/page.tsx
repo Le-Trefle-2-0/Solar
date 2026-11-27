@@ -2,7 +2,7 @@ import {auth} from "@/lib/auth";
 import {can, getAccess} from "@/lib/userPermissions";
 import {headers} from "next/headers";
 import {redirect} from "next/navigation";
-import {getRecruitments} from "@/app/actions/recruitments";
+import {getRecruitments} from "@/lib/recruitmentQueries";
 import {RecruitmentClient} from "@/components/recruitments/recruitment-client";
 
 import {constructMetadata} from "@/lib/metadata";

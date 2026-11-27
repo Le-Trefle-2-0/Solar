@@ -1,4 +1,4 @@
-import {getRecruitments} from "@/app/actions/recruitments";
+import {getRecruitments} from "@/lib/recruitmentQueries";
 import {PublicHeader} from "@/components/landing/header";
 import {PublicFooter} from "@/components/landing/footer";
 import {auth} from "@/lib/auth";
