@@ -2,6 +2,7 @@ import type {FastifyInstance, FastifyRequest} from 'fastify';
 import {z} from 'zod';
 import {isInternal} from '../../lib/internalAuth.js';
 import {prisma} from '../../prisma.js';
+import {getActor} from '../../lib/permissions.js';
 
 /** The only fields these routes may read. Never add `key`, `password` or `twoFactorSecret`. */
 export const KEY_SELECT = {id: true, enabled: true, expiresAt: true, userId: true} as const;
@@ -10,11 +11,14 @@ export const KEY_USER_SELECT = {id: true, name: true, email: true, role: true, i
 export interface KeysRouteDeps {
     findKey: (key: string) => Promise<{id: string; enabled: boolean | null; expiresAt: Date | null; userId: string} | null>;
     findUser: (id: string) => Promise<Record<string, unknown> | null>;
+    /** The account behind the key may still act (not banned or closed, #249). */
+    isActive?: (userId: string) => Promise<boolean>;
 }
 
 const defaultDeps: KeysRouteDeps = {
     findKey: (key) => prisma.apikey.findFirst({where: {key}, select: KEY_SELECT}),
     findUser: (id) => prisma.user.findUnique({where: {id}, select: KEY_USER_SELECT}),
+    isActive: async (userId) => !!(await getActor(userId)),
 };
 
 export async function registerKeysRoutes(app: FastifyInstance, deps: KeysRouteDeps = defaultDeps) {
@@ -31,7 +35,8 @@ export async function registerKeysRoutes(app: FastifyInstance, deps: KeysRouteDe
 
     async function resolveKey(keyString: string) {
         const key = await deps.findKey(keyString);
-        const valid = !!key && key.enabled !== false && (!key.expiresAt || key.expiresAt > new Date());
+        const valid = !!key && key.enabled !== false && (!key.expiresAt || key.expiresAt > new Date())
+            && (!deps.isActive || await deps.isActive(key.userId));
         return valid ? key : null;
     }
 

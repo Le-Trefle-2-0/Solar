@@ -1,6 +1,7 @@
 import {prisma} from '../prisma.js';
 import {ALL_PERMISSIONS, isKnownPermission} from './permissionCatalogue.js';
-import {splitRoles, type Actor, type KnownRole} from './roleAssignment.js';
+import {splitRoles, hasPermission, type Actor, type KnownRole} from './roleAssignment.js';
+import {documentsBlocked, isBanned, isBotAccount, STANDING_SELECT} from './accountStanding.js';
 
 export {hasPermission} from './roleAssignment.js';
 
@@ -31,13 +32,18 @@ export async function getKnownRoles(): Promise<KnownRole[]> {
 /**
  * Who the user is for authorization: their roles, effective permissions and owner status.
  * The owner holds every permission, whatever their roles say.
+ *
+ * Nobody (null) for a banned or closed account, and for an account whose identity documents are
+ * missing or refused, unless it may manage accounts (#247, #249): the API, the WebSocket service
+ * and the voice service then refuse it, as the app's document dialog does. The documents
+ * themselves are sent through the web app, which stays reachable.
  */
 export async function getActor(userId: string): Promise<Actor | null> {
     const [user, ownerId] = await Promise.all([
-        prisma.user.findUnique({where: {id: userId}, select: {id: true, role: true}}),
+        prisma.user.findUnique({where: {id: userId}, select: {id: true, role: true, ...STANDING_SELECT}}),
         getOwnerId(),
     ]);
-    if (!user) return null;
+    if (!user || isBanned(user)) return null;
     const isOwner = ownerId === user.id;
     const roles = splitRoles(user.role);
     if (isOwner) return {id: user.id, isOwner, roles, permissions: [...ALL_PERMISSIONS]};
@@ -47,7 +53,11 @@ export async function getActor(userId: string): Promise<Actor | null> {
         : [];
     const permissions = new Set<string>();
     for (const row of rows) parsePermissions(row.permissions, row.name).forEach(p => permissions.add(p));
-    return {id: user.id, isOwner, roles, permissions: [...permissions]};
+    const granted = [...permissions];
+    if (documentsBlocked(user) && !isBotAccount(user.id) && !hasPermission(granted, 'management.manage_accounts')) {
+        return null;
+    }
+    return {id: user.id, isOwner, roles, permissions: granted};
 }
 
 export async function getUserPermissions(userId: string): Promise<string[]> {

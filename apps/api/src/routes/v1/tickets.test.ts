@@ -59,8 +59,9 @@ test('findBy: 200 with tickets.read_all', async () => {
     assert.equal(await find(await build(['tickets.read_all'], 'user1'), 'c'), 200);
 });
 
-test('findBy: 200 for the assigned user', async () => {
-    assert.equal(await find(await build([], 'user1', 'user1'), 'c'), 200);
+test('findBy: 200 for the assigned user who may still listen, 403 without tickets.send_message (#249)', async () => {
+    assert.equal(await find(await build(['tickets.send_message'], 'user1', 'user1'), 'c'), 200);
+    assert.equal(await find(await build([], 'user1', 'user1'), 'c'), 403);
 });
 
 test('findBy: numeric ID is not a fallback', async () => {
@@ -81,7 +82,9 @@ for (const [url, payload] of edits) {
     });
 
     test(`${url}: allowed for the assigned user and tickets.read_all`, async () => {
-        assert.equal(await post(await build([], 'user1', 'user1'), url, payload), 200);
+        assert.equal(await post(await build(['tickets.send_message'], 'user1', 'user1'), url, payload), 200);
+        // Still assigned, but the role no longer allows listening (#249)
+        assert.equal(await post(await build([], 'user1', 'user1'), url, payload), 403);
         assert.equal(await post(await build(['tickets.read_all'], 'user1'), url, payload), 200);
     });
 }

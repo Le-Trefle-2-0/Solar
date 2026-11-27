@@ -27,8 +27,10 @@ test('write: tickets.send_message_all and admin.sudo write anywhere', () => {
 test('read: public channel, read_all or assigned', () => {
     assert.equal(canReadChannel({...base, channelId: '1'}), true);
     assert.equal(canReadChannel({...base, permissions: ['tickets.read_all']}), true);
-    assert.equal(canReadChannel({...base, assignedUserId: 'u1'}), true);
-    assert.equal(canReadChannel({...base, assignedUserId: 'u2'}), false);
+    assert.equal(canReadChannel({...base, assignedUserId: 'u1', permissions: ['tickets.send_message']}), true);
+    // Assigned, but the role no longer allows listening (#249)
+    assert.equal(canReadChannel({...base, assignedUserId: 'u1'}), false);
+    assert.equal(canReadChannel({...base, assignedUserId: 'u2', permissions: ['tickets.send_message']}), false);
     assert.equal(canReadChannel(base), false);
 });
 

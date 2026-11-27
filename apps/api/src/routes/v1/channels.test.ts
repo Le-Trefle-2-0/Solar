@@ -28,8 +28,9 @@ test('403 for an unknown channel without tickets.read_all', async () => {
     assert.equal(await get('missing', 'user1'), 403);
 });
 
-test('200 for the assigned user', async () => {
-    assert.equal(await get('c', 'user1', [], 'user1'), 200);
+test('200 for the assigned user who may still listen, 403 once the role no longer allows it (#249)', async () => {
+    assert.equal(await get('c', 'user1', ['tickets.send_message'], 'user1'), 200);
+    assert.equal(await get('c', 'user1', [], 'user1'), 403);
 });
 
 test('200 with tickets.read_all', async () => {

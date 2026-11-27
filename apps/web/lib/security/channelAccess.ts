@@ -35,7 +35,8 @@ export interface ChannelAccess {
 export function canReadChannel({channelId, userId, permissions, assignedUserId, isPermanence}: ChannelAccess): boolean {
     if (channelId === PUBLIC_CHANNEL_ID || isPermanence) return true;
     if (has(permissions, "tickets.read_all")) return true;
-    return assignedUserId !== null && assignedUserId === userId;
+    // Being assigned is not enough on its own: the role must still allow listening (#249)
+    return assignedUserId !== null && assignedUserId === userId && has(permissions, "tickets.send_message");
 }
 
 /** Write rule: open channels, tickets.send_message_all, or the assigned volunteer with tickets.send_message. */

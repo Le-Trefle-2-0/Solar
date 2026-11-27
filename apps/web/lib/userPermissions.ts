@@ -2,6 +2,7 @@ import {headers} from "next/headers";
 import prisma from "@/lib/prisma";
 import {auth} from "@/lib/auth";
 import {ALL_PERMISSIONS} from "@/lib/permissions";
+import {documentsBlocked, isBanned, isBotAccount, STANDING_SELECT} from "@/lib/accountStanding";
 
 /** Same key as OWNER_SETTING_KEY in the API. */
 export const OWNER_SETTING_KEY = "owner_user_id";
@@ -47,20 +48,28 @@ export interface Access {
     isOwner: boolean;
 }
 
-/** The signed-in user's access, or null without a session. Server components and actions only. */
+/**
+ * The signed-in user's access, or null without a session. Server components and actions only.
+ * Null as well for a banned or closed account, and for one whose identity documents are missing
+ * or refused unless it may manage accounts: same rule as the API (#247, #249). Roles and status
+ * are read from the database, not from the session cookie, which may be older.
+ */
 export async function getAccess(): Promise<Access | null> {
     const session = await auth.api.getSession({headers: await headers()});
     if (!session) return null;
-    const role = (session.user as {role?: string | null}).role ?? null;
+    const user = await prisma.user.findUnique({
+        where: {id: session.user.id},
+        select: {id: true, role: true, ...STANDING_SELECT},
+    });
+    if (!user || isBanned(user)) return null;
+    const role = user.role ?? null;
     const ownerId = await getOwnerId();
-    const isOwner = ownerId === session.user.id;
-    return {
-        userId: session.user.id,
-        role,
-        roles: splitRoles(role),
-        permissions: isOwner ? [...ALL_PERMISSIONS] : await getRolePermissions(role),
-        isOwner,
-    };
+    const isOwner = ownerId === user.id;
+    const permissions = isOwner ? [...ALL_PERMISSIONS] : await getRolePermissions(role);
+    if (!isOwner && documentsBlocked(user) && !isBotAccount(user.id) && !can(permissions, "management.manage_accounts")) {
+        return null;
+    }
+    return {userId: user.id, role, roles: splitRoles(role), permissions, isOwner};
 }
 
 /** Highest role weight of a user; +Infinity for the owner, -Infinity without any known role. */

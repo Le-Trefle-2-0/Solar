@@ -148,8 +148,10 @@ export async function registerVoiceRoutes(app: FastifyInstance, deps: VoiceRoute
         } catch {
             return reply.send({available: false, rooms: []});
         }
-        const readAll = hasPermission(await deps.getPermissions(userId), 'tickets.read_all');
-        const assigned = readAll ? null : new Set(await deps.findAssignedChannelIds(userId));
+        const perms = await deps.getPermissions(userId);
+        const readAll = hasPermission(perms, 'tickets.read_all');
+        // Assigned écoutes need the listening permission too (#249)
+        const assigned = readAll ? null : new Set(hasPermission(perms, 'tickets.send_message') ? await deps.findAssignedChannelIds(userId) : []);
         return reply.send({
             available: true,
             rooms: rooms.filter(r => r.type === 'permanence' || readAll || assigned!.has(r.channelId)),

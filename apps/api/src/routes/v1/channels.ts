@@ -63,7 +63,7 @@ export async function registerChannelsRoutes(app: FastifyInstance, deps: Channel
                 // In original code: if status.id !== 4 (magic constant). We keep same behavior.
                 if (ticket.status && (ticket.status as any).id !== 4) {
                     if (canReadAll) accessed.push(channel);
-                    else if (ticket.assignedUserId === userId) accessed.push(channel);
+                    else if (ticket.assignedUserId === userId && await canRead(userId, channel.id)) accessed.push(channel);
                 }
             }
             return reply.send({success: true, accessedChannels: accessed});

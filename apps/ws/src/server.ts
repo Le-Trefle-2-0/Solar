@@ -58,6 +58,8 @@ interface SocketData {
     user?: WsUser;
     readAll?: boolean;
     botUserId?: string;
+    /** Kept to check again that the key is still valid when accounts change (#249). */
+    botKey?: string;
     allowedRoom?: string;
     guestUid?: string;
     /** Channel rights checked with the API, per channel. */
@@ -119,7 +121,7 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
             if (apiKey) {
                 const bot = await deps.checkApiKey(apiKey);
                 if (bot?.userId) {
-                    Object.assign(d, {kind: 'bot', botUserId: bot.userId, access: new Map()});
+                    Object.assign(d, {kind: 'bot', botUserId: bot.userId, botKey: apiKey, access: new Map()});
                     return next();
                 }
             }
@@ -298,11 +300,17 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
         }
     }
 
+    /** After a change of roles or accounts: banned, removed and revoked connections are closed (#249). */
     async function refreshAllVolunteers() {
-        for (const socket of io.sockets.sockets.values()) {
-            if (data(socket).kind !== 'volunteer') continue;
+        for (const socket of [...io.sockets.sockets.values()]) {
+            const d = data(socket);
             try {
-                await refreshVolunteer(socket);
+                if (d.kind === 'volunteer') await refreshVolunteer(socket);
+                else if (d.kind === 'bot') {
+                    const bot = await deps.checkApiKey(d.botKey!);
+                    if (bot?.userId !== d.botUserId) socket.disconnect(true);
+                    else d.access = new Map();
+                }
             } catch (e) {
                 log.error('[ws] refresh failed', e);
             }

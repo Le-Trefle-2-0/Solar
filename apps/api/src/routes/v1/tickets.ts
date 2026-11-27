@@ -6,9 +6,11 @@ import {broadcast} from '../../lib/broadcast.js';
 import {pseudonymize} from '../../lib/pseudonym.js';
 import {verifyWidgetSession} from '../../lib/widgetSession.js';
 import {getUserPermissions, hasPermission} from '../../lib/permissions.js';
+import {canAccessTicket} from '../../lib/channelAccess.js';
 import {verifyPow} from '../../lib/pow.js';
 import {limitPerMinute} from '../../lib/rateLimit.js';
 import {endVoiceCall} from '../../lib/voiceControl.js';
+import {getPermanenceStatus} from '../../lib/permanenceStatus.js';
 
 async function canReadTicketsAll(userId: string): Promise<boolean> {
     const perms = await getUserPermissions(userId);
@@ -177,7 +179,7 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
                 console.warn(`[api] No active ticket found for identifier(s) provided`);
                 return reply.status(404).send({success: false, error: 'Ticket not found or already closed'});
             }
-            if (!hasPermission(perms, 'tickets.read_all') && ticket.assignedUserId !== userId) {
+            if (!canAccessTicket(perms, ticket.assignedUserId, userId)) {
                 return reply.status(403).send('forbidden');
             }
 
@@ -246,7 +248,7 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
             if (!ticket) return reply.status(400).send({success: false, error: 'No ticket found'});
             // Only the assigned volunteer (or someone who may read every ticket), and only once
             // the ticket waits for its transmission: notes of other tickets stay untouched (#242)
-            if (!hasPermission(await deps.getPermissions(userId), 'tickets.read_all') && ticket.assignedUserId !== userId) {
+            if (!canAccessTicket(await deps.getPermissions(userId), ticket.assignedUserId, userId)) {
                 return reply.status(403).send('forbidden');
             }
             if (ticket.statusName !== 'closed') {
@@ -336,8 +338,14 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
 
     // POST /v1/tickets/web-create
     app.post('/v1/tickets/web-create', limitPerMinute(5), async (req, reply) => {
+        // Proof of work first: unverified requests never reach the database
         if (!verifyPow((req.body as {pow?: unknown} | undefined)?.pow)) {
             return reply.status(403).send({success: false, error: 'pow_required'});
+        }
+        // Same rule as the widget: public écoutes only while a permanence is running
+        const availability = await getPermanenceStatus();
+        if (!availability.open) {
+            return reply.status(403).send({success: false, error: 'permanence_closed', nextOpening: availability.nextOpening});
         }
         try {
             const syntheticId = `web:${crypto.randomUUID()}`;
@@ -388,11 +396,11 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
         const bodySchema = z.object({channelID: z.string()});
         try {
             const {channelID} = bodySchema.parse((req.body ?? {}) as any);
-            const canReadAll = hasPermission(await deps.getPermissions(userId), 'tickets.read_all');
+            const perms = await deps.getPermissions(userId);
             const ticket = await deps.findTicketByChannelId(channelID);
 
             // Same answer for "missing" and "not yours", so existence is not disclosed.
-            if (!canReadAll && ticket?.assignedUserId !== userId) {
+            if (!canAccessTicket(perms, ticket?.assignedUserId, userId)) {
                 return reply.status(403).send('forbidden');
             }
 
@@ -421,8 +429,7 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
         try {
             const {ticketID, categories} = bodySchema.parse((req.body ?? {}) as any);
             const ticket = await deps.findTicketById(ticketID);
-            const canReadAll = hasPermission(await deps.getPermissions(userId), 'tickets.read_all');
-            if (!canReadAll && ticket?.assignedUserId !== userId) return reply.status(403).send('forbidden');
+            if (!canAccessTicket(await deps.getPermissions(userId), ticket?.assignedUserId, userId)) return reply.status(403).send('forbidden');
             if (!ticket) return reply.status(404).send({success: false, error: 'No ticket found'});
 
             const update = await deps.updateTicket(ticketID, {categories});
@@ -461,8 +468,7 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
             if (!isVisitor) {
                 const userId = await deps.authenticate(req);
                 if (!userId) return reply.status(401).send('unauthorized');
-                const canReadAll = hasPermission(await deps.getPermissions(userId), 'tickets.read_all');
-                if (!canReadAll && ticket?.assignedUserId !== userId) return reply.status(403).send('forbidden');
+                if (!canAccessTicket(await deps.getPermissions(userId), ticket?.assignedUserId, userId)) return reply.status(403).send('forbidden');
             }
             if (!ticket) return reply.status(404).send({success: false, error: 'No ticket found'});
 

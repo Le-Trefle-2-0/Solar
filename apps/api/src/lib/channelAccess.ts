@@ -29,7 +29,18 @@ const isOpen = ({channelId, isPermanence}: ChannelAccessInput) => channelId === 
 export function canReadChannel(input: ChannelAccessInput): boolean {
     if (isOpen(input)) return true;
     if (hasPermission(input.permissions, 'tickets.read_all')) return true;
-    return input.assignedUserId !== null && input.assignedUserId === input.userId;
+    // Being assigned is not enough on its own: the role must still allow listening (#249)
+    return input.assignedUserId !== null && input.assignedUserId === input.userId
+        && hasPermission(input.permissions, 'tickets.send_message');
+}
+
+/**
+ * Acting on a ticket itself (details, notes, categories, transmission): tickets.read_all, or being
+ * assigned to it with a role that still allows listening (#249).
+ */
+export function canAccessTicket(permissions: string[], assignedUserId: string | null | undefined, userId: string): boolean {
+    if (hasPermission(permissions, 'tickets.read_all')) return true;
+    return !!assignedUserId && assignedUserId === userId && hasPermission(permissions, 'tickets.send_message');
 }
 
 export function canWriteChannel(input: ChannelAccessInput): boolean {

@@ -20,6 +20,9 @@ const access = (userId: string, channelId: string) => {
     return {read: false, write: false};
 };
 
+/** Bot keys the fake API still accepts. */
+const validKeys = new Set(['bot-key', 'bot-key-2']);
+
 let base = '';
 let close: () => Promise<void>;
 const quiet = {log: () => undefined, warn: () => undefined, error: () => undefined};
@@ -27,7 +30,7 @@ const quiet = {log: () => undefined, warn: () => undefined, error: () => undefin
 before(async () => {
     const {httpServer, io} = createWsServer({
         verifyJwt: async (t) => (t.startsWith('jwt-') ? {sub: t.slice(4)} : null),
-        checkApiKey: async (k) => (k === 'bot-key' ? {userId: 'bot-user'} : null),
+        checkApiKey: async (k) => (validKeys.has(k) ? {userId: 'bot-user'} : null),
         getSession: async (id) => sessions[id] ?? null,
         getChannelAccess: async (u, c) => access(u, c),
         secrets: SECRETS,
@@ -231,4 +234,12 @@ test('ws: bot-only events reach bot sockets and no volunteer', async () => {
     const [b, v] = await got;
     assert.equal(b.length, 1);
     assert.equal(v.length, 0);
+});
+
+test('a bot whose key is revoked is disconnected on the next permissions update (#249)', async () => {
+    const bot = await client({token: 'bot-key-2'});
+    const closed = new Promise<string>(r => bot.once('disconnect', r));
+    validKeys.delete('bot-key-2');
+    assert.equal(await broadcast(null, 'permissionsUpdate', {}), 200);
+    assert.equal(await closed, 'io server disconnect');
 });

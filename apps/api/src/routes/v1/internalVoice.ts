@@ -55,7 +55,9 @@ export async function authorizeVoice(deps: InternalVoiceDeps, body: unknown): Pr
     // Signed-in volunteer
     if (typeof b.userId === 'string' && b.userId && b.userId.length <= 128) {
         const user = await deps.findUser(b.userId);
-        if (!user || user.banned) return {allowed: false, reason: 'unknown_user'};
+        // getPermissions is null for a banned account or one with missing documents (getActor)
+        const perms = user && !user.banned ? await deps.getPermissions(user.id) : null;
+        if (!user || !perms) return {allowed: false, reason: 'unknown_user'};
         const name = user.displayUsername || user.name;
 
         if (type === 'permanence') {
@@ -65,8 +67,7 @@ export async function authorizeVoice(deps: InternalVoiceDeps, body: unknown): Pr
 
         const ticket = await deps.findTicket(channelId);
         if (!ticket?.voice || ticket.statusName !== 'started') return {allowed: false, reason: 'no_voice_call'};
-        const perms = await deps.getPermissions(user.id);
-        if (!perms || !hasPermission(perms, 'tickets.launch_voice')) return {allowed: false, reason: 'forbidden'};
+        if (!hasPermission(perms, 'tickets.launch_voice')) return {allowed: false, reason: 'forbidden'};
         if (!(await deps.canWrite(user.id, channelId))) return {allowed: false, reason: 'forbidden'};
         return {allowed: true, role: 'volunteer', userId: user.id, name};
     }

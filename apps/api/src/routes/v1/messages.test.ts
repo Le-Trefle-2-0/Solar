@@ -31,7 +31,9 @@ test('403 for a channel the caller is not assigned to, without reading messages'
 });
 
 test('200 for the assigned user, tickets.read_all and the public channel', async () => {
-    assert.equal((await get('c', 'user1', [], 'user1')).status, 200);
+    assert.equal((await get('c', 'user1', ['tickets.send_message'], 'user1')).status, 200);
+    // Still assigned, but the role no longer allows listening (#249)
+    assert.equal((await get('c', 'user1', [], 'user1')).status, 403);
     assert.equal((await get('c', 'user1', ['tickets.read_all'])).status, 200);
     assert.equal((await get('1', 'user1')).status, 200);
 });

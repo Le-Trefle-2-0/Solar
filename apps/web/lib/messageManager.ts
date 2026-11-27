@@ -1,10 +1,8 @@
 "use server"
-import {headers} from "next/headers";
 import prisma from "@/lib/prisma";
-import {auth} from "@/lib/auth";
 import {canWriteChannel, MessageInputSchema} from "@/lib/security/channelAccess";
 import {neutralizeHtml} from "@/lib/security/sanitize";
-import {getRolePermissions} from "@/lib/userPermissions";
+import {getAccess} from "@/lib/userPermissions";
 
 /**
  * Server action: anyone can call it with any argument, so nothing from the
@@ -16,15 +14,15 @@ export const saveMessage = async (input: unknown) => {
     if (!parsed.success) throw new Error("Invalid message");
     const {channelId, replyID} = parsed.data;
 
-    const session = await auth.api.getSession({headers: await headers()});
-    if (!session) throw new Error("Unauthorized");
-    const userId = session.user.id;
+    // Null as well for banned accounts and those with missing documents (#247, #249)
+    const access = await getAccess();
+    if (!access) throw new Error("Unauthorized");
+    const {userId, permissions} = access;
 
     const ticket = await prisma.ticket.findUnique({
         where: {channelId},
         select: {id: true, assignedUserId: true},
     });
-    const permissions = await getRolePermissions((session.user as {role?: string | null}).role, userId);
     // A permanence's channel is open to every member, signed up or not
     const isPermanence = !ticket && !!(await prisma.event.findFirst({where: {channelID: channelId}, select: {id: true}}));
     if (!canWriteChannel({channelId, userId, permissions, assignedUserId: ticket?.assignedUserId ?? null, isPermanence})) {

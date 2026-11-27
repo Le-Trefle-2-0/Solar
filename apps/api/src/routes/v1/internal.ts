@@ -72,7 +72,8 @@ export async function registerInternalRoutes(app: FastifyInstance, deps: Interna
         const channels = [
             PUBLIC_CHANNEL_ID,
             ...await deps.findCurrentPermanenceChannelIds(),
-            ...(readAll ? [] : await deps.findAssignedChannelIds(userId)),
+            // Assigned tickets need the listening permission too (#249)
+            ...(readAll || !hasPermission(actor.permissions, 'tickets.send_message') ? [] : await deps.findAssignedChannelIds(userId)),
         ];
         return reply.send({
             user: {
