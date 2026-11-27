@@ -245,14 +245,15 @@ export function Message(props: {
             <div
                 className={cn(
                     "absolute -top-4 right-2 flex gap-1 opacity-0 transition-opacity z-10",
-                    !readOnly && "group-hover:opacity-100"
+                    // Shown on hover, and when the keyboard focus reaches them
+                    !readOnly && "group-hover:opacity-100 group-focus-within:opacity-100 focus-within:opacity-100"
                 )}>
                 {!readOnly && (
                     <>
                         <Popover onOpenChange={setIsOpen} open={isOpen}>
                             <PopoverTrigger asChild>
-                                <Button variant="outline">
-                                    <SmilePlus/>
+                                <Button variant="outline" aria-label={`Réagir au message de ${authorName}`}>
+                                    <SmilePlus aria-hidden/>
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-fit p-0">
@@ -275,13 +276,14 @@ export function Message(props: {
                             authorName,
                             content,
                             timestamp
-                        }) : toast("Fonctionnalité encore non disponible")}>
-                            <Reply/>
+                        }) : toast("Fonctionnalité encore non disponible")}
+                                aria-label={`Répondre à ${authorName}`}>
+                            <Reply aria-hidden/>
                         </Button>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline">
-                                    <Ellipsis/>
+                                <Button variant="outline" aria-label="Plus d'actions sur ce message">
+                                    <Ellipsis aria-hidden/>
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
@@ -312,7 +314,9 @@ export function Message(props: {
                                 ) : null}
                                 <DropdownMenuSeparator/>
                                 <DropdownMenuItem
-                                    onClick={() => navigator.clipboard.writeText(id.toString())}>
+                                    onClick={() => navigator.clipboard.writeText(id.toString())
+                                        .then(() => toast.success("Identifiant copié"))
+                                        .catch(() => toast.error("Copie impossible"))}>
                                     <IdCardLanyard/> Copier l'identifiant
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -329,20 +333,22 @@ export function Message(props: {
                         </AvatarFallback>
                     </Avatar>
                 ) : (
-                    <span className="hidden group-hover:block text-xs text-gray-500">
+                    <span className="hidden group-hover:block group-focus-within:block text-xs text-muted-foreground">
                 {dateObj.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
             </span>
                 )}
             </div>
             <div>
                 {replyOf && (
-                    <div
-                        className="mb-1 text-xs text-gray-600 hover:text-blue-700 cursor-pointer flex items-center gap-2 border-l-2 border-gray-300 pl-2 max-w-[70vw]"
+                    <button
+                        type="button"
+                        className="mb-1 text-xs text-muted-foreground hover:text-blue-700 dark:hover:text-blue-300 cursor-pointer flex items-center gap-2 border-l-2 border-gray-300 dark:border-gray-600 pl-2 max-w-[70vw] text-left"
                         onClick={() => {
                             const el = document.getElementById(`message-${replyOf.id}`);
                             el?.scrollIntoView({behavior: 'smooth', block: 'center'});
                         }}
                         title={`Aller au message #${replyOf.id}`}
+                        aria-label={`En réponse à ${replyOf.authorName} : ${replyOf.content.slice(0, 60)}. Aller au message`}
                     >
                         <Avatar className="h-4 w-4 rounded-md flex-shrink-0">
                             <AvatarImage src={replyOf.image || ""} alt={replyOf.authorName}/>
@@ -351,18 +357,18 @@ export function Message(props: {
                                 {replyOf.authorName?.slice(0, 2).toUpperCase() || "US"}
                             </AvatarFallback>
                         </Avatar>
-                        <span className="font-medium text-gray-700">{replyOf.authorName}</span>
+                        <span className="font-medium text-foreground/80">{replyOf.authorName}</span>
                         <span
                             className="truncate">{replyOf.content.length > 60 ? `${replyOf.content.slice(0, 60)}…` : replyOf.content}</span>
-                    </div>
+                    </button>
                 )}
                 {showAuthorInfo && (
                     <div className="flex flex-row items-center gap-4 mb-1">
                 <span
                     className={
                         authorRole === 'bot'
-                            ? 'font-semibold text-sm text-blue-800 flex flex-row gap-3'
-                            : 'font-semibold text-sm text-gray-900 flex flex-row gap-3'
+                            ? 'font-semibold text-sm text-blue-800 dark:text-blue-300 flex flex-row gap-3'
+                            : 'font-semibold text-sm text-foreground flex flex-row gap-3'
                     }
                 >
                   {authorName}
@@ -371,16 +377,17 @@ export function Message(props: {
                             variant="secondary"
                             className="bg-blue-600 text-white dark:bg-blue-800"
                         >
-                            <Bot/>
+                            <Bot aria-hidden/>
                             BOT
                         </Badge>}
                 </span>
-                        <span className="font-light text-sm text-gray-900">{formattedDate}</span>
+                        <span className="font-light text-sm text-muted-foreground">{formattedDate}</span>
                     </div>
                 )}
                 {isEditing ? (
                     <div className="flex flex-col gap-2">
                         <textarea
+                            aria-label="Modifier le message"
                             value={editContent}
                             onChange={(e) => setEditContent(e.target.value)}
                             rows={3}
@@ -394,23 +401,27 @@ export function Message(props: {
                                     handleSaveEdit();
                                 }
                             }}
-                            className="w-full p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                            className="w-full p-2 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring resize-none"
                         />
                         <div className="flex gap-2">
+                            <Button size="sm" onClick={handleSaveEdit} disabled={!editContent.trim()}>
+                                Enregistrer
+                            </Button>
                             <Button size="sm" variant="outline" onClick={() => {
                                 setIsEditing(false);
                                 setEditContent(content);
                             }}>
                                 Annuler
                             </Button>
+                            <span className="self-center text-xs text-muted-foreground">Entrée pour enregistrer, Échap pour annuler</span>
                         </div>
                     </div>
                 ) : (
-                    <h3 className="text-base font-normal text-gray-900 whitespace-pre-wrap break-words max-w-full">
+                    <div className="text-base font-normal text-foreground whitespace-pre-wrap break-words max-w-full">
                         {mediaTenorGifRegex.test(content) || resolvedTenorGif ? (
                             <Image
                                 src={resolvedTenorGif || content}
-                                alt="gif"
+                                alt="GIF"
                                 height={256}
                                 width={256}
                                 unoptimized
@@ -460,13 +471,13 @@ export function Message(props: {
                             })
                         )}
                         {wasEdited ? (
-                            <span className="ml-2 text-xs text-gray-500 italic">Modifié</span>) : null}
+                            <span className="ml-2 text-xs text-muted-foreground italic">Modifié</span>) : null}
                         {undelivered ? (
                             <span className="ml-2 text-xs font-medium text-destructive"
                                   title="La personne a fermé ses messages privés Discord ou quitté Discord">
                                 Non remis
                             </span>) : null}
-                    </h3>
+                    </div>
                 )}
 
                 {Object.entries(reactionMap ?? {}).length > 0 && (
@@ -474,18 +485,27 @@ export function Message(props: {
                         {Object.entries(reactionMap ?? {}).map(([emoji, list]) => (
                             <Badge
                                 key={emoji}
+                                asChild
                                 variant={list.some(r => r.userID === userID) ? "secondary" : "outline"}
                                 className={list.some(r => r.userID === userID) ? "text-base bg-blue-300 dark:bg-blue-800 cursor-pointer" : "text-base cursor-pointer"}
-                                onClick={() => {
-                                    if (readOnly) return;
-                                    if (list.some(r => r.userID === userID)) {
-                                        const reaction = list.find(r => r.userID === userID);
-                                        if (!reaction) return;
-                                        removeReaction(reaction.id, emoji)
-                                    } else sendReaction(emoji);
-                                }}
                             >
-                                {emoji} {list.length}
+                                {/* A button: the keyboard can add or take back a reaction too */}
+                                <button
+                                    type="button"
+                                    disabled={readOnly}
+                                    aria-pressed={list.some(r => r.userID === userID)}
+                                    aria-label={`${emoji} : ${list.length} réaction${list.length > 1 ? "s" : ""}${list.some(r => r.userID === userID) ? ", dont la vôtre" : ""}`}
+                                    onClick={() => {
+                                        if (readOnly) return;
+                                        if (list.some(r => r.userID === userID)) {
+                                            const reaction = list.find(r => r.userID === userID);
+                                            if (!reaction) return;
+                                            removeReaction(reaction.id, emoji)
+                                        } else sendReaction(emoji);
+                                    }}
+                                >
+                                    {emoji} {list.length}
+                                </button>
                             </Badge>
                         ))}
                     </div>
@@ -497,9 +517,9 @@ export function Message(props: {
     return (
         <div className="contents">
             {showDateSeparator && (
-                <div className="flex items-center my-4">
-                    <div className="flex-grow border-t border-gray-300"></div>
-                    <span className="px-4 text-xs text-gray-500">
+                <div className="flex items-center my-4" role="separator" aria-label={new Date(currentDate).toLocaleDateString('fr-FR', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'})}>
+                    <div className="flex-grow border-t border-border" aria-hidden></div>
+                    <span className="px-4 text-xs text-muted-foreground" aria-hidden>
                         {new Date(currentDate).toLocaleDateString('fr-FR', {
                             weekday: 'long',
                             year: 'numeric',
@@ -507,7 +527,7 @@ export function Message(props: {
                             day: 'numeric',
                         })}
                     </span>
-                    <div className="flex-grow border-t border-gray-300"></div>
+                    <div className="flex-grow border-t border-border" aria-hidden></div>
                 </div>
             )}
             {!readOnly ? (
