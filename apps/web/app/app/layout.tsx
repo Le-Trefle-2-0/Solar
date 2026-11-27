@@ -9,6 +9,8 @@ import {VoiceProvider} from "@/context/Voice";
 import {DocumentSubmissionDialog} from "@/components/users/document-submission-dialog";
 import {AccountOnHold} from "@/components/users/account-on-hold";
 import {TwoFactorRequired} from "@/components/users/two-factor-required";
+import {WelcomeTour} from "@/components/users/welcome-tour";
+import {tourSteps} from "@/lib/onboarding";
 import {addDays, differenceInDays, format} from "date-fns";
 import {fr} from "date-fns/locale";
 import prisma from "@/lib/prisma";
@@ -132,6 +134,10 @@ export default async function RootLayout({
         ? (await prisma.user.findMany({where: {documentsStatus: 'submitted'}, select: {id: true}})).map(u => u.id)
         : [];
 
+    // Welcome tour until seen once, after any document dialog (#82)
+    const showTour = !showDocDialog
+        && !(await prisma.user.findUnique({where: {id: access.userId}, select: {onboardedAt: true}}))?.onboardedAt;
+
     return (
         <SocketProvider>
             <VoiceProvider>
@@ -148,6 +154,10 @@ export default async function RootLayout({
                         {access.needsTwoFactor && <TwoFactorRequired/>}
                         {children}
                     </div>
+                    {showTour && (
+                        <WelcomeTour steps={tourSteps(access.permissions, access.needsTwoFactor)}
+                                     needsTwoFactor={access.needsTwoFactor}/>
+                    )}
                     {showDocDialog && (
                         <DocumentSubmissionDialog
                             open={true}

@@ -69,6 +69,7 @@ model User {
   idCardStatus           String?             @default("missing")
   lastName               String?             @db.Text
   newsletterSubscription Boolean             @default(false)
+  onboardedAt            DateTime?
   accounts               Account[]
   apikeys                Apikey[]
   events                 Event[]

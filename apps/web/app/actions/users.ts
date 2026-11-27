@@ -122,7 +122,7 @@ export async function inviteUserAction(formData: z.infer<typeof inviteSchema>) {
                 <p>C'est un plaisir de vous accueillir sur la plateforme du Trèfle 2.0 !</p>
                 <p>Votre compte a été créé avec succès par un administrateur.</p>
                 <p>Dans quelques instants, vous allez recevoir un <strong>deuxième e-mail</strong> contenant un lien sécurisé pour définir votre mot de passe et accéder à votre espace.</p>
-                <p><strong>Note importante :</strong> ce lien est valable pendant <strong>24 heures</strong>. Passé ce délai, vous pourrez en demander un nouveau sur la page de réinitialisation du mot de passe.</p>
+                <p><strong>Note importante :</strong> ce lien est valable pendant <strong>1 heure</strong>. Passé ce délai, vous pourrez en demander un nouveau avec « Mot de passe oublié » sur la page de connexion.</p>
                 <p>À très vite sur Le Trèfle 2.0 !</p>
             `,
         });
