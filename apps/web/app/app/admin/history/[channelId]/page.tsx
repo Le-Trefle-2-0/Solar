@@ -32,7 +32,8 @@ export default async function HistoryDetailPage({
     const {channelId} = await params;
 
     return (
-        <Page title="Historique du Salon" description={`Canal: ${channelId}`} className="p-0">
+        <Page title="Historique du Salon" description={`Canal: ${channelId}`} className="p-0"
+              back={{href: "/app/admin/history", label: "Retour à l'historique"}}>
             <HistoryChat channelId={channelId}/>
         </Page>
     );

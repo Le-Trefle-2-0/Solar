@@ -18,6 +18,8 @@ export interface Msg {
     edited?: boolean;
     /** Discord écoutes: the bot could not deliver this message to the user. */
     undelivered?: boolean;
+    /** Team note in the transcript (identity revealed…), never shown to the person. */
+    internal?: boolean;
 }
 
 export interface MsgWithID extends Msg {

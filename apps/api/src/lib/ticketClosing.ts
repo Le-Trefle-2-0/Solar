@@ -2,6 +2,22 @@ import {prisma} from '../prisma.js';
 import {broadcast} from './broadcast.js';
 import {pseudonymize} from './pseudonym.js';
 import {endVoiceCall} from './voiceControl.js';
+import {hasPermission} from './roleAssignment.js';
+
+/**
+ * Managers (those who assign écoutes) may close an écoute nobody was assigned to and archive it
+ * at once: the person left before being taken in charge, a test, a mistake… There is then no
+ * transmission to write. An assigned écoute always waits for its volunteer's transmission.
+ */
+export function canArchiveWithoutTransmission(permissions: string[], assignedUserId: string | null): boolean {
+    return !assignedUserId && hasPermission(permissions, 'tickets.attribute');
+}
+
+/** What the history shows in place of a transmission. */
+export function archiveNote(managerName: string, reason?: string): string {
+    const why = reason?.trim();
+    return `Écoute fermée sans attribution par ${managerName}${why ? `. Motif : ${why}` : '.'}`;
+}
 
 /** The écoute's room and the volunteers' lists learn about a status change. */
 export async function broadcastStatusUpdate(channelId: string, statusId: number, statusName: string) {

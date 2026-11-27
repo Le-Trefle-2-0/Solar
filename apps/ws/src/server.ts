@@ -390,6 +390,13 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
                         if (payload.audience === 'bots') {
                             // For the bot accounts only (e.g. a voice link to forward on Discord)
                             io.to(BOTS).emit(event, eventData);
+                        } else if (payload.audience === 'staff') {
+                            // Team notes of an écoute: its volunteers and readers, never the
+                            // visitor's widget nor the bot, which are in the room too
+                            if (!isChannelId(room)) return send(res, 400, 'invalid room');
+                            const members = await io.in(room).fetchSockets();
+                            const staff = members.filter(s => (s.data as SocketData).kind === 'volunteer').map(s => s.id);
+                            io.to([...staff, READERS]).emit(event, eventData);
                         } else if (room === null || room === '') {
                             // Room-less events are notifications (ids, statuses), for volunteers
                             io.to(VOLUNTEERS).emit(event, eventData);

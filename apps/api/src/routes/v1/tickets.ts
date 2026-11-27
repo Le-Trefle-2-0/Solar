@@ -8,7 +8,7 @@ import {getUserPermissions, hasPermission} from '../../lib/permissions.js';
 import {canAccessTicket} from '../../lib/channelAccess.js';
 import {verifyPow} from '../../lib/pow.js';
 import {limitPerMinute} from '../../lib/rateLimit.js';
-import {closeTicket, broadcastStatusUpdate} from '../../lib/ticketClosing.js';
+import {archiveNote, canArchiveWithoutTransmission, closeTicket, broadcastStatusUpdate} from '../../lib/ticketClosing.js';
 import {getPermanenceStatus} from '../../lib/permanenceStatus.js';
 
 async function canReadTicketsAll(userId: string): Promise<boolean> {
@@ -138,7 +138,10 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
     app.post('/v1/tickets/close', async (req, reply) => {
         const bodySchema = z.object({
             channelID: z.string().optional(),
-            discordUserID: z.string().optional()
+            discordUserID: z.string().optional(),
+            /** Managers, on an écoute nobody was assigned to: archived at once, no transmission. */
+            withoutTransmission: z.boolean().optional(),
+            reason: z.string().trim().max(500).optional(),
         }).refine(data => data.channelID || data.discordUserID, {
             message: "Either channelID or discordUserID must be provided"
         });
@@ -154,7 +157,7 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
             const perms = await deps.getPermissions(userId);
             if (!hasPermission(perms, 'tickets.close')) return reply.status(403).send('forbidden');
 
-            const {channelID, discordUserID} = bodySchema.parse((req.body ?? {}) as any);
+            const {channelID, discordUserID, withoutTransmission, reason} = bodySchema.parse((req.body ?? {}) as any);
 
             const ticket = await prisma.ticket.findFirst({
                 where: {
@@ -174,8 +177,29 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
                 return reply.status(403).send('forbidden');
             }
 
-            const update = await closeTicket(ticket, 'volunteer');
+            if (withoutTransmission && !canArchiveWithoutTransmission(perms, ticket.assignedUserId)) {
+                return reply.status(403).send({success: false, error: 'assigned_or_not_manager'});
+            }
+
+            let update = await closeTicket(ticket, 'volunteer');
             console.log(`[api] Ticket ${ticket.id} closed by ${user.id}`);
+
+            if (withoutTransmission) {
+                // Nobody took it in charge: there is nothing to report, it goes straight to the history
+                const archived = await prisma.ticketStatus.findUnique({where: {name: 'commented'}});
+                if (!archived) return reply.status(500).send({success: false, error: 'status_missing'});
+                update = await prisma.ticket.update({
+                    where: {id: ticket.id},
+                    include: {status: true},
+                    data: {
+                        statusName: archived.name,
+                        statusLabel: archived.label,
+                        categories: [],
+                        observations: archiveNote(user.displayUsername || user.name, reason),
+                    },
+                });
+                if (ticket.channelId) await broadcastStatusUpdate(ticket.channelId, archived.id, archived.name);
+            }
 
             return reply.send({success: true, update});
         } catch (e) {

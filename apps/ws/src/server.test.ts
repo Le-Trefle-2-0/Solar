@@ -236,6 +236,23 @@ test('ws: bot-only events reach bot sockets and no volunteer', async () => {
     assert.equal(v.length, 0);
 });
 
+test('ws: team notes reach the volunteers of the room, never the visitor nor the bot', async () => {
+    const exp = Date.now() + 60_000;
+    const [vol, guest, bot, other] = await Promise.all([
+        client({jwt: 'jwt-vol'}),
+        client({guest: {uid: 'g9', channelId: 'c1', exp, sig: signGuest(SECRETS.guest, 'c1', 'g9', exp)}}),
+        client({token: 'bot-key'}),
+        client({jwt: 'jwt-other'}),
+    ]);
+    assert.equal(await ack(guest, 'listen', {id: 'c1'}), true);
+    assert.equal(await ack(bot, 'listen', {id: 'c1'}), true);
+    const got = Promise.all([vol, guest, bot, other].map(c => collect(c, 'message')));
+    assert.equal(await broadcast('c1', 'message', {internal: true}, SECRETS.broadcast, {audience: 'staff'}), 200);
+    const [v, g, b, o] = await got;
+    assert.deepEqual([v.length, g.length, b.length, o.length], [1, 0, 0, 0]);
+    assert.equal(await broadcast(null, 'message', {}, SECRETS.broadcast, {audience: 'staff'}), 400);
+});
+
 test('a bot whose key is revoked is disconnected on the next permissions update (#249)', async () => {
     const bot = await client({token: 'bot-key-2'});
     const closed = new Promise<string>(r => bot.once('disconnect', r));

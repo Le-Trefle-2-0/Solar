@@ -219,7 +219,8 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
             const limit = Math.max(1, Math.min(100, limitStr ? parseInt(String(limitStr), 10) : 60));
             const before = beforeStr ? new Date(parseInt(String(beforeStr), 10)) : undefined;
 
-            const where: any = before ? {channelId, createdAt: {lt: before}} : {channelId};
+            // Team notes of the écoute are never shown to the visitor
+            const where: any = before ? {channelId, internal: false, createdAt: {lt: before}} : {channelId, internal: false};
 
             const raw = await prisma.message.findMany({
                 where,

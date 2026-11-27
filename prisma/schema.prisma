@@ -83,6 +83,7 @@ model User {
   tickets                Ticket[]
   twofactors             TwoFactor[]
   channelReads           UserChannelRead[]
+  vigilances             Vigilance[]
 
   @@map("user")
 }
@@ -257,6 +258,9 @@ model Message {
   relayedAt   DateTime?
   /// Discord écoutes: the user could not be reached (DMs closed, account gone)
   relayFailed Boolean   @default(false)
+  /// Note of the team in the transcript (e.g. an identity revealed): never shown to the
+  /// visitor nor sent to the Discord user
+  internal    Boolean   @default(false)
   channel   Channel    @relation(fields: [channelId], references: [id], onDelete: Cascade)
   ticket    Ticket?    @relation(fields: [ticketId], references: [id])
   user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -266,6 +270,23 @@ model Message {
   @@index([ticketId], map: "message_ticketId_fkey")
   @@index([userId], map: "message_userId_fkey")
   @@map("message")
+}
+
+/// A concern noted about a person who asks for écoutes (abuse, risk…), shown to the volunteers
+/// of their next écoutes. The person is known by the keyed hash of their Discord id only.
+model Vigilance {
+  id            String   @id @default(cuid())
+  requesterHash String   @db.VarChar(80)
+  category      String   @db.VarChar(64)
+  note          String?  @db.Text
+  ticketId      Int?
+  createdById   String?
+  createdAt     DateTime @default(now())
+  createdBy     User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([requesterHash])
+  @@index([createdById])
+  @@map("vigilance")
 }
 
 model Reaction {

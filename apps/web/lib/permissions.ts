@@ -3,7 +3,7 @@ import {adminAc, defaultStatements} from "better-auth/plugins/admin/access";
 
 export const statement = {
     ...defaultStatements,
-    tickets: ['open', 'close', 'read_all', 'attribute', 'launch_voice', 'send_message_all', 'send_message', 'transmission'],
+    tickets: ['open', 'close', 'read_all', 'attribute', 'launch_voice', 'send_message_all', 'send_message', 'transmission', 'reveal_identity'],
     management: ['manage_accounts', 'ticket_history', 'view_transmission', 'view_stats'],
     permanence: ['open', 'close', 'register', 'unregister', 'unregister_other_all', 'unregister_other_user', 'register_other_all', 'register_other_user'],
     messages: ['manage'],
@@ -70,6 +70,12 @@ export const PERMISSION_METADATA: Record<string, PermissionInfo> = {
         id: 'tickets.transmission',
         label: 'Faire des transmissions',
         description: 'Permet de rédiger le compte-rendu final de l\'écoute',
+        category: 'Écoutes'
+    },
+    'tickets.reveal_identity': {
+        id: 'tickets.reveal_identity',
+        label: "Révéler l'identifiant Discord",
+        description: "En cas d'urgence, permet de voir l'identifiant Discord de la personne pendant l'écoute ; c'est noté dans la transcription",
         category: 'Écoutes'
     },
 
@@ -252,7 +258,7 @@ export const bot = ac.newRole({
 
 export const admin = ac.newRole({
     ...adminAc.statements,
-    tickets: ['open', 'close', 'read_all', 'attribute', 'launch_voice', 'send_message_all', 'send_message', 'transmission'],
+    tickets: ['open', 'close', 'read_all', 'attribute', 'launch_voice', 'send_message_all', 'send_message', 'transmission', 'reveal_identity'],
     management: ['manage_accounts', 'ticket_history', 'view_transmission', 'view_stats'],
     permanence: ['open', 'close', 'register', 'unregister', 'unregister_other_all', 'unregister_other_user', 'register_other_all', 'register_other_user'],
     messages: ['manage'],

@@ -10,6 +10,7 @@ import {z} from 'zod';
 import {DISCORD_ID, DiscordProfileError, downloadAvatar, fetchDiscordProfile} from '../../lib/discordProfiles.js';
 import {syncTeamPerson} from '../../lib/teamDiscordSync.js';
 import {DISCORD_BOT_SETTING_KEY} from '../../lib/discordBotSettings.js';
+import {withOtherCategory} from '../../lib/ticketCategories.js';
 
 /** Authenticated user holding `permission` (admin.sudo and the owner hold every permission). */
 async function requirePermission(req: any, reply: any, permission: string) {
@@ -42,7 +43,8 @@ export async function registerAdminRoutes(app: FastifyInstance) {
         } catch {
             categories = [];
         }
-        return reply.send({categories: Array.isArray(categories) ? categories : []});
+        // "Autres" is always offered, last
+        return reply.send({categories: withOtherCategory(categories)});
     });
 
     app.get('/v1/admin/settings', async (req, reply) => {
@@ -414,7 +416,9 @@ export async function registerAdminRoutes(app: FastifyInstance) {
                 OR: [
                     {ticketId: {in: ticketIds}},
                     {channelId: {in: tickets.map(t => t.channelId).filter(Boolean) as string[]}}
-                ]
+                ],
+                // Team notes are not part of the conversation
+                internal: false,
             },
             orderBy: {createdAt: 'asc'},
             select: {ticketId: true, channelId: true, createdAt: true}

@@ -15,6 +15,7 @@ interface CallOpts {
     as?: string | null;
     perms?: string[];
     recent?: string[];
+    since?: Date[];
 }
 
 async function call(url: string, opts: CallOpts = {}) {
@@ -22,9 +23,12 @@ async function call(url: string, opts: CallOpts = {}) {
     const deps: AvailableUsersDeps = {
         authenticate: async () => (opts.as === undefined ? 'caller' : opts.as),
         getPermissions: async () => opts.perms ?? ['tickets.attribute'],
-        findTicketByChannelId: async (id) => (id === 'c' ? {discordUserID: 'd1', voice: false} : null),
+        findTicketByChannelId: async (id) => (id === 'c' ? {discordUserID: 'd1'} : null),
         findUsers: async () => leaky as any,
-        findAssignedUserIds: async () => opts.recent ?? [],
+        findAssignments: async (_ids, since) => {
+            opts.since?.push(since);
+            return (opts.recent ?? []).map(userId => ({userId, at: new Date('2026-11-20T10:00:00Z')}));
+        },
     };
     await registerAvailableUsersRoutes(app, deps);
     const res = await app.inject(url);
@@ -53,13 +57,13 @@ test('getAvailable: only id and name, recently assigned users excluded', async (
     assert.deepEqual(body, [{id: 'u1', name: 'Alice'}]);
 });
 
-test('getAvailable: ineligible lists only carry id and name', async () => {
-    const {status, body} = await call('/v1/events/getAvailable?channelID=c&lists=ineligible', {recent: ['u1']});
+test('getAvailable: one list of ineligible volunteers, id, name and when they may again', async () => {
+    const since: Date[] = [];
+    const {status, body} = await call('/v1/events/getAvailable?channelID=c&lists=ineligible', {recent: ['u1', 'u1'], since});
     assert.equal(status, 200);
-    assert.deepEqual(body, {
-        ineligibleText: [{id: 'u1', name: 'Alice'}],
-        ineligibleVoice: [{id: 'u1', name: 'Alice'}],
-    });
+    // Same person at most once every 30 days, text and voice alike
+    assert.deepEqual(body, {ineligible: [{id: 'u1', name: 'Alice', until: '2026-12-20T10:00:00.000Z'}]});
+    assert.ok(Math.abs(Date.now() - since[0].getTime() - 30 * 24 * 3600_000) < 60_000);
 });
 
 test('getAvailable: admin.sudo is accepted', async () => {

@@ -4,7 +4,7 @@
  */
 export const ALL_PERMISSIONS = [
     'tickets.open', 'tickets.close', 'tickets.read_all', 'tickets.attribute', 'tickets.launch_voice',
-    'tickets.send_message_all', 'tickets.send_message', 'tickets.transmission',
+    'tickets.send_message_all', 'tickets.send_message', 'tickets.transmission', 'tickets.reveal_identity',
     'management.manage_accounts', 'management.ticket_history', 'management.view_transmission', 'management.view_stats',
     'users.read_all',
     'permanence.open', 'permanence.close', 'permanence.register', 'permanence.unregister',

@@ -81,6 +81,8 @@ export async function registerMessagesRoutes(app: FastifyInstance, deps: Message
                 edited: (msg as any).edited,
                 // Discord écoutes: the bot could not deliver it to the user (#298)
                 undelivered: !!(msg as any).relayFailed,
+                // Team note (identity revealed…): shown apart in the transcript
+                internal: !!(msg as any).internal,
             });
         }
         return out.reverse();

@@ -6,24 +6,20 @@ import {EmojiPicker, EmojiPickerContent, EmojiPickerFooter, EmojiPickerSearch,} 
 import {
     Check,
     ChevronsUpDown,
-    CircleAlert,
-    Copy,
-    IdCardLanyard,
     Info,
     Laugh,
     MessageCircleOff,
-    MicOff,
     NotebookPen,
-    ScanFace,
     Send,
+    ShieldAlert,
     TvMinimalPlay,
     UserRoundPlus,
-    UserRoundX,
     X
 } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import React, {FormEvent, useEffect, useLayoutEffect, useRef, useState} from "react";
-import {EventData, formVolunteer, Msg, MsgWithID, ticketInfo} from "@/lib/interface";
+import {EventData, formVolunteer, Msg, MsgWithID} from "@/lib/interface";
+import {TicketInfoDialog} from "@/components/ticket-info-dialog";
 import {z, ZodError} from "zod";
 import {toast} from "sonner";
 import {saveMessage} from "@/lib/messageManager";
@@ -40,6 +36,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
+    Label,
     Skeleton,
     Textarea,
     useSidebar
@@ -67,18 +64,24 @@ import {useRouter} from "next/navigation";
 import {Message} from "@/components/message";
 import {useSocket} from "@/context/Socket";
 import {PermanenceVoiceControls, TicketVoiceControls} from "@/components/voice/chat-voice-controls";
-import {VisuallyHidden} from "@radix-ui/react-visually-hidden";
 import {apiFetch} from "@/lib/api";
 import {markChannelAsRead} from "@/app/actions/chat";
 
 export function Chat(props: { channelID: string, statusID: number }) {
     const {channelID, statusID} = props;
     const [status, setStatus] = useState(statusID);
+    // Dialogs closed by hand once their request succeeded (a closing button must not be the
+    // submit button: it removes the form before the browser submits it)
+    const [assignOpen, setAssignOpen] = useState(false);
+    const [transmissionOpen, setTransmissionOpen] = useState(false);
+    const [assigning, setAssigning] = useState(false);
+    const [closeReason, setCloseReason] = useState("");
+    // Managers (tickets.attribute) may close an écoute nobody was assigned to without a transmission
+    const [canAttribute, setCanAttribute] = useState(false);
     const {data: session} = useSession();
     const {socket, setChannelID} = useSocket();
     const router = useRouter();
     const [emojiOpen, setEmojiOpen] = useState(false);
-    const [ticketInfo, setTicketInfo] = useState<ticketInfo>();
     const [gifOpen, setGifOpen] = useState(false);
     const [showTyping, setShowTyping] = useState(false);
     const [typingUsers, setTypingUsers] = useState<{ id: string; name: string; image: string | null }[]>([]);
@@ -113,8 +116,6 @@ export function Chat(props: { channelID: string, statusID: number }) {
     const [idToCall, setIdToCall] = useState('');
     const [localStream, setLocalStream] = useState<MediaStream | null>(null);
     const [available, setAvailable] = useState<formVolunteer[]>([]);
-    const [ineligibleText, setIneligibleText] = useState<string[]>([]);
-    const [ineligibleVoice, setIneligibleVoice] = useState<string[]>([]);
     const {toggleSidebar} = useSidebar();
     const [canManageMessages, setCanManageMessages] = useState(false);
     const [eventInfo, setEventInfo] = useState<EventData | null>(null);
@@ -727,19 +728,6 @@ export function Chat(props: { channelID: string, statusID: number }) {
                     }).catch(() => {
                 });
 
-                apiFetch(`/v1/events/getAvailable?channelID=${channelID}&lists=ineligible`)
-                    .then((d) => {
-                        if (cancelled) return;
-                        const textNames = Array.isArray(d?.ineligibleText) ? d.ineligibleText.map((u: any) => u.name).filter(Boolean) : [];
-                        const voiceNames = Array.isArray(d?.ineligibleVoice) ? d.ineligibleVoice.map((u: any) => u.name).filter(Boolean) : [];
-                        setIneligibleText(textNames);
-                        setIneligibleVoice(voiceNames);
-                    })
-                    .catch(() => {
-                        if (cancelled) return;
-                        setIneligibleText([]);
-                        setIneligibleVoice([]);
-                    });
             } catch (e) {
                 if (cancelled) return;
                 // Keep skeleton visible and retry with exponential backoff
@@ -776,6 +764,15 @@ export function Chat(props: { channelID: string, statusID: number }) {
         } catch {
         }
     }, [channelID, setChannelID]);
+
+    useEffect(() => {
+        apiFetch('/v1/auth/permissions')
+            .then((d: { permissions?: string[] }) => {
+                const perms = d.permissions ?? [];
+                setCanAttribute(perms.includes('admin.sudo') || perms.includes('tickets.attribute'));
+            })
+            .catch(() => setCanAttribute(false));
+    }, []);
 
     useEffect(() => {
         apiFetch('/v1/permissions/messages/manage')
@@ -951,27 +948,32 @@ export function Chat(props: { channelID: string, statusID: number }) {
     });
 
     function assign(data: z.infer<typeof FormSchema>) {
+        if (!ticket?.id) {
+            toast.error("L'écoute n'est pas encore chargée, réessayez dans un instant");
+            return;
+        }
+        setAssigning(true);
         apiFetch(`/v1/tickets/assign`, {
             method: "POST",
             body: JSON.stringify({
-                ticketID: ticket?.id,
+                ticketID: ticket.id,
                 assignmentID: data.volunteer.id
             }),
         }).then(res => {
-            if (res.success) {
-                toast.success(`L'écoute à été attribuée à ${data.volunteer.name}`)
-                setStatus(2)
-                socket?.emit('update')
-            } else {
-                return toast("Erreur lors de l'attribution", {
-                    description: (
-                        <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
-                          <code className="text-white">{JSON.stringify(res.error, null, 2)}</code>
-                        </pre>
-                    ),
-                })
-            }
-        })
+            if (!res.success) throw new Error(res.error || "refused");
+            toast.success(`L'écoute a été attribuée à ${data.volunteer.name}`);
+            setTicket(prev => prev ? {...prev, assignedUserId: data.volunteer.id, statusName: "started"} : prev);
+            setStatus(2);
+            setAssignOpen(false);
+            form.reset();
+            socket?.emit('update');
+        }).catch((e: Error) => {
+            toast.error("L'écoute n'a pas été attribuée", {
+                description: e.message === "User cannot handle tickets"
+                    ? "Ce bénévole n'a pas les droits pour prendre une écoute."
+                    : e.message === "forbidden" ? "Vous n'avez pas le droit d'attribuer les écoutes." : e.message,
+            });
+        }).finally(() => setAssigning(false));
     }
 
     const transmissionSchema = z.object({
@@ -999,21 +1001,15 @@ export function Chat(props: { channelID: string, statusID: number }) {
                 categories: data.categories,
             })
         }).then(res => {
-            if (res.success) {
-                toast("Transmission envoyée")
-                setTimeout(() => {
-                    router.push("/app/chat")
-                    socket?.emit('update')
-                }, 2000)
-            } else {
-                return toast("Erreur lors de la transmission", {
-                    description: (
-                        <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
-                  <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-                </pre>
-                    ),
-                })
-            }
+            if (!res.success) throw new Error(res.error || "refused");
+            toast.success("Transmission envoyée");
+            setTransmissionOpen(false);
+            setTimeout(() => {
+                router.push("/app/chat")
+                socket?.emit('update')
+            }, 2000)
+        }).catch((e: Error) => {
+            toast.error("La transmission n'a pas été envoyée", {description: e.message === "forbidden" ? "Vous n'avez pas accès à cette écoute." : e.message});
         })
     }
 
@@ -1067,7 +1063,22 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                     <Skeleton className="h-4 w-1/3"/>
                                 </div>
                             )}
-                            {chat.map(({author, content, timestamp, reactions, id, replyID, edited, undelivered}, key) => {
+                            {chat.map(({author, content, timestamp, reactions, id, replyID, edited, undelivered, internal}, key) => {
+                                // Team note (identity revealed…): apart from the conversation, never seen by the person
+                                if (internal) {
+                                    return (
+                                        <div key={id} role="note"
+                                             className="mx-auto my-3 flex max-w-xl items-start gap-2 rounded-md border border-dashed border-destructive/40 px-3 py-2 text-sm">
+                                            <ShieldAlert className="mt-0.5 size-4 shrink-0 text-destructive" aria-hidden/>
+                                            <div className="min-w-0">
+                                                <p className="break-words">{content}</p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    Note de l&apos;équipe, invisible pour la personne, le {new Date(timestamp).toLocaleString("fr-FR", {dateStyle: "short", timeStyle: "short"})}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    );
+                                }
                                 const prevMessage = key > 0 ? chat[key - 1] : null
                                 const nextMessage = key < chat.length - 1 ? chat[key + 1] : null
                                 const currentDate = new Date(timestamp).getTime()
@@ -1165,7 +1176,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                         </div>
                     )) :
                         <div className="absolute top-6 right-6 flex flex-row gap-2 z-20">
-                            <AlertDialog>
+                            <AlertDialog open={assignOpen} onOpenChange={setAssignOpen}>
                                 <AlertDialogTrigger asChild>
                                     <Button
                                         className={channelID == "1" || status == 3 || status == 4 ? "hidden" : "flex"}
@@ -1250,9 +1261,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
                                             <AlertDialogFooter>
                                                 <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                                <AlertDialogAction asChild>
-                                                    <Button type="submit">Valider</Button>
-                                                </AlertDialogAction>
+                                                <Button type="submit" disabled={assigning}>Valider</Button>
                                             </AlertDialogFooter>
                                         </form>
                                     </Form>
@@ -1288,21 +1297,37 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                             permanence merci d'utiliser l'onglet latéral.
                                         </AlertDialogDescription>
                                     </AlertDialogHeader>
+                                    {canAttribute && ticket && !ticket.assignedUserId && (
+                                        <div className="space-y-2 rounded-md border p-3 text-sm">
+                                            <p>
+                                                Personne n&apos;a été attribué à cette écoute : elle sera archivée directement,
+                                                sans transmission, avec votre nom.
+                                            </p>
+                                            <Label htmlFor="close-reason">Motif (facultatif)</Label>
+                                            <Textarea id="close-reason" rows={2} maxLength={500} value={closeReason}
+                                                      placeholder="Ex. : la personne est partie avant la prise en charge"
+                                                      onChange={(e) => setCloseReason(e.target.value)}/>
+                                        </div>
+                                    )}
                                     <AlertDialogFooter>
                                         <AlertDialogCancel>Annuler</AlertDialogCancel>
                                         <AlertDialogAction asChild>
                                             <Button variant="destructive" onClick={() => {
+                                                const archive = canAttribute && !!ticket && !ticket.assignedUserId;
                                                 apiFetch('/v1/tickets/close', {
                                                     method: 'POST',
                                                     body: JSON.stringify({
-                                                        channelID: channelID
+                                                        channelID: channelID,
+                                                        ...(archive ? {withoutTransmission: true, reason: closeReason.trim() || undefined} : {}),
                                                     })
                                                 }).then(res => {
-                                                    if (res.success) {
-                                                        setStatus(3)
-                                                        socket?.emit('update')
-                                                    }
-                                                })
+                                                    if (!res.success) throw new Error(res.error || "refused");
+                                                    // Archived: no transmission to write
+                                                    setStatus(archive ? 4 : 3)
+                                                    setCloseReason("")
+                                                    if (archive) toast.success("Écoute fermée et archivée");
+                                                    socket?.emit('update')
+                                                }).catch(() => toast.error("L'écoute n'a pas été fermée"))
                                             }}>
                                                 Fermer l'écoute
                                             </Button>
@@ -1311,7 +1336,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                 </AlertDialogContent>
                             </AlertDialog>
 
-                            <AlertDialog>
+                            <AlertDialog open={transmissionOpen} onOpenChange={setTransmissionOpen}>
                                 <AlertDialogTrigger asChild>
                                     <Button className={channelID == "1" || status !== 3 ? "hidden" : "flex"}
                                             variant="outline" disabled={status !== 3}>
@@ -1458,81 +1483,14 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
                                             <AlertDialogFooter>
                                                 <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                                <AlertDialogAction asChild>
-                                                    <Button type="submit">Envoyer</Button>
-                                                </AlertDialogAction>
+                                                <Button type="submit" disabled={transmissionForm.formState.isSubmitting}>Envoyer</Button>
                                             </AlertDialogFooter>
                                         </form>
                                     </Form>
                                 </AlertDialogContent>
                             </AlertDialog>
 
-                            <Dialog>
-                                <DialogTrigger asChild>
-                                    <Button variant="outline">
-                                        <Info/>
-                                    </Button>
-                                </DialogTrigger>
-                                <DialogContent className="w-[1000px]">
-                                    <DialogHeader>
-                                        <VisuallyHidden>
-                                            <DialogTitle>Informations de l'écoute</DialogTitle>
-                                        </VisuallyHidden>
-                                        {/*<DialogDescription>*/}
-                                        <h4 className="scroll-m-20 text-xl font-semibold tracking-tight flex flex-row gap-3">
-                                            <CircleAlert/> Vigilances
-                                        </h4>
-                                        <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
-                                            {
-                                                ticketInfo?.vigis.length && ticketInfo.vigis.length > 0 ?
-                                                    ticketInfo?.vigis.map((item, index) => (
-                                                        <li key={index}>{item.date.toLocaleDateString()} - {item.motive}</li>
-                                                    )) : <li>Aucune vigilance en cours</li>
-                                            }
-                                        </ul>
-
-                                        <h4 className="scroll-m-20 text-xl font-semibold tracking-tight flex flex-row gap-3">
-                                            <UserRoundX/> Bénévoles Inéligibles
-                                        </h4>
-                                        <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
-                                            {ineligibleText.length > 0 ? (
-                                                ineligibleText.map((name, index) => (
-                                                    <li key={index}>{name}</li>
-                                                ))
-                                            ) : (
-                                                <li>Aucun bénévole inéligible</li>
-                                            )}
-                                        </ul>
-
-                                        <h4 className="scroll-m-20 text-xl font-semibold tracking-tight flex flex-row gap-3">
-                                            <MicOff/> Bénévoles Inéligibles Vocal
-                                        </h4>
-                                        <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
-                                            {ineligibleVoice.length > 0 ? (
-                                                ineligibleVoice.map((name, index) => (
-                                                    <li key={index}>{name}</li>
-                                                ))
-                                            ) : (
-                                                <li>Aucun bénévole inéligible</li>
-                                            )}
-                                        </ul>
-
-                                        <h4 className="scroll-m-20 text-xl font-semibold tracking-tight flex flex-row gap-3">
-                                            <IdCardLanyard/> Identifiant
-                                        </h4>
-                                        <p className="leading-7 [&:not(:first-child)]:mt-6">
-                                            Numéro d'anonymat : 277dd0... <Button variant="secondary">
-                                            <Copy/> Copier</Button>
-                                        </p>
-                                        <p className="leading-7 [&:not(:first-child)]:mt-6">
-                                            Identifiant Discord : <Button variant="secondary">
-                                            <ScanFace/> Révéler</Button>
-                                        </p>
-
-                                        {/*</DialogDescription>*/}
-                                    </DialogHeader>
-                                </DialogContent>
-                            </Dialog>
+                            <TicketInfoDialog channelId={channelID}/>
                         </div>
                 }
 

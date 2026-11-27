@@ -19,9 +19,12 @@ import {
 } from "@/components/ui";
 import {toast} from "sonner";
 import {apiFetch} from "@/lib/api";
-import {Loader2, Plus, Trash2} from "lucide-react";
+import {Loader2, Lock, Plus, Trash2} from "lucide-react";
 import {TeamSettings} from "@/components/admin/team-settings";
 import {DiscordBotSetup} from "@/components/admin/discord-bot-setup";
+
+/** "Autres" is always offered in transmissions (added by the API): not a category to manage. */
+const isOtherCategory = (c: string) => ["autre", "autres"].includes(c.trim().toLowerCase());
 
 interface Settings {
     widget_enabled: boolean;
@@ -128,6 +131,9 @@ export default function AdminSettingsView({initialSettings, roles, canManageNews
 
     const handleAddCategory = async () => {
         if (!newCategory.trim()) return;
+        if (isOtherCategory(newCategory)) {
+            return toast.error("« Autres » est toujours proposée, inutile de l'ajouter");
+        }
         if (settings.monitoring_categories.includes(newCategory.trim())) {
             return toast.error("Cette catégorie existe déjà");
         }
@@ -239,7 +245,8 @@ export default function AdminSettingsView({initialSettings, roles, canManageNews
                 <CardHeader>
                     <CardTitle>Catégories de Monitoring</CardTitle>
                     <CardDescription>
-                        Définissez les catégories disponibles lors de la rédaction des transmissions.
+                        Définissez les catégories disponibles lors de la rédaction des transmissions. « Autres » est
+                        toujours proposée en dernier.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -256,7 +263,7 @@ export default function AdminSettingsView({initialSettings, roles, canManageNews
                         </Button>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                        {settings.monitoring_categories?.map((category) => (
+                        {settings.monitoring_categories?.filter(c => !isOtherCategory(c)).map((category) => (
                             <div
                                 key={category}
                                 className="flex items-center justify-between p-2 rounded-md border bg-muted/50"
@@ -273,12 +280,14 @@ export default function AdminSettingsView({initialSettings, roles, canManageNews
                                 </Button>
                             </div>
                         ))}
+                        {/* Always offered by the API, cannot be removed */}
+                        <div className="flex items-center justify-between p-2 rounded-md border border-dashed">
+                            <span className="text-sm">Autres</span>
+                            <span className="flex h-8 items-center gap-1.5 px-2 text-xs text-muted-foreground">
+                                <Lock className="h-3.5 w-3.5" aria-hidden/> Toujours proposée
+                            </span>
+                        </div>
                     </div>
-                    {settings.monitoring_categories?.length === 0 && (
-                        <p className="text-sm text-muted-foreground text-center py-4">
-                            Aucune catégorie définie.
-                        </p>
-                    )}
                 </CardContent>
             </Card>
 

@@ -121,7 +121,7 @@ const defaultDeps: BotBridgeDeps = {
     pendingMessages: async (ticket) => {
         const rows = await prisma.message.findMany({
             where: {
-                channelId: ticket.channelId, userId: {not: null}, relayedAt: null, relayFailed: false,
+                channelId: ticket.channelId, userId: {not: null}, relayedAt: null, relayFailed: false, internal: false,
                 createdAt: {gte: ticket.createdAt},
             },
             orderBy: {id: 'asc'},
