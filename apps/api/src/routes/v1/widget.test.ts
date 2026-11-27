@@ -30,7 +30,7 @@ const invalid: [string, Record<string, string>][] = [
 async function build(statusName = 'waiting') {
     const app = Fastify();
     await app.register(cookie);
-    await registerWidgetRoutes(app);
+    await registerWidgetRoutes(app, {widgetEnabled: async () => true});
     await registerWsRoutes(app, {findTicketByChannelId: async () => ({statusName})});
     return app;
 }
@@ -76,4 +76,36 @@ test('ws/guest: credentials come from the session, not the body', async () => {
     const res = await guest('c');
     assert.equal(res.statusCode, 200);
     assert.equal(res.json().credentials.uid, 'guest_1');
+});
+
+test('widget switched off: every visitor route refuses, availability answers closed', async () => {
+    const app = Fastify();
+    await app.register(cookie);
+    await registerWidgetRoutes(app, {widgetEnabled: async () => false});
+    await registerWsRoutes(app, {findTicketByChannelId: async () => ({statusName: 'started'})});
+    for (const [method, url] of [
+        ['GET', '/v1/widget/challenge'],
+        ['POST', '/v1/widget/session'],
+        ['GET', '/v1/widget/status'],
+        ['POST', '/v1/widget/close'],
+        ['POST', '/v1/widget/voice'],
+        ['GET', '/v1/messages/widget/c?limit=60'],
+        ['POST', '/v1/messages/widget/c'],
+        ['POST', '/v1/ws/guest'],
+    ] as const) {
+        // A valid session changes nothing: an écoute in progress cannot be continued either
+        const res = await app.inject({method, url, cookies: cookies('c'), payload: {channelId: 'c', content: 'x'}});
+        assert.equal(res.statusCode, 403, `${method} ${url}`);
+        assert.equal(res.json().error, 'widget_disabled', `${method} ${url}`);
+    }
+    const availability = await app.inject({url: '/v1/widget/availability'});
+    assert.equal(availability.statusCode, 200);
+    assert.deepEqual(availability.json(), {open: false, nextOpening: null, disabled: true});
+});
+
+test('widget switched off: the rest of the API is untouched', async () => {
+    const app = Fastify();
+    await registerWidgetRoutes(app, {widgetEnabled: async () => false});
+    app.get('/v1/tickets', async () => ({ok: true}));
+    assert.equal((await app.inject({url: '/v1/tickets'})).statusCode, 200);
 });

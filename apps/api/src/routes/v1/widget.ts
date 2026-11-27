@@ -11,6 +11,7 @@ import {getPermanenceStatus} from '../../lib/permanenceStatus.js';
 import {endVoiceCall} from '../../lib/voiceControl.js';
 import {isTicketWritable} from '../../lib/ticketWrites.js';
 import {isSameSiteRequest} from '../../lib/requestOrigin.js';
+import {isWidgetEnabled, isWidgetRoute, widgetOffResponse} from '../../lib/widgetSwitch.js';
 
 const WIDGET_COOKIES = ['widget_channel', 'widget_uid', 'widget_exp', 'widget_sig', 'widget_public'];
 
@@ -35,13 +36,22 @@ function clearWidgetCookies(reply: any) {
     });
 }
 
-export async function registerWidgetRoutes(app: FastifyInstance) {
+export type WidgetDeps = {widgetEnabled: () => Promise<boolean>};
+
+export async function registerWidgetRoutes(app: FastifyInstance, deps: WidgetDeps = {widgetEnabled: isWidgetEnabled}) {
     // Starting, closing or writing in a visitor's écoute: only from our own pages (#271)
     app.addHook('preHandler', async (req, reply) => {
         const widgetWrite = req.method === 'POST' && (req.url.startsWith('/v1/widget/') || req.url.startsWith('/v1/messages/widget/'));
         if (widgetWrite && !isSameSiteRequest(req.headers.origin)) {
             return reply.status(403).send({success: false, error: 'forbidden_origin'});
         }
+    });
+
+    // The widget switched off in the settings: every visitor route refuses, not only the display
+    app.addHook('onRequest', async (req, reply) => {
+        if (!isWidgetRoute(req.url) || await deps.widgetEnabled()) return;
+        const {status, body} = widgetOffResponse(req.url);
+        return reply.status(status).send(body);
     });
 
     app.get('/v1/widget/challenge', limitPerMinute(20), async () => createChallenge());

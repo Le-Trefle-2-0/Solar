@@ -233,7 +233,7 @@ export default function AdminSettingsView({initialSettings, roles, canManageNews
                                 Activer le widget de chat
                             </Label>
                             <p className="text-sm text-muted-foreground">
-                                Si désactivé, le widget n'apparaîtra plus sur la page d'accueil publique.
+                                Désactivé, le widget disparaît du site et plus aucune écoute ne peut être ouverte ni poursuivie depuis le site, même celles en cours.
                             </p>
                         </div>
                         {loading && <Loader2 className="h-4 w-4 animate-spin ml-2"/>}

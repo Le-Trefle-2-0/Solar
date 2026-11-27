@@ -27,7 +27,8 @@ function statusLine(status: string): {text: string; tone: 'wait' | 'live' | 'don
     return {text: "En attente d'un bénévole", tone: 'wait'};
 }
 
-type Availability = {open: true; closesAt: string} | {open: false; nextOpening: {start: string; end: string} | null};
+// disabled: the widget is switched off in Solar's settings, whatever the planning says
+type Availability = {open: true; closesAt: string} | {open: false; nextOpening: {start: string; end: string} | null; disabled?: boolean};
 
 /** "jeudi 27 novembre à 20:00" */
 const formatOpening = (iso: string) => new Date(iso).toLocaleString('fr-FR', {
@@ -189,7 +190,9 @@ export default function ChatWidget() {
                 : {channelId: '', ticketId: 0, creds: null};
         } catch (err: any) {
             if (err.message === 'session_expired') return {channelId: '', ticketId: 0, creds: null, error: 'session_expired'};
-            if (err.message === 'permanence_closed') return {channelId: '', ticketId: 0, creds: null, error: 'permanence_closed'};
+            if (err.message === 'permanence_closed' || err.message === 'widget_disabled') {
+                return {channelId: '', ticketId: 0, creds: null, error: 'permanence_closed'};
+            }
             return null;
         }
     }, [loadMessages, loadTicketStatus]);
@@ -366,9 +369,15 @@ export default function ChatWidget() {
             });
             setInput('');
             if (!wsConnected) await loadMessages(channelId);
-        } catch {
+        } catch (err: any) {
+            // Switched off during the écoute: nothing can be sent any more, show the closed step
+            if (err?.message === 'widget_disabled') {
+                clearLocalStorage();
+                resetState();
+                await loadAvailability();
+            }
         }
-    }, [channelId, input, ticketStatus, loadMessages, visitorUserId, visitorCreds, wsConnected]);
+    }, [channelId, input, ticketStatus, loadMessages, visitorUserId, visitorCreds, wsConnected, clearLocalStorage, resetState, loadAvailability]);
 
     const openNewTicket = useCallback(async () => {
         setLoading(true);
@@ -484,13 +493,17 @@ export default function ChatWidget() {
                         <div className="flex flex-1 flex-col overflow-y-auto px-6 py-6">
                             <CalendarClock className="size-8 text-primary" aria-hidden="true"/>
                             <h3 className="mt-4 text-xl font-semibold leading-snug">
-                                Aucun bénévole n&apos;est disponible pour le moment.
+                                {availability.disabled
+                                    ? "Les écoutes en ligne sont suspendues pour le moment."
+                                    : <>Aucun bénévole n&apos;est disponible pour le moment.</>}
                             </h3>
                             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                                Les bénévoles vous écoutent pendant les permanences. Vous pourrez écrire ici
-                                dès le début de la prochaine.
+                                {availability.disabled
+                                    ? "Vous ne pouvez pas écrire aux bénévoles depuis ce site en ce moment. Revenez un peu plus tard."
+                                    : <>Les bénévoles vous écoutent pendant les permanences. Vous pourrez écrire ici
+                                        dès le début de la prochaine.</>}
                             </p>
-                            <div className="mt-6 rounded-2xl border border-primary/30 bg-primary/10 px-4 py-3">
+                            {!availability.disabled && <div className="mt-6 rounded-2xl border border-primary/30 bg-primary/10 px-4 py-3">
                                 {availability.nextOpening ? (
                                     <>
                                         <p className="text-sm text-muted-foreground">Prochaine permanence</p>
@@ -501,7 +514,7 @@ export default function ChatWidget() {
                                 ) : (
                                     <p className="text-sm">Aucune permanence n&apos;est programmée pour l&apos;instant.</p>
                                 )}
-                            </div>
+                            </div>}
                             <p className="mt-6 text-sm leading-relaxed text-muted-foreground">
                                 En cas de danger immédiat, appelez le 112. Pour parler à quelqu&apos;un tout de suite,
                                 le 3114 (prévention du suicide) répond jour et nuit, gratuitement.

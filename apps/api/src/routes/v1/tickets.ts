@@ -7,10 +7,8 @@ import {verifyWidgetSession} from '../../lib/widgetSession.js';
 import {getUserPermissions, hasPermission} from '../../lib/permissions.js';
 import {canAccessTicket} from '../../lib/channelAccess.js';
 import {publicTicket} from '../../lib/publicTicket.js';
-import {verifyPow} from '../../lib/pow.js';
 import {limitPerMinute} from '../../lib/rateLimit.js';
 import {archiveNote, canArchiveWithoutTransmission, closeTicket, broadcastStatusUpdate} from '../../lib/ticketClosing.js';
-import {getPermanenceStatus} from '../../lib/permanenceStatus.js';
 import {assignRefusal, canHandleTickets} from '../../lib/presence.js';
 import {assignmentContext} from './presence.js';
 
@@ -280,55 +278,7 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
 
     // Écoutes from Discord are opened through /v1/bot/tickets (botBridge.ts), by the bot account only (#229)
 
-    // POST /v1/tickets/web-create
-    app.post('/v1/tickets/web-create', limitPerMinute(5), async (req, reply) => {
-        // Proof of work first: unverified requests never reach the database
-        if (!verifyPow((req.body as {pow?: unknown} | undefined)?.pow)) {
-            return reply.status(403).send({success: false, error: 'pow_required'});
-        }
-        // Same rule as the widget: public écoutes only while a permanence is running
-        const availability = await getPermanenceStatus();
-        if (!availability.open) {
-            return reply.status(403).send({success: false, error: 'permanence_closed', nextOpening: availability.nextOpening});
-        }
-        try {
-            const syntheticId = `web:${crypto.randomUUID()}`;
-            const status = await prisma.ticketStatus.findUnique({where: {name: 'waiting'}});
-            if (!status) return reply.status(500).send({success: false, error: 'status_missing'});
-
-            const ticket = await prisma.ticket.create({
-                data: {
-                    discordUserID: syntheticId,
-                    source: 'web',
-                    metadata: {},
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                    statusName: status.name,
-                    statusLabel: status.label,
-                },
-            });
-
-            let channelName = String(ticket.id).padStart(5, '0');
-            channelName = 'Ticket-' + channelName;
-
-            const channel = await prisma.channel.create({data: {name: channelName}});
-
-            const updatedTicket = await prisma.ticket.update({
-                where: {id: ticket.id},
-                data: {
-                    updatedAt: new Date(),
-                    channelName: channel.name,
-                    channelId: channel.id,
-                },
-            });
-
-            await broadcast(null, 'updateRequest', {channelId: updatedTicket.channelId});
-
-            return reply.send({success: true, ticket: publicTicket(updatedTicket)});
-        } catch (e) {
-            return reply.status(500).send({success: false, message: 'Internal server error'});
-        }
-    });
+    // Website écoutes open through /v1/widget/session only, which follows the widget switch and the planning
 
     // POST /v1/tickets/findBy/channelID
     // Requires tickets.read_all, except for the user the ticket is assigned to.
