@@ -131,6 +131,8 @@ services:
       NEXT_PUBLIC_APP_URL: http://web:3000
       NEXT_PUBLIC_API_URL: http://api:3001
       STORAGE_INTERNAL_URL: http://storage:3004
+      # The web's server actions broadcast to the WebSocket service from inside the network
+      WS_INTERNAL_URL: http://ws:3002
       NEXT_PUBLIC_WS_URL: ws://localhost:3002
       DATABASE_URL: mysql://root:${MYSQL_ROOT_PASSWORD}@mysql:3306/solar
     volumes:
