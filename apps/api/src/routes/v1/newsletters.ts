@@ -43,7 +43,8 @@ export async function registerNewslettersRoutes(app: FastifyInstance) {
         }
         (req as FastifyRequest & {userId?: string}).userId = userId;
     };
-    const guarded = {preHandler: requireNewsletterRole, bodyLimit: 5 * MAX_CONTENT};
+    // onRequest: the caller is checked from the headers before a body of up to 10 MiB is read
+    const guarded = {onRequest: requireNewsletterRole, bodyLimit: 5 * MAX_CONTENT};
     const userIdOf = (req: FastifyRequest) => (req as FastifyRequest & {userId?: string}).userId!;
 
     const parse = <T>(schema: z.ZodType<T>, value: unknown, reply: FastifyReply): T | null => {

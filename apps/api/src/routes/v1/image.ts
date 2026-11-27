@@ -7,10 +7,14 @@ import {limitPerMinute} from '../../lib/rateLimit.js';
 
 export async function registerImageRoutes(app: FastifyInstance) {
     // A few images a minute, each at most MAX_IMAGE_BYTES (#262)
-    app.post('/v1/image', {...limitPerMinute(10), bodyLimit: 6 * 1024 * 1024}, async (req, reply) => {
-        const userId = await authenticate(req);
-        if (!userId) return reply.status(401).send('unauthorized');
-
+    app.post('/v1/image', {
+        ...limitPerMinute(10),
+        bodyLimit: 6 * 1024 * 1024,
+        // The caller is checked from the headers before a body of up to 6 MiB is read
+        onRequest: async (req, reply) => {
+            if (!await authenticate(req)) return reply.status(401).send('unauthorized');
+        },
+    }, async (req, reply) => {
         const bodySchema = z.object({
             image: z.string().refine(isAllowedImage, 'invalid_image')
         });

@@ -233,10 +233,13 @@ export async function registerAdminRoutes(app: FastifyInstance) {
         return reply.send({people});
     });
 
-    app.post('/v1/admin/team/people', {bodyLimit: 6 * 1024 * 1024}, async (req, reply) => {
-        const admin = await requirePermission(req, reply, 'settings.manage');
-        if (!admin) return;
-
+    app.post('/v1/admin/team/people', {
+        bodyLimit: 6 * 1024 * 1024,
+        // The caller is checked from the headers before a photo of up to 6 MiB is read
+        onRequest: async (req, reply) => {
+            if (!await requirePermission(req, reply, 'settings.manage')) return reply;
+        },
+    }, async (req, reply) => {
         const {id, name, image, bio, syncName, syncImage} = req.body as {
             id?: string,
             name: string,
