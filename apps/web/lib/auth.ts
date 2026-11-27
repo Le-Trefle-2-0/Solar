@@ -91,6 +91,8 @@ export const auth = betterAuth({
     },
     user: {
         additionalFields: userAdditionalFields,
+        // From the settings page: the new address is confirmed through a link sent to it
+        changeEmail: {enabled: true},
     },
     database: prismaAdapter(prisma, {
         provider: "mysql", // or "mysql", "postgresql", ...etc
@@ -141,6 +143,37 @@ export const auth = betterAuth({
         // A new password closes every open session, including the one that may have leaked (#276)
         revokeSessionsOnPasswordReset: true,
     },
+    // Only used to confirm a new address from the settings page: the link goes to the new
+    // address, and the e-mail changes once it is opened. Nothing is sent at sign-up.
+    emailVerification: {
+        sendOnSignUp: false,
+        autoSignInAfterVerification: false,
+        async sendVerificationEmail({user, url}) {
+            // A few per address and per hour, like the reset e-mails (#252)
+            if (!allowResetEmail(`verify:${user.email}`)) {
+                console.warn("[auth] verification e-mail skipped: too many requests for this address");
+                return;
+            }
+            const content = `
+                <p>Bonjour ${escapeHtml(user.name || "")},</p>
+                <p>Vous avez demandé à utiliser cette adresse pour votre compte Le Trèfle 2.0.</p>
+                <p>Cliquez sur le bouton ci-dessous pour la confirmer :</p>
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="${url}" class="button" style="color: white !important;">Confirmer cette adresse</a>
+                </div>
+                <p>Ce lien expirera bientôt.</p>
+                <p>Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet e-mail : rien ne changera.</p>
+            `;
+            const {html} = renderEmailTemplate({title: "Confirmation de votre nouvelle adresse", content});
+            const {error} = await getResendClient().emails.send({
+                from: "Le Trèfle 2.0 <noreply@solar.letrefle.org>",
+                to: user.email,
+                subject: "Le Trèfle 2.0 - Confirmation de votre nouvelle adresse e-mail",
+                html,
+            });
+            if (error) console.error("[auth] Resend error sending verification e-mail:", error);
+        },
+    },
     // Better Auth's limiter (in memory: one web instance). Server-side auth.api calls are not
     // counted, so password changes go through the client endpoints (#252).
     rateLimit: {
@@ -152,6 +185,7 @@ export const auth = betterAuth({
             "/sign-in/username": {window: 60, max: 5},
             "/change-password": {window: 300, max: 5},
             "/request-password-reset": {window: 300, max: 3},
+            "/change-email": {window: 300, max: 3},
             "/reset-password": {window: 300, max: 5},
             "/two-factor/verify-totp": {window: 60, max: 5},
             "/two-factor/verify-backup-code": {window: 60, max: 5},
@@ -179,7 +213,12 @@ export const auth = betterAuth({
                 || (endpoint.startsWith("/organization/") && !organizationRead && process.env.AUTH_ORGANIZATIONS !== "true")) {
                 throw new APIError("NOT_FOUND", {message: "Not available"});
             }
-            // No e-mail verification is configured, so no verification link is ever sent: its
+            // Verification e-mails only follow a change of address from the settings page: nobody
+            // may ask for one directly (it would send e-mails to any unverified account)
+            if (endpoint === "/send-verification-email") {
+                throw new APIError("NOT_FOUND", {message: "Not available"});
+            }
+            // Without e-mail verification configured, no verification link is ever sent: its
             // tokens are not parsed at all until it is (emailVerification or user.changeEmail)
             const authOptions = (context as any)?.context?.options;
             if (endpoint === "/verify-email" && !authOptions?.emailVerification?.sendVerificationEmail

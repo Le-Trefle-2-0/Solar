@@ -560,7 +560,9 @@ export function AuthView({pathname}: { pathname: string }) {
         e.preventDefault();
         setLoading(true);
         try {
-            const res = await fetch("/api/auth/forgot-password", {
+            // Better Auth's route (there is no /forgot-password); it answers the same whether or
+            // not the address has an account
+            const res = await fetch("/api/auth/request-password-reset", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({

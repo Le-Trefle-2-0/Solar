@@ -158,6 +158,7 @@ export default function SettingsPage() {
         setLoading(true);
         const {error} = await authClient.changeEmail({
             newEmail: email,
+            callbackURL: "/app/settings",
         });
         setLoading(false);
 
