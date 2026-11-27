@@ -2,6 +2,7 @@ import {createRemoteJWKSet, JWTPayload, jwtVerify} from 'jose';
 import {APP_URL, INTERNAL_AUTH_URL} from './env.js';
 import {prisma} from './prisma.js';
 import {getActor} from './lib/permissions.js';
+import {isSessionActive, readSessionId} from './lib/sessions.js';
 
 const JWKS = createRemoteJWKSet(new URL(`${INTERNAL_AUTH_URL}/api/auth/jwks`));
 const normalizeUrl = (value: string) => value.replace(/\/$/, '');
@@ -43,7 +44,10 @@ export async function authenticate(req: any): Promise<string | null> {
     // 1. Try JWT
     const jwt = await verifyAuthorizationHeader(req.headers.authorization);
     if (jwt) {
-        return activeAccount((jwt.sub as string) || (jwt as any).userId);
+        const userId = typeof jwt.sub === 'string' ? jwt.sub : null;
+        // The session the JWT came from must still be open (signed out, reset password: #276)
+        if (!userId || !(await isSessionActive(readSessionId(jwt), userId))) return null;
+        return activeAccount(userId);
     }
 
     // 2. Try API Key (header only: query strings end up in logs and browser history)

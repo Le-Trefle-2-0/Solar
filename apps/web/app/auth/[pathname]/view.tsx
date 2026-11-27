@@ -403,11 +403,9 @@ export function AuthView({pathname}: { pathname: string }) {
 
         // Force refresh session state on auth page to avoid ghost sessions
         authClient.getSession().then(({data}) => {
-            console.log("[Auth] Session data:", data);
             if (data && !isSignUp) {
                 // If 2FA is required/enabled but not yet verified, don't redirect
                 if (twoFactor) {
-                    console.log("[Auth] 2FA UI is active, blocking redirect");
                     return;
                 }
 
@@ -416,13 +414,11 @@ export function AuthView({pathname}: { pathname: string }) {
                 const user = data.user as any;
 
                 if (session?.twoFactorRedirect || (user?.twoFactorEnabled && !session?.twoFactorVerified)) {
-                    console.log("[Auth] 2FA required (redirect flag or unverified), showing OTP screen");
                     setTwoFactor(true);
                     return;
                 }
 
                 // If we are on sign-in but have a valid and verified session, redirect to app
-                console.log("[Auth] Session valid and verified, redirecting to /app");
                 router.push("/app");
             }
         });
@@ -458,7 +454,6 @@ export function AuthView({pathname}: { pathname: string }) {
     const handleSignIn = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        console.log("[SignIn] Attempting sign-in for:", form.email);
         const {error, data} = await signIn.email({
             email: form.email,
             password: form.password,
@@ -467,7 +462,6 @@ export function AuthView({pathname}: { pathname: string }) {
             onRequest: () => setLoading(true),
             onResponse: () => setLoading(false),
             onError: (ctx) => {
-                console.log("[SignIn] Error context:", ctx);
                 // Better Auth returns 403 or 400 with TWO_FACTOR_REQUIRED code or message
                 const is2FA = ctx.error.status === 403 ||
                     ctx.error.code === "TWO_FACTOR_REQUIRED" ||
@@ -475,17 +469,14 @@ export function AuthView({pathname}: { pathname: string }) {
                     ctx.error.message?.toLowerCase().includes("two-factor");
 
                 if (is2FA) {
-                    console.log("[SignIn] Two-factor authentication required (via error)");
                     setTwoFactor(true);
                 } else {
                     toast.error(ctx.error.message || "Email ou mot de passe incorrect");
                 }
             },
             onSuccess: (ctx) => {
-                console.log("[SignIn] Success context:", ctx);
                 // Better Auth might return success with twoFactorRedirect or twoFactorRequired
                 if (ctx.data && ((ctx.data as any).twoFactorRequired || (ctx.data as any).twoFactorRedirect)) {
-                    console.log("[SignIn] Two-factor required flag found in success response");
                     setTwoFactor(true);
                     return;
                 }
@@ -496,7 +487,6 @@ export function AuthView({pathname}: { pathname: string }) {
 
         // Fallback check if response data is returned outside of onSuccess/onError context
         if (data && ((data as any).twoFactorRequired || (data as any).twoFactorRedirect)) {
-            console.log("[SignIn] Two-factor required flag found in response data");
             setTwoFactor(true);
         }
 

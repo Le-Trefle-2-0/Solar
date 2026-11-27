@@ -75,8 +75,10 @@ MEDIASOUP_MAX_PORT=40100
 MYSQL_ROOT_PASSWORD=un_mot_de_passe_mysql_local
 REDIS_PASSWORD=un_mot_de_passe_redis_local
 
-# Derrière un reverse proxy : "true", un nombre de sauts ou les adresses des proxys (limitation de débit par IP)
-TRUST_PROXY=1
+# Seulement derrière un reverse proxy : "true", un nombre de sauts ou les adresses des proxys.
+# Si l'API est exposée directement, laisser commenté : sinon n'importe qui choisit son adresse IP
+# avec X-Forwarded-For et contourne les limites par IP.
+# TRUST_PROXY=1
 # Hôtes autorisés pour les images distantes (POST /v1/image), séparés par des virgules
 IMAGE_ALLOWED_HOSTS=
 

@@ -241,12 +241,10 @@ export default function SettingsPage() {
             toast.error(error.message || "Code invalide");
         } else if (data) {
             // Generate backup codes after enabling
-            console.log("[A2F] TOTP Verified, generating backup codes...");
             const {data: codesData, error: codesError} = await authClient.twoFactor.generateBackupCodes({
                 password: confirmPassword,
             });
 
-            console.log("[A2F] generateBackupCodes result:", {codesData, codesError});
 
             if (codesError) {
                 console.error("[A2F] Error generating backup codes:", codesError);
@@ -257,10 +255,9 @@ export default function SettingsPage() {
                 // Better Auth typical response for generateBackupCodes is either the array or { backupCodes: string[] }
                 const codes = Array.isArray(codesData) ? codesData : (codesData as any).backupCodes;
                 if (Array.isArray(codes)) {
-                    console.log("[A2F] Backup codes set:", codes.length);
                     setBackupCodes(codes);
                 } else {
-                    console.warn("[A2F] Unexpected backup codes format:", codesData);
+                    console.warn("[A2F] Unexpected backup codes format");
                 }
             }
 

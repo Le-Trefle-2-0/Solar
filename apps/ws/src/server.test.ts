@@ -282,3 +282,35 @@ test('a bot whose key is revoked is disconnected on the next permissions update 
     assert.equal(await broadcast(null, 'permissionsUpdate', {}), 200);
     assert.equal(await closed, 'io server disconnect');
 });
+
+test('signing out closes the volunteer sockets of that session (#276)', async () => {
+    const open = new Set(['s1']);
+    const {httpServer, io} = createWsServer({
+        verifyJwt: async (t) => ({sub: 'vol', sid: t}),
+        checkApiKey: async () => null,
+        getSession: async (id, sid) => (open.has(sid as string) ? sessions[id] ?? null : null),
+        getChannelAccess: async (u, c) => access(u, c),
+        secrets: SECRETS,
+        sessionCheckMs: 50,
+        log: quiet,
+    });
+    await new Promise<void>(r => httpServer.listen(0, '127.0.0.1', r));
+    const url = `http://127.0.0.1:${(httpServer.address() as AddressInfo).port}`;
+    try {
+        // A JWT of a session already closed is refused
+        await assert.rejects(new Promise((resolve, reject) => {
+            const c = connect(url, {auth: {jwt: 's2'}, transports: ['websocket'], forceNew: true, reconnection: false});
+            c.once('connect', () => resolve(c));
+            c.once('connect_error', reject);
+        }));
+        const c = connect(url, {auth: {jwt: 's1'}, transports: ['websocket'], forceNew: true, reconnection: false});
+        await new Promise(r => c.once('connect', r));
+        const closed = new Promise(r => c.once('disconnect', r));
+        open.delete('s1');
+        await closed;
+        c.disconnect();
+    } finally {
+        io.close();
+        await new Promise(r => httpServer.close(() => r(undefined)));
+    }
+});

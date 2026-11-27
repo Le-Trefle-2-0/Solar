@@ -59,8 +59,8 @@ export type RoomState =
     | {type: 'ticket'; channelId: string; volunteer: boolean; visitor: boolean};
 
 export interface VoiceDeps {
-    verifyJwt(token: string): Promise<{sub?: string} | null>;
-    authorize(request: {room: {type: RoomType; channelId: string}; userId?: string; token?: unknown}): Promise<Grant>;
+    verifyJwt(token: string): Promise<{sub?: string; sid?: unknown} | null>;
+    authorize(request: {room: {type: RoomType; channelId: string}; userId?: string; sid?: unknown; token?: unknown}): Promise<Grant>;
     createRouter(): Promise<RouterLike>;
     publishState(state: RoomState): Promise<void>;
     internalSecret: string;
@@ -188,6 +188,8 @@ export function createVoiceServer(deps: VoiceDeps): {httpServer: HttpServer; io:
                 const payload = await deps.verifyJwt(auth.jwt);
                 if (isId(payload?.sub)) {
                     socket.data.userId = payload!.sub;
+                    // Checked by the API at each join: signing out ends voice access too (#276)
+                    socket.data.sid = payload!.sid;
                     return next();
                 }
             }
@@ -228,7 +230,7 @@ export function createVoiceServer(deps: VoiceDeps): {httpServer: HttpServer; io:
             }
             const grant = await deps.authorize({
                 room: {type, channelId},
-                ...(socket.data.userId ? {userId: socket.data.userId} : {token: socket.data.voiceToken}),
+                ...(socket.data.userId ? {userId: socket.data.userId, sid: socket.data.sid} : {token: socket.data.voiceToken}),
             });
             if (!grant.allowed) return ack({error: grant.reason});
 

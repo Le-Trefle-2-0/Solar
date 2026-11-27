@@ -107,6 +107,8 @@ function voiceDeps(over: Partial<InternalVoiceDeps> = {}): InternalVoiceDeps {
         findUser: async (id) => (id === 'ghost' ? null : {id, name: id, displayUsername: null, banned: id === 'banned'}),
         getPermissions: async (id) => (id === 'rbe' ? ['tickets.read_all', 'tickets.send_message_all'] : ['tickets.launch_voice', 'tickets.send_message']),
         canWrite: async (id, c) => c === 'live' && id === 'vol',
+        // Tests pass no session id unless they check a closed one
+        isSessionActive: async (sid) => sid !== 'signed-out',
         isPermanenceChannel: async (c) => c === 'perm',
         findTicket: async (c) => tickets()[c] ?? null,
         secret: () => SECRET,
@@ -121,6 +123,11 @@ test('voice rooms: every member joins the permanence room, not a ticket room', a
     assert.equal((await authorizeVoice(deps, {room: {type: 'permanence', channelId: 'live'}, userId: 'anyone'})).allowed, false);
     assert.equal((await authorizeVoice(deps, {room: {type: 'permanence', channelId: 'perm'}, userId: 'banned'})).allowed, false);
     assert.equal((await authorizeVoice(deps, {room: {type: 'permanence', channelId: 'perm'}, token: issueVoiceToken(SECRET, 'perm', NOW)})).allowed, false);
+});
+
+test('voice rooms: a volunteer who signed out since connecting joins nothing (#276)', async () => {
+    const grant = await authorizeVoice(voiceDeps(), {room: {type: 'permanence', channelId: 'perm'}, userId: 'vol', sid: 'signed-out'});
+    assert.deepEqual(grant, {allowed: false, reason: 'session_ended'});
 });
 
 test('voice rooms: a ticket call is the handling volunteer and the token holder only', async () => {

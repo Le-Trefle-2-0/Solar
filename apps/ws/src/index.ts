@@ -76,7 +76,7 @@ const {httpServer, io} = createWsServer({
         const data = await internalPost<{valid?: boolean; user?: {id: string}}>('/v1/keys/check', {key});
         return data?.valid && data.user?.id ? {userId: data.user.id} : null;
     },
-    getSession: (userId) => internalPost<WsSession>('/v1/internal/ws/session', {userId}),
+    getSession: (userId, sid) => internalPost<WsSession>('/v1/internal/ws/session', {userId, sid}),
     // Fail closed when the API cannot answer
     getChannelAccess: async (userId, channelId) =>
         await internalPost<{read: boolean; write: boolean}>('/v1/internal/ws/channel-access', {userId, channelId})

@@ -5,6 +5,7 @@ import {getActor} from '../../lib/permissions.js';
 import {hasPermission} from '../../lib/roleAssignment.js';
 import {getChannelAccess, isPermanenceChannel} from '../../lib/channelAccess.js';
 import {verifyVoiceToken} from '../../lib/voiceToken.js';
+import {isSessionActive} from '../../lib/sessions.js';
 
 /**
  * Who may join a voice room (asked by the voice service, Bearer INTERNAL_API_SECRET):
@@ -21,6 +22,8 @@ export interface InternalVoiceDeps {
     isInternal: (req: any) => boolean;
     findUser: (userId: string) => Promise<{id: string; name: string; displayUsername: string | null; banned: boolean | null} | null>;
     getPermissions: (userId: string) => Promise<string[] | null>;
+    /** The Better Auth session behind the volunteer's JWT is still open (#276). */
+    isSessionActive: (sid: unknown, userId: string) => Promise<boolean>;
     canWrite: (userId: string, channelId: string) => Promise<boolean>;
     isPermanenceChannel: (channelId: string) => Promise<boolean>;
     findTicket: (channelId: string) => Promise<{voice: boolean; statusName: string} | null>;
@@ -35,6 +38,7 @@ const defaultDeps: InternalVoiceDeps = {
         select: {id: true, name: true, displayUsername: true, banned: true},
     }),
     getPermissions: async (userId) => (await getActor(userId))?.permissions ?? null,
+    isSessionActive,
     canWrite: async (userId, channelId) => (await getChannelAccess(userId, channelId)).write,
     isPermanenceChannel,
     findTicket: (channelId) => prisma.ticket.findUnique({where: {channelId}, select: {voice: true, statusName: true}}),
@@ -45,7 +49,7 @@ const defaultDeps: InternalVoiceDeps = {
 const CHANNEL_RE = /^[A-Za-z0-9_-]{1,64}$/;
 
 export async function authorizeVoice(deps: InternalVoiceDeps, body: unknown): Promise<VoiceGrant> {
-    const b = (body ?? {}) as {room?: {type?: unknown; channelId?: unknown}; userId?: unknown; token?: unknown};
+    const b = (body ?? {}) as {room?: {type?: unknown; channelId?: unknown}; userId?: unknown; sid?: unknown; token?: unknown};
     const type = b.room?.type;
     const channelId = b.room?.channelId;
     if ((type !== 'permanence' && type !== 'ticket') || typeof channelId !== 'string' || !CHANNEL_RE.test(channelId)) {
@@ -58,6 +62,8 @@ export async function authorizeVoice(deps: InternalVoiceDeps, body: unknown): Pr
         // getPermissions is null for a banned account or one with missing documents (getActor)
         const perms = user && !user.banned ? await deps.getPermissions(user.id) : null;
         if (!user || !perms) return {allowed: false, reason: 'unknown_user'};
+        // Signed out since connecting: the session is gone (#276)
+        if (!(await deps.isSessionActive(b.sid, user.id))) return {allowed: false, reason: 'session_ended'};
         const name = user.displayUsername || user.name;
 
         if (type === 'permanence') {

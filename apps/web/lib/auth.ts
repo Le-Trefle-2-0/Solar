@@ -47,13 +47,20 @@ const pluginList: any[] = [
         // column, which the API reads (#244)
         schema: {apikey: {fields: {referenceId: "userId"}}},
     }),
-    jwt(),
+    jwt({
+        jwt: {
+            expirationTime: "15m",
+            // The API, the realtime and the voice services check that this session is still
+            // open: signing out or resetting the password ends their access at once (#276)
+            definePayload: ({user, session}) => ({...user, sid: session.id}),
+        },
+    }),
     bearer(),
     passkey(),
 ];
 
-// Always add OpenAPI at the end
-pluginList.push(openAPI());
+// The OpenAPI reference loads a third-party script: development only (#282)
+if (process.env.NODE_ENV !== "production") pluginList.push(openAPI());
 
 // Development-friendly base URL and trusted origins
 const IS_DEV = process.env.NODE_ENV !== "production";
@@ -122,6 +129,8 @@ export const auth = betterAuth({
             }
         },
         autoSignIn: true,
+        // A new password closes every open session, including the one that may have leaked (#276)
+        revokeSessionsOnPasswordReset: true,
     },
     // Better Auth's limiter (in memory: one web instance). Server-side auth.api calls are not
     // counted, so password changes go through the client endpoints (#252).

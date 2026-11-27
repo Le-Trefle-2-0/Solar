@@ -3,7 +3,7 @@
 import {useRouter} from "next/navigation";
 import {LogOut} from "lucide-react";
 import {Button} from "@/components/ui/button";
-import {authClient} from "@/lib/auth-client";
+import {signOutEverywhere} from "@/lib/sign-out";
 
 /**
  * What an account the API refuses sees instead of the app: documents missing or refused
@@ -12,7 +12,7 @@ import {authClient} from "@/lib/auth-client";
  */
 export function AccountOnHold({reason}: { reason: "documents" | "suspended" }) {
     const router = useRouter();
-    const signOut = () => authClient.signOut({fetchOptions: {onSuccess: () => router.push("/auth/sign-in")}});
+    const signOut = () => signOutEverywhere(() => router.push("/auth/sign-in"));
 
     return (
         <main className="flex min-h-svh items-center justify-center bg-background p-4">

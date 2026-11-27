@@ -3,6 +3,7 @@ import {prisma} from '../../prisma.js';
 import {isInternal} from '../../lib/internalAuth.js';
 import {getActor} from '../../lib/permissions.js';
 import {hasPermission} from '../../lib/roleAssignment.js';
+import {isSessionActive} from '../../lib/sessions.js';
 import {canReadChannel, canWriteChannel, describeChannel, findTicketAccess, isPermanenceChannel, PUBLIC_CHANNEL_ID, type TicketAccessRow} from '../../lib/channelAccess.js';
 
 /**
@@ -13,6 +14,8 @@ import {canReadChannel, canWriteChannel, describeChannel, findTicketAccess, isPe
 export interface InternalWsDeps {
     isInternal: (req: any) => boolean;
     getActor: (userId: string) => Promise<{id: string; permissions: string[]} | null>;
+    /** The Better Auth session behind the socket's JWT is still open (#276). */
+    isSessionActive: (sid: unknown, userId: string) => Promise<boolean>;
     findUser: (userId: string) => Promise<{id: string; name: string; displayUsername: string | null; image: string | null; role: string | null; banned: boolean | null} | null>;
     findTicketByChannelId: (channelId: string) => Promise<TicketAccessRow | null>;
     isPermanenceChannel: (channelId: string) => Promise<boolean>;
@@ -27,6 +30,7 @@ export interface InternalWsDeps {
 const defaultDeps: InternalWsDeps = {
     isInternal,
     getActor,
+    isSessionActive,
     findUser: (userId) => prisma.user.findUnique({
         where: {id: userId},
         select: {id: true, name: true, displayUsername: true, image: true, role: true, banned: true},
@@ -73,8 +77,9 @@ export async function registerInternalRoutes(app: FastifyInstance, deps: Interna
         const userId = readUserId(req.body);
         if (!userId) return reply.status(400).send({error: 'invalid_user'});
 
-        const [user, actor] = await Promise.all([deps.findUser(userId), deps.getActor(userId)]);
-        if (!user || !actor || user.banned) return reply.status(404).send({error: 'not_found'});
+        const sid = (req.body as {sid?: unknown} | undefined)?.sid;
+        const [user, actor, open] = await Promise.all([deps.findUser(userId), deps.getActor(userId), deps.isSessionActive(sid, userId)]);
+        if (!user || !actor || user.banned || !open) return reply.status(404).send({error: 'not_found'});
 
         const readAll = hasPermission(actor.permissions, 'tickets.read_all');
         // Open channels (shared channel, current permanences) for everyone, plus assigned tickets

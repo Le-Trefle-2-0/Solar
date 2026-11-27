@@ -25,13 +25,16 @@ export interface WsSession {
 }
 
 export interface WsDeps {
-    verifyJwt: (token: string) => Promise<{sub?: string} | null>;
+    verifyJwt: (token: string) => Promise<{sub?: string; sid?: unknown} | null>;
     /** API key of a bot account; resolves to its user id. */
     checkApiKey: (key: string) => Promise<{userId: string} | null>;
-    getSession: (userId: string) => Promise<WsSession | null>;
+    /** Null when the account may not connect, or its Better Auth session `sid` was closed (#276). */
+    getSession: (userId: string, sid: unknown) => Promise<WsSession | null>;
     getChannelAccess: (userId: string, channelId: string) => Promise<{read: boolean; write: boolean}>;
     secrets: {guest: string; broadcast: string; internal: string};
     corsOrigin?: string;
+    /** How often volunteer sockets are checked again against the API (ms). */
+    sessionCheckMs?: number;
     log?: Pick<Console, 'log' | 'warn' | 'error'>;
 }
 
@@ -55,6 +58,8 @@ type Kind = 'volunteer' | 'bot' | 'guest';
 interface SocketData {
     kind: Kind;
     userId?: string;
+    /** Better Auth session behind the JWT: signing out closes the socket (#276). */
+    sid?: unknown;
     user?: WsUser;
     readAll?: boolean;
     botUserId?: string;
@@ -109,9 +114,9 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
             if (jwt) {
                 const payload = await deps.verifyJwt(jwt);
                 const userId = str(payload?.sub, 128);
-                const session = userId ? await deps.getSession(userId) : null;
+                const session = userId ? await deps.getSession(userId, payload?.sid) : null;
                 if (userId && session) {
-                    Object.assign(d, {kind: 'volunteer', userId, user: session.user, readAll: session.readAll, access: new Map()});
+                    Object.assign(d, {kind: 'volunteer', userId, sid: payload?.sid, user: session.user, readAll: session.readAll, access: new Map()});
                     (socket as any).__initialChannels = session.channels;
                     return next();
                 }
@@ -283,7 +288,7 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
     /** Re-checks a volunteer socket against the API: identity, read-all, followed and joined channels. */
     async function refreshVolunteer(socket: Socket) {
         const d = data(socket);
-        const session = await deps.getSession(d.userId!);
+        const session = await deps.getSession(d.userId!, d.sid);
         if (!session) {
             socket.disconnect(true);
             return;
@@ -329,6 +334,12 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
             }
         }
     }
+
+    // Signed out, reset password, removed account: sockets close within a few minutes even
+    // without any other event (#276)
+    const sessionCheck = setInterval(() => void refreshAllVolunteers(), deps.sessionCheckMs ?? 2 * 60_000);
+    sessionCheck.unref();
+    httpServer.on('close', () => clearInterval(sessionCheck));
 
     // ---- HTTP: health, bot status, server-to-server broadcast ----
     const send = (res: ServerResponse, status: number, body: unknown) => {
