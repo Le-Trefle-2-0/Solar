@@ -11,6 +11,7 @@ import {DISCORD_ID, DiscordProfileError, downloadAvatar, fetchDiscordProfile} fr
 import {syncTeamPerson} from '../../lib/teamDiscordSync.js';
 import {DISCORD_BOT_SETTING_KEY} from '../../lib/discordBotSettings.js';
 import {withOtherCategory} from '../../lib/ticketCategories.js';
+import {forgetWidgetSwitch, WIDGET_ENABLED_KEY} from '../../lib/widgetSwitch.js';
 
 /** Authenticated user holding `permission` (admin.sudo and the owner hold every permission). */
 async function requirePermission(req: any, reply: any, permission: string) {
@@ -80,6 +81,11 @@ export async function registerAdminRoutes(app: FastifyInstance) {
                 create: {key, value}
             });
 
+            if (key === WIDGET_ENABLED_KEY) {
+                forgetWidgetSwitch();
+                // Switched off: visitors' realtime connections close too, not only the API routes
+                if (value === 'false') await broadcast(null, 'widgetDisabled', {}, {audience: 'guests'});
+            }
             return reply.send({setting});
         } catch (e) {
             console.error("[Settings] Failed to upsert setting in API:", e);

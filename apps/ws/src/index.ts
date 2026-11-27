@@ -93,6 +93,8 @@ const {httpServer, io, enableCluster} = createWsServer({
         internal: INTERNAL_SECRET,
     },
     corsOrigin: process.env.WS_CORS_ORIGIN || process.env.NEXT_PUBLIC_APP_URL || '*',
+    // Fail closed: without an answer from the API, visitors do not connect
+    widgetEnabled: async () => (await internalPost<{enabled: boolean}>('/v1/internal/ws/widget', {}))?.enabled === true,
     trustedProxies: process.env.TRUSTED_PROXIES?.split(',').map(s => s.trim()).filter(Boolean),
 });
 

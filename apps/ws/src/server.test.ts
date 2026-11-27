@@ -29,6 +29,8 @@ const getStoredMessage = async (u: string, c: string, id: number) => stored[`${u
 
 /** Bot keys the fake API still accepts. */
 const validKeys = new Set(['bot-key', 'bot-key-2']);
+/** The widget switch the fake API reports. */
+let widgetOn = true;
 
 let base = '';
 let close: () => Promise<void>;
@@ -41,6 +43,7 @@ before(async () => {
         getSession: async (id) => sessions[id] ?? null,
         getChannelAccess: async (u, c) => access(u, c),
         getStoredMessage,
+        widgetEnabled: async () => widgetOn,
         secrets: SECRETS,
         log: quiet,
     });
@@ -382,3 +385,21 @@ test('ws: wrong API keys are limited per client address, other addresses unaffec
     assert.equal(await from('8.8.8.8', 'bot-key'), true);
 });
 
+test('ws: switching the widget off disconnects visitors, and they cannot connect again', async () => {
+    const exp = Date.now() + 60_000;
+    const creds = {guest: {uid: 'g9', channelId: 'c1', exp, sig: signGuest(SECRETS.guest, 'c1', 'g9', exp)}};
+    const [guest, vol] = await Promise.all([client(creds), client({jwt: 'jwt-vol'})]);
+    const told = new Promise(r => guest.once('widgetDisabled', r));
+    const closed = new Promise(r => guest.once('disconnect', r));
+    widgetOn = false;
+    try {
+        assert.equal(await broadcast(null, 'widgetDisabled', {}, SECRETS.broadcast, {audience: 'guests'}), 200);
+        await told;
+        await closed;
+        assert.equal(vol.connected, true, 'volunteers stay connected');
+        await assert.rejects(client(creds));
+    } finally {
+        widgetOn = true;
+    }
+    assert.ok((await client(creds)).connected);
+});

@@ -2,9 +2,10 @@
  * Sends an event through the WebSocket service. `room` targets a channel (its members and
  * those who may read every ticket); null targets every volunteer. `audience: 'bots'` targets
  * the sockets authenticated with a bot API key instead; `audience: 'staff'` the volunteers of the
- * room and those who may read every ticket, never the visitor's widget nor the bot (team notes).
+ * room and those who may read every ticket, never the visitor's widget nor the bot (team notes);
+ * `audience: 'guests'` every visitor's widget, whose connection is then closed (widget switched off).
  */
-export async function broadcast(room: string | null, event: string, data: any, options: {audience?: 'bots' | 'staff'} = {}) {
+export async function broadcast(room: string | null, event: string, data: any, options: {audience?: 'bots' | 'staff' | 'guests'} = {}) {
     try {
         let base = process.env.WS_INTERNAL_URL || process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:5000';
         if (base.startsWith('ws://')) base = 'http://' + base.slice('ws://'.length);

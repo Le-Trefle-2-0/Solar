@@ -6,6 +6,7 @@ import {hasPermission} from '../../lib/roleAssignment.js';
 import {isSessionActive} from '../../lib/sessions.js';
 import {canReadChannel, canWriteChannel, describeChannel, findTicketAccess, isPermanenceChannel, PUBLIC_CHANNEL_ID, type TicketAccessRow} from '../../lib/channelAccess.js';
 import {isTicketWritable} from '../../lib/ticketWrites.js';
+import {isWidgetEnabled} from '../../lib/widgetSwitch.js';
 
 /**
  * Service-to-service routes for the WebSocket service (Authorization: Bearer INTERNAL_API_SECRET).
@@ -137,6 +138,12 @@ export async function registerInternalRoutes(app: FastifyInstance, deps: Interna
         const channel = await describeChannel(channelId, deps.findTicketByChannelId, deps.isPermanenceChannel);
         const input = {channelId, userId, permissions: actor.permissions, ...channel};
         return reply.send({read: canReadChannel(input), write: canWriteChannel(input)});
+    });
+
+    // Whether visitors may connect: the widget switch, as the widget routes read it
+    app.post('/v1/internal/ws/widget', async (req, reply) => {
+        if (!deps.isInternal(req)) return reply.status(401).send({error: 'unauthorized'});
+        return reply.send({enabled: await isWidgetEnabled()});
     });
 
     // The stored message the WebSocket service may relay: saved by this user in this channel a

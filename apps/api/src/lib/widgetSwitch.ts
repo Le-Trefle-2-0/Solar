@@ -10,11 +10,16 @@ export const WIDGET_ENABLED_KEY = 'widget_enabled';
 
 /**
  * The switch is read at most once per CACHE_MS: it is checked before the per-IP rate limits, on
- * every widget path (unknown ones included), so it must not cost a query per request. Turning it
- * off takes effect within that delay.
+ * every widget path (unknown ones included), so it must not cost a query per request. Saved
+ * through the settings route it applies at once; changed any other way, within that delay.
  */
 const CACHE_MS = 5_000;
 let cached: {value: Promise<boolean>; at: number} | null = null;
+
+/** Called when the switch is saved through the API: this instance applies it at once. */
+export function forgetWidgetSwitch() {
+    cached = null;
+}
 
 /** On unless explicitly turned off, as in the settings page. */
 export function isWidgetEnabled(now = Date.now()): Promise<boolean> {

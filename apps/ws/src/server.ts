@@ -39,6 +39,8 @@ export interface WsDeps {
     getStoredMessage: (userId: string, channelId: string, id: number) => Promise<{content: string; replyID: number | null} | null>;
     secrets: {guest: string; broadcast: string; internal: string};
     corsOrigin?: string;
+    /** The website widget's on/off switch (asked at each visitor connection). */
+    widgetEnabled?: () => Promise<boolean>;
     /** Addresses of our reverse proxies, skipped from the right of X-Forwarded-For. */
     trustedProxies?: string[];
     /** How often volunteer sockets are checked again against the API (ms). */
@@ -99,7 +101,8 @@ export function signGuest(secret: string, channelId: string, uid: string, exp: n
 
 /** Sent between instances so each re-checks its own sockets (#249 with REDIS_URL). */
 const RECHECK_EVENT = 'solar:recheck';
-type Recheck = {room?: string; all?: boolean};
+/** A room to re-check, every volunteer and bot, or every visitor to disconnect after `guests` event. */
+type Recheck = {room?: string; all?: boolean; guests?: string};
 
 export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Server; enableCluster: () => void} {
     const log = deps.log ?? console;
@@ -211,7 +214,9 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
                 const exp = typeof guest.exp === 'number' ? guest.exp : Number(guest.exp);
                 const sig = str(guest.sig, 128);
                 if (uid && channelId && Number.isFinite(exp) && exp > Date.now() && sig
-                    && safeEqual(sig, signGuest(deps.secrets.guest, channelId, uid, exp))) {
+                    && safeEqual(sig, signGuest(deps.secrets.guest, channelId, uid, exp))
+                    // Widget switched off: still-valid visitor credentials no longer connect
+                    && (!deps.widgetEnabled || await deps.widgetEnabled())) {
                     Object.assign(d, {kind: 'guest', allowedRoom: channelId, guestUid: uid});
                     return next();
                 }
@@ -442,7 +447,13 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
     /** Several instances (Redis adapter): broadcasts reach one instance, which tells the others. */
     let clustered = false;
     async function runRecheck(recheck: Recheck) {
-        if (recheck.all) await refreshAllVolunteers();
+        if (typeof recheck.guests === 'string') {
+            for (const socket of [...io.sockets.sockets.values()]) {
+                if (data(socket).kind !== 'guest') continue;
+                socket.emit(recheck.guests, {});
+                socket.disconnect(true);
+            }
+        } else if (recheck.all) await refreshAllVolunteers();
         else if (isChannelId(recheck.room)) await recheckRoom(recheck.room);
     }
     io.on(RECHECK_EVENT, (recheck: Recheck) => void runRecheck(recheck ?? {}).catch(e => log.error('[ws] recheck failed', e)));
@@ -521,7 +532,14 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
                         if (typeof event !== 'string' || !event || event.length > 64 || typeof eventData === 'undefined') {
                             return send(res, 400, 'invalid payload');
                         }
-                        if (payload.audience === 'bots') {
+                        if (payload.audience === 'guests') {
+                            // The widget was switched off: every visitor is told, then disconnected,
+                            // on every instance
+                            const recheck: Recheck = {guests: event};
+                            if (clustered) io.serverSideEmit(RECHECK_EVENT, recheck);
+                            await runRecheck(recheck);
+                            return send(res, 200, {success: true});
+                        } else if (payload.audience === 'bots') {
                             // For the bot accounts only (e.g. a voice link to forward on Discord)
                             io.to(BOTS).emit(event, eventData);
                         } else if (payload.audience === 'staff') {
