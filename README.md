@@ -69,6 +69,13 @@ MEDIASOUP_ANNOUNCED_IP=127.0.0.1
 MEDIASOUP_MIN_PORT=40000
 MEDIASOUP_MAX_PORT=40100
 
+# Bot Discord (apps/bot) : sans DISCORD_TOKEN, le bot reste inactif. Voir « Bot Discord » plus bas.
+DISCORD_TOKEN=
+DISCORD_GUILD_ID=
+DISCORD_OPENING_CHANNEL_ID=
+DISCORD_OPENING_MESSAGE_ID=
+SOLAR_BOT_API_KEY=
+
 # docker-compose (développement local uniquement) : mots de passe MySQL et Redis
 MYSQL_ROOT_PASSWORD=un_mot_de_passe_mysql_local
 REDIS_PASSWORD=un_mot_de_passe_redis_local
@@ -148,6 +155,46 @@ Ce fichier sert uniquement au développement local : serveurs de développement,
 
 ---
 
+## 🤖 Bot Discord
+
+Le bot (`apps/bot`) permet aux usagers du serveur Discord d'ouvrir et de suivre leur écoute en messages privés, comme
+avec l'ancien bot ; les bénévoles répondent dans Solar. Il ne garde aucune donnée : les écoutes en cours et les
+messages à remettre sont lus dans Solar, ce qui lui permet de reprendre après un redémarrage ou une coupure.
+
+- **Ouverture et fermeture** : elles suivent le planning de Solar (une écoute ne peut être ouverte que pendant une
+  permanence). Le bot modifie le même message du salon d'ouverture (texte et bouton « Ouvrir une écoute »), annonce
+  l'ouverture et ouvre le salon vocal pendant la permanence s'ils sont configurés.
+- **Écoute** : messages privés relayés dans les deux sens, sans identifier le bénévole ; indicateur de saisie ;
+  fermeture par l'usager (bouton « Fermer l'écoute ») ou par le bénévole ; lien d'appel quand le bénévole passe en vocal.
+- **Non pris en charge pour l'instant** : images (#301), signalements et levée d'anonymat (#302).
+
+Configuration (`.env`) :
+
+```env
+# Application Discord : jeton du bot (portail développeurs Discord, onglet Bot). Secret.
+DISCORD_TOKEN=
+# Serveur, salon et message d'ouverture (identifiants de l'ancien settings.json : mainGuildID, ticketOpening).
+# Le message doit avoir été écrit par ce bot ; sinon (ou s'il est vide) le bot reprend son dernier message du salon
+# ou en publie un nouveau et indique son identifiant dans ses journaux.
+DISCORD_GUILD_ID=
+DISCORD_OPENING_CHANNEL_ID=
+DISCORD_OPENING_MESSAGE_ID=
+# Facultatifs : salon d'annonce de l'ouverture, salon vocal ouvert pendant les permanences, salon des autres supports
+DISCORD_ANNOUNCE_CHANNEL_ID=
+DISCORD_VOICE_CHANNEL_ID=
+DISCORD_HELP_CHANNEL_ID=718250345951658064
+# Clé API du compte bot, générée dans Administration > Paramètres, section Bot. Secret.
+SOLAR_BOT_API_KEY=
+# Adresses de l'API et du serveur WebSocket vues par le bot
+API_BASE_URL=http://localhost:3001
+WS_INTERNAL_URL=http://localhost:5000
+```
+
+Sur le portail développeurs Discord, le bot n'a besoin d'aucun intent privilégié. Sur le serveur, il doit pouvoir lire
+et écrire dans le salon d'ouverture (et d'annonce), et gérer les permissions du salon vocal s'il est configuré.
+
+---
+
 ## 🔒 Authentification et Accès
 
 L'accès à la partie connectée de l'application se fait uniquement sur invitation. Une fois le premier administrateur
@@ -161,3 +208,4 @@ créé via l'outil de configuration, celui-ci peut gérer les membres et les inv
 - `npm run setup:admin` : Outil de création du premier administrateur.
 - `npm run db` : Réinitialise la base de données (Attention : destructif).
 - `npm run build:all` : Compile tous les services pour la production.
+- `npm run dev:bot` : Lance uniquement le bot Discord.

@@ -54,6 +54,7 @@ apps/storage/dist
 apps/voice/dist/
 apps/ws/dist/
 apps/api/dist/
+apps/bot/dist/
 .output.txt
 confidentialite.html
 faq_content.html

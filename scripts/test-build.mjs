@@ -41,6 +41,7 @@ const EXPECTED_OUTPUTS = {
     ws: ["apps/ws/dist/index.js"],
     voice: ["apps/voice/dist/index.js"],
     storage: ["apps/storage/dist/index.js"],
+    bot: ["apps/bot/dist/index.js"],
     web: ["apps/web/.next/BUILD_ID"],
 };
 const CLEAN_DIRS = {
@@ -48,6 +49,7 @@ const CLEAN_DIRS = {
     ws: ["apps/ws/dist"],
     voice: ["apps/voice/dist"],
     storage: ["apps/storage/dist"],
+    bot: ["apps/bot/dist"],
     web: ["apps/web/.next"],
 };
 

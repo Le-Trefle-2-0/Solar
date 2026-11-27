@@ -106,6 +106,20 @@ services:
     depends_on:
       - api
 
+  # Discord bot: idle without DISCORD_TOKEN (and the bot settings) in the .env
+  bot:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm ci && npm run dev:bot"
+    environment:
+      API_BASE_URL: http://api:3001
+      WS_INTERNAL_URL: http://ws:3002
+    volumes:
+      - ./:/app
+    depends_on:
+      - api
+      - ws
+
   web:
     image: node:20-alpine
     working_dir: /app
