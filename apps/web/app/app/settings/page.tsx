@@ -632,6 +632,7 @@ export default function SettingsPage() {
                                                     variant="ghost"
                                                     size="icon"
                                                     className="h-8 w-8 text-destructive"
+                                                    aria-label={`Supprimer la clé d'accès ${pk.name ?? ""}`.trim()}
                                                     onClick={() => handleDeletePasskey(pk.id)}
                                                 >
                                                     <Trash2 className="h-4 w-4"/>
@@ -643,6 +644,7 @@ export default function SettingsPage() {
                                 <div className="flex gap-2">
                                     <Input
                                         placeholder="Nom de la clé"
+                                        aria-label="Nom de la nouvelle clé d'accès"
                                         value={passkeyName}
                                         onChange={(e) => setPasskeyName(e.target.value)}
                                         className="max-w-xs"
@@ -692,6 +694,8 @@ export default function SettingsPage() {
                                                         variant="ghost"
                                                         size="icon"
                                                         className="h-8 w-8 text-destructive"
+                                                        aria-label={`Déconnecter l'appareil ${s.userAgent || "inconnu"}`}
+                                                        title="Déconnecter cet appareil"
                                                         onClick={() => handleRevokeSession(s.token)}
                                                         disabled={loading}
                                                     >

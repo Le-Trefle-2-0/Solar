@@ -240,11 +240,12 @@ export default function NewsletterEditorInner({id, initialNewsletter, volunteerC
         <div className="h-full flex flex-col overflow-hidden bg-muted/10">
             <header className="bg-background border-b px-6 py-4 flex items-center justify-between shadow-sm z-10">
                 <div className="flex items-center gap-4">
-                    <Link href="/app/newsletters">
-                        <Button variant="ghost" size="icon">
-                            <ArrowLeft className="h-5 w-5"/>
-                        </Button>
-                    </Link>
+                    {/* One link, not a button inside a link */}
+                    <Button variant="ghost" size="icon" asChild>
+                        <Link href="/app/newsletters" aria-label="Retour aux newsletters">
+                            <ArrowLeft className="h-5 w-5" aria-hidden/>
+                        </Link>
+                    </Button>
                     <Input
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}

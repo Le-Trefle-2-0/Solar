@@ -100,16 +100,19 @@ export function RecruitmentClient({initialData}: RecruitmentClientProps) {
                                         <div className="flex items-center">
                                             <Switch
                                                 id={`toggle-${recruitment.id}`}
+                                                aria-label={`Recrutement « ${recruitment.title} » ouvert`}
                                                 checked={recruitment.enabled}
                                                 onCheckedChange={(checked) => handleToggle(recruitment.id, checked)}
                                             />
                                         </div>
                                         <div className="flex items-center gap-1">
                                             <Button variant="ghost" size="icon" className="h-8 w-8"
+                                                    aria-label={`Modifier le recrutement « ${recruitment.title} »`}
                                                     onClick={() => handleEdit(recruitment)}>
                                                 <Edit className="h-4 w-4"/>
                                             </Button>
                                             <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive"
+                                                    aria-label={`Supprimer le recrutement « ${recruitment.title} »`}
                                                     onClick={() => handleDelete(recruitment.id)}>
                                                 <Trash2 className="h-4 w-4"/>
                                             </Button>

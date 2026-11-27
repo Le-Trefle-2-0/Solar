@@ -114,19 +114,34 @@ export function FieldManager({fields, onChange}: FieldManagerProps) {
                                 : "hover:bg-muted/30"
                         }`}
                     >
-                        <div
-                            className="flex flex-col gap-1 mt-1 text-muted-foreground/50 hover:text-primary transition-colors touch-none"
-                            style={{cursor: 'grab'}}
-                            title="Faire glisser pour réorganiser"
-                        >
-                            <Icons.GripVertical className="h-5 w-5 pointer-events-none"/>
+                        <div className="flex flex-col items-center gap-0.5 mt-1">
+                            <span
+                                aria-hidden
+                                className="text-muted-foreground/50 hover:text-primary transition-colors touch-none"
+                                style={{cursor: 'grab'}}
+                                title="Faire glisser pour réorganiser"
+                            >
+                                <Icons.GripVertical className="h-5 w-5 pointer-events-none"/>
+                            </span>
+                            {/* The same without a mouse */}
+                            <Button type="button" variant="ghost" size="icon" className="h-6 w-6"
+                                    aria-label={`Monter le champ ${field.label || index + 1}`}
+                                    disabled={index === 0} onClick={() => moveField(index, 'up')}>
+                                <Icons.ChevronUp className="h-4 w-4" aria-hidden/>
+                            </Button>
+                            <Button type="button" variant="ghost" size="icon" className="h-6 w-6"
+                                    aria-label={`Descendre le champ ${field.label || index + 1}`}
+                                    disabled={index === fields.length - 1} onClick={() => moveField(index, 'down')}>
+                                <Icons.ChevronDown className="h-4 w-4" aria-hidden/>
+                            </Button>
                         </div>
                         <div className="flex-1 flex items-center justify-between gap-4">
                             <div className="flex items-center gap-4 flex-1">
                                 <div className="flex flex-col gap-1.5 w-[300px]">
-                                    <Label
+                                    <Label htmlFor={`field-label-${index}`}
                                         className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Label</Label>
                                     <Input
+                                        id={`field-label-${index}`}
                                         value={field.label}
                                         onChange={(e) => {
                                             const newLabel = e.target.value;
@@ -138,13 +153,13 @@ export function FieldManager({fields, onChange}: FieldManagerProps) {
                                     />
                                 </div>
                                 <div className="flex flex-col gap-1.5 w-[160px]">
-                                    <Label
+                                    <Label htmlFor={`field-type-${index}`}
                                         className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Type</Label>
                                     <Select
                                         value={field.type}
                                         onValueChange={(value) => updateField(index, {type: value})}
                                     >
-                                        <SelectTrigger className="h-9 text-sm">
+                                        <SelectTrigger id={`field-type-${index}`} className="h-9 text-sm">
                                             <SelectValue/>
                                         </SelectTrigger>
                                         <SelectContent>
@@ -157,7 +172,7 @@ export function FieldManager({fields, onChange}: FieldManagerProps) {
                                 </div>
 
                                 <div className="flex flex-col gap-1.5 w-[220px]">
-                                    <Label
+                                    <Label htmlFor={`field-min-${index}`}
                                         className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Minimum</Label>
                                     <div className="flex items-center gap-1">
                                         {(() => {
@@ -165,6 +180,7 @@ export function FieldManager({fields, onChange}: FieldManagerProps) {
                                             return (
                                                 <>
                                                     <Input
+                                                        id={`field-min-${index}`}
                                                         type="number"
                                                         value={field.min || ""}
                                                         onChange={(e) => updateField(index, {min: e.target.value ? parseInt(e.target.value) : null})}
@@ -177,7 +193,7 @@ export function FieldManager({fields, onChange}: FieldManagerProps) {
                                                         onValueChange={(value: any) => updateField(index, {minUnit: value})}
                                                         disabled={!isMinSupported}
                                                     >
-                                                        <SelectTrigger className="h-9 flex-1 text-sm">
+                                                        <SelectTrigger className="h-9 flex-1 text-sm" aria-label="Unité du minimum">
                                                             <SelectValue/>
                                                         </SelectTrigger>
                                                         <SelectContent>
@@ -194,7 +210,7 @@ export function FieldManager({fields, onChange}: FieldManagerProps) {
 
                             <div className="flex items-center gap-4">
                                 <div className="flex flex-col gap-1.5 items-center w-[80px]">
-                                    <Label
+                                    <Label htmlFor={`req-${index}`}
                                         className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Obligatoire</Label>
                                     <div className="flex items-center justify-center h-9">
                                         <Switch
@@ -206,12 +222,13 @@ export function FieldManager({fields, onChange}: FieldManagerProps) {
                                 </div>
 
                                 <div className="flex flex-col gap-1.5 items-center w-[50px]">
-                                    <Label
-                                        className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Action</Label>
+                                    <span aria-hidden
+                                        className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Action</span>
                                     <Button
                                         type="button"
                                         variant="ghost"
                                         size="icon"
+                                        aria-label={`Supprimer le champ ${field.label || index + 1}`}
                                         onClick={() => removeField(index)}
                                         className="h-9 w-9 text-destructive hover:bg-destructive/10"
                                     >

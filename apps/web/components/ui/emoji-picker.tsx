@@ -61,6 +61,7 @@ function EmojiPickerEmoji({
                           }: EmojiPickerListEmojiProps) {
     return (
         <button
+            aria-label={emoji.label}
             {...props}
             className={cn(
                 "data-[active]:bg-accent flex size-7 items-center justify-center rounded-sm text-base",

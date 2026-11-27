@@ -8,7 +8,7 @@ import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {Switch} from "@/components/ui/switch";
 import * as Icons from "lucide-react";
-import {Crown, GripVertical, Lock, Plus, RotateCcw, Shield, Trash2} from "lucide-react";
+import {ChevronDown, ChevronUp, Crown, GripVertical, Lock, Plus, RotateCcw, Shield, Trash2} from "lucide-react";
 import {IconPicker} from "@/components/ui/icon-picker";
 import {ALL_PERMISSIONS, PERMISSION_METADATA} from "@/lib/permissions";
 import {toast} from "sonner";
@@ -141,6 +141,16 @@ export function RolesManager() {
         newRoles.splice(index, 0, movedRole);
         setDraggedIndex(index);
         setRoles(newRoles);
+    };
+
+    /** Keyboard and screen reader alternative to dragging: one place up (-1) or down (+1). */
+    const moveRole = (index: number, step: -1 | 1) => {
+        const target = index + step;
+        if (target < 0 || target >= roles.length || !canManage(roles[index]) || !canManage(roles[target])) return;
+        const newRoles = [...roles];
+        [newRoles[index], newRoles[target]] = [newRoles[target], newRoles[index]];
+        setRoles(newRoles);
+        updateRolesOrder(newRoles);
     };
 
     const onDragEnd = () => {
@@ -283,26 +293,54 @@ export function RolesManager() {
                                     className={`flex items-center justify-between p-3 rounded-lg border transition-all cursor-pointer select-none ${editingRole?.id === role.id ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'hover:bg-muted'} ${draggedIndex === index ? 'opacity-40 border-primary border-dashed' : ''}`}
                                     onClick={() => setEditingRole({...role})}
                                 >
-                                    <div className="flex items-center gap-3">
-                                        <div
+                                    {/* The row's button: opens the role, with the keyboard too */}
+                                    <button type="button"
+                                            className="flex flex-1 min-w-0 items-center gap-3 text-left rounded-md"
+                                            aria-pressed={editingRole?.id === role.id}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setEditingRole({...role});
+                                            }}>
+                                        <span
+                                            aria-hidden
                                             className={manageable ? "cursor-grab active:cursor-grabbing text-muted-foreground/50 hover:text-primary transition-colors" : "text-muted-foreground/40"}
                                             title={manageable ? "Déplacer" : "Rôle égal ou supérieur au vôtre"}>
                                             {manageable ? <GripVertical className="h-4 w-4"/> : <Lock className="h-4 w-4"/>}
-                                        </div>
+                                        </span>
                                         {renderRoleIcon(role)}
-                                        <div>
-                                            <p className="font-medium text-sm">{role.name}</p>
-                                        </div>
-                                    </div>
-                                    {manageable && role.name !== DEFAULT_ROLE && (
+                                        <span className="font-medium text-sm truncate">{role.name}</span>
+                                        {!manageable && <span className="sr-only">, rôle égal ou supérieur au vôtre</span>}
+                                    </button>
+                                    {manageable && (
                                         <div className="flex items-center gap-1">
-                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive"
+                                            <Button variant="ghost" size="icon" className="h-8 w-8"
+                                                    aria-label={`Monter le rôle ${role.name}`}
+                                                    disabled={index === 0 || !canManage(roles[index - 1])}
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        handleDelete(role.id);
+                                                        moveRole(index, -1);
                                                     }}>
-                                                <Trash2 className="h-4 w-4"/>
+                                                <ChevronUp className="h-4 w-4"/>
                                             </Button>
+                                            <Button variant="ghost" size="icon" className="h-8 w-8"
+                                                    aria-label={`Descendre le rôle ${role.name}`}
+                                                    disabled={index === roles.length - 1 || !canManage(roles[index + 1])}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        moveRole(index, 1);
+                                                    }}>
+                                                <ChevronDown className="h-4 w-4"/>
+                                            </Button>
+                                            {role.name !== DEFAULT_ROLE && (
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive"
+                                                        aria-label={`Supprimer le rôle ${role.name}`}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleDelete(role.id);
+                                                        }}>
+                                                    <Trash2 className="h-4 w-4"/>
+                                                </Button>
+                                            )}
                                         </div>
                                     )}
                                 </div>

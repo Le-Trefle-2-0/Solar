@@ -331,14 +331,16 @@ export default function PlanningCalendar({events, onRefresh}: {
         <div className="h-full flex flex-col pt-0 px-2 pb-2">
             <div className="flex justify-between items-center mb-2 flex-shrink-0">
                 <div className="flex items-center gap-2">
-                    <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
-                        <ChevronLeft className="h-5 w-5"/>
+                    <button type="button" aria-label="Mois précédent" className="rounded p-1 hover:bg-muted"
+                            onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
+                        <ChevronLeft className="h-5 w-5" aria-hidden/>
                     </button>
-                    <button onClick={() => setCurrentMonth(new Date())} className="text-xs px-2 py-1 rounded border">
+                    <button type="button" onClick={() => setCurrentMonth(new Date())} className="text-xs px-2 py-1 rounded border">
                         Aujourd’hui
                     </button>
-                    <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
-                        <ChevronRight className="h-5 w-5"/>
+                    <button type="button" aria-label="Mois suivant" className="rounded p-1 hover:bg-muted"
+                            onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
+                        <ChevronRight className="h-5 w-5" aria-hidden/>
                     </button>
                 </div>
 

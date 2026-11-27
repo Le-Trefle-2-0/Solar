@@ -26,6 +26,7 @@ export function SiteHeader() {
                     variant="ghost"
                     size="icon"
                     onClick={toggleSidebar}
+                    aria-label="Afficher ou masquer le menu"
                 >
                     <SidebarIcon/>
                 </Button>

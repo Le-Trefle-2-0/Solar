@@ -386,14 +386,14 @@ export function TeamSettings() {
                                         <RefreshCw className={`h-3 w-3 ${syncingId === person.id ? "animate-spin" : ""}`} />
                                     </Button>
                                 )}
-                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => {
+                                <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`Modifier ${person.name}`} onClick={() => {
                                     setEditingPerson(person);
                                     setLinkId("");
                                     setIsPersonModalOpen(true);
                                 }}>
                                     <Edit className="h-3 w-3" />
                                 </Button>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDeletePerson(person.id)}>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" aria-label={`Supprimer ${person.name}`} onClick={() => handleDeletePerson(person.id)}>
                                     <Trash2 className="h-3 w-3" />
                                 </Button>
                             </div>
@@ -448,19 +448,19 @@ export function TeamSettings() {
                                         </div>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                    <Button variant="ghost" size="icon" onClick={() => moveCategory(catIndex, 'up')} disabled={catIndex === 0 || saving}>
+                                    <Button variant="ghost" size="icon" aria-label={`Monter la catégorie ${category.name}`} onClick={() => moveCategory(catIndex, 'up')} disabled={catIndex === 0 || saving}>
                                         <ChevronUp className="h-4 w-4" />
                                     </Button>
-                                    <Button variant="ghost" size="icon" onClick={() => moveCategory(catIndex, 'down')} disabled={catIndex === categories.length - 1 || saving}>
+                                    <Button variant="ghost" size="icon" aria-label={`Descendre la catégorie ${category.name}`} onClick={() => moveCategory(catIndex, 'down')} disabled={catIndex === categories.length - 1 || saving}>
                                         <ChevronDown className="h-4 w-4" />
                                     </Button>
-                                    <Button variant="ghost" size="icon" onClick={() => {
+                                    <Button variant="ghost" size="icon" aria-label={`Modifier la catégorie ${category.name}`} onClick={() => {
                                         setEditingCategory(category);
                                         setIsCategoryModalOpen(true);
                                     }}>
                                         <Edit className="h-4 w-4" />
                                     </Button>
-                                    <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDeleteCategory(category.id)}>
+                                    <Button variant="ghost" size="icon" className="text-destructive" aria-label={`Supprimer la catégorie ${category.name}`} onClick={() => handleDeleteCategory(category.id)}>
                                         <Trash2 className="h-4 w-4" />
                                     </Button>
                                 </div>
@@ -482,7 +482,7 @@ export function TeamSettings() {
                                                 <div>
                                                     <p className="text-sm font-medium flex items-center gap-2">
                                                         {member.person?.name || "Personne non liée"}
-                                                        {member.isLead && <span title="Responsable"><Crown className="h-3 w-3 text-yellow-500" /></span>}
+                                                        {member.isLead && <span title="Responsable"><Crown className="h-3 w-3 text-yellow-500" aria-hidden /><span className="sr-only">(responsable)</span></span>}
                                                     </p>
                                                     <p className="text-xs text-muted-foreground">
                                                         {member.role}
@@ -491,13 +491,13 @@ export function TeamSettings() {
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-1">
-                                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => {
+                                                <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`Modifier ${member.person?.name ?? "ce membre"}`} onClick={() => {
                                                     setEditingMember(member);
                                                     setIsMemberModalOpen(true);
                                                 }}>
                                                     <Edit className="h-3 w-3" />
                                                 </Button>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDeleteMember(member.id)}>
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" aria-label={`Retirer ${member.person?.name ?? "ce membre"}`} onClick={() => handleDeleteMember(member.id)}>
                                                     <Trash2 className="h-3 w-3" />
                                                 </Button>
                                             </div>

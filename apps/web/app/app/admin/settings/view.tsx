@@ -273,6 +273,7 @@ export default function AdminSettingsView({initialSettings, roles, canManageNews
                                     variant="ghost"
                                     size="icon"
                                     className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                    aria-label={`Supprimer la catégorie ${category}`}
                                     onClick={() => handleRemoveCategory(category)}
                                     disabled={loading}
                                 >
@@ -367,6 +368,7 @@ export default function AdminSettingsView({initialSettings, roles, canManageNews
                                     variant="outline"
                                     size="icon"
                                     className="text-destructive border-destructive/20 hover:bg-destructive/10 hover:border-destructive/30 shrink-0"
+                                    aria-label={`Supprimer le créneau ${index + 1}`}
                                     onClick={() => handleRemoveSlot(index)}
                                     disabled={loading}
                                 >
@@ -444,6 +446,7 @@ export default function AdminSettingsView({initialSettings, roles, canManageNews
                                                     variant="ghost"
                                                     size="icon"
                                                     className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                                    aria-label={`Désinscrire ${subscriber.email}`}
                                                     onClick={() => handleRemoveSubscriber(subscriber.id)}
                                                     disabled={loading}
                                                 >
