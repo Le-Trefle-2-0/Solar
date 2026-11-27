@@ -18,6 +18,7 @@ import {apiKey} from "@better-auth/api-key";
 import {userAdditionalFields} from "./security/userFields";
 import {APIError} from "better-auth/api";
 import {allowResetEmail} from "./security/resetEmailLimit";
+import {escapeHtml} from "./security/escape";
 
 /** Same key as OWNER_SETTING_KEY in lib/userPermissions.ts and the API. */
 const OWNER_SETTING_KEY = "owner_user_id";
@@ -94,7 +95,7 @@ export const auth = betterAuth({
             const buttonText = "Réinitialiser mon mot de passe";
 
             const content = `
-                <p>Bonjour ${data.user.name || ""},</p>
+                <p>Bonjour ${escapeHtml(data.user.name || "")},</p>
                 <p>Une demande de réinitialisation de mot de passe a été effectuée pour votre compte Le Trèfle 2.0.</p>
                 <p>Cliquez sur le bouton ci-dessous pour choisir un nouveau mot de passe :</p>
                 <div style="text-align: center; margin: 30px 0;">

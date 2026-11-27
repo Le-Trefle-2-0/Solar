@@ -2,7 +2,7 @@ import {headers} from "next/headers";
 
 /**
  * Per-visitor limits for the public forms of the site (contact, applications, waiting lists,
- * newsletter, #223). Server actions are plain POST endpoints anyone can call in a loop: without
+ * newsletter, #223; donations, #280). Server actions are plain POST endpoints anyone can call in a loop: without
  * this they cost e-mails and AI calls. In memory (one web instance), keyed by client address.
  */
 
@@ -15,6 +15,8 @@ export const PUBLIC_ACTION_RULES = {
     application: {max: 5, windowMs: HOUR},
     waitlist: {max: 10, windowMs: HOUR},
     newsletter: {max: 10, windowMs: HOUR},
+    // Each one asks HelloAsso for a checkout (#280)
+    donation: {max: 10, windowMs: HOUR},
 } satisfies Record<string, Rule>;
 
 export type PublicAction = keyof typeof PUBLIC_ACTION_RULES;

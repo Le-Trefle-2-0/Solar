@@ -2,6 +2,10 @@ import {Resend} from 'resend';
 import {prisma} from '../prisma.js';
 import {renderEmailTemplate} from './email-template.js';
 import {APP_URL} from '../env.js';
+import {unsubscribeSignature} from './unsubscribeToken.js';
+import {internalRecipients} from './newsletterRecipients.js';
+import {getOwnerId} from './permissions.js';
+import {STANDING_SELECT} from './accountStanding.js';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -51,11 +55,17 @@ export async function sendNewsletter(newsletterId: string) {
             });
             recipients = subscribers;
         } else {
-            const subscribers = await prisma.user.findMany({
-                where: {newsletterSubscription: true},
-                select: {email: true, id: true}
-            });
-            recipients = subscribers;
+            // Internal news: active team accounts only, never banned, closed, blocked or
+            // role-less ones, nor the bot (#263)
+            const [subscribers, roleRows, ownerId] = await Promise.all([
+                prisma.user.findMany({
+                    where: {newsletterSubscription: true},
+                    select: {email: true, id: true, role: true, ...STANDING_SELECT},
+                }),
+                prisma.role.findMany({select: {name: true, permissions: true}}),
+                getOwnerId(),
+            ]);
+            recipients = internalRecipients(subscribers, ownerId, roleRows);
         }
 
         if (recipients.length === 0) {
@@ -75,7 +85,7 @@ export async function sendNewsletter(newsletterId: string) {
                 content: contentHtml,
                 footer: footerText,
                 showSolarLink: !isPublic,
-                unsubscribeUrl: `${APP_URL}/newsletters/unsubscribe?id=${recipient.id}`
+                unsubscribeUrl: `${APP_URL}/newsletters/unsubscribe?id=${encodeURIComponent(recipient.id)}&sig=${unsubscribeSignature(recipient.id)}`
             });
 
             return resend.emails.send({

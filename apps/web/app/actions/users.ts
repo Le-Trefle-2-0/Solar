@@ -13,6 +13,7 @@ import {renderEmailTemplate} from "@/lib/email-template";
 import {truncateEmail} from "@/lib/utils";
 import {broadcast} from "@/lib/broadcast";
 import {canLinkFile, isFileId} from "@/lib/security/fileAccess";
+import {escapeHtml} from "@/lib/security/escape";
 
 const inviteSchema = z.object({
     name: z.string().min(1),
@@ -116,7 +117,7 @@ export async function inviteUserAction(formData: z.infer<typeof inviteSchema>) {
         const {html: welcomeHtml} = renderEmailTemplate({
             title: "Bienvenue sur Le Trèfle 2.0",
             content: `
-                <p>Bonjour ${name},</p>
+                <p>Bonjour ${escapeHtml(name)},</p>
                 <p>C'est un plaisir de vous accueillir sur la plateforme du Trèfle 2.0 !</p>
                 <p>Votre compte a été créé avec succès par un administrateur.</p>
                 <p>Dans quelques instants, vous allez recevoir un <strong>deuxième e-mail</strong> contenant un lien sécurisé pour définir votre mot de passe et accéder à votre espace.</p>
@@ -175,7 +176,7 @@ export async function inviteUserAction(formData: z.infer<typeof inviteSchema>) {
         return {success: true, user: userData};
     } catch (e: any) {
         console.error("[inviteAction] Error:", e);
-        return {error: e.message || "An error occurred during invitation"};
+        return {error: "L'invitation n'a pas pu être envoyée."};
     }
 }
 
@@ -247,7 +248,7 @@ export async function submitDocumentsAction(data: {
         return {success: true};
     } catch (e: any) {
         console.error("[submitDocumentsAction] Error:", e);
-        return {error: e.message || "Failed to submit documents"};
+        return {error: "Les documents n'ont pas pu être envoyés."};
     }
 }
 
@@ -308,7 +309,7 @@ export async function validateDocumentsAction(
         return {success: true};
     } catch (e: any) {
         console.error("[validateDocumentsAction] Error:", e);
-        return {error: e.message || "Failed to validate documents"};
+        return {error: "Les documents n'ont pas pu être validés."};
     }
 }
 
@@ -354,7 +355,7 @@ export async function rejectDocumentAction(userId: string, type: 'idCard' | 'cas
         return {success: true};
     } catch (e: any) {
         console.error("[rejectDocumentAction] Error:", e);
-        return {error: e.message || "Failed to reject document"};
+        return {error: "Le document n'a pas pu être refusé."};
     }
 }
 
@@ -393,7 +394,7 @@ export async function requestRenewalAction(userId: string) {
         return {success: true};
     } catch (e: any) {
         console.error("[requestRenewalAction] Error:", e);
-        return {error: e.message || "Failed to request renewal"};
+        return {error: "Le renouvellement n'a pas pu être demandé."};
     }
 }
 
@@ -444,7 +445,7 @@ export async function requestAllRenewalAction() {
         return {success: true};
     } catch (e: any) {
         console.error("[requestAllRenewalAction] Error:", e);
-        return {error: e.message || "Failed to request all renewal"};
+        return {error: "Le renouvellement n'a pas pu être demandé."};
     }
 }
 

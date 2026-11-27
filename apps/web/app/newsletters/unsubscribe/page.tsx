@@ -10,17 +10,13 @@ import Link from "next/link";
 
 function UnsubscribeContent() {
     const searchParams = useSearchParams();
-    const [email, setEmail] = useState("");
     const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
     const [errorMessage, setErrorMessage] = useState("");
 
-    const autoUnsubscribe = async (id: string) => {
+    const autoUnsubscribe = async (id: string, signature: string) => {
         setStatus("loading");
-        const result = await unsubscribeById(id);
+        const result = await unsubscribeById(id, signature);
         if (result.success) {
-            if (result.email) {
-                setEmail(result.email);
-            }
             setStatus("success");
         } else {
             setStatus("error");
@@ -30,8 +26,9 @@ function UnsubscribeContent() {
 
     useEffect(() => {
         const id = searchParams.get("id");
-        if (id) {
-            autoUnsubscribe(id);
+        const signature = searchParams.get("sig");
+        if (id && signature) {
+            autoUnsubscribe(id, signature);
         } else {
             setStatus("error");
             setErrorMessage("Lien de désinscription invalide.");
@@ -61,10 +58,7 @@ function UnsubscribeContent() {
                         <CheckCircle2 className="h-12 w-12 text-green-500" />
                         <p className="text-lg font-medium">Vous avez été désinscrit avec succès.</p>
                         <p className="text-muted-foreground text-sm">
-                            {email 
-                                ? <>Vous ne recevrez plus de newsletters de notre part à l'adresse <strong>{email}</strong>.</>
-                                : "Vous ne recevrez plus de newsletters de notre part."
-                            }
+                            Vous ne recevrez plus de newsletters de notre part.
                         </p>
                     </div>
                 )}

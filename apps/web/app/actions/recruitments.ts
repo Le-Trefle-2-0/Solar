@@ -10,6 +10,7 @@ import {revalidatePath} from "next/cache";
 import {recruitmentSchema} from "@/lib/recruitments";
 import {renderEmailTemplate} from "@/lib/email-template";
 import {allowPublicAction, TOO_MANY_REQUESTS} from "@/lib/security/actionRateLimit";
+import {emailSubject, escapeDiscord, escapeHtml} from "@/lib/security/escape";
 
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
@@ -73,7 +74,72 @@ Réponds UNIQUEMENT avec un objet JSON au format: {"summary": "ton résumé ici"
     }
 }
 
+/** At most this many characters per answer, and of Discord messages per application. */
+const MAX_ANSWER_LENGTH = 10_000;
+const MAX_DISCORD_MESSAGES = 6;
+
+/**
+ * Posts an application to the recruitment's Discord webhook: answers shown as typed (no
+ * formatting, link or mention), split over a bounded number of messages (#265).
+ */
+async function sendApplicationToDiscord(webhook: string, title: string, answers: { label: string; value: string }[]) {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://solar.letrefle.org";
+    const fields: { name: string; value: string; inline: boolean }[] = [];
+    for (const {label, value} of answers) {
+        const text = escapeDiscord(value || "Non renseigné");
+        const name = escapeDiscord(label).slice(0, 200);
+        // Discord: 1024 characters per field value
+        for (let i = 0, part = 1; i < text.length; i += 1000, part++) {
+            fields.push({name: part === 1 ? name : `${name} (suite ${part})`, value: text.slice(i, i + 1000), inline: false});
+        }
+    }
+
+    const messages: typeof fields[] = [];
+    let current: typeof fields = [];
+    let length = 0;
+    for (const field of fields) {
+        const size = field.name.length + field.value.length;
+        if (current.length >= 15 || length + size > 5000) {
+            messages.push(current);
+            current = [];
+            length = 0;
+        }
+        current.push(field);
+        length += size;
+    }
+    if (current.length) messages.push(current);
+
+    const safeTitle = escapeDiscord(title).slice(0, 200);
+    for (const [index, chunk] of messages.slice(0, MAX_DISCORD_MESSAGES).entries()) {
+        const first = index === 0;
+        const response = await fetch(webhook, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                username: "Recrutement - Le Trèfle",
+                avatar_url: `${appUrl}/Logomark1024_marges.png`,
+                // Never ping anyone, whatever the text says
+                allowed_mentions: {parse: []},
+                embeds: [{
+                    title: first ? `Nouvelle candidature : ${safeTitle}` : `Suite candidature : ${safeTitle}`,
+                    color: 0x5865F2,
+                    fields: chunk,
+                    footer: first ? {text: `Candidature envoyée le ${new Date().toLocaleString("fr-FR")}`} : undefined,
+                    timestamp: first ? new Date().toISOString() : undefined,
+                }],
+            }),
+        });
+        if (!response.ok) console.error(`Discord webhook error (${response.status}):`, await response.text());
+        // Small delay to avoid rate limits
+        await new Promise(resolve => setTimeout(resolve, 500));
+    }
+    if (messages.length > MAX_DISCORD_MESSAGES) {
+        console.warn(`[recruitments] application cut on Discord after ${MAX_DISCORD_MESSAGES} messages; the e-mail has it all`);
+    }
+}
+
 export async function getRecruitments() {
+
     return prisma.recruitment.findMany({
         orderBy: [
             {enabled: "desc"},
@@ -101,14 +167,12 @@ export async function applyToRecruitment(recruitmentId: string, data: Record<str
     const {getResendClient} = await import("@/lib/resend");
     const resend = getResendClient();
 
-    // Use email from data if it exists for replyTo
-    const applicantEmail = data.email || "noreply@solar.letrefle.org";
-    const applicantName = `${data.firstName || ""} ${data.lastName || ""}`.trim() || "Candidat";
-
-    // Validation
-    const recruitmentFields = recruitment.fields as any[];
+    // Only the fields of this recruitment, each bounded: never keys chosen by the sender (#265)
+    const recruitmentFields = (recruitment.fields as any[]).filter(f => f && typeof f.name === "string");
+    const answers: { label: string; value: string }[] = [];
     for (const field of recruitmentFields) {
-        const value = String(data[field.name] || "").trim();
+        const raw = data?.[field.name];
+        const value = (typeof raw === "string" || typeof raw === "number" || typeof raw === "boolean" ? String(raw) : "").trim();
 
         if (field.required && !value) {
             return {error: `Le champ "${field.label}" est obligatoire.`};
@@ -128,28 +192,33 @@ export async function applyToRecruitment(recruitmentId: string, data: Record<str
                 }
             }
 
-            if (value.length > 10000) {
+            if (value.length > MAX_ANSWER_LENGTH) {
                 return {error: `Le champ "${field.label}" ne doit pas dépasser 10 000 caractères.`};
             }
         }
+        answers.push({label: String(field.label ?? field.name).slice(0, 200), value});
     }
 
-    const fieldsHtml = Object.entries(data)
-        .map(([key, value]) => {
-            const field = (recruitment.fields as any[]).find(f => f.name === key);
-            const label = field ? field.label : key;
-            return `<p><strong>${label} :</strong> ${String(value).replace(/\n/g, "<br>")}</p>`;
-        })
+    const answer = (name: string) => {
+        const raw = data?.[name];
+        return typeof raw === "string" ? raw.trim().slice(0, 200) : "";
+    };
+    const email = answer("email");
+    const applicantEmail = z.string().email().safeParse(email).success ? email : "noreply@solar.letrefle.org";
+    const applicantName = `${answer("firstName")} ${answer("lastName")}`.trim() || "Candidat";
+
+    const fieldsHtml = answers
+        .map(({label, value}) => `<p><strong>${escapeHtml(label)} :</strong> ${escapeHtml(value || "Non renseigné", {lineBreaks: true})}</p>`)
         .join("");
 
     const {html} = renderEmailTemplate({
-        title: `Nouvelle candidature : ${recruitment.title}`,
+        title: `Nouvelle candidature : ${escapeHtml(recruitment.title)}`,
         content: `
             <div style="margin-bottom: 20px;">
                 ${fieldsHtml}
             </div>
         `,
-        footer: `Candidature envoyée le ${new Date().toLocaleString()}`
+        footer: `Candidature envoyée le ${new Date().toLocaleString("fr-FR")}`
     });
 
     try {
@@ -157,124 +226,19 @@ export async function applyToRecruitment(recruitmentId: string, data: Record<str
             from: "Le Trèfle 2.0 <noreply@solar.letrefle.org>",
             to: recruitment.contactEmail || "contact@letrefle.org",
             replyTo: applicantEmail,
-            subject: `[Recrutement] ${recruitment.title} - ${applicantName}`,
+            subject: emailSubject(`[Recrutement] ${recruitment.title} - ${applicantName}`),
             html,
         });
 
         if (error) {
             console.error("Resend error:", error);
-            return {error: `Erreur Resend: ${error.message}`};
+            // Technical details stay in the server logs (#275)
+            return {error: "Votre candidature n'a pas pu être envoyée. Réessayez plus tard."};
         }
 
-        // Send to Discord if webhook is configured
         if (recruitment.discordWebhook) {
             try {
-                const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://solar.letrefle.org";
-                const avatarUrl = `${appUrl}/Logomark1024_marges.png`;
-
-                // Prepare all fields and handle splitting long values
-                const discordFields: { name: string, value: string, inline: boolean }[] = [];
-
-                Object.entries(data).forEach(([key, value]) => {
-                    const field = (recruitment.fields as any[]).find(f => f.name === key);
-                    const label = field ? field.label : key;
-                    const stringValue = String(value) || "N/A";
-
-                    if (stringValue.length <= 1024) {
-                        discordFields.push({
-                            name: label,
-                            value: stringValue,
-                            inline: false
-                        });
-                    } else {
-                        // Split long value into multiple fields, avoid cutting in the middle of a word
-                        let remaining = stringValue;
-                        let part = 1;
-                        while (remaining.length > 0) {
-                            let chunk = "";
-                            if (remaining.length <= 1024) {
-                                chunk = remaining;
-                                remaining = "";
-                            } else {
-                                // Try to find the last space or newline before 1024 characters
-                                const possibleChunk = remaining.substring(0, 1024);
-                                const lastSpace = Math.max(possibleChunk.lastIndexOf(" "), possibleChunk.lastIndexOf("\n"));
-
-                                if (lastSpace > 0) {
-                                    chunk = remaining.substring(0, lastSpace);
-                                    remaining = remaining.substring(lastSpace).trim();
-                                } else {
-                                    // No space found, fallback to hard cut
-                                    chunk = remaining.substring(0, 1024);
-                                    remaining = remaining.substring(1024);
-                                }
-                            }
-
-                            discordFields.push({
-                                name: part === 1 ? label : `${label} (Suite ${part})`,
-                                value: chunk,
-                                inline: false
-                            });
-                            part++;
-                        }
-                    }
-                });
-
-                // Split fields into chunks. Discord limits: 25 fields per embed, 6000 total characters per embed.
-                // We'll use a more conservative approach: max 10 fields OR ~5000 characters per embed.
-                let currentFields: typeof discordFields = [];
-                let currentLength = 0;
-                let isFirstMessage = true;
-
-                const sendCurrentChunk = async () => {
-                    if (currentFields.length === 0) return;
-
-                    const response = await fetch(recruitment.discordWebhook!, {
-                        method: "POST",
-                        headers: {"Content-Type": "application/json"},
-                        body: JSON.stringify({
-                            username: "Recrutement - Le Trèfle",
-                            avatar_url: avatarUrl,
-                            embeds: [{
-                                title: isFirstMessage ? `Nouvelle candidature : ${recruitment.title}` : `Suite candidature : ${recruitment.title}`,
-                                color: 0x5865F2,
-                                fields: currentFields,
-                                footer: isFirstMessage ? {
-                                    text: `Candidature envoyée le ${new Date().toLocaleString()}`
-                                } : undefined,
-                                timestamp: isFirstMessage ? new Date().toISOString() : undefined
-                            }]
-                        })
-                    });
-
-                    if (!response.ok) {
-                        const errorText = await response.text();
-                        console.error(`Discord webhook error (${response.status}):`, errorText);
-                    }
-
-                    currentFields = [];
-                    currentLength = 0;
-                    isFirstMessage = false;
-
-                    // Small delay to avoid rate limits
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                };
-
-                for (const field of discordFields) {
-                    const fieldLength = field.name.length + field.value.length;
-
-                    // If adding this field exceeds limits, send current chunk first
-                    if (currentFields.length >= 15 || (currentLength + fieldLength) > 5000) {
-                        await sendCurrentChunk();
-                    }
-
-                    currentFields.push(field);
-                    currentLength += fieldLength;
-                }
-
-                // Send the last chunk
-                await sendCurrentChunk();
-
+                await sendApplicationToDiscord(recruitment.discordWebhook, recruitment.title, answers);
             } catch (discordErr) {
                 console.error("Failed to send to Discord webhook:", discordErr);
             }
