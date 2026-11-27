@@ -1,8 +1,9 @@
 /**
- * Settings of the bot. The token, server and Solar access come from the root .env (see README,
- * "Bot Discord"). The channels and the opening message are set in Solar (Administration >
- * Paramètres > Bot Discord); an empty field there uses the .env value (DISCORD_*_ID), the ids of
- * the former bot's settings.json.
+ * Settings of the bot, all set up in Solar (Administration > Paramètres > Bot Discord): the
+ * token, server and Solar API key are fetched from the API with INTERNAL_API_SECRET, the
+ * channels and the opening message through the bot's own API routes. The .env values
+ * (DISCORD_TOKEN, DISCORD_GUILD_ID, SOLAR_BOT_API_KEY, DISCORD_*_ID) are only used while
+ * nothing is set up in Solar.
  */
 
 export interface DiscordChannels {
@@ -12,8 +13,6 @@ export interface DiscordChannels {
     openingMessageId: string | null;
     /** Where the opening is announced (former toCloseMessageChannel). Optional. */
     announceChannelId: string | null;
-    /** Voice channel shown to everyone only during permanences (former voiceTicketChannelID). Optional. */
-    voiceChannelId: string | null;
     /** "Autre support d'écoute" channel mentioned in the texts. */
     helpChannelId: string | null;
 }
@@ -38,16 +37,26 @@ export function envChannels(env: NodeJS.ProcessEnv = process.env): DiscordChanne
         openingChannelId: id(env.DISCORD_OPENING_CHANNEL_ID),
         openingMessageId: id(env.DISCORD_OPENING_MESSAGE_ID),
         announceChannelId: id(env.DISCORD_ANNOUNCE_CHANNEL_ID),
-        voiceChannelId: id(env.DISCORD_VOICE_CHANNEL_ID),
         helpChannelId: id(env.DISCORD_HELP_CHANNEL_ID),
     };
 }
 
-export function loadConfig(env: NodeJS.ProcessEnv = process.env): BotConfig {
-    const missing = ['DISCORD_TOKEN', 'DISCORD_GUILD_ID', 'SOLAR_BOT_API_KEY'].filter(name => !env[name]?.trim());
-    if (missing.length) throw new Error(`Missing environment variables: ${missing.join(', ')}`);
+/** What the bot needs to start: from Solar's set-up, or the .env of an older set-up. */
+export type Credentials = {discordToken: string; guildId: string; solarApiKey: string};
+
+/** DISCORD_TOKEN, DISCORD_GUILD_ID and SOLAR_BOT_API_KEY, when all three are in the .env. */
+export function credentialsFromEnv(env: NodeJS.ProcessEnv = process.env): Credentials | null {
+    const discordToken = env.DISCORD_TOKEN?.trim();
     const guildId = id(env.DISCORD_GUILD_ID);
-    if (!guildId) throw new Error('DISCORD_GUILD_ID must be a Discord id');
+    const solarApiKey = env.SOLAR_BOT_API_KEY?.trim();
+    return discordToken && guildId && solarApiKey ? {discordToken, guildId, solarApiKey} : null;
+}
+
+export const apiBaseUrl = (env: NodeJS.ProcessEnv = process.env) => (env.API_BASE_URL || 'http://localhost:3001').replace(/\/$/, '');
+
+export function loadConfig(credentials: Credentials, env: NodeJS.ProcessEnv = process.env): BotConfig {
+    const guildId = id(credentials.guildId);
+    if (!guildId) throw new Error('the Discord server is not a Discord id');
 
     let wsUrl = env.WS_INTERNAL_URL || env.NEXT_PUBLIC_WS_URL || 'http://localhost:5000';
     if (wsUrl.startsWith('ws://')) wsUrl = 'http://' + wsUrl.slice(5);
@@ -55,7 +64,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): BotConfig {
 
     const {helpChannelId, ...channels} = envChannels(env);
     return {
-        discordToken: env.DISCORD_TOKEN!.trim(),
+        discordToken: credentials.discordToken,
         guildId,
         ...channels,
         links: {
@@ -63,9 +72,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): BotConfig {
             siteUrl: env.BOT_SITE_URL || 'https://letrefle.org',
             inviteUrl: env.BOT_INVITE_URL || 'https://discord.gg/letrefle',
         },
-        apiBaseUrl: (env.API_BASE_URL || 'http://localhost:3001').replace(/\/$/, ''),
+        apiBaseUrl: apiBaseUrl(env),
         wsUrl,
-        apiKey: env.SOLAR_BOT_API_KEY!.trim(),
+        apiKey: credentials.solarApiKey,
     };
 }
 
@@ -79,7 +88,6 @@ export function applyChannels(cfg: BotConfig, fromSolar: Partial<Record<keyof Di
         openingChannelId: pick('openingChannelId'),
         openingMessageId: pick('openingMessageId'),
         announceChannelId: pick('announceChannelId'),
-        voiceChannelId: pick('voiceChannelId'),
     };
     const helpChannelId = pick('helpChannelId') ?? DEFAULT_HELP_CHANNEL_ID;
 

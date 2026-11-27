@@ -33,7 +33,7 @@ export const DEFAULT_ROLES: {name: string; weight: number; icon: string; permiss
     },
     // Communication team
     {name: 'Rédacteur', weight: 30, icon: 'PenLine', permissions: ['newsletters.manage']},
-    // Technical account of the Discord bot (looked up by POST /v1/bot/setup)
+    // Technical account of the Discord bot (created by POST /v1/bot/setup/account)
     {name: 'bot', weight: 20, icon: 'Bot', permissions: ['tickets.open', 'tickets.close', 'tickets.read_all', 'tickets.send_message_all']},
     // Listening volunteers: read and write the tickets assigned to them (no extra permission
     // needed for that), close and report on them, and sign up for planning events

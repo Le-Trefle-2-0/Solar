@@ -8,7 +8,12 @@ import {broadcast} from '../../lib/broadcast.js';
 import {neutralizeHtml} from '../../lib/sanitize.js';
 import {getPermanenceStatus, type PermanenceStatus} from '../../lib/permanenceStatus.js';
 import {closeTicket} from '../../lib/ticketClosing.js';
-import {readDiscordBotSettings, type DiscordBotSettings} from '../../lib/discordBotSettings.js';
+import {
+    isOpeningPublishRequested,
+    openingMessagePublished,
+    readDiscordBotSettings,
+    type DiscordBotSettings,
+} from '../../lib/discordBotSettings.js';
 
 /**
  * What the Discord bot (apps/bot) exchanges with Solar (#293). Only the bot account (API key of
@@ -31,6 +36,10 @@ export interface BotBridgeDeps {
     permanence: () => Promise<PermanenceStatus>;
     /** Channels and message set in Solar's settings page (null: the bot's .env value). */
     discordSettings: () => Promise<DiscordBotSettings>;
+    /** "Publier un nouveau message" was chosen in the set-up. */
+    publishRequested: () => Promise<boolean>;
+    /** The bot posted that message: it becomes the opening message. */
+    openingMessagePublished: (messageId: string) => Promise<void>;
     /** Open écoutes that came from Discord. */
     activeTickets: () => Promise<BotTicket[]>;
     findOpenTicketByChannel: (channelId: string) => Promise<BotTicket | null>;
@@ -59,6 +68,8 @@ const defaultDeps: BotBridgeDeps = {
     getPermissions: getUserPermissions,
     permanence: () => getPermanenceStatus(),
     discordSettings: readDiscordBotSettings,
+    publishRequested: isOpeningPublishRequested,
+    openingMessagePublished,
     activeTickets: async () => (await prisma.ticket.findMany({where: openDiscordTicket, orderBy: {id: 'asc'}})).map(toBotTicket),
     findOpenTicketByChannel: async (channelId) => {
         const t = await prisma.ticket.findFirst({where: {...openDiscordTicket, channelId}});
@@ -162,7 +173,15 @@ export async function registerBotBridgeRoutes(app: FastifyInstance, deps: BotBri
 
     app.get('/v1/bot/settings', async (req, reply) => {
         if (!await requireBot(req, reply)) return;
-        return reply.send({discord: await deps.discordSettings()});
+        return reply.send({discord: await deps.discordSettings(), publishOpeningMessage: await deps.publishRequested()});
+    });
+
+    app.post('/v1/bot/settings/opening-message', async (req, reply) => {
+        if (!await requireBot(req, reply)) return;
+        const messageId = (req.body as {messageId?: unknown} | undefined)?.messageId;
+        if (typeof messageId !== 'string' || !DISCORD_ID.test(messageId)) return reply.status(400).send({error: 'invalid_body'});
+        await deps.openingMessagePublished(messageId);
+        return reply.send({success: true});
     });
 
     app.get('/v1/bot/tickets/active', async (req, reply) => {

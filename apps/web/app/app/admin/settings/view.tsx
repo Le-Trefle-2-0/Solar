@@ -20,9 +20,8 @@ import {
 import {toast} from "sonner";
 import {apiFetch} from "@/lib/api";
 import {Loader2, Plus, Trash2} from "lucide-react";
-import {BotClient} from "@/components/admin/bot-client";
 import {TeamSettings} from "@/components/admin/team-settings";
-import {DiscordBotSettings} from "@/components/admin/discord-bot-settings";
+import {DiscordBotSetup} from "@/components/admin/discord-bot-setup";
 
 interface Settings {
     widget_enabled: boolean;
@@ -385,9 +384,7 @@ export default function AdminSettingsView({initialSettings, roles, canManageNews
                 </CardContent>
             </Card>
 
-            <BotClient/>
-
-            <DiscordBotSettings/>
+            <DiscordBotSetup/>
 
             <TeamSettings/>
 

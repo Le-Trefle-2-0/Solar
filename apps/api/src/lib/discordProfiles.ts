@@ -7,6 +7,8 @@
  * contact Discord; a photo is downloaded again only when the avatar changed.
  */
 
+import {getDiscordCredentials} from './discordBotCredentials.js';
+
 const API = 'https://discord.com/api/v10';
 const CDN = 'https://cdn.discordapp.com';
 export const DISCORD_ID = /^\d{15,22}$/;
@@ -52,12 +54,16 @@ export interface DiscordDeps {
     sleep: (ms: number) => Promise<void>;
 }
 
-export const defaultDiscordDeps = (): DiscordDeps => ({
-    token: process.env.DISCORD_TOKEN?.trim() || undefined,
-    guildId: process.env.DISCORD_GUILD_ID && DISCORD_ID.test(process.env.DISCORD_GUILD_ID) ? process.env.DISCORD_GUILD_ID : null,
-    fetch,
-    sleep: (ms) => new Promise(r => setTimeout(r, ms)),
-});
+/** The bot set up in Solar (Paramètres > Bot Discord), else DISCORD_TOKEN / DISCORD_GUILD_ID. */
+export const defaultDiscordDeps = async (): Promise<DiscordDeps> => {
+    const credentials = await getDiscordCredentials();
+    return {
+        token: credentials?.token,
+        guildId: credentials?.guildId ?? null,
+        fetch,
+        sleep: (ms) => new Promise(r => setTimeout(r, ms)),
+    };
+};
 
 /** GET on the Discord API; waits once when rate limited. Null on 404. */
 async function discordGet<T>(deps: DiscordDeps, path: string): Promise<T | null> {
@@ -78,8 +84,9 @@ async function discordGet<T>(deps: DiscordDeps, path: string): Promise<T | null>
     throw new DiscordProfileError('unavailable', 'Discord limite les requêtes, réessayez plus tard');
 }
 
-export async function fetchDiscordProfile(discordId: string, deps: DiscordDeps = defaultDiscordDeps()): Promise<DiscordProfile> {
-    if (!deps.token) throw new DiscordProfileError('no_token', 'Le bot Discord n\'est pas configuré (DISCORD_TOKEN)');
+export async function fetchDiscordProfile(discordId: string, given?: DiscordDeps): Promise<DiscordProfile> {
+    const deps = given ?? await defaultDiscordDeps();
+    if (!deps.token) throw new DiscordProfileError('no_token', 'Le bot Discord n\'est pas configuré (Paramètres > Bot Discord)');
     if (!DISCORD_ID.test(discordId)) throw new DiscordProfileError('not_found', 'Identifiant Discord invalide');
 
     const member = deps.guildId ? await discordGet<DiscordMember>(deps, `/guilds/${deps.guildId}/members/${discordId}`) : null;

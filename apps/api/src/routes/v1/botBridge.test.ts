@@ -15,8 +15,10 @@ function build(overrides: Partial<BotBridgeDeps> = {}, as: string | null = 'bot_
         permanence: async () => ({open: true, closesAt: '2026-11-27T22:00:00.000Z'}),
         discordSettings: async () => ({
             openingChannelId: '885276175696547890', openingMessageId: null, announceChannelId: null,
-            voiceChannelId: null, helpChannelId: null,
+            helpChannelId: null,
         }),
+        publishRequested: async () => true,
+        openingMessagePublished: async (id) => void calls.push(`published:${id}`),
         activeTickets: async () => [ticket],
         findOpenTicketByChannel: async (id) => id === ticket.channelId ? ticket : null,
         findOpenTicketByUser: async () => null,
@@ -60,6 +62,18 @@ test('settings: the channels set in Solar', async () => {
     assert.equal(res.statusCode, 200);
     assert.equal(res.json().discord.openingChannelId, '885276175696547890');
     assert.equal(res.json().discord.openingMessageId, null);
+    assert.equal(res.json().publishOpeningMessage, true);
+});
+
+test('settings: the bot reports the opening message it posted', async () => {
+    const {app, calls} = build();
+    const post = (messageId: unknown) => app.inject({method: 'POST', url: '/v1/bot/settings/opening-message', payload: {messageId}});
+    assert.equal((await post('not-an-id')).statusCode, 400);
+    assert.equal((await post('885276306223276052')).statusCode, 200);
+    assert.deepEqual(calls, ['published:885276306223276052']);
+    // Volunteers cannot set it
+    const volunteer = build({}, 'user1', ['admin.sudo']).app;
+    assert.equal((await volunteer.inject({method: 'POST', url: '/v1/bot/settings/opening-message', payload: {messageId: '885276306223276052'}})).statusCode, 403);
 });
 
 test('opening: one écoute per person, only during a permanence', async () => {

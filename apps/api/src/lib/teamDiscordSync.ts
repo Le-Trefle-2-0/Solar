@@ -56,13 +56,11 @@ let timer: NodeJS.Timeout | null = null;
 
 export function startTeamDiscordSync() {
     if (timer) return;
-    if (!defaultDiscordDeps().token) {
-        console.log('[team] DISCORD_TOKEN is not set: team photos are not synced with Discord');
-        return;
-    }
     const hours = Math.max(1, Number(process.env.DISCORD_SYNC_INTERVAL_HOURS) || 6);
     const run = async () => {
         try {
+            // The bot may be set up later, from Solar: checked at each run
+            if (!(await defaultDiscordDeps()).token) return;
             const {total, failed} = await syncAllTeamPeople();
             if (total) console.log(`[team] Discord sync: ${total - failed}/${total} people up to date`);
         } catch (e) {

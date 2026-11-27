@@ -69,10 +69,7 @@ MEDIASOUP_ANNOUNCED_IP=127.0.0.1
 MEDIASOUP_MIN_PORT=40000
 MEDIASOUP_MAX_PORT=40100
 
-# Bot Discord (apps/bot) : sans DISCORD_TOKEN, le bot reste inactif. Voir « Bot Discord » plus bas.
-DISCORD_TOKEN=
-DISCORD_GUILD_ID=
-SOLAR_BOT_API_KEY=
+# Bot Discord (apps/bot) : il se configure dans Solar, rien à ajouter ici. Voir « Bot Discord » plus bas.
 
 # docker-compose (développement local uniquement) : mots de passe MySQL et Redis
 MYSQL_ROOT_PASSWORD=un_mot_de_passe_mysql_local
@@ -160,45 +157,44 @@ avec l'ancien bot ; les bénévoles répondent dans Solar. Il ne garde aucune do
 messages à remettre sont lus dans Solar, ce qui lui permet de reprendre après un redémarrage ou une coupure.
 
 - **Ouverture et fermeture** : elles suivent le planning de Solar (une écoute ne peut être ouverte que pendant une
-  permanence). Le bot modifie le même message du salon d'ouverture (texte et bouton « Ouvrir une écoute »), annonce
-  l'ouverture et ouvre le salon vocal pendant la permanence s'ils sont configurés.
+  permanence). Le bot modifie le même message du salon d'ouverture (texte et bouton « Ouvrir une écoute »), et annonce
+  l'ouverture si un salon d'annonce est choisi.
 - **Écoute** : messages privés relayés dans les deux sens, sans identifier le bénévole ; indicateur de saisie ;
   fermeture par l'usager (bouton « Fermer l'écoute ») ou par le bénévole ; lien d'appel quand le bénévole passe en vocal.
 - **Non pris en charge pour l'instant** : images (#301), signalements et levée d'anonymat (#302).
 
-Les salons et le message se règlent dans **Administration > Paramètres, section Bot Discord** : salon et message
-d'ouverture, salon d'annonce, salon vocal, salon des autres supports. Le bot applique un changement tout de suite. Le
-message d'ouverture doit avoir été écrit par ce bot ; sinon (ou s'il est vide) le bot reprend son dernier message du
-salon ou en publie un nouveau et indique son identifiant dans ses journaux. Un champ laissé vide reprend la valeur
-`DISCORD_*_ID` du `.env` ci-dessous.
+**Mise en place** : dans **Administration > Paramètres, section Bot Discord**, « Configurer le bot » guide pas à pas :
 
-Configuration (`.env`) :
+1. Solar crée le compte du bot et sa clé d'accès (rien à copier).
+2. Vous collez le jeton du bot, pris sur le [portail développeurs Discord](https://discord.com/developers/applications)
+   (onglet Bot, « Reset Token »). Solar le vérifie auprès de Discord et le garde chiffré dans la base.
+3. Vous choisissez le serveur ; si le bot n'y est pas, le bouton « Ajouter le bot à un serveur » ouvre l'invitation
+   Discord avec les permissions nécessaires, et le serveur apparaît ensuite tout seul.
+4. Vous choisissez les salons dans des listes, et le message d'ouverture parmi ceux du bot (ou un nouveau message).
+
+Le service du bot n'a besoin d'aucune variable propre : il demande sa configuration à l'API avec
+`INTERNAL_API_SECRET` (déjà présent pour les autres services), toutes les 30 secondes, et redémarre de lui-même quand
+le jeton, le serveur ou la clé changent. Les changements de salons s'appliquent tout de suite. Le jeton est chiffré
+avec une clé dérivée de `INTERNAL_API_SECRET` : si ce secret change, il faut indiquer à nouveau le jeton.
+
+Sans configuration dans Solar, le bot reprend l'ancienne configuration du `.env` si elle est complète
+(`DISCORD_TOKEN`, `DISCORD_GUILD_ID`, `SOLAR_BOT_API_KEY`, et les salons `DISCORD_OPENING_CHANNEL_ID`,
+`DISCORD_OPENING_MESSAGE_ID`, `DISCORD_ANNOUNCE_CHANNEL_ID`, `DISCORD_HELP_CHANNEL_ID`).
+Seules les adresses vues par le bot peuvent avoir besoin d'être ajustées :
 
 ```env
-# Application Discord : jeton du bot (portail développeurs Discord, onglet Bot). Secret.
-DISCORD_TOKEN=
-# Serveur (identifiant de l'ancien settings.json : mainGuildID)
-DISCORD_GUILD_ID=
-# Facultatifs, utilisés quand le champ correspondant est vide dans Solar (identifiants de l'ancien settings.json)
-DISCORD_OPENING_CHANNEL_ID=
-DISCORD_OPENING_MESSAGE_ID=
-DISCORD_ANNOUNCE_CHANNEL_ID=
-DISCORD_VOICE_CHANNEL_ID=
-DISCORD_HELP_CHANNEL_ID=718250345951658064
-# Clé API du compte bot, générée dans Administration > Paramètres, section Bot. Secret.
-SOLAR_BOT_API_KEY=
-# Adresses de l'API et du serveur WebSocket vues par le bot
 API_BASE_URL=http://localhost:3001
 WS_INTERNAL_URL=http://localhost:5000
 ```
 
-Sur le portail développeurs Discord, le bot n'a besoin d'aucun intent privilégié. Sur le serveur, il doit pouvoir lire
-et écrire dans le salon d'ouverture (et d'annonce), et gérer les permissions du salon vocal s'il est configuré.
+Sur le portail développeurs Discord, le bot n'a besoin d'aucun intent privilégié. L'invitation lui donne seulement :
+voir les salons, envoyer des messages et des liens intégrés, lire l'historique. Les appels vocaux se font dans Solar
+(le bot envoie le lien en message privé) : le bot ne gère aucun salon vocal sur Discord.
 
 **Équipe de la page d'accueil** : dans Administration > Paramètres, section Équipe, une personne peut être importée
 depuis Discord par son identifiant, ou son profil lié à un compte Discord. Son pseudo sur le serveur et sa photo sont
 alors repris et tenus à jour par l'API (toutes les `DISCORD_SYNC_INTERVAL_HOURS` heures, 6 par défaut), avec le même
-`DISCORD_TOKEN` et `DISCORD_GUILD_ID`. Modifier le nom ou la photo à la main les personnalise (ils ne suivent plus
+bot et le même serveur. Modifier le nom ou la photo à la main les personnalise (ils ne suivent plus
 Discord) ; « Resynchroniser » les reprend de Discord. Les photos sont copiées dans la base : les visiteurs du site ne
 contactent jamais Discord.
 

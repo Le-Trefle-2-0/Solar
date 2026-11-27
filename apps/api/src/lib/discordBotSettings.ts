@@ -12,7 +12,6 @@ export const DISCORD_BOT_FIELDS = {
     openingChannelId: 'DISCORD_OPENING_CHANNEL_ID',
     openingMessageId: 'DISCORD_OPENING_MESSAGE_ID',
     announceChannelId: 'DISCORD_ANNOUNCE_CHANNEL_ID',
-    voiceChannelId: 'DISCORD_VOICE_CHANNEL_ID',
     helpChannelId: 'DISCORD_HELP_CHANNEL_ID',
 } as const;
 
@@ -62,6 +61,28 @@ export function envDiscordBotSettings(env: NodeJS.ProcessEnv = process.env): Dis
 export async function readDiscordBotSettings(): Promise<DiscordBotSettings> {
     const row = await prisma.settings.findUnique({where: {key: DISCORD_BOT_SETTING_KEY}});
     return parseDiscordBotSettings(row?.value);
+}
+
+/** Set when "Publier un nouveau message" is chosen: the bot posts it, then reports its id. */
+export const PUBLISH_OPENING_KEY = 'discord_bot_publish_opening';
+
+export async function isOpeningPublishRequested() {
+    return (await prisma.settings.findUnique({where: {key: PUBLISH_OPENING_KEY}}))?.value === 'true';
+}
+
+export async function requestOpeningPublish(requested: boolean) {
+    if (requested) {
+        await prisma.settings.upsert({where: {key: PUBLISH_OPENING_KEY}, update: {value: 'true'}, create: {key: PUBLISH_OPENING_KEY, value: 'true'}});
+    } else {
+        await prisma.settings.deleteMany({where: {key: PUBLISH_OPENING_KEY}});
+    }
+}
+
+/** The bot posted the opening message: it becomes the one it edits. */
+export async function openingMessagePublished(messageId: string) {
+    const settings = await readDiscordBotSettings();
+    await writeDiscordBotSettings({...settings, openingMessageId: messageId});
+    await requestOpeningPublish(false);
 }
 
 export async function writeDiscordBotSettings(settings: DiscordBotSettings) {

@@ -28,5 +28,5 @@ export function documentsBlocked(user: Standing, now = new Date()): boolean {
     return now.getTime() - user.documentsRenewalAt.getTime() >= RENEWAL_GRACE_DAYS * 24 * 3600_000;
 }
 
-/** The technical account of the Discord bot is recognised by its id (see POST /v1/bot/setup). */
+/** The technical account of the Discord bot is recognised by its id (see POST /v1/bot/setup/account). */
 export const isBotAccount = (userId: string) => userId.startsWith('bot_');

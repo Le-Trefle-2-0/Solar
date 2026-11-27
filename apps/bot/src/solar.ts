@@ -21,7 +21,9 @@ export type PostResult = 'saved' | 'duplicate' | 'ticket_closed';
 export interface SolarApi {
     permanence(): Promise<PermanenceStatus>;
     /** Channels and message set in Solar's settings page (null fields: use the .env). */
-    discordSettings(): Promise<Record<string, string | null>>;
+    discordSettings(): Promise<{channels: Record<string, string | null>; publishOpeningMessage: boolean}>;
+    /** The opening message the bot just posted (when asked to publish a new one). */
+    reportOpeningMessage(messageId: string): Promise<void>;
     activeTickets(): Promise<ActiveTicket[]>;
     openTicket(discordUserId: string): Promise<OpenResult>;
     postUserMessage(channelId: string, discordMessageId: string, content: string): Promise<PostResult>;
@@ -71,7 +73,10 @@ export function createSolarApi(baseUrl: string, apiKey: string, fetchImpl: typeo
         async discordSettings() {
             const r = await call('GET', '/v1/bot/settings');
             ok(r, 'settings');
-            return (r.data?.discord ?? {}) as Record<string, string | null>;
+            return {channels: (r.data?.discord ?? {}) as Record<string, string | null>, publishOpeningMessage: r.data?.publishOpeningMessage === true};
+        },
+        async reportOpeningMessage(messageId) {
+            ok(await call('POST', '/v1/bot/settings/opening-message', {messageId}), 'opening-message');
         },
         async activeTickets() {
             const r = await call('GET', '/v1/bot/tickets/active');
