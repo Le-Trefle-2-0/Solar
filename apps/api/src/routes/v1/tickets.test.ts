@@ -7,8 +7,11 @@ import {signWidgetSession} from '../../lib/widgetSession.js';
 
 process.env.WS_GUEST_SECRET = 'test-secret';
 
-/** Ticket ids written to by the routes under test. */
+/** Ticket ids written to by the routes under test, and ticket ids looked up. */
 const writes: number[] = [];
+const lookups: number[] = [];
+/** Status of ticket 1. */
+let ticketStatus = 'closed';
 
 async function build(perms: string[], authedAs: string | null, assignedUserId: string | null = null) {
     const app = Fastify();
@@ -17,7 +20,10 @@ async function build(perms: string[], authedAs: string | null, assignedUserId: s
         authenticate: async () => authedAs,
         getPermissions: async () => perms,
         findTicketByChannelId: async (channelId) => channelId === 'c' ? {assignedUserId} : null,
-        findTicketById: async (id) => id === 1 ? {assignedUserId, channelId: 'c'} : null,
+        findTicketById: async (id) => {
+            lookups.push(id);
+            return id === 1 ? {assignedUserId, channelId: 'c', statusName: ticketStatus} : null;
+        },
         updateTicket: async (id) => {
             writes.push(id);
             return {id};
@@ -104,6 +110,27 @@ test('submit-feedback: a visitor may only rate their own ticket', async () => {
     assert.equal(own.statusCode, 200);
     assert.deepEqual(own.json(), {success: true});
     assert.equal((await send('other')).statusCode, 401);
+});
+
+test('submit-feedback: no ticket is looked up before the caller is known', async () => {
+    lookups.length = 0;
+    assert.equal(await post(await build([], null), '/v1/tickets/submit-feedback', edits[1][1]), 401);
+    assert.deepEqual(lookups, []);
+});
+
+test('submit-feedback: refused while the écoute is still open, nothing written', async () => {
+    writes.length = 0;
+    try {
+        for (const status of ['waiting', 'started']) {
+            ticketStatus = status;
+            assert.equal(await post(await build(['tickets.read_all'], 'user1'), '/v1/tickets/submit-feedback', edits[1][1]), 409);
+        }
+        ticketStatus = 'commented';
+        assert.equal(await post(await build(['tickets.read_all'], 'user1'), '/v1/tickets/submit-feedback', edits[1][1]), 200);
+    } finally {
+        ticketStatus = 'closed';
+    }
+    assert.deepEqual(writes, [1]);
 });
 
 

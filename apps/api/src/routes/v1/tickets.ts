@@ -22,7 +22,7 @@ export interface TicketsRouteDeps {
     authenticate: (req: any) => Promise<string | null | undefined>;
     getPermissions: (userId: string) => Promise<string[]>;
     findTicketByChannelId: (channelId: string) => Promise<{assignedUserId: string | null} | null>;
-    findTicketById: (id: number) => Promise<{assignedUserId: string | null; channelId: string | null} | null>;
+    findTicketById: (id: number) => Promise<{assignedUserId: string | null; channelId: string | null; statusName: string} | null>;
     updateTicket: (id: number, data: {categories?: string[]; feedback?: object}) => Promise<unknown>;
 }
 
@@ -115,6 +115,10 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
             const {ticketID, assignmentID} = bodySchema.parse((req.body ?? {}) as any);
             const ticket = await prisma.ticket.findUnique({where: {id: ticketID}});
             if (!ticket) return reply.status(400).send('Ticket not found');
+            // A closed écoute stays closed: its transcript is final (#266)
+            if (ticket.statusName !== 'waiting' && ticket.statusName !== 'started') {
+                return reply.status(409).send({success: false, error: 'ticket_closed'});
+            }
             const user = await prisma.user.findUnique({where: {id: assignmentID}});
             if (!user) return reply.status(400).send('User not found');
             // The target must be allowed to handle tickets.
@@ -354,17 +358,25 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
 
         try {
             const {ticketID, feedback} = bodySchema.parse((req.body ?? {}) as any);
-            const ticket = await deps.findTicketById(ticketID);
 
-            // Either the visitor who owns the ticket (signed widget cookies), or staff with access to it.
-            const isVisitor = !!ticket?.channelId
-                && verifyWidgetSession(req.cookies ?? {})?.channelId === ticket.channelId;
+            // Either the visitor who owns the ticket (signed widget cookies), or staff with access
+            // to it. Nobody is looked up before one of the two is shown.
+            const session = verifyWidgetSession(req.cookies ?? {});
+            let userId = session ? null : await deps.authenticate(req);
+            if (!session && !userId) return reply.status(401).send('unauthorized');
+
+            const ticket = await deps.findTicketById(ticketID);
+            const isVisitor = !!session && !!ticket?.channelId && session.channelId === ticket.channelId;
             if (!isVisitor) {
-                const userId = await deps.authenticate(req);
+                userId ??= await deps.authenticate(req);
                 if (!userId) return reply.status(401).send('unauthorized');
                 if (!canAccessTicket(await deps.getPermissions(userId), ticket?.assignedUserId, userId)) return reply.status(403).send('forbidden');
             }
             if (!ticket) return reply.status(404).send({success: false, error: 'No ticket found'});
+            // The form is offered once the écoute has ended (#266)
+            if (ticket.statusName !== 'closed' && ticket.statusName !== 'commented') {
+                return reply.status(409).send({success: false, error: 'ticket_open'});
+            }
 
             await deps.updateTicket(ticketID, {feedback});
             // The ticket is not echoed back: it holds staff notes the visitor must not see.
