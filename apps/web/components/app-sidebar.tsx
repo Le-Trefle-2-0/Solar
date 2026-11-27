@@ -185,7 +185,7 @@ export function AppSidebar({pendingDocsCount = 0, unreadChannelIds = [], pending
             permission: "management.ticket_history",
         },
         {
-            name: "Utilisateurs",
+            name: "Bénévoles",
             url: "/app/admin/users",
             icon: ShieldUser,
             permission: "management.manage_accounts",
@@ -244,7 +244,7 @@ export function AppSidebar({pendingDocsCount = 0, unreadChannelIds = [], pending
             if (item.name === "Chat Permanence") {
                 return { ...item, hasNotification: Array.from(unreadIds).some(id => id !== '1' && !id.startsWith('ticket-')) && activeChannelId !== 'chat' };
             }
-            if (item.name === "Utilisateurs") {
+            if (item.name === "Bénévoles") {
                 return { ...item, hasNotification: pendingIds.size > 0 };
             }
             return item;

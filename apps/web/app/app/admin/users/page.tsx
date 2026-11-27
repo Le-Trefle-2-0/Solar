@@ -98,7 +98,7 @@ async function getData(): Promise<{ users: DisplayAccount[], roles: any[] }> {
 }
 
 export const metadata = constructMetadata({
-    title: "Administration • Utilisateurs",
+    title: "Administration • Bénévoles",
     noIndex: true,
 });
 
@@ -118,7 +118,7 @@ export default async function AdminUsersPage() {
     const {users, roles} = await getData()
 
     return (
-        <Page title="Utilisateurs" description="Gérez les comptes utilisateurs et les accès">
+        <Page title="Bénévoles" description="Gérez les comptes des bénévoles et leurs accès">
             <UsersTable data={users} availableRoles={roles}/>
         </Page>
     )
