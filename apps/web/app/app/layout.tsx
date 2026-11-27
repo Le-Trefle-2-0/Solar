@@ -8,6 +8,7 @@ import {SocketProvider} from "@/context/Socket";
 import {VoiceProvider} from "@/context/Voice";
 import {DocumentSubmissionDialog} from "@/components/users/document-submission-dialog";
 import {AccountOnHold} from "@/components/users/account-on-hold";
+import {TwoFactorRequired} from "@/components/users/two-factor-required";
 import {addDays, differenceInDays, format} from "date-fns";
 import {fr} from "date-fns/locale";
 import prisma from "@/lib/prisma";
@@ -34,6 +35,8 @@ export default async function RootLayout({
     // Account managers (and the owner) may dismiss their own document reminder
     const access = await getAccess();
     const isAdmin = !!access && can(access.permissions, "management.manage_accounts");
+    // The document dialog must not keep an account manager away from the settings where 2FA is enabled
+    const maySkipDocDialog = !!access?.managesAccounts;
 
     let showDocDialog = false;
     let isRenewal = false;
@@ -45,7 +48,7 @@ export default async function RootLayout({
         if (!user.documentsRenewalAt || user.documentsStatus === 'rejected') {
             // Initial activation or rejected
             showDocDialog = true;
-            isDismissible = isAdmin;
+            isDismissible = maySkipDocDialog;
         } else {
             // Annual renewal request
             showDocDialog = true;
@@ -55,7 +58,7 @@ export default async function RootLayout({
             deadlineStr = format(deadlineDate, "PP", {locale: fr});
             const daysSinceRenewalRequest = differenceInDays(new Date(), renewalRequestDate);
 
-            if (isAdmin || daysSinceRenewalRequest < 14) {
+            if (maySkipDocDialog || daysSinceRenewalRequest < 14) {
                 isDismissible = true;
             } else {
                 isDismissible = false;
@@ -64,7 +67,7 @@ export default async function RootLayout({
     }
 
     // Double check: Admin must ALWAYS be able to dismiss
-    if (isAdmin) {
+    if (maySkipDocDialog) {
         isDismissible = true;
     }
 
@@ -142,6 +145,7 @@ export default async function RootLayout({
                     <div className="flex flex-col h-full w-full overflow-hidden relative">
                         <SidebarTrigger
                             className="absolute top-2 left-2 z-50 bg-background/50 backdrop-blur shadow-sm border rounded-md"/>
+                        {access.needsTwoFactor && <TwoFactorRequired/>}
                         {children}
                     </div>
                     {showDocDialog && (

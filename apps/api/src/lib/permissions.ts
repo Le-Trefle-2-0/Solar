@@ -2,6 +2,7 @@ import {prisma} from '../prisma.js';
 import {ALL_PERMISSIONS, isKnownPermission} from './permissionCatalogue.js';
 import {splitRoles, hasPermission, type Actor, type KnownRole} from './roleAssignment.js';
 import {documentsBlocked, isBanned, isBotAccount, STANDING_SELECT} from './accountStanding.js';
+import {applyTwoFactorGate} from './twoFactorGate.js';
 
 export {hasPermission} from './roleAssignment.js';
 
@@ -31,7 +32,8 @@ export async function getKnownRoles(): Promise<KnownRole[]> {
 
 /**
  * Who the user is for authorization: their roles, effective permissions and owner status.
- * The owner holds every permission, whatever their roles say.
+ * The owner holds every permission, whatever their roles say. Without 2FA, nobody (owner
+ * included, the bot excepted) holds a privileged permission (see twoFactorGate.ts, #17).
  *
  * Nobody (null) for a banned or closed account, and for an account whose identity documents are
  * missing or refused, unless it may manage accounts (#247, #249): the API, the WebSocket service
@@ -58,7 +60,8 @@ export function resolveActor(user: ActorRow, ownerId: string | null, roleRows: {
     if (isBanned(user)) return null;
     const isOwner = ownerId === user.id;
     const roles = splitRoles(user.role);
-    if (isOwner) return {id: user.id, isOwner, roles, permissions: [...ALL_PERMISSIONS]};
+    const hasTwoFactor = !!user.twoFactorEnabled || isBotAccount(user.id);
+    if (isOwner) return {id: user.id, isOwner, roles, ...applyTwoFactorGate([...ALL_PERMISSIONS], hasTwoFactor)};
 
     const permissions = new Set<string>();
     for (const row of roleRows) {
@@ -68,7 +71,7 @@ export function resolveActor(user: ActorRow, ownerId: string | null, roleRows: {
     if (documentsBlocked(user) && !isBotAccount(user.id) && !hasPermission(granted, 'management.manage_accounts')) {
         return null;
     }
-    return {id: user.id, isOwner, roles, permissions: granted};
+    return {id: user.id, isOwner, roles, ...applyTwoFactorGate(granted, hasTwoFactor)};
 }
 
 export async function getUserPermissions(userId: string): Promise<string[]> {

@@ -1,7 +1,7 @@
 import {headers} from "next/headers";
 import prisma from "@/lib/prisma";
 import {auth} from "@/lib/auth";
-import {getRolePermissions} from "@/lib/userPermissions";
+import {getEffectivePermissions} from "@/lib/userPermissions";
 import type {FileOwnership, Viewer} from "@/lib/security/fileAccess";
 
 /**
@@ -45,7 +45,7 @@ export async function getViewer(): Promise<Viewer | null> {
     const session = await auth.api.getSession({headers: await headers()});
     if (!session) return null;
     const role = (session.user as {role?: string | null}).role;
-    return {userId: session.user.id, role, permissions: await getRolePermissions(role, session.user.id)};
+    return {userId: session.user.id, role, permissions: await getEffectivePermissions(session.user.id)};
 }
 
 export async function getFileOwnership(meta: StorageMeta): Promise<FileOwnership> {

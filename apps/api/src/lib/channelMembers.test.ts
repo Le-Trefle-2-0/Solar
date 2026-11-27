@@ -7,7 +7,7 @@ const roles = [
     {name: 'Référent', permissions: JSON.stringify(['tickets.read_all', 'tickets.attribute'])},
     {name: 'Rédacteur', permissions: JSON.stringify(['newsletters.manage'])},
 ];
-const ok = {banned: false, banExpires: null, documentsStatus: 'validated', documentsRenewalAt: null};
+const ok = {banned: false, banExpires: null, documentsStatus: 'validated', documentsRenewalAt: null, twoFactorEnabled: true};
 const user = (id: string, role: string | null, standing: Partial<typeof ok> = {}): MemberRow =>
     ({id, name: id, username: null, displayUsername: null, image: null, role, ...ok, ...standing});
 

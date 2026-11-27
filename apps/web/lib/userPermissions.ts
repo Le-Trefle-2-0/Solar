@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import {auth} from "@/lib/auth";
 import {ALL_PERMISSIONS} from "@/lib/permissions";
 import {documentsBlocked, isBanned, isBotAccount, STANDING_SELECT} from "@/lib/accountStanding";
+import {applyTwoFactorGate} from "@/lib/twoFactorGate";
 
 /** Same key as OWNER_SETTING_KEY in the API. */
 export const OWNER_SETTING_KEY = "owner_user_id";
@@ -36,6 +37,17 @@ export async function getRolePermissions(role: string | null | undefined, userId
     return Array.from(perms);
 }
 
+/**
+ * What a user may do right now: role permissions (all of them for the owner), minus the
+ * privileged ones without 2FA (#17).
+ */
+export async function getEffectivePermissions(userId: string): Promise<string[]> {
+    const user = await prisma.user.findUnique({where: {id: userId}, select: {role: true, twoFactorEnabled: true}});
+    if (!user) return [];
+    const granted = await getRolePermissions(user.role, userId);
+    return applyTwoFactorGate(granted, !!user.twoFactorEnabled || isBotAccount(userId)).permissions;
+}
+
 export function can(permissions: string[], permission: string): boolean {
     return permissions.includes("admin.sudo") || permissions.includes(permission);
 }
@@ -46,6 +58,10 @@ export interface Access {
     roles: string[];
     permissions: string[];
     isOwner: boolean;
+    /** Privileged permissions are withheld until the account enables 2FA (#17). */
+    needsTwoFactor: boolean;
+    /** Manages accounts by role, with or without 2FA: only for dismissing one's own document dialog. */
+    managesAccounts: boolean;
 }
 
 /**
@@ -65,11 +81,13 @@ export async function getAccess(): Promise<Access | null> {
     const role = user.role ?? null;
     const ownerId = await getOwnerId();
     const isOwner = ownerId === user.id;
-    const permissions = isOwner ? [...ALL_PERMISSIONS] : await getRolePermissions(role);
-    if (!isOwner && documentsBlocked(user) && !isBotAccount(user.id) && !can(permissions, "management.manage_accounts")) {
+    const granted = isOwner ? [...ALL_PERMISSIONS] : await getRolePermissions(role);
+    const managesAccounts = can(granted, "management.manage_accounts");
+    if (!isOwner && documentsBlocked(user) && !isBotAccount(user.id) && !managesAccounts) {
         return null;
     }
-    return {userId: user.id, role, roles: splitRoles(role), permissions, isOwner};
+    const gate = applyTwoFactorGate(granted, !!user.twoFactorEnabled || isBotAccount(user.id));
+    return {userId: user.id, role, roles: splitRoles(role), isOwner, managesAccounts, ...gate};
 }
 
 /** Highest role weight of a user; +Infinity for the owner, -Infinity without any known role. */

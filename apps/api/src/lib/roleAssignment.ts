@@ -22,6 +22,8 @@ export interface Actor {
     isOwner: boolean;
     roles: string[];
     permissions: string[];
+    /** Privileged permissions are withheld until the account enables 2FA (#17). */
+    needsTwoFactor?: boolean;
 }
 
 export type Refusal = {status: 400 | 403 | 409; message: string};

@@ -196,6 +196,7 @@ export async function registerRolesRoutes(app: FastifyInstance, deps: RolesRoute
         const actor = await requireActor(req, reply);
         if (!actor) return;
         if (!actor.isOwner) return reply.status(403).send('forbidden: only the owner can reset the roles');
+        if (actor.needsTwoFactor) return reply.status(403).send('forbidden: two-factor authentication required');
         await deps.resetRoles();
         await deps.notify(null);
         return reply.send({success: true});

@@ -10,9 +10,10 @@ export type Standing = {
     banExpires?: Date | null;
     documentsStatus?: string | null;
     documentsRenewalAt?: Date | null;
+    twoFactorEnabled?: boolean | null;
 };
 
-export const STANDING_SELECT = {banned: true, banExpires: true, documentsStatus: true, documentsRenewalAt: true} as const;
+export const STANDING_SELECT = {banned: true, banExpires: true, documentsStatus: true, documentsRenewalAt: true, twoFactorEnabled: true} as const;
 
 export const RENEWAL_GRACE_DAYS = 14;
 

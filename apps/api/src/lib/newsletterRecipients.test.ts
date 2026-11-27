@@ -6,7 +6,7 @@ const roles = [
     {name: 'Bénévole Écoutant', permissions: JSON.stringify(['tickets.send_message'])},
     {name: 'none', permissions: '[]'},
 ];
-const ok = {banned: false, banExpires: null, documentsStatus: 'validated', documentsRenewalAt: null};
+const ok = {banned: false, banExpires: null, documentsStatus: 'validated', documentsRenewalAt: null, twoFactorEnabled: true};
 const user = (id: string, role: string | null, standing = {}) => ({id, email: `${id}@x.fr`, role, ...ok, ...standing});
 
 test('internal newsletters: active team members only', () => {
