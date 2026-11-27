@@ -163,8 +163,8 @@ export function AdminValidationView({account, onClose, onUpdate}: AdminValidatio
                         <ShieldCheck className="text-primary" size={18}/>
                         Validation Admin
                     </h2>
-                    <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8">
-                        <X size={18}/>
+                    <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8" aria-label="Fermer la validation">
+                        <X size={18} aria-hidden/>
                     </Button>
                 </div>
 
@@ -381,22 +381,34 @@ function DocumentFrame({fileId, filename}: {fileId: string, filename: string}) {
 
     const isPdf = mimeType === 'application/pdf';
     const isImage = mimeType?.startsWith('image/');
+    const [failed, setFailed] = useState(false);
+
+    // A type with no preview: its message replaces the spinner at once
+    useEffect(() => {
+        if (mimeType && !isPdf && !isImage) setIsLoading(false);
+    }, [mimeType, isPdf, isImage]);
 
     return (
         <div className="relative w-full h-full bg-white rounded-lg shadow-2xl overflow-hidden min-h-[800px]"
              onContextMenu={(e) => e.preventDefault()}>
             {isLoading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-background/50 z-10">
-                    <Loader2 className="animate-spin text-primary" size={40}/>
+                    <Loader2 className="animate-spin text-primary" size={40} aria-hidden/>
+                    <span className="sr-only" role="status">Chargement du document…</span>
                 </div>
             )}
 
-            {isPdf ? (
+            {failed ? (
+                <div className="flex flex-col items-center justify-center h-full min-h-[800px] gap-4">
+                    <AlertCircle size={64} className="text-destructive" aria-hidden/>
+                    <p className="text-muted-foreground">Le document n&apos;a pas pu être chargé.</p>
+                </div>
+            ) : isPdf ? (
                 <iframe
                     src={`${fileUrl}#toolbar=0&navpanes=0`}
                     className="w-full h-full border-none select-none min-h-[800px]"
                     onLoad={() => setIsLoading(false)}
-                    title="PDF Preview"
+                    title={`Document : ${filename}`}
                 />
             ) : isImage ? (
                 <div className="w-full flex items-center justify-center bg-black/5 min-h-[800px]">
@@ -405,6 +417,10 @@ function DocumentFrame({fileId, filename}: {fileId: string, filename: string}) {
                         alt={filename}
                         className="max-w-full h-auto select-none pointer-events-none"
                         onLoad={() => setIsLoading(false)}
+                        onError={() => {
+                            setFailed(true);
+                            setIsLoading(false);
+                        }}
                         draggable={false}
                     />
                 </div>

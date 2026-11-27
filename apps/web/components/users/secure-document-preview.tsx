@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {FileText, Loader2, AlertCircle, X} from "lucide-react";
 import {Button} from "@/components/ui/button";
 
@@ -32,6 +32,9 @@ export function SecureDocumentPreview({fileId, filename, onClose}: SecureDocumen
                 if (ext === 'pdf') setMimeType('application/pdf');
                 else if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext || '')) {
                     setMimeType(`image/${ext === 'jpg' ? 'jpeg' : ext}`);
+                } else {
+                    // Nothing to show: the error message replaces the spinner
+                    setIsLoading(false);
                 }
             }
         };
@@ -42,21 +45,38 @@ export function SecureDocumentPreview({fileId, filename, onClose}: SecureDocumen
     const isPdf = mimeType === 'application/pdf';
     const isImage = mimeType?.startsWith('image/');
 
+    // A type with no preview: its message is shown at once, without a spinner over it
+    useEffect(() => {
+        if (mimeType && !isPdf && !isImage) setIsLoading(false);
+    }, [mimeType, isPdf, isImage]);
+
+    // A modal: focus on its close button, Escape closes it
+    const closeRef = useRef<HTMLButtonElement>(null);
+    useEffect(() => {
+        closeRef.current?.focus();
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') onClose();
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [onClose]);
+
     return (
-        <div className="fixed inset-0 z-50 flex flex-col bg-background/95 backdrop-blur-sm animate-in fade-in duration-200">
+        <div role="dialog" aria-modal="true" aria-labelledby="document-preview-title"
+             className="fixed inset-0 z-50 flex flex-col bg-background/95 backdrop-blur-sm animate-in fade-in duration-200">
             <div className="flex items-center justify-between px-4 py-3 border-b">
                 <div className="flex items-center gap-3">
                     <div className="p-2 bg-muted rounded">
-                        <FileText size={20} className="text-primary"/>
+                        <FileText size={20} className="text-primary" aria-hidden/>
                     </div>
                     <div>
-                        <h3 className="font-semibold text-sm leading-none">{filename}</h3>
+                        <h2 id="document-preview-title" className="font-semibold text-sm leading-none">{filename}</h2>
                         <p className="text-xs text-muted-foreground mt-1">Aperçu sécurisé</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon" onClick={onClose}>
-                        <X size={20}/>
+                    <Button ref={closeRef} variant="ghost" size="icon" onClick={onClose} aria-label="Fermer l'aperçu">
+                        <X size={20} aria-hidden/>
                     </Button>
                 </div>
             </div>
@@ -64,7 +84,8 @@ export function SecureDocumentPreview({fileId, filename, onClose}: SecureDocumen
             <div className="flex-1 relative overflow-hidden bg-muted/20 flex items-center justify-center p-4">
                 {isLoading && (
                     <div className="absolute inset-0 flex items-center justify-center bg-background/50 z-10">
-                        <Loader2 className="animate-spin text-primary" size={40}/>
+                        <Loader2 className="animate-spin text-primary" size={40} aria-hidden/>
+                        <span className="sr-only" role="status">Chargement de l'aperçu…</span>
                     </div>
                 )}
 
@@ -79,7 +100,7 @@ export function SecureDocumentPreview({fileId, filename, onClose}: SecureDocumen
                                 src={`${fileUrl}#toolbar=0&navpanes=0&scrollbar=0`}
                                 className="w-full h-full border-none select-none"
                                 onLoad={() => setIsLoading(false)}
-                                title="PDF Preview"
+                                title={`Aperçu : ${filename}`}
                             />
                         ) : isImage ? (
                             <div className="w-full h-full flex items-center justify-center bg-black/5 overflow-auto">
@@ -88,6 +109,10 @@ export function SecureDocumentPreview({fileId, filename, onClose}: SecureDocumen
                                     alt={filename}
                                     className="max-w-full max-h-full object-contain select-none pointer-events-none"
                                     onLoad={() => setIsLoading(false)}
+                                    onError={() => {
+                                        setMimeType(null);
+                                        setIsLoading(false);
+                                    }}
                                     draggable={false}
                                 />
                             </div>
@@ -105,10 +130,9 @@ export function SecureDocumentPreview({fileId, filename, onClose}: SecureDocumen
                         </div>
                     )}
                     
-                    {/* Transparent overlay to block clicks/drags in the iframe/image area */}
-                    {/* We only show it once loading is done to not block the iframe from actually rendering if it needs focus, 
-                        though usually it's fine. */}
-                    {!isLoading && (
+                    {/* Over images only: blocks dragging and the context menu. Never over a PDF, whose
+                        pages must stay scrollable (a recto/verso document has two). */}
+                    {!isLoading && isImage && (
                         <div 
                             className="absolute inset-0 z-20" 
                             style={{ pointerEvents: 'auto' }}
