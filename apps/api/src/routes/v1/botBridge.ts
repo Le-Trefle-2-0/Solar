@@ -8,6 +8,7 @@ import {broadcast} from '../../lib/broadcast.js';
 import {neutralizeHtml} from '../../lib/sanitize.js';
 import {getPermanenceStatus, type PermanenceStatus} from '../../lib/permanenceStatus.js';
 import {closeTicket} from '../../lib/ticketClosing.js';
+import {readDiscordBotSettings, type DiscordBotSettings} from '../../lib/discordBotSettings.js';
 
 /**
  * What the Discord bot (apps/bot) exchanges with Solar (#293). Only the bot account (API key of
@@ -28,6 +29,8 @@ export interface BotBridgeDeps {
     authenticate: (req: FastifyRequest) => Promise<string | null | undefined>;
     getPermissions: (userId: string) => Promise<string[]>;
     permanence: () => Promise<PermanenceStatus>;
+    /** Channels and message set in Solar's settings page (null: the bot's .env value). */
+    discordSettings: () => Promise<DiscordBotSettings>;
     /** Open écoutes that came from Discord. */
     activeTickets: () => Promise<BotTicket[]>;
     findOpenTicketByChannel: (channelId: string) => Promise<BotTicket | null>;
@@ -55,6 +58,7 @@ const defaultDeps: BotBridgeDeps = {
     authenticate,
     getPermissions: getUserPermissions,
     permanence: () => getPermanenceStatus(),
+    discordSettings: readDiscordBotSettings,
     activeTickets: async () => (await prisma.ticket.findMany({where: openDiscordTicket, orderBy: {id: 'asc'}})).map(toBotTicket),
     findOpenTicketByChannel: async (channelId) => {
         const t = await prisma.ticket.findFirst({where: {...openDiscordTicket, channelId}});
@@ -154,6 +158,11 @@ export async function registerBotBridgeRoutes(app: FastifyInstance, deps: BotBri
     app.get('/v1/bot/permanence', async (req, reply) => {
         if (!await requireBot(req, reply)) return;
         return reply.send(await deps.permanence());
+    });
+
+    app.get('/v1/bot/settings', async (req, reply) => {
+        if (!await requireBot(req, reply)) return;
+        return reply.send({discord: await deps.discordSettings()});
     });
 
     app.get('/v1/bot/tickets/active', async (req, reply) => {

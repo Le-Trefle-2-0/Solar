@@ -72,8 +72,6 @@ MEDIASOUP_MAX_PORT=40100
 # Bot Discord (apps/bot) : sans DISCORD_TOKEN, le bot reste inactif. Voir « Bot Discord » plus bas.
 DISCORD_TOKEN=
 DISCORD_GUILD_ID=
-DISCORD_OPENING_CHANNEL_ID=
-DISCORD_OPENING_MESSAGE_ID=
 SOLAR_BOT_API_KEY=
 
 # docker-compose (développement local uniquement) : mots de passe MySQL et Redis
@@ -168,18 +166,22 @@ messages à remettre sont lus dans Solar, ce qui lui permet de reprendre après 
   fermeture par l'usager (bouton « Fermer l'écoute ») ou par le bénévole ; lien d'appel quand le bénévole passe en vocal.
 - **Non pris en charge pour l'instant** : images (#301), signalements et levée d'anonymat (#302).
 
+Les salons et le message se règlent dans **Administration > Paramètres, section Bot Discord** : salon et message
+d'ouverture, salon d'annonce, salon vocal, salon des autres supports. Le bot applique un changement tout de suite. Le
+message d'ouverture doit avoir été écrit par ce bot ; sinon (ou s'il est vide) le bot reprend son dernier message du
+salon ou en publie un nouveau et indique son identifiant dans ses journaux. Un champ laissé vide reprend la valeur
+`DISCORD_*_ID` du `.env` ci-dessous.
+
 Configuration (`.env`) :
 
 ```env
 # Application Discord : jeton du bot (portail développeurs Discord, onglet Bot). Secret.
 DISCORD_TOKEN=
-# Serveur, salon et message d'ouverture (identifiants de l'ancien settings.json : mainGuildID, ticketOpening).
-# Le message doit avoir été écrit par ce bot ; sinon (ou s'il est vide) le bot reprend son dernier message du salon
-# ou en publie un nouveau et indique son identifiant dans ses journaux.
+# Serveur (identifiant de l'ancien settings.json : mainGuildID)
 DISCORD_GUILD_ID=
+# Facultatifs, utilisés quand le champ correspondant est vide dans Solar (identifiants de l'ancien settings.json)
 DISCORD_OPENING_CHANNEL_ID=
 DISCORD_OPENING_MESSAGE_ID=
-# Facultatifs : salon d'annonce de l'ouverture, salon vocal ouvert pendant les permanences, salon des autres supports
 DISCORD_ANNOUNCE_CHANNEL_ID=
 DISCORD_VOICE_CHANNEL_ID=
 DISCORD_HELP_CHANNEL_ID=718250345951658064

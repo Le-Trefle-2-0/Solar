@@ -13,6 +13,10 @@ function build(overrides: Partial<BotBridgeDeps> = {}, as: string | null = 'bot_
         authenticate: async () => as,
         getPermissions: async () => perms,
         permanence: async () => ({open: true, closesAt: '2026-11-27T22:00:00.000Z'}),
+        discordSettings: async () => ({
+            openingChannelId: '885276175696547890', openingMessageId: null, announceChannelId: null,
+            voiceChannelId: null, helpChannelId: null,
+        }),
         activeTickets: async () => [ticket],
         findOpenTicketByChannel: async (id) => id === ticket.channelId ? ticket : null,
         findOpenTicketByUser: async () => null,
@@ -48,6 +52,14 @@ test('bot routes: only the bot account with its key', async () => {
     assert.equal((await build({}, 'user1', ['admin.sudo']).app.inject('/v1/bot/permanence')).statusCode, 403);
     assert.equal((await build({}, 'bot_abc', []).app.inject('/v1/bot/permanence')).statusCode, 403);
     assert.equal((await build().app.inject('/v1/bot/permanence')).statusCode, 200);
+    assert.equal((await build({}, 'user1', ['admin.sudo']).app.inject('/v1/bot/settings')).statusCode, 403);
+});
+
+test('settings: the channels set in Solar', async () => {
+    const res = await build().app.inject('/v1/bot/settings');
+    assert.equal(res.statusCode, 200);
+    assert.equal(res.json().discord.openingChannelId, '885276175696547890');
+    assert.equal(res.json().discord.openingMessageId, null);
 });
 
 test('opening: one écoute per person, only during a permanence', async () => {

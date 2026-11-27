@@ -20,6 +20,8 @@ export type PostResult = 'saved' | 'duplicate' | 'ticket_closed';
 
 export interface SolarApi {
     permanence(): Promise<PermanenceStatus>;
+    /** Channels and message set in Solar's settings page (null fields: use the .env). */
+    discordSettings(): Promise<Record<string, string | null>>;
     activeTickets(): Promise<ActiveTicket[]>;
     openTicket(discordUserId: string): Promise<OpenResult>;
     postUserMessage(channelId: string, discordMessageId: string, content: string): Promise<PostResult>;
@@ -65,6 +67,11 @@ export function createSolarApi(baseUrl: string, apiKey: string, fetchImpl: typeo
             const r = await call('GET', '/v1/bot/permanence');
             ok(r, 'permanence');
             return r.data as PermanenceStatus;
+        },
+        async discordSettings() {
+            const r = await call('GET', '/v1/bot/settings');
+            ok(r, 'settings');
+            return (r.data?.discord ?? {}) as Record<string, string | null>;
         },
         async activeTickets() {
             const r = await call('GET', '/v1/bot/tickets/active');

@@ -9,6 +9,7 @@ import {parseStatsRange} from '../../lib/statsRange.js';
 import {z} from 'zod';
 import {DISCORD_ID, DiscordProfileError, downloadAvatar, fetchDiscordProfile} from '../../lib/discordProfiles.js';
 import {syncTeamPerson} from '../../lib/teamDiscordSync.js';
+import {DISCORD_BOT_SETTING_KEY} from '../../lib/discordBotSettings.js';
 
 /** Authenticated user holding `permission` (admin.sudo and the owner hold every permission). */
 async function requirePermission(req: any, reply: any, permission: string) {
@@ -66,6 +67,8 @@ export async function registerAdminRoutes(app: FastifyInstance) {
         if (typeof key !== 'string' || !key || typeof value !== 'string') return reply.status(400).send('invalid setting');
         // Ownership is not a setting anyone with settings.manage may change
         if (key === OWNER_SETTING_KEY) return reply.status(403).send('forbidden: reserved setting');
+        // Checked and applied by its own route (PUT /v1/bot/discord-settings)
+        if (key === DISCORD_BOT_SETTING_KEY) return reply.status(400).send('use /v1/bot/discord-settings');
 
         try {
             // @ts-ignore

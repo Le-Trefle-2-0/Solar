@@ -15,7 +15,7 @@ import {
     RESTJSONErrorCodes,
 } from 'discord.js';
 import {io} from 'socket.io-client';
-import {loadConfig} from './config.js';
+import {applyChannels, envChannels, loadConfig} from './config.js';
 import {createSolarApi} from './solar.js';
 import {TicketRelay, type DiscordPort, type RoomsPort} from './relay.js';
 import {PermanenceWatcher, type PermanenceView} from './permanence.js';
@@ -83,6 +83,8 @@ const relay = new TicketRelay(api, discord, rooms, cfg.links);
 socket.on('connect', () => {
     socket.emit('bot:checkin');
     console.log('[bot] connected to the realtime service');
+    // Settings changed while disconnected
+    void loadChannels();
     relay.resync().catch(e => console.warn(`[bot] resync failed: ${(e as Error).message}`));
 });
 socket.on('connect_error', (e) => console.warn(`[bot] realtime service unreachable: ${e.message}`));
@@ -103,32 +105,56 @@ socket.on('voiceInvite', (e: {channelId?: string; url?: string; expiresAt?: numb
     }
 });
 
+// ---- Channels set in Solar ----
+const envIds = envChannels();
+let watching = false;
+
+/** Reads the channels set in Solar's settings page; applies them right away when they changed. */
+async function loadChannels() {
+    try {
+        const changed = applyChannels(cfg, await api.discordSettings(), envIds);
+        if (!changed.size) return;
+        console.log(`[bot] Discord settings updated (${[...changed].join(', ')})`);
+        if (changed.has('openingChannelId') || changed.has('openingMessageId')) opening = null;
+        // Shows the opening message, voice channel and presence again with the new settings
+        if (watching) await watcher.tick(true);
+    } catch (e) {
+        console.warn(`[bot] Discord settings not read from Solar, keeping the current ones: ${(e as Error).message}`);
+    }
+}
+
+socket.on('botSettings', () => void loadChannels());
+
 // ---- Opening message and permanence ----
 let opening: Message | null = null;
 
 /** The opening channel's message: the configured one, else the bot's last one, else a new one. */
-async function openingMessageRef(): Promise<Message> {
+async function openingMessageRef(channelId: string): Promise<Message> {
     if (opening) return opening;
-    const channel = await client.channels.fetch(cfg.openingChannelId);
-    if (!channel || channel.type !== ChannelType.GuildText) throw new Error('DISCORD_OPENING_CHANNEL_ID is not a text channel');
+    const channel = await client.channels.fetch(channelId);
+    if (!channel || channel.type !== ChannelType.GuildText) throw new Error('the opening channel is not a text channel');
     const me = client.user!.id;
     if (cfg.openingMessageId) {
         const message = await channel.messages.fetch(cfg.openingMessageId).catch(() => null);
         if (message?.author.id === me) return (opening = message);
         // Only its author may edit a message: a message of another application is left as is
-        console.warn('[bot] DISCORD_OPENING_MESSAGE_ID is not a message of this bot: using another one');
+        console.warn('[bot] the opening message is not a message of this bot in that channel: using another one');
     }
     const recent = await channel.messages.fetch({limit: 20});
     const own = recent.find(m => m.author.id === me && m.embeds.length > 0);
     if (own) return (opening = own);
     opening = await channel.send({content: '…'});
-    console.log(`[bot] opening message posted: set DISCORD_OPENING_MESSAGE_ID=${opening.id}`);
+    console.log(`[bot] opening message posted (${opening.id}): set it in Solar, Paramètres > Bot Discord`);
     return opening;
 }
 
 async function applyPermanence(view: PermanenceView, {opened}: {opened: boolean}) {
-    const message = await openingMessageRef();
-    await message.edit(openingMessage(view.open, view.next, cfg.links));
+    if (cfg.openingChannelId) {
+        const message = await openingMessageRef(cfg.openingChannelId);
+        await message.edit(openingMessage(view.open, view.next, cfg.links));
+    } else {
+        console.warn('[bot] no opening channel: set it in Solar, Paramètres > Bot Discord');
+    }
 
     client.user?.setPresence({
         status: view.open ? PresenceUpdateStatus.Online : PresenceUpdateStatus.DoNotDisturb,
@@ -142,7 +168,7 @@ async function applyPermanence(view: PermanenceView, {opened}: {opened: boolean}
             await voice.permissionOverwrites.edit(guild.roles.everyone, {ViewChannel: view.open, Connect: view.open});
         }
     }
-    if (opened && cfg.announceChannelId) {
+    if (opened && cfg.announceChannelId && cfg.openingChannelId) {
         const announce = await guild.channels.fetch(cfg.announceChannelId).catch(() => null);
         if (announce?.isSendable()) await announce.send(openingAnnouncement(cfg.openingChannelId));
     }
@@ -153,7 +179,10 @@ const watcher = new PermanenceWatcher(api, applyPermanence);
 // ---- Discord events ----
 client.once(Events.ClientReady, (ready) => {
     console.log(`[bot] signed in to Discord as ${ready.user.tag}`);
-    watcher.start();
+    void loadChannels().finally(() => {
+        watching = true;
+        watcher.start();
+    });
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {

@@ -3,6 +3,14 @@ import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
 import {randomBytes} from 'crypto';
 import {getActor, hasPermission} from '../../lib/permissions.js';
+import {broadcast} from '../../lib/broadcast.js';
+import {
+    discordBotSettingsSchema,
+    emptyDiscordBotSettings,
+    envDiscordBotSettings,
+    readDiscordBotSettings,
+    writeDiscordBotSettings,
+} from '../../lib/discordBotSettings.js';
 
 /** Bot management is technical configuration: settings.manage (held by admin.sudo and the owner too). */
 async function checkAdmin(req: any, reply: any) {
@@ -70,6 +78,27 @@ export async function registerBotRoutes(app: FastifyInstance) {
             },
             hasKey: !!apiKey
         });
+    });
+
+    // Channels and message of the Discord bot; an empty field uses the .env value (`fallback`)
+    app.get('/v1/bot/discord-settings', async (req, reply) => {
+        const admin = await checkAdmin(req, reply);
+        if (!admin) return;
+        return reply.send({settings: await readDiscordBotSettings(), fallback: envDiscordBotSettings()});
+    });
+
+    app.put('/v1/bot/discord-settings', async (req, reply) => {
+        const admin = await checkAdmin(req, reply);
+        if (!admin) return;
+        const parsed = discordBotSettingsSchema.safeParse(req.body ?? {});
+        if (!parsed.success) {
+            return reply.status(400).send({error: 'invalid_ids', fields: parsed.error.issues.map(i => i.path[0])});
+        }
+        const settings = {...emptyDiscordBotSettings(), ...parsed.data};
+        await writeDiscordBotSettings(settings);
+        // The bot applies them right away (it also reads them again when it reconnects)
+        await broadcast(null, 'botSettings', {updatedAt: Date.now()}, {audience: 'bots'});
+        return reply.send({settings, fallback: envDiscordBotSettings()});
     });
 
     app.post('/v1/bot/setup', async (req, reply) => {
