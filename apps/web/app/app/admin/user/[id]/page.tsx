@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import {can, getAccess} from "@/lib/userPermissions";
 import {HistoryTable} from "../../history/history-table";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {redirect} from "next/navigation";
@@ -17,7 +18,15 @@ export default async function UserDetail({
     params: Promise<{ id: string }>
 }) {
     const {id} = await params;
-    const user = await prisma.user.findUnique({where: {id}});
+    // Profiles and their listening history: for those who manage accounts or see members (#270)
+    const access = await getAccess();
+    if (!access || !(can(access.permissions, "management.manage_accounts") || can(access.permissions, "users.read_all"))) {
+        return redirect("/app");
+    }
+    const user = await prisma.user.findUnique({
+        where: {id},
+        select: {id: true, name: true, displayUsername: true, image: true, createdAt: true},
+    });
     if (!user) return redirect("/app")
 
     return (
