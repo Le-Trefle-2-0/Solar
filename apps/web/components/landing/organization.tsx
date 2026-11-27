@@ -69,7 +69,7 @@ export function OrganizationTree({categories}: { categories: Category[] }) {
                     --ink: #F6F6F6;
                 }
             `}</style>
-            
+
             <div className="px-4 md:px-8 w-full max-w-7xl mx-auto relative z-10">
                 <ScrollReveal className="text-center mb-16">
                     <h2 className="text-3xl font-semibold tracking-tighter sm:text-4xl md:text-5xl mb-4">
@@ -86,9 +86,9 @@ export function OrganizationTree({categories}: { categories: Category[] }) {
                         <div className="mb-12 text-center">
                             <h3 className="text-3xl font-bold mb-4 font-barlow">Le Conseil d'Administration</h3>
                         </div>
-                        
-                        <CACarousel 
-                            members={caCategory.members.filter(m => !!m.person)} 
+
+                        <CACarousel
+                            members={caCategory.members.filter(m => !!m.person)}
                             getPolesForPerson={getPolesForPerson}
                         />
                     </div>
@@ -99,28 +99,28 @@ export function OrganizationTree({categories}: { categories: Category[] }) {
                     <div className="relative">
                         {/* Connecting line for desktop */}
                         <div className="hidden lg:block w-px h-12 bg-muted-foreground/20 mx-auto mb-0" />
-                        
+
                         <div className={cn(
                             "flex flex-wrap lg:flex-nowrap justify-center gap-6 lg:gap-12 relative pt-0 lg:pt-12 mx-auto",
-                            poleCategories.length === 1 ? "max-w-md" : 
-                            poleCategories.length === 2 ? "max-w-4xl" : 
+                            poleCategories.length === 1 ? "max-w-md" :
+                            poleCategories.length === 2 ? "max-w-4xl" :
                             poleCategories.length === 3 ? "max-w-6xl" : "max-w-[100rem]"
                         )}>
                             {/* Horizontal line for desktop - adjusted width based on number of poles */}
                             {poleCategories.length > 1 && (
-                                <div 
-                                    className="hidden lg:block absolute top-0 bg-muted-foreground/20 h-px" 
+                                <div
+                                    className="hidden lg:block absolute top-0 bg-muted-foreground/20 h-px"
                                     style={{
                                         width: `${(poleCategories.length - 1) * (100 / poleCategories.length)}%`,
                                         left: `${(100 / poleCategories.length) / 2}%`
                                     }}
                                 />
                             )}
-                            
+
                             {poleCategories.map((pole, i) => (
                                 <div key={pole.id} className="w-full sm:w-[calc(50%-12px)] lg:flex-1 min-w-0 lg:max-w-[420px]">
-                                    <PoleColumn 
-                                        pole={pole} 
+                                    <PoleColumn
+                                        pole={pole}
                                         isPersonInCA={isPersonInCA || false}
                                         delay={i * 100}
                                     />
@@ -135,7 +135,7 @@ export function OrganizationTree({categories}: { categories: Category[] }) {
                     <div className="mt-20 space-y-16">
                         {otherCategories.map((category) => {
                             const Icon = (LucideIcons as any)[category.icon || "Users"] || LucideIcons.Users;
-                            const sortedMembers = [...category.members].sort((a, b) => 
+                            const sortedMembers = [...category.members].sort((a, b) =>
                                 a.person.name.localeCompare(b.person.name)
                             );
                             return (
@@ -152,8 +152,8 @@ export function OrganizationTree({categories}: { categories: Category[] }) {
                                             <ScrollReveal key={i} delay={i * 100} animation="slide-up"
                                                         className={cn(
                                                             "w-full max-w-sm",
-                                                            sortedMembers.length === 1 ? "sm:w-1/2" : 
-                                                            sortedMembers.length === 2 ? "sm:w-[calc(50%-12px)]" : 
+                                                            sortedMembers.length === 1 ? "sm:w-1/2" :
+                                                            sortedMembers.length === 2 ? "sm:w-[calc(50%-12px)]" :
                                                             "sm:w-[calc(50%-12px)] lg:w-[calc(33.33%-16px)]"
                                                         )}>
                                                 <PersonCard person={member.person} role={member.role}/>
@@ -170,10 +170,22 @@ export function OrganizationTree({categories}: { categories: Category[] }) {
     );
 }
 
+/** Enter or Space on an element given role="button": the same as a click. */
+function openWithKeyboard(e: React.KeyboardEvent<HTMLElement>) {
+    if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        e.currentTarget.click();
+    }
+}
+
+/** Auto-advancing carousels stay still when the system asks for reduced motion. */
+const prefersReducedMotion = () =>
+    typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
 function PoleColumn({pole, isPersonInCA, delay}: { pole: Category, isPersonInCA: (n: string) => boolean, delay: number }) {
     const leads = pole.members.filter(m => m.isLead);
     const teams = Array.from(new Set(pole.members.filter(m => !m.isLead).map(m => m.teamName || "")));
-    
+
     // Sort leads to put CA members first maybe? Or just keep original order
     const sortedLeads = [...leads];
 
@@ -195,27 +207,28 @@ function PoleColumn({pole, isPersonInCA, delay}: { pole: Category, isPersonInCA:
 
     return (
         <ScrollReveal animation="slide-up" delay={delay} className="h-full">
-            <div 
+            <div
                 className={cn(
                     "relative h-full bg-card rounded-lg border-2 overflow-hidden flex flex-col transition-colors duration-300",
                     "before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-1.5"
                 )}
-                style={{ 
+                style={{
                     borderColor: poleColor.startsWith('var') ? poleColor : `${poleColor}66` // 66 = ~40% opacité pour un meilleur rendu
                 }}
             >
                 {/* Visual top border */}
                 <div className="h-1.5 w-full" style={{ backgroundColor: poleColor }} />
-                
+
                 {/* Column Stem for Desktop */}
                 <div className="hidden lg:block absolute -top-8 left-1/2 -translate-x-1/2 w-px h-8 bg-muted-foreground/20" />
 
-                <div 
+                <div
                     className={cn(
                         "p-6 flex items-center justify-between cursor-pointer sm:cursor-default",
                         !isMobile && "pointer-events-none"
                     )}
                     onClick={() => isMobile && setIsOpen(!isOpen)}
+                    {...(isMobile ? {role: "button", tabIndex: 0, "aria-expanded": isOpen, onKeyDown: openWithKeyboard} : {})}
                 >
                     <div>
                         <h4 className="text-3xl font-bold leading-tight font-barlow">{pole.name}</h4>
@@ -235,7 +248,7 @@ function PoleColumn({pole, isPersonInCA, delay}: { pole: Category, isPersonInCA:
                                 <li key={idx}>
                                     <Dialog>
                                         <DialogTrigger asChild>
-                                            <div className="flex items-center gap-4 cursor-pointer hover:bg-muted/30 p-2 rounded-md transition-colors group/lead">
+                                            <div role="button" tabIndex={0} onKeyDown={openWithKeyboard} aria-label={`${lead.person.name} : voir la présentation`} className="flex items-center gap-4 cursor-pointer hover:bg-muted/30 p-2 rounded-md transition-colors group/lead">
                                                 <Avatar className="h-12 w-12 border shadow-sm group-hover/lead:border-primary/50 transition-colors">
                                                     {lead.person.image ? (
                                                         <Image src={lead.person.image} alt={lead.person.name} width={48} height={48} className="object-cover" unoptimized />
@@ -271,7 +284,7 @@ function PoleColumn({pole, isPersonInCA, delay}: { pole: Category, isPersonInCA:
                                                         <li key={midx}>
                                                             <Dialog>
                                                                 <DialogTrigger asChild>
-                                                                    <div className="flex items-center gap-4 cursor-pointer hover:bg-muted/30 p-2 rounded-md transition-colors group/member">
+                                                                    <div role="button" tabIndex={0} onKeyDown={openWithKeyboard} aria-label={`${m.person.name} : voir la présentation`} className="flex items-center gap-4 cursor-pointer hover:bg-muted/30 p-2 rounded-md transition-colors group/member">
                                                                         <Avatar className="h-10 w-10 border opacity-90 group-hover/member:opacity-100 transition-opacity">
                                                                             {m.person.image ? (
                                                                                 <Image src={m.person.image} alt={m.person.name} width={40} height={40} className="object-cover" unoptimized />
@@ -337,7 +350,7 @@ function CACarousel({members, getPolesForPerson}: { members: TeamMember[], getPo
     const maxIndex = Math.max(0, members.length - visibleCount);
 
     useEffect(() => {
-        if (!isCarousel || isPaused) return;
+        if (!isCarousel || isPaused || prefersReducedMotion()) return;
         const interval = setInterval(() => {
             setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
         }, 5000);
@@ -356,14 +369,14 @@ function CACarousel({members, getPolesForPerson}: { members: TeamMember[], getPo
                     return (
                         <div key={i} className="w-full sm:w-[calc(50%-12px)] lg:w-[calc(25%-18px)]">
                             <ScrollReveal delay={i * 50} animation="slide-up">
-                                <PersonCard 
-                                    person={member.person} 
+                                <PersonCard
+                                    person={member.person}
                                     role={member.role}
                                     customBadge={personPoles.length > 0 && (
                                         <div className="flex flex-wrap gap-1.5 mt-3 justify-center">
                                             {personPoles.map(p => (
-                                                <span 
-                                                    key={p.id} 
+                                                <span
+                                                    key={p.id}
                                                     className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[12px] font-semibold"
                                                     style={{ borderColor: p.color?.startsWith('#') ? p.color : `var(--${p.color || 'blue'})`, color: 'inherit' }}
                                                 >
@@ -383,12 +396,14 @@ function CACarousel({members, getPolesForPerson}: { members: TeamMember[], getPo
     }
 
     return (
-        <div 
+        <div
             className="relative overflow-hidden group/carousel"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
+            onFocus={() => setIsPaused(true)}
+            onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setIsPaused(false)}
         >
-            <div 
+            <div
                 className="flex transition-transform duration-700 ease-in-out"
                 style={{ transform: `translateX(-${currentIndex * (100 / visibleCount)}%)` }}
             >
@@ -396,14 +411,14 @@ function CACarousel({members, getPolesForPerson}: { members: TeamMember[], getPo
                     const personPoles = getPolesForPerson(member.person.name);
                     return (
                         <div key={i} className="px-3 shrink-0" style={{ width: `${100 / visibleCount}%` }}>
-                            <PersonCard 
-                                person={member.person} 
+                            <PersonCard
+                                person={member.person}
                                 role={member.role}
                                 customBadge={personPoles.length > 0 && (
                                     <div className="flex flex-wrap gap-1.5 mt-3 justify-center">
                                         {personPoles.map(p => (
-                                            <span 
-                                                key={p.id} 
+                                            <span
+                                                key={p.id}
                                                 className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[12px] font-semibold"
                                                 style={{ borderColor: p.color?.startsWith('#') ? p.color : `var(--${p.color || 'blue'})`, color: 'inherit' }}
                                             >
@@ -418,17 +433,20 @@ function CACarousel({members, getPolesForPerson}: { members: TeamMember[], getPo
                     );
                 })}
             </div>
-            
+
             {/* Dots */}
             <div className="flex justify-center gap-2 mt-10">
                 {Array.from({ length: maxIndex + 1 }).map((_, i) => (
                     <button
                         key={i}
+                        type="button"
                         onClick={() => setCurrentIndex(i)}
                         className={cn(
                             "w-2.5 h-2.5 rounded-full transition-all duration-300",
                             currentIndex === i ? "bg-primary w-8" : "bg-primary/20 hover:bg-primary/40"
                         )}
+                        aria-label={`Aller à la diapositive ${i + 1}`}
+                        aria-current={currentIndex === i ? "true" : undefined}
                     />
                 ))}
             </div>
@@ -461,7 +479,7 @@ function ShowcaseCarousel({items}: { items: TeamMember[] }) {
     const maxIndex = isCarousel ? items.length - visibleCount : 0;
 
     useEffect(() => {
-        if (!isCarousel || isPaused) return;
+        if (!isCarousel || isPaused || prefersReducedMotion()) return;
 
         const interval = setInterval(() => {
             setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
@@ -482,8 +500,8 @@ function ShowcaseCarousel({items}: { items: TeamMember[] }) {
                     <ScrollReveal key={i} delay={i * 100} animation="slide-up"
                                   className={cn(
                                       "w-full max-w-sm",
-                                      items.length === 1 ? "sm:w-1/2" : 
-                                      items.length === 2 ? "sm:w-[calc(50%-12px)]" : 
+                                      items.length === 1 ? "sm:w-1/2" :
+                                      items.length === 2 ? "sm:w-[calc(50%-12px)]" :
                                       "sm:w-[calc(50%-12px)] lg:w-[calc(33.33%-16px)]"
                                   )}>
                         <PersonCard person={member.person} role={member.role}/>
@@ -500,6 +518,8 @@ function ShowcaseCarousel({items}: { items: TeamMember[] }) {
             className="w-full relative overflow-hidden px-4"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
+            onFocus={() => setIsPaused(true)}
+            onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setIsPaused(false)}
         >
             <div
                 className="flex transition-transform duration-1000 ease-in-out"
@@ -529,7 +549,9 @@ function ShowcaseCarousel({items}: { items: TeamMember[] }) {
                                 "w-2 h-2 rounded-full transition-all duration-300",
                                 currentIndex === i ? "bg-primary w-6" : "bg-primary/20 hover:bg-primary/40"
                             )}
-                            aria-label={`Go to slide ${i + 1}`}
+                            type="button"
+                            aria-label={`Aller à la diapositive ${i + 1}`}
+                            aria-current={currentIndex === i ? "true" : undefined}
                         />
                     );
                 })}
@@ -542,7 +564,7 @@ function PersonCard({person, role, customBadge}: { person: Person, role: string,
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Card className={cn(
+                <Card role="button" tabIndex={0} onKeyDown={openWithKeyboard} aria-label={`${person.name}, ${role} : voir la présentation`} className={cn(
                     "group hover:border-primary/50 transition-all duration-300 bg-card/50 backdrop-blur-sm shadow-md border border-transparent cursor-pointer h-full",
                 )}>
                     <CardContent className="py-6 flex flex-col items-center text-center">

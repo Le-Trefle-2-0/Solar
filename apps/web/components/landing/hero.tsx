@@ -62,12 +62,12 @@ export function Hero() {
                     className="flex flex-col items-center lg:items-end gap-12 w-full mt-12 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-500 fill-mode-both">
 
 
-                <div className="flex flex-col items-center animate-bounce cursor-pointer w-full"
+                <button type="button" className="flex flex-col items-center motion-safe:animate-bounce cursor-pointer w-full rounded-md"
                          onClick={scrollToAbout}>
                         <span
-                            className="text-xs sm:text-sm font-medium mb-2 opacity-50">Descendez pour en savoir plus</span>
-                        <ChevronDown className="h-4 w-4 sm:h-5 sm:w-5 opacity-50"/>
-                    </div>
+                            className="text-xs sm:text-sm font-medium mb-2 opacity-70">Descendez pour en savoir plus</span>
+                        <ChevronDown className="h-4 w-4 sm:h-5 sm:w-5 opacity-70" aria-hidden/>
+                    </button>
                 </div>
             </div>
 

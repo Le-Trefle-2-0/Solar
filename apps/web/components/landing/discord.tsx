@@ -71,6 +71,8 @@ export function DiscordSection() {
                         <Card className="p-0 overflow-hidden border-none shadow-2xl bg-[#313338]">
                             <CardContent className="p-0">
                                 <iframe
+                                    title="Serveur Discord du Trèfle : membres en ligne et invitation"
+                                    loading="lazy"
                                     src="https://discord.com/widget?id=718246706319458365&theme=dark"
                                     width="100%"
                                     height="500"
