@@ -1,4 +1,6 @@
-const MAX_BYTES = 10 * 1024 * 1024;
+/** Newsletter images and team photos: 4 MB at most (#262). */
+export const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
+const MAX_BYTES = MAX_IMAGE_BYTES;
 
 /** Accepted inline formats, recognised by their first bytes. SVG is excluded: it can carry scripts. */
 const SIGNATURES: Record<string, (b: Buffer) => boolean> = {

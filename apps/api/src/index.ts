@@ -26,7 +26,8 @@ const app = Fastify({
     },
     // Needed behind a reverse proxy, otherwise every client shares the proxy's rate limit
     trustProxy: trustProxySetting(),
-    bodyLimit: 50 * 1024 * 1024 // 50MB
+    // Larger bodies only where a route allows them (images, newsletters, team photos: #262)
+    bodyLimit: 2 * 1024 * 1024
 });
 
 // Only the web app and API_CORS_ORIGIN, never any origin by default (#259)

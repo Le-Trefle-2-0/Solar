@@ -21,8 +21,10 @@ export const saveMessage = async (input: unknown) => {
 
     const ticket = await prisma.ticket.findUnique({
         where: {channelId},
-        select: {id: true, assignedUserId: true},
+        select: {id: true, assignedUserId: true, statusName: true},
     });
+    // A closed écoute's transcript is final, as in the API (apps/api/src/lib/ticketWrites.ts, #266)
+    if (ticket && !["waiting", "started"].includes(ticket.statusName)) throw new Error("Ticket closed");
     // A permanence's channel is open to every member, signed up or not
     const isPermanence = !ticket && !!(await prisma.event.findFirst({where: {channelID: channelId}, select: {id: true}}));
     if (!canWriteChannel({channelId, userId, permissions, assignedUserId: ticket?.assignedUserId ?? null, isPermanence})) {

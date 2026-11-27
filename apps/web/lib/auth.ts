@@ -20,6 +20,9 @@ import {APIError} from "better-auth/api";
 import {allowResetEmail} from "./security/resetEmailLimit";
 import {escapeHtml} from "./security/escape";
 
+/** A profile photo (data URL) of about 300 KB at most; the WebSocket service drops larger ones. */
+const MAX_AVATAR_LENGTH = 400_000;
+
 /** Same key as OWNER_SETTING_KEY in lib/userPermissions.ts and the API. */
 const OWNER_SETTING_KEY = "owner_user_id";
 import {passkey} from "@better-auth/passkey";
@@ -157,6 +160,17 @@ export const auth = betterAuth({
             const endpoint = (context as any)?.path || "";
             if (endpoint.startsWith("/admin/") || path.includes("/api/auth/admin/")) {
                 throw new APIError("FORBIDDEN", {message: "Not available"});
+            }
+            // Profile fields: bounded, an avatar is a small image (#262)
+            if (endpoint === "/update-user") {
+                const body = ((context as any)?.body ?? {}) as { name?: unknown; image?: unknown };
+                if (body.name !== undefined && (typeof body.name !== "string" || body.name.length > 100)) {
+                    throw new APIError("BAD_REQUEST", {message: "Nom trop long (100 caractères au plus)."});
+                }
+                if (body.image !== undefined && body.image !== null
+                    && (typeof body.image !== "string" || body.image.length > MAX_AVATAR_LENGTH)) {
+                    throw new APIError("BAD_REQUEST", {message: "Image de profil trop lourde."});
+                }
             }
             if (path.includes("sign-up")) {
                 const userCount = await prisma.user.count();

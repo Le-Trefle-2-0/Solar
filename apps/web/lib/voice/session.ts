@@ -58,6 +58,7 @@ export class VoiceSession {
     private participants = new Map<string, VoiceParticipant>();
     private selfId: string | null = null;
     private closed = false;
+    private started = false;
     muted = false;
 
     constructor(
@@ -87,7 +88,14 @@ export class VoiceSession {
     }
 
     async start(): Promise<void> {
+        // One start per session: a second click never opens a second microphone (#261)
+        if (this.started || this.closed) return;
+        this.started = true;
         this.status("connecting");
+        // Left while connecting: the microphone opened meanwhile is released at once (#261)
+        const stillWanted = () => {
+            if (this.closed) throw new Error("closed");
+        };
         try {
             // Microphone first: nothing is joined if the visitor refuses it
             try {
@@ -98,6 +106,7 @@ export class VoiceSession {
             } catch {
                 throw new Error("microphone");
             }
+            stillWanted();
 
             this.socket = io(voiceServiceUrl(), {
                 auth: this.auth,
@@ -109,6 +118,7 @@ export class VoiceSession {
                 this.socket!.once("connect", () => resolve());
                 this.socket!.once("connect_error", () => reject(new Error("connection")));
             });
+            stillWanted();
             this.listen();
 
             const joined = await this.request<{
@@ -133,8 +143,9 @@ export class VoiceSession {
             if (!this.closed) this.status("connected");
         } catch (e: any) {
             const code = e?.message || "connection";
+            const left = this.closed;
             this.cleanup();
-            this.status("error", VOICE_ERRORS[code] || VOICE_ERRORS.connection);
+            if (!left && code !== "closed") this.status("error", VOICE_ERRORS[code] || VOICE_ERRORS.connection);
         }
     }
 
@@ -248,6 +259,8 @@ export class VoiceSession {
 
     private cleanup() {
         this.closed = true;
+        // Also when leaving while start() still waits: whatever it opened is closed here or by
+        // start() itself as soon as it resumes
         for (const id of [...this.consumers.keys()]) this.dropConsumer(id);
         try {
             this.producer?.close();

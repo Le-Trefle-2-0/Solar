@@ -3,6 +3,7 @@ import {z} from 'zod';
 import {isInternal} from '../../lib/internalAuth.js';
 import {prisma} from '../../prisma.js';
 import {getActor} from '../../lib/permissions.js';
+import {hashApiKey} from '../../lib/apiKeyHash.js';
 
 /** The only fields these routes may read. Never add `key`, `password` or `twoFactorSecret`. */
 export const KEY_SELECT = {id: true, enabled: true, expiresAt: true, userId: true} as const;
@@ -16,7 +17,8 @@ export interface KeysRouteDeps {
 }
 
 const defaultDeps: KeysRouteDeps = {
-    findKey: (key) => prisma.apikey.findFirst({where: {key}, select: KEY_SELECT}),
+    // Keys are stored hashed (#278)
+    findKey: (key) => prisma.apikey.findFirst({where: {key: hashApiKey(key)}, select: KEY_SELECT}),
     findUser: (id) => prisma.user.findUnique({where: {id}, select: KEY_USER_SELECT}),
     isActive: async (userId) => !!(await getActor(userId)),
 };

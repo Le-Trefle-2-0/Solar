@@ -14,6 +14,7 @@ import {truncateEmail} from "@/lib/utils";
 import {broadcast} from "@/lib/broadcast";
 import {canLinkFile, isFileId} from "@/lib/security/fileAccess";
 import {escapeHtml} from "@/lib/security/escape";
+import {purgeDocuments} from "@/lib/security/documentRetention";
 
 const inviteSchema = z.object({
     name: z.string().min(1),
@@ -235,10 +236,17 @@ export async function submitDocumentsAction(data: {
             updateData.casierRejectReason = null;
         }
 
+        const previous = await prisma.user.findUnique({
+            where: {id: session.user.id},
+            select: {idCardFileId: true, casierFileId: true},
+        });
         await prisma.user.update({
             where: {id: session.user.id},
             data: updateData,
         });
+        // Replaced documents and abandoned uploads are deleted (#272)
+        await purgeDocuments([session.user.id], [previous?.idCardFileId, previous?.casierFileId])
+            .catch(e => console.error("[submitDocumentsAction] document purge failed:", e));
 
         await broadcast(null, 'documentsUpdate', {
             userId: session.user.id,
@@ -372,6 +380,7 @@ export async function requestRenewalAction(userId: string) {
     }
 
     try {
+        const previous = await prisma.user.findUnique({where: {id: userId}, select: {idCardFileId: true, casierFileId: true}});
         await prisma.user.update({
             where: {id: userId},
             data: {
@@ -385,6 +394,10 @@ export async function requestRenewalAction(userId: string) {
                 casierRejectReason: null,
             },
         });
+
+        // The previous documents are no longer kept (#272)
+        await purgeDocuments([userId], [previous?.idCardFileId, previous?.casierFileId])
+            .catch(e => console.error("[requestRenewalAction] document purge failed:", e));
 
         await broadcast(null, 'documentsUpdate', {
             userId,
@@ -429,6 +442,7 @@ export async function requestAllRenewalAction() {
             .filter((u) => u.id !== ownerId && !splitRoles(u.role).some((r) => sudoRoles.has(r)))
             .map((u) => u.id);
 
+        const previous = await prisma.user.findMany({where: {id: {in: targets}}, select: {idCardFileId: true, casierFileId: true}});
         await prisma.user.updateMany({
             where: {id: {in: targets}},
             data: {
@@ -442,6 +456,9 @@ export async function requestAllRenewalAction() {
                 casierRejectReason: null,
             },
         });
+        // The previous documents are no longer kept (#272)
+        await purgeDocuments(targets, previous.flatMap(u => [u.idCardFileId, u.casierFileId]))
+            .catch(e => console.error("[requestAllRenewalAction] document purge failed:", e));
         return {success: true};
     } catch (e: any) {
         console.error("[requestAllRenewalAction] Error:", e);
@@ -521,6 +538,10 @@ export async function deleteUserAction(userId: string) {
                 data: {assignedUserId: null, statusName: "waiting", statusLabel: "Non-Assignée"},
             });
         });
+
+        // A removed account keeps no identity document (#272)
+        await prisma.file.deleteMany({where: {uploadedById: userId}})
+            .catch(e => console.error("[removeUser] document purge failed:", e));
 
         // Check the result instead of assuming it (#248)
         const after = await prisma.user.findUnique({

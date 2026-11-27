@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {buildApp, type StoredFile} from './app.js';
+import {buildApp, contentMatchesType, fileContentSecurityPolicy, type StoredFile} from './app.js';
 
 const SECRET = 'storage-test-secret';
 
@@ -68,8 +68,8 @@ test('storage: no CORS header is sent', async () => {
 
 test('storage: upload with the secret records the uploader', async () => {
     const {app, files} = await setup();
-    const res = await app.inject({method: 'POST', url: '/v1/files', ...multipart('a.png', 'image/png', 'png'),
-        headers: {...multipart('a.png', 'image/png', 'png').headers, ...auth, 'x-uploaded-by': 'u2'}});
+    const res = await app.inject({method: 'POST', url: '/v1/files', ...multipart('a.pdf', 'application/pdf', '%PDF-1.7 doc'),
+        headers: {...multipart('a.pdf', 'application/pdf', '%PDF-1.7 doc').headers, ...auth, 'x-uploaded-by': 'u2'}});
     assert.equal(res.statusCode, 200);
     assert.equal(files.get(res.json().id)?.uploadedById, 'u2');
 });
@@ -84,11 +84,24 @@ test('storage: upload without uploader or with a disallowed type is refused', as
         headers: {...pdf.headers, ...auth}})).statusCode, 400);
 });
 
-test('storage: served files carry nosniff', async () => {
+test('storage: served files carry nosniff and a policy that runs nothing', async () => {
     const {app} = await setup();
     const res = await app.inject({method: 'GET', url: '/v1/files/existing', headers: auth});
     assert.equal(res.statusCode, 200);
     assert.equal(res.headers['x-content-type-options'], 'nosniff');
+    assert.match(String(res.headers['content-security-policy']), /default-src 'none'/);
+    assert.match(fileContentSecurityPolicy('image/png'), /sandbox/);
+});
+
+test('storage: a file whose content is not of its declared type is refused (#253)', async () => {
+    const {app} = await setup();
+    const disguised = multipart('photo.png', 'image/png', '<html><script>alert(1)</script></html>');
+    const res = await app.inject({method: 'POST', url: '/v1/files', payload: disguised.payload,
+        headers: {...disguised.headers, ...auth, 'x-uploaded-by': 'u2'}});
+    assert.equal(res.statusCode, 415);
+    assert.equal(contentMatchesType('image/png', Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0])), true);
+    assert.equal(contentMatchesType('image/jpeg', Buffer.from([0xff, 0xd8, 0xff, 0xe0])), true);
+    assert.equal(contentMatchesType('application/pdf', Buffer.from('<html>')), false);
 });
 
 test('storage: delete with the secret works, unknown id is 404', async () => {

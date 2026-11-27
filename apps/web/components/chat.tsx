@@ -214,76 +214,8 @@ export function Chat(props: { channelID: string, statusID: number }) {
         return result;
     };
 
-    // Throttled + debounced scheduling for LanguageTool checks
-    const [ltQuery, setLtQuery] = useState<string>("");
-    const lastCheckAtRef = useRef<number>(0);
-    const lastCheckedTextRef = useRef<string>("");
-    useEffect(() => {
-        // Clear on empty or very short inputs
-        if (!currentMsg || currentMsg.trim().length < 4) {
-            setLtMatches([]);
-            setHighlightHtml("");
-            setLtQuery("");
-            return;
-        }
-        const now = Date.now();
-        const minInterval = 1200; // throttle: at most ~1.2s
-        const idleDelay = 800; // debounce after pause
-        const prev = lastCheckedTextRef.current;
-        const delta = Math.abs(currentMsg.length - prev.length);
-        const significantChange = delta >= 5 || /[\s\.,;:!?]$/.test(currentMsg);
-
-        // Immediate check if throttled interval passed and change significant
-        if (now - lastCheckAtRef.current > minInterval && significantChange) {
-            lastCheckAtRef.current = now;
-            lastCheckedTextRef.current = currentMsg;
-            setLtQuery(currentMsg);
-            return;
-        }
-        // Debounced check after user pauses typing
-        const t = setTimeout(() => {
-            lastCheckAtRef.current = Date.now();
-            lastCheckedTextRef.current = currentMsg;
-            setLtQuery(currentMsg);
-        }, idleDelay);
-        return () => clearTimeout(t);
-    }, [currentMsg]);
-
-    // LanguageTool API call driven by ltQuery (not every keystroke)
-    useEffect(() => {
-        if (!ltQuery) return;
-        (async () => {
-            try {
-                if (ltAbortRef.current) ltAbortRef.current.abort();
-                const controller = new AbortController();
-                ltAbortRef.current = controller;
-                const params = new URLSearchParams();
-                params.set("language", "fr");
-                params.set("text", ltQuery);
-                const res = await fetch("https://api.languagetool.org/v2/check", {
-                    method: "POST",
-                    headers: {"Content-Type": "application/x-www-form-urlencoded"},
-                    body: params.toString(),
-                    signal: controller.signal,
-                });
-                if (!res.ok) throw new Error("LanguageTool API error");
-                const data = await res.json();
-                const matches = (data.matches || []).map((m: any) => ({
-                    offset: m.offset as number,
-                    length: m.length as number,
-                    message: typeof m.message === "string" ? m.message : "Erreur détectée",
-                    replacements: Array.isArray(m.replacements) ? m.replacements.map((r: any) => r.value).filter(Boolean) : [],
-                }));
-                // Avoid applying stale results to newer text
-                if (ltQuery === currentMsg) {
-                    setLtMatches(matches);
-                }
-            } catch (e) {
-                if ((e as any)?.name === "AbortError") return;
-                setLtMatches([]);
-            }
-        })();
-    }, [ltQuery, currentMsg]);
+    // No third-party spell checker: écoute drafts never leave Solar (#260). The browser's own
+    // checker (spellCheck on the textarea) underlines mistakes locally.
 
     // Rebuild highlight HTML when text or matches change
     useEffect(() => {
@@ -1624,7 +1556,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                                 formRef.current?.requestSubmit();
                                             }
                                         }}
-                                        spellCheck={false}
+                                        spellCheck
                                         lang="fr"
                                         data-ms-editor="false"
                                         value={currentMsg}

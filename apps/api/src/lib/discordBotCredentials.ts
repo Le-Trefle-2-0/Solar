@@ -1,6 +1,7 @@
 import {randomBytes} from 'crypto';
 import {prisma} from '../prisma.js';
 import {open, seal} from './secretBox.js';
+import {hashApiKey} from './apiKeyHash.js';
 import type {BotIdentity} from './discordSetup.js';
 
 /**
@@ -84,12 +85,17 @@ export async function latestBotKey(userId: string) {
     });
 }
 
+/** The bot's current key, encrypted: the database only holds hashes of API keys (#278). */
+const BOT_KEY_SETTING = 'bot_api_key_sealed';
+const BOT_KEY_PURPOSE = 'bot-api-key';
+
 async function createKey(userId: string) {
     const now = new Date();
-    return prisma.apikey.create({
+    const plain = `sk_bot_${randomBytes(24).toString('hex')}`;
+    const row = await prisma.apikey.create({
         data: {
             id: `key_${randomBytes(16).toString('hex')}`,
-            key: `sk_bot_${randomBytes(24).toString('hex')}`,
+            key: hashApiKey(plain),
             name: 'Solar Bot Key',
             userId,
             enabled: true,
@@ -97,6 +103,31 @@ async function createKey(userId: string) {
             updatedAt: now,
         },
     });
+    const value = JSON.stringify({keyId: row.id, sealed: seal(plain, BOT_KEY_PURPOSE)});
+    await prisma.settings.upsert({where: {key: BOT_KEY_SETTING}, update: {value}, create: {key: BOT_KEY_SETTING, value}});
+    return row;
+}
+
+/**
+ * The bot's current API key in clear, for the bot only (GET /v1/internal/bot/credentials). A key
+ * stored before keys were hashed, or one that can no longer be decrypted, is replaced.
+ */
+export async function currentBotKey(userId: string): Promise<string | null> {
+    const latest = await latestBotKey(userId);
+    if (latest) {
+        const setting = await prisma.settings.findUnique({where: {key: BOT_KEY_SETTING}});
+        try {
+            const stored = setting ? JSON.parse(setting.value) as {keyId?: string; sealed?: string} : null;
+            const plain = stored?.keyId === latest.id && stored.sealed ? open(stored.sealed, BOT_KEY_PURPOSE) : null;
+            if (plain && hashApiKey(plain) === latest.key) return plain;
+        } catch {
+            // unreadable: replaced below
+        }
+    }
+    await rotateBotKey();
+    const setting = await prisma.settings.findUnique({where: {key: BOT_KEY_SETTING}});
+    const stored = setting ? JSON.parse(setting.value) as {sealed?: string} : null;
+    return stored?.sealed ? open(stored.sealed, BOT_KEY_PURPOSE) : null;
 }
 
 /** Creates the bot account and its API key when missing. The key is never shown: the bot fetches it. */

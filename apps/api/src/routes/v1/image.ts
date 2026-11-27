@@ -3,9 +3,11 @@ import {z} from 'zod';
 import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
 import {isAllowedImage} from '../../lib/imageValidation.js';
+import {limitPerMinute} from '../../lib/rateLimit.js';
 
 export async function registerImageRoutes(app: FastifyInstance) {
-    app.post('/v1/image', async (req, reply) => {
+    // A few images a minute, each at most MAX_IMAGE_BYTES (#262)
+    app.post('/v1/image', {...limitPerMinute(10), bodyLimit: 6 * 1024 * 1024}, async (req, reply) => {
         const userId = await authenticate(req);
         if (!userId) return reply.status(401).send('unauthorized');
 

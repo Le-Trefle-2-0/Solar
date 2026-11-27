@@ -15,6 +15,7 @@ import {
 import {
     ensureBotAccount,
     findBotAccount,
+    currentBotKey,
     latestBotKey,
     readSetup,
     rotateBotKey,
@@ -273,10 +274,10 @@ export async function registerBotRoutes(app: FastifyInstance) {
     app.get('/v1/internal/bot/credentials', async (req, reply) => {
         if (!isInternal(req)) return reply.status(401).send({error: 'unauthorized'});
         const bot = await findBotAccount();
-        const key = bot ? await latestBotKey(bot.id) : null;
+        const key = bot ? await currentBotKey(bot.id) : null;
         const {stored} = await readSetup();
         const missing = [!key && 'solar_account', !stored && 'discord_token', !stored?.guildId && 'discord_guild'].filter(Boolean);
         if (missing.length) return reply.status(404).send({error: 'not_configured', missing});
-        return reply.send({discordToken: stored!.token, guildId: stored!.guildId, solarApiKey: key!.key});
+        return reply.send({discordToken: stored!.token, guildId: stored!.guildId, solarApiKey: key});
     });
 }

@@ -3,6 +3,7 @@ import {APP_URL, INTERNAL_AUTH_URL} from './env.js';
 import {prisma} from './prisma.js';
 import {getActor} from './lib/permissions.js';
 import {isSessionActive, readSessionId} from './lib/sessions.js';
+import {hashApiKey} from './lib/apiKeyHash.js';
 
 const JWKS = createRemoteJWKSet(new URL(`${INTERNAL_AUTH_URL}/api/auth/jwks`));
 const normalizeUrl = (value: string) => value.replace(/\/$/, '');
@@ -53,7 +54,7 @@ export async function authenticate(req: any): Promise<string | null> {
     // 2. Try API Key (header only: query strings end up in logs and browser history)
     const token = (req.headers['token'] as string) || '';
     if (token) {
-        const key = await prisma.apikey.findFirst({where: {key: token}});
+        const key = await prisma.apikey.findFirst({where: {key: hashApiKey(token)}});
         if (key && key.enabled !== false && (!key.expiresAt || key.expiresAt > new Date())) {
             return activeAccount(key.userId);
         }

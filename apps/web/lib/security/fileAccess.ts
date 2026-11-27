@@ -52,6 +52,10 @@ export function fileResponseHeaders(mime: string, filename: string, size: number
         "content-length": String(size),
         "content-disposition": `${disposition}; filename="${encodeURIComponent(filename)}"`,
         "x-content-type-options": "nosniff",
+        // Nothing in a served file runs; same policy as the storage service (#253)
+        "content-security-policy": safeMime === "application/pdf"
+            ? "default-src 'none'; object-src 'self'; frame-ancestors 'self'"
+            : "default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; sandbox; frame-ancestors 'self'",
         "cache-control": "private, no-store",
     };
 }
