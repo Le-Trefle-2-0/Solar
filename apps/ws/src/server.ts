@@ -168,6 +168,17 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
         if (d.kind === 'volunteer') {
             socket.join([VOLUNTEERS, userRoom(d.userId!)]);
             if (d.readAll) socket.join(READERS);
+            // Online = connected to Solar, whatever the page: announced on the first tab only
+            void io.in(userRoom(d.userId!)).fetchSockets().then(tabs => {
+                const user = publicUser(socket);
+                if (tabs.length === 1 && user) io.to(VOLUNTEERS).emit('userOnline', {user});
+            });
+            socket.on('disconnect', async () => {
+                const user = publicUser(socket);
+                if (!user) return;
+                // Offline once the last tab is closed
+                if ((await io.in(userRoom(user.id)).fetchSockets()).length === 0) io.to(VOLUNTEERS).emit('userOffline', {user});
+            });
             // Channels the API listed for this user (write rights are checked on first send)
             for (const room of ((socket as any).__initialChannels as string[] ?? []).filter(isChannelId)) {
                 socket.join(room);
@@ -199,11 +210,11 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
             if (user) io.to(room).emit('userLeft', {channelId: room, user});
         });
 
-        // Who is in a channel: members only, never visitors
-        on('getOnlineUsers', async (payload, ack) => {
-            const room = payload?.channelID;
-            if (d.kind === 'guest' || !isChannelId(room) || !socket.rooms.has(room)) return ack([]);
-            const sockets = await io.in(room).fetchSockets();
+        // Who is connected to Solar (any page): volunteers only, never visitors. The member list
+        // of each channel (from the API) decides who is shown.
+        on('getOnlineUsers', async (_payload, ack) => {
+            if (d.kind !== 'volunteer') return ack([]);
+            const sockets = await io.in(VOLUNTEERS).fetchSockets();
             const seen = new Set<string>();
             const users = sockets
                 .map(s => (s.data as SocketData).user)

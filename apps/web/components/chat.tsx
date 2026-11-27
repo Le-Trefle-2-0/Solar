@@ -415,6 +415,8 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
     const [onlineUsers, setOnlineUsers] = useState<UserFromList[]>([]);
     const [allMembers, setAllMembers] = useState<UserFromList[]>([]);
+    const onlineIds = new Set(onlineUsers.map(u => u.id));
+    const onlineMemberCount = allMembers.filter(m => onlineIds.has(m.id)).length;
 
     // Roles as configured on the roles page (name, order, icon); refreshed when they change.
     const [configuredRoles, setConfiguredRoles] = useState<{ name: string; weight: number; icon?: string | null }[]>([]);
@@ -483,23 +485,18 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
         socket.on("userList", handleUserList);
 
-        const handleJoined = (payload: { channelId: string; user: UserFromList }) => {
-            if (payload?.channelId === channelID && payload.user) {
-                const normalizedUser = {...payload.user, role: getHighestRole(payload.user.role as any)};
-                setOnlineUsers(prev => {
-                    const exists = prev.some(u => u.id === normalizedUser.id);
-                    return exists ? prev : [...prev, normalizedUser];
-                });
-            }
+        // Online = connected to Solar, whatever the page they are on
+        const handleOnline = (payload: { user: UserFromList }) => {
+            if (!payload?.user) return;
+            const normalizedUser = {...payload.user, role: getHighestRole(payload.user.role as any)};
+            setOnlineUsers(prev => prev.some(u => u.id === normalizedUser.id) ? prev : [...prev, normalizedUser]);
         };
-        const handleLeft = (payload: { channelId: string; user: UserFromList }) => {
-            if (payload?.channelId === channelID && payload.user) {
-                setOnlineUsers(prev => prev.filter(u => u.id !== payload.user.id));
-            }
+        const handleOffline = (payload: { user: UserFromList }) => {
+            if (payload?.user) setOnlineUsers(prev => prev.filter(u => u.id !== payload.user.id));
         };
 
-        socket.on("userJoined", handleJoined);
-        socket.on("userLeft", handleLeft);
+        socket.on("userOnline", handleOnline);
+        socket.on("userOffline", handleOffline);
 
         const onMessage = (data: Msg) => {
             if (data.channel.id === channelID) {
@@ -621,9 +618,6 @@ export function Chat(props: { channelID: string, statusID: number }) {
             setChat(prev => prev.map(m => m.id === data.id ? {...m, undelivered: true} : m));
         };
 
-        socket.on('joined', handleJoined);
-        socket.on('left', handleLeft);
-
         socket.on('connect', handleConnect);
         socket.on('reconnect', handleConnect as any);
         socket.on('reconnect_attempt', requestSnapshot as any);
@@ -642,8 +636,8 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
         return () => {
             socket.off('userList', handleUserList);
-            socket.off('userJoined', handleJoined);
-            socket.off('userLeft', handleLeft);
+            socket.off('userOnline', handleOnline);
+            socket.off('userOffline', handleOffline);
             socket.off('connect', handleConnect);
             socket.off('reconnect', handleConnect as any);
             socket.off('reconnect_attempt', requestSnapshot as any);
@@ -1814,20 +1808,14 @@ export function Chat(props: { channelID: string, statusID: number }) {
                         </Dialog>
                     </div>
                     <small className="text-sm leading-none font-medium">
-                        {onlineUsers.length} utilisateur{onlineUsers.length >= 2 ? "s" : ""} connecté{onlineUsers.length >= 2 ? "s" : ""}
+                        {onlineMemberCount} membre{onlineMemberCount >= 2 ? "s" : ""} connecté{onlineMemberCount >= 2 ? "s" : ""}
                     </small>
                 </div>
                 <div className="flex flex-col overflow-y-auto">
                     {Object.entries(
                         (() => {
-                            // Merge allMembers and onlineUsers
-                            const memberMap = new Map<string, UserFromList & { isOnline: boolean }>();
-                            allMembers.forEach(m => memberMap.set(m.id, {...m, isOnline: false}));
-                            onlineUsers.forEach(u => {
-                                memberMap.set(u.id, {...(memberMap.get(u.id) || u), isOnline: true});
-                            });
-
-                            const merged = Array.from(memberMap.values());
+                            // Only those who may see this channel; online if connected to Solar
+                            const merged = allMembers.map(m => ({...m, isOnline: onlineIds.has(m.id)}));
 
                             const online = merged.filter(m => m.isOnline);
                             const offline = merged.filter(m => !m.isOnline);

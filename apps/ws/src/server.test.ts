@@ -12,6 +12,7 @@ const sessions: Record<string, WsSession> = {
     vol: {user: {id: 'vol', username: 'Vol', image: null, role: 'Bénévole Écoutant'}, readAll: false, channels: ['1', 'c1']},
     reader: {user: {id: 'reader', username: 'Reader', image: null, role: 'Référent'}, readAll: true, channels: ['1']},
     other: {user: {id: 'other', username: 'Other', image: null, role: 'Bénévole Écoutant'}, readAll: false, channels: ['1']},
+    solo: {user: {id: 'solo', username: 'Solo', image: null, role: 'Bénévole Écoutant'}, readAll: false, channels: ['1']},
 };
 const access = (userId: string, channelId: string) => {
     if (channelId === '1') return {read: true, write: true};
@@ -234,6 +235,27 @@ test('ws: bot-only events reach bot sockets and no volunteer', async () => {
     const [b, v] = await got;
     assert.equal(b.length, 1);
     assert.equal(v.length, 0);
+});
+
+test('ws: online means connected to Solar, on any page; announced on the first tab, gone with the last', async () => {
+    const reader = await client({jwt: 'jwt-reader'});
+    const online = collect(reader, 'userOnline');
+    const offline = collect(reader, 'userOffline', 400);
+    // "solo" follows no ticket channel: still online
+    const [tab1, tab2] = [await client({jwt: 'jwt-solo'}), await client({jwt: 'jwt-solo'})];
+    const users = await ack<{id: string}[]>(reader, 'getOnlineUsers', {channelID: 'c1'});
+    assert.ok(users.some(u => u.id === 'solo'));
+    assert.equal(new Set(users.map(u => u.id)).size, users.length);
+    assert.deepEqual((await online).filter(e => e.user.id === 'solo').length, 1);
+
+    tab1.disconnect();
+    await new Promise(r => setTimeout(r, 50));
+    tab2.disconnect();
+    assert.deepEqual((await offline).filter(e => e.user.id === 'solo').length, 1);
+    // A bot is never listed
+    const bot = await client({token: 'bot-key'});
+    assert.ok(!(await ack<{id: string}[]>(reader, 'getOnlineUsers', {})).some(u => u.id === 'bot-user'));
+    assert.deepEqual(await ack(bot, 'getOnlineUsers', {}), []);
 });
 
 test('ws: team notes reach the volunteers of the room, never the visitor nor the bot', async () => {

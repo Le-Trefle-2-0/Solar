@@ -43,16 +43,27 @@ export async function getActor(userId: string): Promise<Actor | null> {
         prisma.user.findUnique({where: {id: userId}, select: {id: true, role: true, ...STANDING_SELECT}}),
         getOwnerId(),
     ]);
-    if (!user || isBanned(user)) return null;
+    if (!user) return null;
+    const roles = splitRoles(user.role);
+    const rows = roles.length && ownerId !== user.id
+        ? await prisma.role.findMany({where: {name: {in: roles}}, select: {name: true, permissions: true}})
+        : [];
+    return resolveActor(user, ownerId, rows);
+}
+
+type ActorRow = {id: string; role: string | null} & Parameters<typeof isBanned>[0];
+
+/** getActor's rules on already loaded rows (several users at once: see channelMembers.ts). */
+export function resolveActor(user: ActorRow, ownerId: string | null, roleRows: {name: string; permissions: string}[]): Actor | null {
+    if (isBanned(user)) return null;
     const isOwner = ownerId === user.id;
     const roles = splitRoles(user.role);
     if (isOwner) return {id: user.id, isOwner, roles, permissions: [...ALL_PERMISSIONS]};
 
-    const rows = roles.length
-        ? await prisma.role.findMany({where: {name: {in: roles}}, select: {name: true, permissions: true}})
-        : [];
     const permissions = new Set<string>();
-    for (const row of rows) parsePermissions(row.permissions, row.name).forEach(p => permissions.add(p));
+    for (const row of roleRows) {
+        if (roles.includes(row.name)) parsePermissions(row.permissions, row.name).forEach(p => permissions.add(p));
+    }
     const granted = [...permissions];
     if (documentsBlocked(user) && !isBotAccount(user.id) && !hasPermission(granted, 'management.manage_accounts')) {
         return null;
