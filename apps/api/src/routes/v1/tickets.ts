@@ -10,6 +10,8 @@ import {verifyPow} from '../../lib/pow.js';
 import {limitPerMinute} from '../../lib/rateLimit.js';
 import {archiveNote, canArchiveWithoutTransmission, closeTicket, broadcastStatusUpdate} from '../../lib/ticketClosing.js';
 import {getPermanenceStatus} from '../../lib/permanenceStatus.js';
+import {assignRefusal, canHandleTickets} from '../../lib/presence.js';
+import {assignmentContext} from './presence.js';
 
 async function canReadTicketsAll(userId: string): Promise<boolean> {
     const perms = await getUserPermissions(userId);
@@ -33,8 +35,6 @@ const defaultDeps: TicketsRouteDeps = {
     updateTicket: (id, data) => prisma.ticket.update({where: {id}, data: {...data, updatedAt: new Date()}}),
 };
 
-/** Roles able to handle tickets: a ticket may only be assigned to a user holding one of these. */
-const TICKET_HANDLER_PERMISSIONS = ['tickets.close', 'tickets.read_all', 'tickets.send_message', 'tickets.send_message_all'];
 
 export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsRouteDeps = defaultDeps) {
     // GET /v1/tickets – list tickets depending on auth
@@ -111,9 +111,16 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
             if (!user) return reply.status(400).send('User not found');
             // The target must be allowed to handle tickets.
             const targetPerms = await deps.getPermissions(user.id);
-            if (!TICKET_HANDLER_PERMISSIONS.some(p => hasPermission(targetPerms, p))) {
+            if (!canHandleTickets(targetPerms)) {
                 return reply.status(400).send('User cannot handle tickets');
             }
+            // Present in the current permanence ("Rejoindre la permanence"), one écoute at a time
+            const {permanenceOn, present} = await assignmentContext();
+            const otherOpenTicket = await prisma.ticket.count({
+                where: {assignedUserId: user.id, statusName: 'started', id: {not: ticketID}},
+            }) > 0;
+            const refusal = assignRefusal({permanenceOn, present: present.has(user.id), otherOpenTicket});
+            if (refusal) return reply.status(409).send({success: false, error: refusal});
             const status = await prisma.ticketStatus.findUnique({where: {name: 'started'}});
             if (!status) return reply.status(500).send({success: false, error: 'status_missing'});
             const update = await prisma.ticket.update({

@@ -20,6 +20,7 @@ import * as LucideIcons from "lucide-react";
 import React, {FormEvent, useEffect, useLayoutEffect, useRef, useState} from "react";
 import {EventData, formVolunteer, Msg, MsgWithID} from "@/lib/interface";
 import {TicketInfoDialog} from "@/components/ticket-info-dialog";
+import {PermanencePresence} from "@/components/permanence-presence";
 import {z, ZodError} from "zod";
 import {toast} from "sonner";
 import {saveMessage} from "@/lib/messageManager";
@@ -716,17 +717,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                     .catch(() => {
                     });
 
-                apiFetch(`/v1/events/getAvailable?channelID=${channelID}`)
-                    .then((d) => {
-                        if (cancelled) return;
-                        setAvailable([
-                            ...d.map((user: { name: any; id: any; }) => ({
-                                label: user.name,
-                                value: {id: user.id, name: user.name},
-                            }))
-                        ]);
-                    }).catch(() => {
-                });
+                loadAvailable();
 
             } catch (e) {
                 if (cancelled) return;
@@ -947,6 +938,16 @@ export function Chat(props: { channelID: string, statusID: number }) {
         resolver: zodResolver(FormSchema),
     });
 
+    /** Volunteers who may take this écoute now: present in the permanence, free, eligible. */
+    function loadAvailable() {
+        if (channelID === "1") return;
+        apiFetch(`/v1/events/getAvailable?channelID=${channelID}`)
+            .then((d: { id: string; name: string }[]) => {
+                if (Array.isArray(d)) setAvailable(d.map(user => ({label: user.name, value: {id: user.id, name: user.name}})));
+            })
+            .catch(() => setAvailable([]));
+    }
+
     function assign(data: z.infer<typeof FormSchema>) {
         if (!ticket?.id) {
             toast.error("L'écoute n'est pas encore chargée, réessayez dans un instant");
@@ -969,9 +970,12 @@ export function Chat(props: { channelID: string, statusID: number }) {
             socket?.emit('update');
         }).catch((e: Error) => {
             toast.error("L'écoute n'a pas été attribuée", {
-                description: e.message === "User cannot handle tickets"
-                    ? "Ce bénévole n'a pas les droits pour prendre une écoute."
-                    : e.message === "forbidden" ? "Vous n'avez pas le droit d'attribuer les écoutes." : e.message,
+                description: ({
+                    "User cannot handle tickets": "Ce bénévole n'a pas les droits pour prendre une écoute.",
+                    forbidden: "Vous n'avez pas le droit d'attribuer les écoutes.",
+                    not_present: "Ce bénévole n'a pas rejoint la permanence.",
+                    busy: "Ce bénévole est déjà en écoute : une seule à la fois.",
+                } as Record<string, string>)[e.message] ?? e.message,
             });
         }).finally(() => setAssigning(false));
     }
@@ -1172,11 +1176,16 @@ export function Chat(props: { channelID: string, statusID: number }) {
                     // Permanence chat (status 0): only its voice channel. Other channels: the écoute toolbar.
                     status === 0 ? (channelID !== "1" && (
                         <div className="absolute top-6 right-6 flex flex-row gap-2 z-20">
+                            <PermanencePresence/>
                             <PermanenceVoiceControls channelId={channelID}/>
                         </div>
                     )) :
                         <div className="absolute top-6 right-6 flex flex-row gap-2 z-20">
-                            <AlertDialog open={assignOpen} onOpenChange={setAssignOpen}>
+                            <AlertDialog open={assignOpen} onOpenChange={(open) => {
+                                setAssignOpen(open);
+                                // Who joined or finished an écoute since the page was opened
+                                if (open) loadAvailable();
+                            }}>
                                 <AlertDialogTrigger asChild>
                                     <Button
                                         className={channelID == "1" || status == 3 || status == 4 ? "hidden" : "flex"}
@@ -1224,8 +1233,11 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                                                         className="h-9"
                                                                     />
                                                                     <CommandList>
-                                                                        <CommandEmpty>Aucun bénévole
-                                                                            trouvé</CommandEmpty>
+                                                                        <CommandEmpty>
+                                                                            {available.length === 0
+                                                                                ? "Aucun bénévole disponible : les bénévoles doivent rejoindre la permanence et ne pas être déjà en écoute."
+                                                                                : "Aucun bénévole trouvé"}
+                                                                        </CommandEmpty>
                                                                         <CommandGroup>
                                                                             {available.map((available) => (
                                                                                 <CommandItem
@@ -1252,7 +1264,8 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                                             </PopoverContent>
                                                         </Popover>
                                                         <FormDescription>
-                                                            Le bénévole aura ensuite accès à l'écoute
+                                                            Seuls les bénévoles présents à la permanence et libres sont proposés.
+                                                            Le bénévole aura ensuite accès à l'écoute.
                                                         </FormDescription>
                                                         <FormMessage/>
                                                     </FormItem>

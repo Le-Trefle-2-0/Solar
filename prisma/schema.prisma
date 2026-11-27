@@ -84,6 +84,7 @@ model User {
   twofactors             TwoFactor[]
   channelReads           UserChannelRead[]
   vigilances             Vigilance[]
+  permanencePresences    PermanencePresence[]
 
   @@map("user")
 }
@@ -316,10 +317,27 @@ model Event {
   user          User                @relation(fields: [userId], references: [id])
   registrations EventRegistration[]
   roleSlots     RoleSlot[]
+  presences     PermanencePresence[]
 
   @@index([channelID], map: "event_channelID_fkey")
   @@index([userId], map: "event_userId_fkey")
   @@map("event")
+}
+
+/// A volunteer who joined a permanence ("Rejoindre la permanence"), registered for it or as a
+/// reinforcement: only present volunteers can be assigned écoutes. Kept after they leave.
+model PermanencePresence {
+  id       String    @id @default(cuid())
+  eventId  String
+  userId   String
+  joinedAt DateTime  @default(now())
+  leftAt   DateTime?
+  event    Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([eventId, leftAt])
+  @@index([userId])
+  @@map("permanence_presence")
 }
 
 model RoleSlot {

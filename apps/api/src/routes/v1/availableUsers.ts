@@ -4,6 +4,7 @@ import {authenticate} from '../../auth.js';
 import {getUserPermissions, hasPermission} from '../../lib/permissions.js';
 import {requesterIdVariants} from '../../lib/pseudonym.js';
 import {ELIGIBILITY_WINDOW_DAYS} from '../../lib/requester.js';
+import {assignmentContext} from './presence.js';
 
 /** Only what the attribution picker shows. Never e-mail, address, birth date or document ids (#210). */
 export type PublicUser = {id: string; name: string};
@@ -19,6 +20,8 @@ export interface AvailableUsersDeps {
     findUsers: () => Promise<PublicUser[]>;
     /** Who was assigned to écoutes of these requesters since `since` (text and voice), and when. */
     findAssignments: (requesterIds: string[], since: Date) => Promise<{userId: string; at: Date}[]>;
+    /** Who may be assigned now: present in the current permanence (if one is on), not in an écoute. */
+    assignable: () => Promise<{permanenceOn: boolean; present: Set<string>; busy: Set<string>}>;
 }
 
 export const availableUsersDefaultDeps: AvailableUsersDeps = {
@@ -38,6 +41,11 @@ export const availableUsersDefaultDeps: AvailableUsersDeps = {
             select: {assignedUserId: true, createdAt: true},
         });
         return tickets.map(t => ({userId: t.assignedUserId!, at: t.createdAt}));
+    },
+    assignable: async () => {
+        const {permanenceOn, present} = await assignmentContext();
+        const busy = await prisma.ticket.findMany({where: {statusName: 'started', assignedUserId: {not: null}}, select: {assignedUserId: true}});
+        return {permanenceOn, present, busy: new Set(busy.map(t => t.assignedUserId!))};
     },
 };
 
@@ -84,8 +92,12 @@ export async function registerAvailableUsersRoutes(app: FastifyInstance, deps: A
             const ineligible = await ineligibleVolunteers(deps, ticket.discordUserID);
             if (lists === 'ineligible') return reply.send({ineligible});
 
+            // The picker: present in the permanence, free, and not ineligible for this person
             const excluded = new Set(ineligible.map(u => u.id));
-            return reply.send((await deps.findUsers()).filter(u => !excluded.has(u.id)).map(u => ({id: u.id, name: u.name})));
+            const {permanenceOn, present, busy} = await deps.assignable();
+            return reply.send((await deps.findUsers())
+                .filter(u => !excluded.has(u.id) && !busy.has(u.id) && (!permanenceOn || present.has(u.id)))
+                .map(u => ({id: u.id, name: u.name})));
         } catch (e) {
             console.error('Failed to compute available users:', e);
             return reply.status(500).send({success: false, error: 'Failed to compute available users'});

@@ -16,6 +16,8 @@ interface CallOpts {
     perms?: string[];
     recent?: string[];
     since?: Date[];
+    present?: string[] | null;
+    busy?: string[];
 }
 
 async function call(url: string, opts: CallOpts = {}) {
@@ -29,6 +31,11 @@ async function call(url: string, opts: CallOpts = {}) {
             opts.since?.push(since);
             return (opts.recent ?? []).map(userId => ({userId, at: new Date('2026-11-20T10:00:00Z')}));
         },
+        assignable: async () => ({
+            permanenceOn: opts.present !== null && opts.present !== undefined,
+            present: new Set(opts.present ?? []),
+            busy: new Set(opts.busy ?? []),
+        }),
     };
     await registerAvailableUsersRoutes(app, deps);
     const res = await app.inject(url);
@@ -64,6 +71,14 @@ test('getAvailable: one list of ineligible volunteers, id, name and when they ma
     // Same person at most once every 30 days, text and voice alike
     assert.deepEqual(body, {ineligible: [{id: 'u1', name: 'Alice', until: '2026-12-20T10:00:00.000Z'}]});
     assert.ok(Math.abs(Date.now() - since[0].getTime() - 30 * 24 * 3600_000) < 60_000);
+});
+
+test('getAvailable: during a permanence, only volunteers who joined it and are not in an écoute', async () => {
+    assert.deepEqual((await call('/v1/events/getAvailable?channelID=c', {present: ['u2']})).body, [{id: 'u2', name: 'Bob'}]);
+    assert.deepEqual((await call('/v1/events/getAvailable?channelID=c', {present: ['u1', 'u2'], busy: ['u1']})).body, [{id: 'u2', name: 'Bob'}]);
+    assert.deepEqual((await call('/v1/events/getAvailable?channelID=c', {present: []})).body, []);
+    // Outside permanences: anyone free
+    assert.deepEqual((await call('/v1/events/getAvailable?channelID=c', {busy: ['u2']})).body, [{id: 'u1', name: 'Alice'}]);
 });
 
 test('getAvailable: admin.sudo is accepted', async () => {
