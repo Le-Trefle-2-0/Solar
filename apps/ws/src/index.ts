@@ -93,6 +93,7 @@ const {httpServer, io, enableCluster} = createWsServer({
         internal: INTERNAL_SECRET,
     },
     corsOrigin: process.env.WS_CORS_ORIGIN || process.env.NEXT_PUBLIC_APP_URL || '*',
+    trustedProxies: process.env.TRUSTED_PROXIES?.split(',').map(s => s.trim()).filter(Boolean),
 });
 
 // Optional Redis scale-out

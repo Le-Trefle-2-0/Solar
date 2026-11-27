@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import http from 'node:http';
 import type {AddressInfo} from 'node:net';
 import {io as connect, type Socket as ClientSocket} from 'socket.io-client';
-import {createWsServer, signGuest, type WsSession} from './server.js';
+import {createWsServer, MAX_KEY_FAILURES_PER_MINUTE, signGuest, type WsSession} from './server.js';
 
 const SECRETS = {guest: 'guest-secret', broadcast: 'broadcast-secret', internal: 'internal-secret'};
 
@@ -365,3 +365,20 @@ test('ws: a flood of events is cut down, then the connection is closed (#258)', 
     for (let i = 0; i < 400; i++) c.emit('ping');
     await closed;
 });
+
+test('ws: wrong API keys are limited per client address, other addresses unaffected', async () => {
+    const from = (address: string, token: string) => new Promise<boolean>((resolve) => {
+        const c = connect(base, {
+            auth: {token}, transports: ['websocket'], forceNew: true, reconnection: false,
+            extraHeaders: {'x-forwarded-for': `6.6.6.6, ${address}`},
+        });
+        clients.push(c);
+        c.once('connect', () => resolve(true));
+        c.once('connect_error', () => resolve(false));
+    });
+    for (let i = 0; i < MAX_KEY_FAILURES_PER_MINUTE; i++) assert.equal(await from('9.9.9.9', `wrong-${i}`), false);
+    // Even the right key is no longer checked from that address
+    assert.equal(await from('9.9.9.9', 'bot-key'), false);
+    assert.equal(await from('8.8.8.8', 'bot-key'), true);
+});
+

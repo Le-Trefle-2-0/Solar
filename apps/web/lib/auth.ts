@@ -19,6 +19,7 @@ import {userAdditionalFields} from "./security/userFields";
 import {APIError} from "better-auth/api";
 import {allowResetEmail} from "./security/resetEmailLimit";
 import {escapeHtml} from "./security/escape";
+import {TRUSTED_PROXIES} from "./security/clientAddress";
 
 /** A profile photo (data URL) of about 300 KB at most; the WebSocket service drops larger ones. */
 const MAX_AVATAR_LENGTH = 400_000;
@@ -83,7 +84,10 @@ export const auth = betterAuth({
     advanced: {
         // Disable secure cookies on http during development so OAuth works on localhost
         useSecureCookies: !IS_DEV,
-        trustProxy: true,
+        // Rate limits per client: X-Forwarded-For is read from the right, past our proxies.
+        // Without this, any request with two addresses in it fell into one bucket shared by
+        // everyone, which a single client could exhaust to block every sign-in.
+        ipAddress: {trustedProxies: TRUSTED_PROXIES},
     },
     user: {
         additionalFields: userAdditionalFields,

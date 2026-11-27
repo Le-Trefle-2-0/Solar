@@ -39,6 +39,8 @@ export interface WsDeps {
     getStoredMessage: (userId: string, channelId: string, id: number) => Promise<{content: string; replyID: number | null} | null>;
     secrets: {guest: string; broadcast: string; internal: string};
     corsOrigin?: string;
+    /** Addresses of our reverse proxies, skipped from the right of X-Forwarded-For. */
+    trustedProxies?: string[];
     /** How often volunteer sockets are checked again against the API (ms). */
     sessionCheckMs?: number;
     log?: Pick<Console, 'log' | 'warn' | 'error'>;
@@ -61,6 +63,9 @@ export const MAX_DROPPED_EVENTS = 200;
 
 const ROOM_RE = /^[A-Za-z0-9_-]{1,64}$/;
 export const isChannelId = (v: unknown): v is string => typeof v === 'string' && ROOM_RE.test(v) && !RESERVED.has(v);
+
+/** Wrong API keys a client address may try per minute before key checks are refused. */
+export const MAX_KEY_FAILURES_PER_MINUTE = 10;
 
 export const MAX_MESSAGE_LENGTH = 2000;
 export const MAX_SOCKET_PAYLOAD = 256 * 1024;
@@ -98,6 +103,7 @@ type Recheck = {room?: string; all?: boolean};
 
 export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Server; enableCluster: () => void} {
     const log = deps.log ?? console;
+    const trustedProxies = new Set((deps.trustedProxies ?? ['127.0.0.1', '::1']).map(p => p.split('/')[0]));
     const httpServer = createServer();
     const corsOrigin = deps.corsOrigin || '*';
     const io = new Server(httpServer, {
@@ -141,6 +147,29 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
     }
 
     // ---- authentication ----
+
+    /** Wrong API keys per client address in the last minute. */
+    const keyFailures = new Map<string, number[]>();
+    const keyAttemptAllowed = (address: string, now = Date.now()) =>
+        (keyFailures.get(address) ?? []).filter(t => now - t < 60_000).length < MAX_KEY_FAILURES_PER_MINUTE;
+    const recordKeyFailure = (address: string, now = Date.now()) => {
+        keyFailures.set(address, [...(keyFailures.get(address) ?? []).filter(t => now - t < 60_000), now]);
+        if (keyFailures.size > 10_000) {
+            for (const [k, times] of keyFailures) if (!times.some(t => now - t < 60_000)) keyFailures.delete(k);
+        }
+    };
+
+    /** The rightmost X-Forwarded-For hop that is not one of our proxies, else the socket's peer. */
+    function clientAddress(socket: Socket): string {
+        const forwarded = socket.handshake.headers['x-forwarded-for'];
+        const hops = (Array.isArray(forwarded) ? forwarded.join(',') : forwarded ?? '').split(',').map(s => s.trim()).filter(Boolean);
+        for (let i = hops.length - 1; i >= 0; i--) {
+            const hop = hops[i].replace(/^::ffff:/, '');
+            if (!trustedProxies.has(hop)) return hop;
+        }
+        return socket.handshake.address;
+    }
+
     io.use(async (socket, next) => {
         try {
             const auth = (socket.handshake.auth ?? {}) as Record<string, unknown>;
@@ -160,11 +189,19 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
 
             const apiKey = str(auth.token, 512);
             if (apiKey) {
+                // The API's limit on key checks does not apply to this service (it is exempt as
+                // an internal caller): wrong keys are limited here, per client address
+                const address = clientAddress(socket);
+                if (!keyAttemptAllowed(address)) {
+                    log.warn('[ws] too many wrong API keys from one address');
+                    return next(new Error('Authentication error'));
+                }
                 const bot = await deps.checkApiKey(apiKey);
                 if (bot?.userId) {
                     Object.assign(d, {kind: 'bot', botUserId: bot.userId, botKey: apiKey, access: new Map()});
                     return next();
                 }
+                recordKeyFailure(address);
             }
 
             const guest = auth.guest as Record<string, unknown> | undefined;

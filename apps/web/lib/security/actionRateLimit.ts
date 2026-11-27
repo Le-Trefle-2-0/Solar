@@ -1,4 +1,5 @@
 import {headers} from "next/headers";
+import {clientAddressFromForwarded} from "./clientAddress";
 
 /**
  * Per-visitor limits for the public forms of the site (contact, applications, waiting lists,
@@ -35,11 +36,13 @@ export function takeToken(key: string, rule: Rule, now = Date.now()): boolean {
     return allowed;
 }
 
-/** The client address as the reverse proxy reports it (first hop of X-Forwarded-For). */
+/**
+ * The client address as the reverse proxy saw it: the rightmost hop of X-Forwarded-For that is
+ * not our proxy. The first hop is whatever the client chose to send, a new one per request.
+ */
 async function clientAddress(): Promise<string> {
     const h = await headers();
-    const forwarded = h.get("x-forwarded-for")?.split(",")[0]?.trim();
-    return forwarded || h.get("x-real-ip") || "unknown";
+    return clientAddressFromForwarded(h.get("x-forwarded-for")) || "unknown";
 }
 
 /** False when this visitor sent too many of these forms recently. */
