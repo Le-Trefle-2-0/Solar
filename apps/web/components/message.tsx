@@ -56,6 +56,7 @@ export function Message(props: {
     replyTargetId?: number,
     replyOf?: { id: number; authorName: string; content: string; image?: string | null } | undefined,
     edited?: boolean,
+    undelivered?: boolean,
     readOnly?: boolean,
 }) {
     const {
@@ -78,6 +79,7 @@ export function Message(props: {
         replyOf,
         canManageMessages,
         edited: wasEdited,
+        undelivered,
         readOnly,
     } = props;
     const {socket} = useSocket();
@@ -457,6 +459,11 @@ export function Message(props: {
                         )}
                         {wasEdited ? (
                             <span className="ml-2 text-xs text-gray-500 italic">Modifié</span>) : null}
+                        {undelivered ? (
+                            <span className="ml-2 text-xs font-medium text-destructive"
+                                  title="La personne a fermé ses messages privés Discord ou quitté Discord">
+                                Non remis
+                            </span>) : null}
                     </h3>
                 )}
 

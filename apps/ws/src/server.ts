@@ -240,7 +240,9 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
         on('typing', (payload) => {
             const room = payload?.id;
             if (!isChannelId(room) || !socket.rooms.has(room)) return;
-            const user = d.kind === 'guest' ? {id: d.guestUid, name: 'Visiteur', image: null} : d.user
+            // The bot types on behalf of the Discord user of the écoute
+            const user = d.kind === 'guest' ? {id: d.guestUid, name: 'Visiteur', image: null}
+                : d.kind === 'bot' ? {id: 'guest', name: 'Visiteur', image: null} : d.user
                 ? {id: d.user.id, name: d.user.username, image: d.user.image} : null;
             if (user) socket.to(room).emit('typingIndicator', {id: room, user});
         });

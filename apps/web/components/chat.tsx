@@ -614,6 +614,11 @@ export function Chat(props: { channelID: string, statusID: number }) {
             setChat(prev => prev.filter(m => m.id !== data.messageID));
         };
 
+        // Discord écoutes: the bot could not deliver a message to the user (#298)
+        const onMessageUndelivered = (data: { id: number }) => {
+            setChat(prev => prev.map(m => m.id === data.id ? {...m, undelivered: true} : m));
+        };
+
         socket.on('joined', handleJoined);
         socket.on('left', handleLeft);
 
@@ -631,6 +636,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
         socket.on('ticketStatusUpdate', onStatusUpdate);
         socket.on('reactionRemove', onReactionRemove);
         socket.on('messageDelete', onMessageDelete);
+        socket.on('messageUndelivered', onMessageUndelivered);
 
         return () => {
             socket.off('userList', handleUserList);
@@ -645,6 +651,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
             socket.off('reactionRemove', onReactionRemove);
             socket.off('typingIndicator', onTyping);
             socket.off('messageDelete', onMessageDelete);
+            socket.off('messageUndelivered', onMessageUndelivered);
             socket.off('messageEdit', onMessageEdit);
             socket.off('ticketStatusUpdate', onStatusUpdate);
         };
@@ -1060,7 +1067,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                     <Skeleton className="h-4 w-1/3"/>
                                 </div>
                             )}
-                            {chat.map(({author, content, timestamp, reactions, id, replyID, edited}, key) => {
+                            {chat.map(({author, content, timestamp, reactions, id, replyID, edited, undelivered}, key) => {
                                 const prevMessage = key > 0 ? chat[key - 1] : null
                                 const nextMessage = key < chat.length - 1 ? chat[key + 1] : null
                                 const currentDate = new Date(timestamp).getTime()
@@ -1126,6 +1133,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                             channelId={channelID}
                                             canManageMessages={canManageMessages}
                                             edited={edited}
+                                            undelivered={undelivered}
                                             onReply={({id, authorName, content, timestamp}) => {
                                                 setReplyTo({id, authorName, content, timestamp});
                                                 setTimeout(() => textRef.current?.focus(), 0);

@@ -16,6 +16,8 @@ export interface Msg {
     reactions: Reaction[] | null;
     replyID?: number | null;
     edited?: boolean;
+    /** Discord écoutes: the bot could not deliver this message to the user. */
+    undelivered?: boolean;
 }
 
 export interface MsgWithID extends Msg {

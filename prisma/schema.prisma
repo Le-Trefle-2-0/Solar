@@ -253,6 +253,10 @@ model Message {
   edited    Boolean    @default(false)
   replyID   Int?
   ticketId  Int?
+  /// Discord écoutes: when the bot delivered this volunteer message to the user (#298)
+  relayedAt   DateTime?
+  /// Discord écoutes: the user could not be reached (DMs closed, account gone)
+  relayFailed Boolean   @default(false)
   channel   Channel    @relation(fields: [channelId], references: [id], onDelete: Cascade)
   ticket    Ticket?    @relation(fields: [ticketId], references: [id])
   user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)

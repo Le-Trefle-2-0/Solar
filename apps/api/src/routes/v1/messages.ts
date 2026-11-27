@@ -79,6 +79,8 @@ export async function registerMessagesRoutes(app: FastifyInstance, deps: Message
                 reactions,
                 replyID: (msg as any).replyID ?? null,
                 edited: (msg as any).edited,
+                // Discord écoutes: the bot could not deliver it to the user (#298)
+                undelivered: !!(msg as any).relayFailed,
             });
         }
         return out.reverse();

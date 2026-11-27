@@ -3,13 +3,12 @@ import {z} from 'zod';
 import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
 import {broadcast} from '../../lib/broadcast.js';
-import {pseudonymize} from '../../lib/pseudonym.js';
 import {verifyWidgetSession} from '../../lib/widgetSession.js';
 import {getUserPermissions, hasPermission} from '../../lib/permissions.js';
 import {canAccessTicket} from '../../lib/channelAccess.js';
 import {verifyPow} from '../../lib/pow.js';
 import {limitPerMinute} from '../../lib/rateLimit.js';
-import {endVoiceCall} from '../../lib/voiceControl.js';
+import {closeTicket, broadcastStatusUpdate} from '../../lib/ticketClosing.js';
 import {getPermanenceStatus} from '../../lib/permanenceStatus.js';
 
 async function canReadTicketsAll(userId: string): Promise<boolean> {
@@ -17,13 +16,6 @@ async function canReadTicketsAll(userId: string): Promise<boolean> {
     return hasPermission(perms, 'tickets.read_all');
 }
 
-async function broadcastStatusUpdate(channelId: string, statusId: number, statusName: string) {
-    // 1. Notify current room of the status change
-    await broadcast(channelId, 'ticketStatusUpdate', {channelId, statusId, statusName});
-
-    // 2. Trigger global sidebar refresh
-    await broadcast(null, 'updateRequest', {channelId});
-}
 
 export interface TicketsRouteDeps {
     authenticate: (req: any) => Promise<string | null | undefined>;
@@ -163,7 +155,6 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
             if (!hasPermission(perms, 'tickets.close')) return reply.status(403).send('forbidden');
 
             const {channelID, discordUserID} = bodySchema.parse((req.body ?? {}) as any);
-            console.log(`[api] Closing ticket for channel=${channelID} discordUserID=${discordUserID}`);
 
             const ticket = await prisma.ticket.findFirst({
                 where: {
@@ -183,40 +174,8 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
                 return reply.status(403).send('forbidden');
             }
 
-            const status = await prisma.ticketStatus.findUnique({where: {name: 'closed'}});
-            if (!status) {
-                console.error('[api] Status "closed" missing in database');
-                return reply.status(500).send({success: false, error: 'status_missing'});
-            }
-
-            const cid = ticket.channelId!;
-            const originalDiscordUserID = ticket.discordUserID;
-            const update = await prisma.ticket.update({
-                where: {id: ticket.id},
-                include: {status: true},
-                data: {
-                    statusName: status.name,
-                    statusLabel: status.label,
-                    discordUserID: pseudonymize(ticket.discordUserID),
-                },
-            });
-
-            console.log(`[api] Ticket ${ticket.id} closed by ${user.name}, original user: ${originalDiscordUserID}`);
-
-            await broadcastStatusUpdate(cid, status.id, status.name);
-            // A closed écoute has no call any more
-            await endVoiceCall(cid);
-
-            // Broadcast ticketClosed to both global and channel rooms to be safe
-            const closePayload = {
-                ticketId: ticket.id,
-                discordUserID: originalDiscordUserID,
-                channelId: cid,
-                statusName: status.name
-            };
-
-            await broadcast(null, 'ticketClosed', closePayload);
-            await broadcast(cid, 'ticketClosed', closePayload);
+            const update = await closeTicket(ticket, 'volunteer');
+            console.log(`[api] Ticket ${ticket.id} closed by ${user.id}`);
 
             return reply.send({success: true, update});
         } catch (e) {
@@ -278,63 +237,7 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
         }
     });
 
-    // POST /v1/tickets/create
-    app.post('/v1/tickets/create', limitPerMinute(60), async (req, reply) => {
-        const bodySchema = z.object({
-            discordUserID: z.string(),
-            token: z.string(),
-            source: z.string().optional(),
-            metadata: z.any().optional(),
-        });
-        try {
-            const {discordUserID, token, source, metadata} = bodySchema.parse((req.body ?? {}) as any);
-            // Validate API key
-            const key = await prisma.apikey.findFirst({where: {key: token}});
-            if (!key || key.enabled === false || (key.expiresAt && key.expiresAt <= new Date())) {
-                return reply.status(401).send('Unauthorized');
-            }
-            const hasTicket = await prisma.ticket.findFirst({where: {discordUserID}});
-            if (hasTicket) return reply.status(401).send({success: false, error: 'User already has an open ticket'});
-
-            const status = await prisma.ticketStatus.findUnique({where: {name: 'waiting'}});
-            if (!status) return reply.status(500).send({success: false, error: 'status_missing'});
-
-            const ticket = await prisma.ticket.create({
-                data: {
-                    discordUserID,
-                    source: source || 'discord',
-                    metadata: metadata || {},
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                    statusName: status.name,
-                    statusLabel: status.label,
-                },
-            });
-
-            // Compute channel name: Ticket-00001 style
-            let channelName = String(ticket.id);
-            while (channelName.length < 5) channelName = '0' + channelName;
-            channelName = 'Ticket-' + channelName;
-
-            const channel = await prisma.channel.create({data: {name: channelName}});
-
-            const updatedTicket = await prisma.ticket.update({
-                where: {id: ticket.id},
-                data: {
-                    updatedAt: new Date(),
-                    channelName: channel.name,
-                    channelId: channel.id,
-                },
-            });
-
-            await broadcast(null, 'updateRequest', {channelId: updatedTicket.channelId});
-
-            return reply.send({success: true, ticket: updatedTicket});
-        } catch (err) {
-            if (err instanceof z.ZodError) return reply.status(400).send({success: false, errors: err.flatten()});
-            return reply.status(500).send({success: false, message: 'Internal server error'});
-        }
-    });
+    // Écoutes from Discord are opened through /v1/bot/tickets (botBridge.ts), by the bot account only (#229)
 
     // POST /v1/tickets/web-create
     app.post('/v1/tickets/web-create', limitPerMinute(5), async (req, reply) => {
