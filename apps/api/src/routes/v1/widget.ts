@@ -15,12 +15,19 @@ import {isWidgetEnabled, isWidgetRoute, widgetOffResponse} from '../../lib/widge
 
 const WIDGET_COOKIES = ['widget_channel', 'widget_uid', 'widget_exp', 'widget_sig', 'widget_public'];
 
+/**
+ * The visitor's session cookies travel only over HTTPS whenever the site is served over HTTPS,
+ * even when the API was started without NODE_ENV=production (npm run start:all, pm2).
+ */
+const secureCookies = () => process.env.NODE_ENV === 'production'
+    || [process.env.BETTER_AUTH_URL, process.env.NEXT_PUBLIC_APP_URL].some(url => url?.startsWith('https://'));
+
 function setWidgetCookie(reply: any, name: string, value: string, maxAgeSec = 60 * 60 * 24) {
     reply.setCookie(name, value, {
         path: '/',
         maxAge: maxAgeSec,
         sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production',
+        secure: secureCookies(),
         httpOnly: true, // The client gets its WS credentials from the response body
     });
 }
@@ -31,7 +38,7 @@ function clearWidgetCookies(reply: any) {
             path: '/',
             maxAge: 0,
             sameSite: 'lax',
-            secure: process.env.NODE_ENV === 'production',
+            secure: secureCookies(),
         });
     });
 }
