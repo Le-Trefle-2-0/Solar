@@ -102,9 +102,9 @@ export async function registerVoiceRoutes(app: FastifyInstance, deps: VoiceRoute
         if (isFromDiscord(ticket)) {
             const token = issueVoiceToken(deps.secret(), channelId, deps.now());
             link = voiceLink(deps.appUrl, token);
+            // No Discord id: the bot finds the requester from its own ticket of this channel
             await deps.notify(channelId, 'voiceInvite', {
                 channelId,
-                discordUserID: ticket.discordUserID,
                 url: link,
                 expiresAt: token.exp,
             }, 'bots');

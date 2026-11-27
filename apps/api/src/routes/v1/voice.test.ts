@@ -75,7 +75,7 @@ test('voice ticket (Discord): the bot gets a signed link for the Discord user', 
     assert.equal(res.statusCode, 200);
     const invite = s.sent.find(e => e.event === 'voiceInvite')!;
     assert.equal(invite.audience, 'bots');
-    assert.equal(invite.data.discordUserID, '123456789');
+    assert.equal(invite.data.discordUserID, undefined);
     assert.match(invite.data.url, /^https:\/\/solar\.example\/vocal\/disc\?e=\d+&t=[a-f0-9]{64}$/);
     assert.equal(res.json().link, invite.data.url);
 });

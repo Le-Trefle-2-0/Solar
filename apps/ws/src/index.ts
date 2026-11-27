@@ -74,7 +74,10 @@ const {httpServer, io} = createWsServer({
     verifyJwt,
     checkApiKey: async (key) => {
         const data = await internalPost<{valid?: boolean; user?: {id: string}}>('/v1/keys/check', {key});
-        return data?.valid && data.user?.id ? {userId: data.user.id} : null;
+        // A socket that shows an API key is treated as the bot: only the bot account's keys
+        // qualify, never a key a volunteer made for their own account (same rule as the
+        // API's isBotAccount)
+        return data?.valid && data.user?.id?.startsWith('bot_') ? {userId: data.user.id} : null;
     },
     getSession: (userId, sid) => internalPost<WsSession>('/v1/internal/ws/session', {userId, sid}),
     // Fail closed when the API cannot answer
