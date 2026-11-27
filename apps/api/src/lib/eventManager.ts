@@ -123,8 +123,10 @@ const registrationUser = {
         name: true,
         image: true,
         role: true,
+        // Busy = an écoute in progress, as the assignment rule counts it (tickets.ts): archived
+        // ("commented") écoutes made everyone who ever listened look busy for good
         tickets: {
-            where: {status: {name: {not: 'closed'}}},
+            where: {statusName: 'started'},
             select: {id: true},
         },
     },
