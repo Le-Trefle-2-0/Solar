@@ -36,7 +36,9 @@ export async function registerV1Routes(app: FastifyInstance) {
     await registerImageRoutes(app);
     await registerBotRoutes(app);
     await registerWidgetRoutes(app);
-    await registerWsRoutes(app);
+    // POST /v1/ws/guest: the widget gets its realtime credentials from /v1/widget/session and
+    // never calls it. Only with API_WS_GUEST_ROUTE=true
+    if (process.env.API_WS_GUEST_ROUTE === 'true') await registerWsRoutes(app);
     await registerAuthRoutes(app);
     await registerNewslettersRoutes(app);
     await registerInternalRoutes(app);
