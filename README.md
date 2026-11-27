@@ -214,6 +214,7 @@ créé via l'outil de configuration, celui-ci peut gérer les membres et les inv
 
 - `npm run dev:all` : Lance tous les services en mode dev.
 - `npm run setup:admin` : Outil de création du premier administrateur.
+- `npm run reset:owner-2fa` : Retire la double authentification du compte propriétaire (application d'authentification et codes de secours perdus) et le déconnecte partout. Sur un serveur compilé : `node apps/api/dist/scripts/reset-owner-2fa.js`.
 - `npm run db` : Réinitialise la base de données (Attention : destructif).
 - `npm run build:all` : Compile tous les services pour la production.
 - `npm run dev:bot` : Lance uniquement le bot Discord.

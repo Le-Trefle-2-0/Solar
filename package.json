@@ -39,6 +39,7 @@
     "compose:up": "docker compose up",
     "compose:down": "docker compose down -v",
     "setup:admin": "tsx scripts/setup-admin.ts",
+    "reset:owner-2fa": "tsx apps/api/src/scripts/reset-owner-2fa.ts",
     "generate:data": "tsx scripts/generate-historical-data.ts"
   },
   "prisma": {
