@@ -3,6 +3,7 @@
 import {getResendClient} from "@/lib/resend";
 import {z} from "zod";
 import {renderEmailTemplate} from "@/lib/email-template";
+import {allowPublicAction, TOO_MANY_REQUESTS} from "@/lib/security/actionRateLimit";
 
 const contactSchema = z.object({
     name: z.string().min(1, "Le nom est obligatoire"),
@@ -14,6 +15,7 @@ const contactSchema = z.object({
 });
 
 export async function sendContactEmail(formData: z.infer<typeof contactSchema>) {
+    if (!await allowPublicAction("contact")) return {error: TOO_MANY_REQUESTS};
     const validated = contactSchema.safeParse(formData);
 
     if (!validated.success) {

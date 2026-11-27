@@ -3,6 +3,10 @@
  * The storage service itself only trusts the web app; these rules are the real access control.
  */
 
+/** Stored files are identified by a UUID (File.id): anything else is refused before any lookup (#254). */
+export const isFileId = (value: unknown): value is string =>
+    typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+
 export const ALLOWED_UPLOAD_TYPES = new Set(["application/pdf", "image/jpeg", "image/png", "image/webp"]);
 export const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
 

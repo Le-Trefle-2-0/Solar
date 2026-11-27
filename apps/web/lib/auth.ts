@@ -8,7 +8,6 @@ import {ac, admin, bot, manager, newsletterManager, none, training, volunteer} f
 import {
     admin as adminPlugin,
     bearer,
-    emailOTP,
     jwt,
     openAPI,
     organization,
@@ -18,40 +17,15 @@ import {
 import {apiKey} from "@better-auth/api-key";
 import {userAdditionalFields} from "./security/userFields";
 import {APIError} from "better-auth/api";
+import {allowResetEmail} from "./security/resetEmailLimit";
 
 /** Same key as OWNER_SETTING_KEY in lib/userPermissions.ts and the API. */
 const OWNER_SETTING_KEY = "owner_user_id";
 import {passkey} from "@better-auth/passkey";
 
+// No sign-in by e-mail code: the app never offered it, and it bypassed the second factor and
+// could send codes to any address (#251, #252).
 const pluginList: any[] = [
-    emailOTP({
-        // Accounts are created by invitation only
-        disableSignUp: true,
-        async sendVerificationOTP({email, otp, type}) {
-            const resend = getResendClient();
-            const {html} = renderEmailTemplate({
-                title: "Code de vérification",
-                content: `
-                    <p>Bonjour,</p>
-                    <p>Voici votre code de vérification pour vous connecter au Trèfle 2.0 :</p>
-                    <div style="font-size: 32px; font-weight: 700; letter-spacing: 5px; text-align: center; margin: 30px 0; padding: 20px; background-color: #f9f9f9; border-radius: 8px; color: #8cc088; border: 1px dashed #8cc088;">
-                        ${otp}
-                    </div>
-                    <p>Ce code expirera dans 10 minutes.</p>
-                    <p>Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet e-mail.</p>
-                `,
-            });
-            const {error} = await resend.emails.send({
-                from: "Le Trèfle 2.0 <noreply@solar.letrefle.org>",
-                to: email,
-                subject: "Le Trèfle 2.0 - Votre code de vérification",
-                html,
-            });
-            if (error) {
-                console.error("Resend error sending OTP:", error);
-            }
-        }
-    }),
     adminPlugin({
         ac, roles: {
             training, volunteer, manager, bot, admin, newsletterManager, none
@@ -107,6 +81,11 @@ export const auth = betterAuth({
     emailAndPassword: {
         enabled: true,
         async sendResetPassword(data, request) {
+            // At most a few reset e-mails per address and per hour, whoever asks (#252)
+            if (!allowResetEmail(data.user.email)) {
+                console.warn("[auth] reset e-mail skipped: too many requests for this address");
+                return;
+            }
             console.log(`[auth] sendResetPassword triggered for ${data.user.email}`);
             const resend = getResendClient();
 
@@ -143,6 +122,22 @@ export const auth = betterAuth({
         },
         autoSignIn: true,
     },
+    // Better Auth's limiter (in memory: one web instance). Server-side auth.api calls are not
+    // counted, so password changes go through the client endpoints (#252).
+    rateLimit: {
+        enabled: true,
+        window: 60,
+        max: 100,
+        customRules: {
+            "/sign-in/email": {window: 60, max: 5},
+            "/sign-in/username": {window: 60, max: 5},
+            "/change-password": {window: 300, max: 5},
+            "/request-password-reset": {window: 300, max: 3},
+            "/reset-password": {window: 300, max: 5},
+            "/two-factor/verify-totp": {window: 60, max: 5},
+            "/two-factor/verify-backup-code": {window: 60, max: 5},
+        },
+    },
     hooks: {
         before: async (context) => {
             const path = (context as any)?.request?.url || (context as any)?.path || "";
@@ -163,6 +158,22 @@ export const auth = betterAuth({
         }
     },
     databaseHooks: {
+        session: {
+            create: {
+                // Discord sign-in has no second factor: accounts that enabled it sign in with
+                // their password (then the code) or a passkey (#251)
+                before: async (session, ctx) => {
+                    const path = (ctx as any)?.path || "";
+                    if (!path.startsWith("/callback/") && !path.startsWith("/oauth2/callback/")) return;
+                    const user = await prisma.user.findUnique({where: {id: session.userId}, select: {twoFactorEnabled: true}});
+                    if (user?.twoFactorEnabled) {
+                        throw new APIError("FORBIDDEN", {
+                            message: "La double authentification est activée sur ce compte : connectez-vous avec votre mot de passe ou une clé de sécurité.",
+                        });
+                    }
+                },
+            },
+        },
         user: {
             create: {
                 // The very first account (created at setup, sign-up is closed afterwards) owns the app

@@ -2,8 +2,10 @@
 
 import prisma from "@/lib/prisma";
 import {revalidatePath} from "next/cache";
+import {allowPublicAction, TOO_MANY_REQUESTS} from "@/lib/security/actionRateLimit";
 
 export async function subscribeToNewsletter(email: string) {
+    if (!await allowPublicAction("newsletter")) return {success: false, error: TOO_MANY_REQUESTS};
     if (!email || !email.includes("@")) {
         return {success: false, error: "Email invalide"};
     }
@@ -23,29 +25,8 @@ export async function subscribeToNewsletter(email: string) {
     }
 }
 
-export async function unsubscribeFromNewsletter(email: string) {
-    if (!email || !email.includes("@")) {
-        return {success: false, error: "Email invalide"};
-    }
-
-    try {
-        await prisma.newsletterSubscriber.deleteMany({
-            where: {email},
-        });
-
-        // Also check if it's a user and update their preference if applicable
-        await prisma.user.updateMany({
-            where: {email},
-            data: {newsletterSubscription: false}
-        });
-
-        revalidatePath("/");
-        return {success: true};
-    } catch (error) {
-        console.error("Newsletter unsubscription error:", error);
-        return {success: false, error: "Une erreur est survenue lors de la désinscription"};
-    }
-}
+// No unsubscription by e-mail address: anyone could unsubscribe anyone (#223). The links of the
+// newsletters carry the subscriber's id instead (unsubscribeById).
 
 export async function unsubscribeById(id: string) {
     if (!id) {

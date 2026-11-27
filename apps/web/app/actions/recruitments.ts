@@ -9,6 +9,7 @@ import {revalidatePath} from "next/cache";
 
 import {recruitmentSchema} from "@/lib/recruitments";
 import {renderEmailTemplate} from "@/lib/email-template";
+import {allowPublicAction, TOO_MANY_REQUESTS} from "@/lib/security/actionRateLimit";
 
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
@@ -88,6 +89,7 @@ export async function getRecruitmentById(id: string) {
 }
 
 export async function applyToRecruitment(recruitmentId: string, data: Record<string, any>) {
+    if (!await allowPublicAction("application")) return {error: TOO_MANY_REQUESTS};
     const recruitment = await prisma.recruitment.findUnique({
         where: {id: recruitmentId},
     });
@@ -539,6 +541,7 @@ export async function toggleRecruitment(id: string, enabled: boolean) {
 }
 
 export async function joinWaitlist(recruitmentId: string, email: string) {
+    if (!await allowPublicAction("waitlist")) return {error: TOO_MANY_REQUESTS};
     const recruitment = await prisma.recruitment.findUnique({
         where: {id: recruitmentId},
     });

@@ -15,6 +15,8 @@ async function getData(): Promise<{ users: DisplayAccount[], roles: any[] }> {
     const hideEmails = process.env.HIDE_EMAILS_IN_ADMIN === "true";
 
     const accountsWithLatestTicket = await prisma.user.findMany({
+        // Removed accounts are kept, emptied, for the history of écoutes (deleteUserAction)
+        where: {NOT: {email: {endsWith: "@compte-supprime.invalid"}}},
         select: {
             id: true,
             name: true,

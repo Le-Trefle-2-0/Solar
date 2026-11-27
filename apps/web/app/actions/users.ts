@@ -6,12 +6,13 @@ import {headers} from "next/headers";
 import {z} from "zod";
 import prisma from "@/lib/prisma";
 import {hashPassword} from "better-auth/crypto";
+import {randomBytes} from "crypto";
 import {getResendClient} from "@/lib/resend";
 import {renderEmailTemplate} from "@/lib/email-template";
 
 import {truncateEmail} from "@/lib/utils";
 import {broadcast} from "@/lib/broadcast";
-import {canLinkFile} from "@/lib/security/fileAccess";
+import {canLinkFile, isFileId} from "@/lib/security/fileAccess";
 
 const inviteSchema = z.object({
     name: z.string().min(1),
@@ -19,6 +20,18 @@ const inviteSchema = z.object({
     // No role = no access: stored as the hidden default role
     roles: z.array(z.string()),
 });
+
+const DOCUMENT_CHANGED = "Le document a changé depuis son ouverture : rechargez la page pour voir le nouveau fichier.";
+
+/** The volunteer's current file differs from the one the reviewer examined (#254). */
+function documentChanged(
+    user: {idCardFileId: string | null; casierFileId: string | null},
+    type: 'idCard' | 'casier' | 'all',
+    examined: {idCard?: string | null; casier?: string | null},
+): boolean {
+    const kinds = type === 'all' ? ['idCard', 'casier'] as const : [type];
+    return kinds.some(kind => (examined[kind] ?? null) !== (kind === 'idCard' ? user.idCardFileId : user.casierFileId));
+}
 
 export async function inviteUserAction(formData: z.infer<typeof inviteSchema>) {
     const session = await auth.api.getSession({
@@ -59,13 +72,14 @@ export async function inviteUserAction(formData: z.infer<typeof inviteSchema>) {
     }
 
     const primaryRole = roles[0];
-    const tempPassword = Math.random().toString(36).slice(-10) + Math.random().toString(36).slice(-10);
+    // Never used to sign in (a reset link is sent), but must not be guessable (#225)
+    const tempPassword = randomBytes(24).toString("base64url");
 
     try {
         // 1. Create User and Account via Prisma to ensure reliability
         console.log(`[inviteAction] Creating user ${email}`);
 
-        const userId = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+        const userId = randomBytes(16).toString("hex");
         const hashedPassword = await hashPassword(tempPassword);
 
         const userData = await prisma.$transaction(async (tx) => {
@@ -83,7 +97,7 @@ export async function inviteUserAction(formData: z.infer<typeof inviteSchema>) {
 
             await tx.account.create({
                 data: {
-                    id: Math.random().toString(36).slice(2),
+                    id: randomBytes(16).toString("hex"),
                     userId: user.id,
                     accountId: user.id,
                     providerId: "credential",
@@ -187,7 +201,7 @@ export async function submitDocumentsAction(data: {
     // Only files this user uploaded may be attached to their profile (#211)
     for (const fileId of [data.idCardFileId, data.casierFileId]) {
         if (fileId === undefined) continue;
-        const file = typeof fileId === "string"
+        const file = isFileId(fileId)
             ? await prisma.file.findUnique({where: {id: fileId}, select: {uploadedById: true}})
             : null;
         if (!canLinkFile(session.user.id, file)) {
@@ -237,7 +251,15 @@ export async function submitDocumentsAction(data: {
     }
 }
 
-export async function validateDocumentsAction(userId: string, type: 'idCard' | 'casier' | 'all' = 'all') {
+/**
+ * Approves documents. `examinedFileIds` are the files the reviewer had on screen: if the volunteer
+ * sent another file meanwhile, nothing is approved (#254).
+ */
+export async function validateDocumentsAction(
+    userId: string,
+    type: 'idCard' | 'casier' | 'all' = 'all',
+    examinedFileIds: {idCard?: string | null; casier?: string | null} = {},
+) {
     const session = await auth.api.getSession({
         headers: await headers(),
     });
@@ -263,6 +285,7 @@ export async function validateDocumentsAction(userId: string, type: 'idCard' | '
         // If both are validated, mark global status as validated
         const user = await prisma.user.findUnique({where: {id: userId}});
         if (!user) return {error: "User not found"};
+        if (documentChanged(user, type, examinedFileIds)) return {error: DOCUMENT_CHANGED};
 
         const newIdCardStatus = updateData.idCardStatus || user.idCardStatus;
         const newCasierStatus = updateData.casierStatus || user.casierStatus;
@@ -289,7 +312,7 @@ export async function validateDocumentsAction(userId: string, type: 'idCard' | '
     }
 }
 
-export async function rejectDocumentAction(userId: string, type: 'idCard' | 'casier', reason: string) {
+export async function rejectDocumentAction(userId: string, type: 'idCard' | 'casier', reason: string, examinedFileId?: string | null) {
     const session = await auth.api.getSession({
         headers: await headers(),
     });
@@ -302,6 +325,9 @@ export async function rejectDocumentAction(userId: string, type: 'idCard' | 'cas
     }
 
     try {
+        const user = await prisma.user.findUnique({where: {id: userId}, select: {idCardFileId: true, casierFileId: true}});
+        if (!user) return {error: "User not found"};
+        if (documentChanged(user, type, {[type]: examinedFileId})) return {error: DOCUMENT_CHANGED};
         const updateData: any = {
             documentsStatus: "rejected"
         };
@@ -322,6 +348,8 @@ export async function rejectDocumentAction(userId: string, type: 'idCard' | 'cas
             userId,
             status: 'rejected'
         });
+        // Refused documents cut access: open connections are checked again (#247)
+        await broadcast(null, 'permissionsUpdate', {userId});
 
         return {success: true};
     } catch (e: any) {
@@ -420,9 +448,19 @@ export async function requestAllRenewalAction() {
     }
 }
 
+/** E-mail domain of removed accounts (never deliverable): such accounts are hidden from lists. */
+const DELETED_EMAIL_DOMAIN = "@compte-supprime.invalid";
+
 /**
- * Deletes an account. Requires management.manage_accounts; the owner, yourself and anyone
- * at or above your rank cannot be deleted (Better Auth's own admin endpoints are disabled).
+ * Removes an account (#248). Requires management.manage_accounts; the owner, yourself and anyone
+ * at or above your rank cannot be removed (Better Auth's own admin endpoints are disabled).
+ *
+ * The account is closed and emptied rather than deleted: its messages in écoutes and its planning
+ * history must stay attributed to a volunteer (a message without an author is shown as the
+ * visitor's). In one transaction: personal data, documents and roles are cleared, the account is
+ * banned, sessions, passwords, passkeys, second factors and API keys are deleted, upcoming
+ * registrations are removed and écoutes in progress go back to the queue. Then every open
+ * connection of the account is closed.
  */
 export async function deleteUserAction(userId: string) {
     const access = await getAccess();
@@ -438,7 +476,62 @@ export async function deleteUserAction(userId: string) {
     }
 
     try {
-        await prisma.user.delete({where: {id: userId}});
+        const now = new Date();
+        await prisma.$transaction(async (tx) => {
+            await tx.user.update({
+                where: {id: userId},
+                data: {
+                    name: "Compte supprimé",
+                    email: `supprime-${userId}${DELETED_EMAIL_DOMAIN}`,
+                    emailVerified: false,
+                    image: null,
+                    username: null,
+                    displayUsername: null,
+                    role: "none",
+                    banned: true,
+                    banReason: "Compte supprimé",
+                    banExpires: null,
+                    twoFactorEnabled: false,
+                    firstName: null,
+                    lastName: null,
+                    birthDate: null,
+                    addressStreet: null,
+                    addressNumber: null,
+                    addressPostalCode: null,
+                    addressCity: null,
+                    documentsText: null,
+                    idCardFileId: null,
+                    idCardRejectReason: null,
+                    casierFileId: null,
+                    casierRejectReason: null,
+                    updatedAt: now,
+                },
+            });
+            await tx.session.deleteMany({where: {userId}});
+            await tx.account.deleteMany({where: {userId}});
+            await tx.passkey.deleteMany({where: {userId}});
+            await tx.twoFactor.deleteMany({where: {userId}});
+            await tx.apikey.deleteMany({where: {userId}});
+            await tx.member.deleteMany({where: {userId}});
+            await tx.eventRegistration.deleteMany({where: {userId, event: {start: {gt: now}}}});
+            // Écoutes in progress go back to those waiting for a volunteer
+            await tx.ticket.updateMany({
+                where: {assignedUserId: userId, statusName: {in: ["waiting", "started"]}},
+                data: {assignedUserId: null, statusName: "waiting", statusLabel: "Non-Assignée"},
+            });
+        });
+
+        // Check the result instead of assuming it (#248)
+        const after = await prisma.user.findUnique({
+            where: {id: userId},
+            select: {banned: true, _count: {select: {sessions: true, accounts: true, apikeys: true, passkeys: true}}},
+        });
+        if (!after?.banned || Object.values(after._count).some(n => n > 0)) {
+            return {error: "La suppression n'a pas pu être vérifiée. Réessayez."};
+        }
+
+        // Close the account's open WebSocket connections and refresh everyone's rights
+        await broadcast(null, "permissionsUpdate", {userId});
         return {success: true};
     } catch (e) {
         console.error("[deleteUserAction] Error:", e);

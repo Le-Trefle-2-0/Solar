@@ -1,5 +1,6 @@
 "use client";
 
+import QRCode from "react-qr-code";
 import {
     Dialog,
     DialogContent,
@@ -779,11 +780,8 @@ export default function SettingsPage() {
                         {twoFactorStep === "qr" && (
                             <div className="space-y-6 flex flex-col items-center">
                                 <div className="bg-white p-4 rounded-xl border-2 border-primary/20 shadow-inner">
-                                    <img
-                                        src={`https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrCode)}&size=160x160`}
-                                        alt="QR Code A2F"
-                                        className="h-40 w-40"
-                                    />
+                                    {/* Drawn in the browser: the secret is never sent to a QR code service (#251) */}
+                                    <div role="img" aria-label="QR Code A2F"><QRCode value={qrCode} size={160}/></div>
                                 </div>
                                 <div className="text-center space-y-2 w-full">
                                     <p className="text-xs font-mono break-all text-muted-foreground select-all bg-muted p-2 rounded">

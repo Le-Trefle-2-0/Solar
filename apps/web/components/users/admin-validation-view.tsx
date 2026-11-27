@@ -28,6 +28,7 @@ import {fr} from "date-fns/locale";
 import {cn} from "@/lib/utils";
 import {SecureDocumentPreview} from "@/components/users/secure-document-preview";
 import {validateDocumentsAction, rejectDocumentAction} from "@/app/actions/users";
+import {isFileId} from "@/lib/security/fileAccess";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
 import {
@@ -83,7 +84,13 @@ export function AdminValidationView({account, onClose, onUpdate}: AdminValidatio
         if (!currentDoc) return;
         setIsProcessing(true);
         try {
-            await validateDocumentsAction(localAccount.id, currentDoc.id as 'idCard' | 'casier');
+            // The file on screen: nothing is approved if the volunteer sent another one meanwhile
+            const res = await validateDocumentsAction(localAccount.id, currentDoc.id as 'idCard' | 'casier',
+                {[currentDoc.id]: currentDoc.fileId});
+            if (res?.error) {
+                toast.error(res.error);
+                return;
+            }
             toast.success(`${currentDoc.title} validé`);
             
             const updatedAccount = {...localAccount};
@@ -117,7 +124,12 @@ export function AdminValidationView({account, onClose, onUpdate}: AdminValidatio
         if (!currentDoc || !rejectReason.trim()) return;
         setIsProcessing(true);
         try {
-            await rejectDocumentAction(localAccount.id, currentDoc.id as 'idCard' | 'casier', rejectReason);
+            const res = await rejectDocumentAction(localAccount.id, currentDoc.id as 'idCard' | 'casier', rejectReason,
+                currentDoc.fileId);
+            if (res?.error) {
+                toast.error(res.error);
+                return;
+            }
             toast.success(`${currentDoc.title} refusé`);
             
             const updatedAccount = {...localAccount};
@@ -353,14 +365,15 @@ function DocumentFrame({fileId, filename}: {fileId: string, filename: string}) {
         setIsLoading(true);
         const fetchMetadata = async () => {
             try {
+                if (!isFileId(fileId)) throw new Error("Invalid file id");
                 const res = await fetch(`${storageUrl}/${encodeURIComponent(fileId)}/meta`);
                 if (!res.ok) throw new Error("Metadata error");
                 const data = await res.json();
                 setMimeType(data.mime);
-            } catch (err) {
-                const ext = filename.split('.').pop()?.toLowerCase();
-                if (ext === 'pdf') setMimeType('application/pdf');
-                else setMimeType('image/jpeg');
+            } catch {
+                // Never guess the type from the file name: only what the server confirmed is shown (#254)
+                setMimeType('inconnu');
+                setIsLoading(false);
             }
         };
         fetchMetadata();

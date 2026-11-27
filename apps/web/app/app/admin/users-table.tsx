@@ -359,7 +359,13 @@ function UserActionsCell({account, availableRoles, setUsers, setDialogOpen, setV
                             disabled={!rejectReasonText.trim()}
                             onClick={async () => {
                                 if (rejectType) {
-                                    await rejectDocumentAction(account.id, rejectType, rejectReasonText);
+                                    // The file listed here: nothing is refused if another one was sent meanwhile
+                                    const res = await rejectDocumentAction(account.id, rejectType, rejectReasonText,
+                                        rejectType === 'idCard' ? account.idCardFileId : account.casierFileId);
+                                    if (res?.error) {
+                                        toast.error(res.error);
+                                        return;
+                                    }
                                     setUsers(prev => prev.map(u => u.id === account.id ? {
                                         ...u,
                                         [rejectType === 'idCard' ? 'idCardStatus' : 'casierStatus']: 'rejected',
