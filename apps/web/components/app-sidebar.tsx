@@ -22,7 +22,8 @@ import {
     Users,
 } from "lucide-react"
 import {NavProjects} from "@/components/nav-projects"
-import {useParams} from "next/navigation";
+import {usePathname} from "next/navigation";
+import Link from "next/link";
 import {
     Sidebar,
     SidebarContent,
@@ -72,21 +73,12 @@ export function AppSidebar({pendingDocsCount = 0, unreadChannelIds = [], pending
     const {rooms: voiceRooms} = useVoiceStatus();
     const {socket} = useSocket();
     const [session, setSession] = useState<any>(null);
-    const params = useParams();
-    const [activeChannelId, setActiveChannelId] = useState<string | null>(null);
-
-    useEffect(() => {
-        const path = window.location.pathname;
-        if (path.startsWith('/app/ticket/')) {
-            setActiveChannelId(path.split('/').pop() || null);
-        } else if (path === '/app/be') {
-            setActiveChannelId('1');
-        } else if (path === '/app/chat') {
-            setActiveChannelId('chat');
-        } else {
-            setActiveChannelId(null);
-        }
-    }, [params]);
+    // The channel on screen, from the path (pages without route parameters included)
+    const pathname = usePathname();
+    const activeChannelId = pathname.startsWith('/app/ticket/') ? pathname.split('/').pop() || null
+        : pathname === '/app/be' ? '1'
+            : pathname === '/app/chat' ? 'chat'
+                : null;
 
     const [unreadIds, setUnreadIds] = useState<Set<string>>(new Set(unreadChannelIds));
     const [pendingIds, setPendingIds] = useState<Set<string>>(new Set(pendingDocsIds));
@@ -106,24 +98,16 @@ export function AppSidebar({pendingDocsCount = 0, unreadChannelIds = [], pending
             const channelId = data.channel?.id;
             const authorId = data.author?.id;
             const currentUserId = session?.user?.id;
-            console.log('[AppSidebar] Received message for channel:', channelId, 'Active channel:', activeChannelId, 'Author:', authorId, 'Me:', currentUserId);
             if (channelId && channelId !== activeChannelId && authorId !== currentUserId) {
-                setUnreadIds(prev => {
-                    const next = new Set(prev);
-                    next.add(channelId);
-                    console.log('[AppSidebar] Updated unreadIds:', Array.from(next));
-                    return next;
-                });
+                setUnreadIds(prev => new Set(prev).add(channelId));
             }
         };
 
         const handleChannelRead = (data: any) => {
-            console.log('[AppSidebar] Received channelRead event:', data);
             if (data.userId === session?.user?.id) {
                 setUnreadIds(prev => {
                     const next = new Set(prev);
                     next.delete(data.channelId);
-                    console.log('[AppSidebar] Cleared unreadId:', data.channelId, 'Remaining:', Array.from(next));
                     return next;
                 });
             }
@@ -133,7 +117,6 @@ export function AppSidebar({pendingDocsCount = 0, unreadChannelIds = [], pending
         socket.on('channelRead', handleChannelRead);
 
         const handleDocumentsUpdate = (data: any) => {
-            console.log('[AppSidebar] Received documentsUpdate event:', data);
             setPendingIds(prev => {
                 const next = new Set(prev);
                 if (data.status === 'submitted') {
@@ -220,7 +203,6 @@ export function AppSidebar({pendingDocsCount = 0, unreadChannelIds = [], pending
             permission: "newsletters.manage",
         },
     ]
-    const [tickets, setTickets] = useState<any[]>([]);
 
     useEffect(() => {
         const updateSession = () => apiFetch('/v1/auth/get-session').then(res => setSession(res));
@@ -255,54 +237,54 @@ export function AppSidebar({pendingDocsCount = 0, unreadChannelIds = [], pending
         });
     }, [session, unreadIds, activeChannelId, pendingIds]);
 
+
+    const MAX_TICKETS_BEFORE_COLLAPSE = 5;
+
+    // The list is fetched when it may have changed (session, updateRequest); unread marks and the
+    // open écoute are applied to it on render, so they never use an outdated copy of each other
+    const userId = session?.user?.id;
+    const [rawTickets, setRawTickets] = useState<any[]>([]);
+    const loadTickets = React.useCallback(() => {
+        apiFetch(`/v1/tickets`)
+            .then((res) => {
+                if (res.success) setRawTickets(res.tickets);
+            })
+            .catch(err => console.error('Failed to load tickets:', err));
+    }, []);
+
+    useEffect(() => {
+        if (userId) loadTickets();
+    }, [userId, loadTickets]);
+
+    useEffect(() => {
+        if (!socket) return;
+        socket.on('updateRequest', loadTickets);
+        return () => {
+            socket.off('updateRequest', loadTickets);
+        };
+    }, [socket, loadTickets]);
+
+    const tickets = React.useMemo(() => rawTickets.map((ticket: any) => {
+            const state = TICKET_STATES[ticketState(ticket, userId)];
+            return {
+                name: `Écoute ${String(ticket.id).padStart(5, '0')}`,
+                url: '/app/ticket/' + ticket.channelId,
+                channelId: ticket.channelId,
+                // The icon tells the status; voice écoutes show a phone while in progress,
+                // and a green dot while the call is going on
+                icon: ticket.voice && state.voiceIcon ? Phone : state.icon,
+                iconClassName: state.className,
+                status: state.label,
+                live: false,
+                hasNotification: unreadIds.has(ticket.channelId) && activeChannelId !== ticket.channelId,
+            };
+        }), [rawTickets, userId, unreadIds, activeChannelId]);
+
     // Mark tickets whose call is going on (visible to supervisors and the assigned volunteer)
     const ticketsWithVoice = React.useMemo(
         () => tickets.map((t: any) => ({...t, live: isTicketCallLive(voiceRooms[t.channelId])})),
         [tickets, voiceRooms],
     );
-
-    const MAX_TICKETS_BEFORE_COLLAPSE = 5;
-
-    const updateTickets = () => {
-        apiFetch(`/v1/tickets`)
-            .then((res) => {
-                if (res.success) {
-                    const ticketList = res.tickets;
-                    const items = ticketList.map((ticket: any) => {
-                        const idStr = String(ticket.id).padStart(5, '0');
-                        const displayName = `Écoute ${idStr}`;
-                        const state = TICKET_STATES[ticketState(ticket, session?.user?.id)];
-                        return {
-                            name: displayName,
-                            url: '/app/ticket/' + ticket.channelId,
-                            channelId: ticket.channelId,
-                            // The icon tells the status; voice écoutes show a phone while in progress,
-                            // and a green dot while the call is going on
-                            icon: ticket.voice && state.voiceIcon ? Phone : state.icon,
-                            iconClassName: state.className,
-                            status: state.label,
-                            live: false,
-                            hasNotification: unreadIds.has(ticket.channelId) && activeChannelId !== ticket.channelId
-                        };
-                    });
-                    setTickets(items);
-                }
-            })
-            .catch(err => console.error('Failed to load tickets:', err));
-    }
-
-    useEffect(() => {
-        if (!socket) return;
-        const onUpdateRequest = () => updateTickets();
-        socket.on('updateRequest', onUpdateRequest);
-        return () => {
-            socket.off('updateRequest', onUpdateRequest);
-        };
-    }, [socket]);
-
-    useEffect(() => {
-        updateTickets()
-    }, [session, unreadIds, activeChannelId]);
 
     return (
         <Sidebar variant="inset" {...props}>
@@ -310,17 +292,17 @@ export function AppSidebar({pendingDocsCount = 0, unreadChannelIds = [], pending
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <a>
+                            <Link href="/app">
                                 <div
                                     className="text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-
-                                    <Image src={logo} alt="logo" height={80}/>
+                                    {/* Decorative: the name next to it says the same */}
+                                    <Image src={logo} alt="" height={80}/>
                                 </div>
                                 <div className="grid flex-1 text-left text-sm leading-tight">
                                     <span className="truncate font-medium">Le Trèfle 2.0</span>
                                     <span className="truncate text-xs">Association d'écoute</span>
                                 </div>
-                            </a>
+                            </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
@@ -340,7 +322,10 @@ export function AppSidebar({pendingDocsCount = 0, unreadChannelIds = [], pending
                                                 <Ear/>
                                                 <span>Écoutes ({tickets.length})</span>
                                                 {tickets.some(t => t.hasNotification) && (
-                                                    <span className="absolute top-2 left-5 flex h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                                                    <>
+                                                        <span aria-hidden className="absolute top-2 left-5 flex h-2 w-2 rounded-full bg-red-500 motion-safe:animate-pulse"/>
+                                                        <span className="sr-only">, nouveaux messages</span>
+                                                    </>
                                                 )}
                                                 <ChevronRight
                                                     className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"/>
@@ -351,17 +336,24 @@ export function AppSidebar({pendingDocsCount = 0, unreadChannelIds = [], pending
                                                 {ticketsWithVoice.map((ticket: any) => (
                                                     <SidebarMenuSubItem key={ticket.name}>
                                                         <SidebarMenuSubButton asChild className="relative pr-6">
-                                                            <a href={ticket.url} title={`${ticket.name} : ${ticket.status}`}>
+                                                            <Link href={ticket.url} title={`${ticket.name} : ${ticket.status}`}
+                                                                  aria-current={activeChannelId === ticket.channelId ? "page" : undefined}>
                                                                 <ticket.icon className={ticket.iconClassName} aria-hidden/>
                                                                 <span className="truncate">{ticket.name}</span>
                                                                 <span className="sr-only">, {ticket.status}</span>
                                                                 {ticket.live && (
-                                                                    <Phone className="size-3 text-emerald-600" aria-label="Appel en cours"/>
+                                                                    <>
+                                                                        <Phone className="size-3 text-emerald-600" aria-hidden/>
+                                                                        <span className="sr-only">, appel en cours</span>
+                                                                    </>
                                                                 )}
                                                                 {ticket.hasNotification && (
-                                                                    <span className="absolute top-1/2 -translate-y-1/2 right-2 flex h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                                                                    <>
+                                                                        <span aria-hidden className="absolute top-1/2 -translate-y-1/2 right-2 flex h-2 w-2 rounded-full bg-red-500 motion-safe:animate-pulse"/>
+                                                                        <span className="sr-only">, nouveaux messages</span>
+                                                                    </>
                                                                 )}
-                                                            </a>
+                                                            </Link>
                                                         </SidebarMenuSubButton>
                                                     </SidebarMenuSubItem>
                                                 ))}

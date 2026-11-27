@@ -1,8 +1,9 @@
 "use client"
 
 import {type LucideIcon,} from "lucide-react"
+import Link from "next/link";
 import {SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem,} from "@/components/ui/sidebar"
-import {usePathname, useRouter} from "next/navigation";
+import {usePathname} from "next/navigation";
 import {cn} from "@/lib/utils";
 
 export function NavProjects({
@@ -21,7 +22,6 @@ export function NavProjects({
         live?: boolean
     }[]
 }) {
-    const router = useRouter()
     const pathname = usePathname()
 
     return (
@@ -32,25 +32,29 @@ export function NavProjects({
                     return (
                         <SidebarMenuItem key={item.name}>
                             <SidebarMenuButton asChild isActive={isActive}>
-                                <a onClick={() => router.push(item.url)}
-                                   title={item.status ? `${item.name} : ${item.status}` : undefined}
-                                   className="cursor-pointer relative flex min-w-0 items-center gap-2">
+                                {/* A real link: reachable with the keyboard, opens in a new tab */}
+                                <Link href={item.url}
+                                      aria-current={isActive ? "page" : undefined}
+                                      title={item.status ? `${item.name} : ${item.status}` : undefined}
+                                      className="relative flex min-w-0 items-center gap-2">
                                     {isActive && (
-                                        <div className="absolute left-[-12px] h-1.5 w-1.5 rounded-full bg-primary"/>
+                                        <span aria-hidden className="absolute left-[-12px] h-1.5 w-1.5 rounded-full bg-primary"/>
                                     )}
-                                    <div className="relative shrink-0">
+                                    <span className="relative shrink-0">
                                         <item.icon className={cn("size-4 shrink-0", item.iconClassName)} aria-hidden/>
                                         {item.hasNotification && (
-                                            <span className="absolute -top-1 -right-1 flex h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                                            <span aria-hidden className="absolute -top-1 -right-1 flex h-2 w-2 rounded-full bg-red-500 motion-safe:animate-pulse"/>
                                         )}
                                         {item.live && (
-                                            <span className="absolute -bottom-1 -right-1 flex h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-sidebar"
-                                                  title="Appel en cours" aria-label="Appel en cours"/>
+                                            <span aria-hidden title="Appel en cours"
+                                                  className="absolute -bottom-1 -right-1 flex h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-sidebar"/>
                                         )}
-                                    </div>
+                                    </span>
                                     <span className="truncate">{item.name}</span>
                                     {item.status && <span className="sr-only">, {item.status}</span>}
-                                </a>
+                                    {item.hasNotification && <span className="sr-only">, nouveaux messages</span>}
+                                    {item.live && <span className="sr-only">, appel en cours</span>}
+                                </Link>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     );
