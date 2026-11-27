@@ -1,5 +1,5 @@
 import {NextResponse} from "next/server";
-import {canDeleteFile, canReadFile, fileResponseHeaders} from "@/lib/security/fileAccess";
+import {canDeleteFile, canReadFile, fileResponseHeaders, isFileId} from "@/lib/security/fileAccess";
 import {getFileMeta, getFileOwnership, getViewer, storageFetch} from "@/lib/storageClient";
 
 type Ctx = {params: Promise<{id: string}>};
@@ -11,6 +11,8 @@ export async function GET(_req: Request, {params}: Ctx) {
     const viewer = await getViewer();
     if (!viewer) return NextResponse.json({error: "unauthorized"}, {status: 401});
     const {id} = await params;
+    // Only a file id (UUID) reaches the storage service (#254)
+    if (!isFileId(id)) return notFound();
 
     try {
         const meta = await getFileMeta(id);
@@ -30,6 +32,7 @@ export async function DELETE(_req: Request, {params}: Ctx) {
     if (!viewer) return NextResponse.json({error: "unauthorized"}, {status: 401});
     if (!canDeleteFile(viewer)) return NextResponse.json({error: "forbidden"}, {status: 403});
     const {id} = await params;
+    if (!isFileId(id)) return notFound();
 
     try {
         const res = await storageFetch(`/v1/files/${encodeURIComponent(id)}`, {method: "DELETE"});
