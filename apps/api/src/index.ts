@@ -46,7 +46,10 @@ app.setErrorHandler(errorHandler);
 // The default handler logs the full URL, query string included
 app.setNotFoundHandler((_req, reply) => reply.status(404).send({error: 'not_found'}));
 
-await app.register(swagger, {
+// The API reference (/docs, /docs/json, /docs/yaml) lists every route, internal ones
+// included, and nothing in Solar uses it: only with API_DOCS=true
+const API_DOCS = process.env.API_DOCS === 'true';
+if (API_DOCS) await app.register(swagger, {
     openapi: {
         info: {
             title: 'Solar API',
@@ -73,7 +76,7 @@ await app.register(swagger, {
     }
 });
 
-await app.register(swaggerUi, {
+if (API_DOCS) await app.register(swaggerUi, {
     routePrefix: '/docs',
 });
 

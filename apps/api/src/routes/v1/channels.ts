@@ -42,7 +42,9 @@ export async function registerChannelsRoutes(app: FastifyInstance, deps: Channel
     const bodySchema = z.object({id: z.string().min(1)});
 
     // POST /v1/channels – returns channels the user can access
+    // Legacy: no part of Solar calls it (one query per channel). Only with API_LEGACY_CHANNEL_LIST=true
     app.post('/v1/channels', async (req, reply) => {
+        if (process.env.API_LEGACY_CHANNEL_LIST !== 'true') return reply.status(404).send({error: 'not_found'});
         try {
             const userId = await authenticate(req);
             if (!userId) return reply.status(401).send('unauthorized');

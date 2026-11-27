@@ -23,7 +23,8 @@ import {registerPresenceRoutes} from './presence.js';
 import {registerSpectateRoutes} from './spectate.js';
 
 export async function registerV1Routes(app: FastifyInstance) {
-    await registerUsersRoutes(app);
+    // GET /v1/users/:id: no part of Solar calls it. Only with API_USER_PROFILE_ROUTE=true
+    if (process.env.API_USER_PROFILE_ROUTE === 'true') await registerUsersRoutes(app);
     await registerMessagesRoutes(app);
     await registerChannelsRoutes(app);
     await registerTicketsRoutes(app);

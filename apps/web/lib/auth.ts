@@ -58,7 +58,9 @@ const pluginList: any[] = [
             definePayload: ({user, session}) => ({...user, sid: session.id}),
         },
     }),
-    bearer(),
+    // The app signs in with cookies only: a session token sent as "Authorization: Bearer", and
+    // the set-auth-token response header, only when explicitly enabled
+    ...(process.env.AUTH_BEARER_TOKENS === "true" ? [bearer()] : []),
     passkey(),
 ];
 
@@ -160,6 +162,25 @@ export const auth = betterAuth({
             const endpoint = (context as any)?.path || "";
             if (endpoint.startsWith("/admin/") || path.includes("/api/auth/admin/")) {
                 throw new APIError("FORBIDDEN", {message: "Not available"});
+            }
+            // Plugin endpoints no screen of the app calls stay closed unless explicitly enabled:
+            // API keys (the bot's key is made by the API itself), sign-in by username,
+            // organizations. Checked on the matched endpoint, before its body is validated.
+            // better-auth-ui's provider reads the organization list and the active organization on
+            // every signed-in page: those two stay open, and answer empty since nobody can join one.
+            const organizationRead = endpoint === "/organization/list" || endpoint === "/organization/get-full-organization";
+            if ((endpoint.startsWith("/api-key/") && process.env.AUTH_API_KEY_ENDPOINTS !== "true")
+                || ((endpoint === "/sign-in/username" || endpoint === "/is-username-available")
+                    && process.env.AUTH_USERNAME_SIGN_IN !== "true")
+                || (endpoint.startsWith("/organization/") && !organizationRead && process.env.AUTH_ORGANIZATIONS !== "true")) {
+                throw new APIError("NOT_FOUND", {message: "Not available"});
+            }
+            // No e-mail verification is configured, so no verification link is ever sent: its
+            // tokens are not parsed at all until it is (emailVerification or user.changeEmail)
+            const authOptions = (context as any)?.context?.options;
+            if (endpoint === "/verify-email" && !authOptions?.emailVerification?.sendVerificationEmail
+                && !authOptions?.user?.changeEmail?.enabled) {
+                throw new APIError("NOT_FOUND", {message: "Not available"});
             }
             // Profile fields: bounded, an avatar is a small image (#262)
             if (endpoint === "/update-user") {
