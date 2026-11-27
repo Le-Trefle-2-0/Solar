@@ -1,6 +1,6 @@
 "use client";
 
-import {authClient} from "@/lib/auth-client";
+import {signOutEverywhere} from "@/lib/sign-out";
 import {useRouter} from "next/navigation";
 
 export default function SignoutButton() {
@@ -8,13 +8,7 @@ export default function SignoutButton() {
     return (
         <button
             className="bg-neutral-700 text-white p-2 rounded-md"
-            onClick={async () => await authClient.signOut({
-                fetchOptions: {
-                    onSuccess: () => {
-                        router.push("/auth/signin");
-                    },
-                },
-            })}
+            onClick={() => signOutEverywhere(() => router.push("/auth/signin"))}
         >
             Déconnexion
         </button>

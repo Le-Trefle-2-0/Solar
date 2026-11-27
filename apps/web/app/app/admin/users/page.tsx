@@ -1,4 +1,6 @@
 import {UsersTable} from "../users-table";
+import {DEFAULT_ROLE} from "@/lib/permissions";
+import {can, getAccess} from "@/lib/userPermissions";
 import {DisplayAccount} from "@/lib/interface";
 import prisma from "@/lib/prisma";
 import {subDays} from "date-fns";
@@ -13,6 +15,8 @@ async function getData(): Promise<{ users: DisplayAccount[], roles: any[] }> {
     const hideEmails = process.env.HIDE_EMAILS_IN_ADMIN === "true";
 
     const accountsWithLatestTicket = await prisma.user.findMany({
+        // Removed accounts are kept, emptied, for the history of écoutes (deleteUserAction)
+        where: {NOT: {email: {endsWith: "@compte-supprime.invalid"}}},
         select: {
             id: true,
             name: true,
@@ -37,7 +41,7 @@ async function getData(): Promise<{ users: DisplayAccount[], roles: any[] }> {
             casierFileId: true,
             casierStatus: true,
             casierRejectReason: true,
-            Ticket: {
+            tickets: {
                 where: {
                     createdAt: {
                         gte: subDays(new Date(), 90),
@@ -54,7 +58,9 @@ async function getData(): Promise<{ users: DisplayAccount[], roles: any[] }> {
         },
     });
 
+    // The default role is never offered: no role selected means no access
     const roles = await prisma.role.findMany({
+        where: {name: {not: DEFAULT_ROLE}},
         orderBy: {weight: 'desc'}
     });
 
@@ -66,7 +72,7 @@ async function getData(): Promise<{ users: DisplayAccount[], roles: any[] }> {
                 username: acc.username as string,
                 email: hideEmails ? truncateEmail(acc.email) : acc.email,
                 role: acc.role as string,
-                lastTicketTimestamp: acc.Ticket.length > 0 ? acc.Ticket[0].createdAt.getTime() : 0,
+                lastTicketTimestamp: acc.tickets.length > 0 ? acc.tickets[0].createdAt.getTime() : 0,
                 documentsStatus: acc.documentsStatus,
                 documentsSentAt: acc.documentsSentAt,
                 documentsValidatedAt: acc.documentsValidatedAt,
@@ -92,7 +98,7 @@ async function getData(): Promise<{ users: DisplayAccount[], roles: any[] }> {
 }
 
 export const metadata = constructMetadata({
-    title: "Administration • Utilisateurs",
+    title: "Administration • Bénévoles",
     noIndex: true,
 });
 
@@ -103,21 +109,16 @@ export default async function AdminUsersPage() {
 
     if (!session) redirect('/auth/sign-in');
 
-    const userRoles = ((session.user as any).role || "").split(",").map((r: string) => r.trim());
-    const userPermissions = (session.user as any).permissions || [];
-    const hasAccess = userRoles.includes("admin") ||
-        userRoles.includes("manager") ||
-        userPermissions.includes("management.manage_accounts") ||
-        userPermissions.includes("admin.sudo");
-
-    if (!hasAccess) {
+    // Permission-based: role names grant nothing by themselves
+    const access = await getAccess();
+    if (!access || !can(access.permissions, 'management.manage_accounts')) {
         redirect("/app");
     }
 
     const {users, roles} = await getData()
 
     return (
-        <Page title="Utilisateurs" description="Gérez les comptes utilisateurs et les accès">
+        <Page title="Bénévoles" description="Gérez les comptes des bénévoles et leurs accès">
             <UsersTable data={users} availableRoles={roles}/>
         </Page>
     )

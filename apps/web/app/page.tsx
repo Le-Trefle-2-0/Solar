@@ -22,14 +22,29 @@ export default async function Home() {
         headers: await headers(),
     });
 
-    const categories = await prisma.teamCategory.findMany({
+    const rawCategories = await prisma.teamCategory.findMany({
         include: {
             members: {
-                orderBy: { name: 'asc' }
+                include: {
+                    person: true
+                },
+                orderBy: {
+                    person: {
+                        name: 'asc'
+                    }
+                }
             }
         },
         orderBy: { order: 'asc' }
     });
+
+    // Les membres sans personne associée (personId nullable) ne sont pas affichables
+    const categories = rawCategories.map(category => ({
+        ...category,
+        members: category.members.filter(
+            (member): member is typeof member & { person: NonNullable<typeof member.person> } => member.person !== null
+        ),
+    }));
 
     // Onboarding: ne pas rediriger d'ici, laisser la page d'accueil publique
     // La redirection se fera dans la page d'authentification si nécessaire

@@ -69,19 +69,24 @@ model User {
   idCardStatus           String?             @default("missing")
   lastName               String?             @db.Text
   newsletterSubscription Boolean             @default(false)
+  onboardedAt            DateTime?
   accounts               Account[]
   apikeys                Apikey[]
-  Event                  Event[]
-  EventRegistration      EventRegistration[]
+  events                 Event[]
+  eventRegistrations     EventRegistration[]
   invitations            Invitation[]
   members                Member[]
   messages               Message[]
   newsletters            Newsletter[]
   passkeys               Passkey[]
-  Reaction               Reaction[]
+  reactions              Reaction[]
   sessions               Session[]
-  Ticket                 Ticket[]
+  tickets                Ticket[]
   twofactors             TwoFactor[]
+  channelReads           UserChannelRead[]
+  vigilances             Vigilance[]
+  permanencePresences    PermanencePresence[]
+  spectateRequests       SpectateRequest[]
 
   @@map("user")
 }
@@ -105,7 +110,10 @@ model File {
   mime      String   @db.Text
   size      Int
   createdAt DateTime @default(now())
+  /// User who uploaded the file, checked before it can be read or linked (#211)
+  uploadedById String?
 
+  @@index([uploadedById])
   @@map("file")
 }
 
@@ -191,6 +199,7 @@ model Invitation {
   role           String?      @db.Text
   status         String       @db.Text
   expiresAt      DateTime
+  createdAt      DateTime     @default(now())
   inviterId      String
   user           User         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
@@ -206,6 +215,9 @@ model TwoFactor {
   backupCodes String  @db.Text
   userId      String
   verified    Boolean
+  /// better-auth 1.7: wrong-code counter and lockout
+  failedVerificationCount Int       @default(0)
+  lockedUntil             DateTime?
   user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId], map: "two_factor_userId_fkey")
@@ -213,14 +225,26 @@ model TwoFactor {
 }
 
 model Channel {
-  id      String    @id @default(cuid())
-  name    String
-  Event   Event[]
-  Message Message[]
-  Ticket  Ticket?
+  id           String            @id @default(cuid())
+  name         String
+  events       Event[]
+  messages     Message[]
+  ticket       Ticket?
+  channelReads UserChannelRead[]
 
   @@unique([id, name])
   @@map("channel")
+}
+
+model UserChannelRead {
+  userId    String
+  channelId String
+  lastRead  DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  @@id([userId, channelId])
+  @@map("user_channel_read")
 }
 
 model Message {
@@ -233,15 +257,39 @@ model Message {
   edited    Boolean    @default(false)
   replyID   Int?
   ticketId  Int?
+  /// Discord écoutes: when the bot delivered this volunteer message to the user (#298)
+  relayedAt   DateTime?
+  /// Discord écoutes: the user could not be reached (DMs closed, account gone)
+  relayFailed Boolean   @default(false)
+  /// Note of the team in the transcript (e.g. an identity revealed): never shown to the
+  /// visitor nor sent to the Discord user
+  internal    Boolean   @default(false)
   channel   Channel    @relation(fields: [channelId], references: [id], onDelete: Cascade)
   ticket    Ticket?    @relation(fields: [ticketId], references: [id])
   user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Reaction  Reaction[]
+  reactions Reaction[]
 
   @@index([channelId], map: "message_channelId_fkey")
   @@index([ticketId], map: "message_ticketId_fkey")
   @@index([userId], map: "message_userId_fkey")
   @@map("message")
+}
+
+/// A concern noted about a person who asks for écoutes (abuse, risk…), shown to the volunteers
+/// of their next écoutes. The person is known by the keyed hash of their Discord id only.
+model Vigilance {
+  id            String   @id @default(cuid())
+  requesterHash String   @db.VarChar(80)
+  category      String   @db.VarChar(64)
+  note          String?  @db.Text
+  ticketId      Int?
+  createdById   String?
+  createdAt     DateTime @default(now())
+  createdBy     User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([requesterHash])
+  @@index([createdById])
+  @@map("vigilance")
 }
 
 model Reaction {
@@ -271,10 +319,51 @@ model Event {
   user          User                @relation(fields: [userId], references: [id])
   registrations EventRegistration[]
   roleSlots     RoleSlot[]
+  presences     PermanencePresence[]
+  spectateRequests SpectateRequest[]
 
   @@index([channelID], map: "event_channelID_fkey")
   @@index([userId], map: "event_userId_fkey")
   @@map("event")
+}
+
+/// A volunteer who joined a permanence ("Rejoindre la permanence"), registered for it or as a
+/// reinforcement: only present volunteers can be assigned écoutes. Kept after they leave.
+model PermanencePresence {
+  id       String    @id @default(cuid())
+  eventId  String
+  userId   String
+  joinedAt DateTime  @default(now())
+  leftAt   DateTime?
+  event    Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([eventId, leftAt])
+  @@index([userId])
+  @@map("permanence_presence")
+}
+
+/// A volunteer in training asking, from a permanence's channel, to observe an écoute. A manager
+/// approves it by choosing an ongoing écoute, read-only for the trainee until it ends, or refuses it.
+/// status: pending | approved | refused | ended (cancelled, stopped, or the écoute ended).
+model SpectateRequest {
+  id          String    @id @default(cuid())
+  eventId     String
+  userId      String
+  status      String    @default("pending")
+  ticketId    Int?
+  decidedById String?
+  createdAt   DateTime  @default(now())
+  decidedAt   DateTime?
+  endedAt     DateTime?
+  event       Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ticket      Ticket?   @relation(fields: [ticketId], references: [id], onDelete: SetNull)
+
+  @@index([eventId, status])
+  @@index([userId, status])
+  @@index([ticketId, status])
+  @@map("spectate_request")
 }
 
 model RoleSlot {
@@ -297,7 +386,7 @@ model EventRegistration {
   registeredAt DateTime @default(now())
   eventId      String?
   status       String   @default("confirmed")
-  Event        Event?   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event        Event?   @relation(fields: [eventId], references: [id], onDelete: Cascade)
   roleSlot     RoleSlot @relation(fields: [roleSlotId], references: [id], onDelete: Cascade)
   user         User     @relation(fields: [userId], references: [id])
 
@@ -325,7 +414,8 @@ model Ticket {
   source         String       @default("discord")
   categories     Json?
   feedback       Json?
-  Message        Message[]
+  messages       Message[]
+  spectators     SpectateRequest[]
   user           User?        @relation(fields: [assignedUserId], references: [id])
   channel        Channel?     @relation(fields: [channelId, channelName], references: [id, name], onDelete: Cascade)
   status         TicketStatus @relation(fields: [statusName, statusLabel], references: [name, label])
@@ -349,6 +439,8 @@ model TicketStatus {
 
 model Apikey {
   id                  String    @id
+  /// better-auth 1.7: key configuration ("default" for keys created before)
+  configId            String    @default("default") @db.VarChar(191)
   name                String?   @db.Text
   start               String?   @db.Text
   prefix              String?   @db.Text
@@ -372,6 +464,7 @@ model Apikey {
   user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId], map: "apikey_userId_fkey")
+  @@index([configId])
   @@map("apikey")
 }
 
@@ -380,6 +473,9 @@ model Jwks {
   publicKey  String   @db.Text
   privateKey String   @db.Text
   createdAt  DateTime
+  expiresAt  DateTime?
+  alg        String?
+  crv        String?
 
   @@map("jwks")
 }
@@ -413,17 +509,18 @@ model Passkey {
 }
 
 model Recruitment {
-  id             String                @id @default(cuid())
-  title          String
-  description    String                @db.LongText
-  icon           String?
-  fields         Json
-  enabled        Boolean               @default(true)
-  createdAt      DateTime              @default(now())
-  updatedAt      DateTime              @updatedAt
-  contactEmail   String?
-  discordWebhook String?               @db.Text
-  waitlist       RecruitmentWaitlist[]
+  id               String                @id @default(cuid())
+  title            String
+  description      String                @db.LongText
+  shortDescription String?               @db.Text
+  icon             String?
+  fields           Json
+  enabled          Boolean               @default(true)
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  contactEmail     String?
+  discordWebhook   String?               @db.Text
+  waitlist         RecruitmentWaitlist[]
 
   @@map("recruitment")
 }
@@ -444,6 +541,8 @@ model TeamCategory {
   id        String       @id @default(cuid())
   name      String
   icon      String?
+  type      String       @default("DEFAULT")
+  color     String?
   order     Int          @default(0)
   members   TeamMember[]
   createdAt DateTime     @default(now())
@@ -452,18 +551,41 @@ model TeamCategory {
   @@map("team_category")
 }
 
+model TeamPerson {
+  id        String       @id @default(cuid())
+  name      String       @unique
+  image     String?      @db.LongText
+  bio       String?      @db.Text
+  /// Discord account the name and photo are imported from (optional)
+  discordId         String?   @unique @db.VarChar(32)
+  /// Whether the name / photo follow Discord; turned off when customised
+  syncName          Boolean   @default(true)
+  syncImage         Boolean   @default(true)
+  /// Avatar imported last, to download the photo again only when it changed
+  discordAvatarHash String?
+  discordSyncedAt   DateTime?
+  discordSyncError  String?   @db.Text
+  members   TeamMember[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@map("team_person")
+}
+
 model TeamMember {
   id         String       @id @default(cuid())
-  name       String
   role       String
-  image      String?      @db.LongText
-  bio        String?      @db.Text
+  isLead     Boolean      @default(false)
+  teamName   String?
   categoryId String
+  personId   String?
   category   TeamCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  person     TeamPerson?  @relation(fields: [personId], references: [id], onDelete: Cascade)
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
 
   @@index([categoryId], map: "team_member_categoryId_fkey")
+  @@index([personId], map: "team_member_personId_fkey")
   @@map("team_member")
 }
 

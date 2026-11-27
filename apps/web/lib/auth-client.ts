@@ -1,7 +1,6 @@
 import {createAuthClient} from "better-auth/react";
 import {
     adminClient,
-    emailOTPClient,
     organizationClient,
     twoFactorClient,
     usernameClient
@@ -16,7 +15,6 @@ import {getWebBase} from "@/lib/api";
 export const authClient = createAuthClient({
     baseURL: getWebBase(),
     plugins: [
-        emailOTPClient(),
         adminClient({
             ac, roles: {
                 training, volunteer, manager, bot, admin, newsletterManager
@@ -35,5 +33,4 @@ export const {
     signOut,
     signUp,
     useSession,
-    emailOtp,
 } = authClient;

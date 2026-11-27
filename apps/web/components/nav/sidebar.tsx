@@ -15,9 +15,6 @@ export default async function Nav() {
 
     if (!session) return redirect("/auth/sign-in");
 
-    const userRoles = ((session.user as any).role || "").split(",").map((r: string) => r.trim());
-    const isAdmin = userRoles.includes("admin") || userRoles.includes("manager");
-
     return (
         <div className="w-2xs border-e border-main flex flex-col justify-between items-center">
             <div className="w-5/6 flex flex-row items-center gap-6 mt-2">

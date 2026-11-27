@@ -5,6 +5,9 @@ import {broadcast} from '../../lib/broadcast.js';
 import {z} from "zod";
 
 import {getUserPermissions, hasPermission} from '../../lib/permissions.js';
+import {neutralizeHtml} from '../../lib/sanitize.js';
+import {getChannelAccess} from '../../lib/channelAccess.js';
+import {isTicketWritable} from '../../lib/ticketWrites.js';
 
 async function checkAuth(req: any, reply: any) {
     const userId = await authenticate(req);
@@ -20,13 +23,19 @@ async function hasManagePermission(userId: string) {
     return hasPermission(perms, 'messages.manage');
 }
 
+/** The écoute a message belongs to is still open (#266). */
+async function messageWritable(ticketId: number | null): Promise<boolean> {
+    if (!ticketId) return true;
+    return isTicketWritable(await prisma.ticket.findUnique({where: {id: ticketId}, select: {statusName: true}}));
+}
+
 export async function registerMessageRoutes(app: FastifyInstance) {
     app.post('/v1/messages', async (req, reply) => {
         const userId = await checkAuth(req, reply);
         if (!userId) return;
 
         const bodySchema = z.object({
-            channelId: z.string().min(1),
+            channelId: z.string().min(1).max(64),
             content: z.string().min(1).max(2000),
             discordID: z.string().optional().nullable(),
             replyID: z.number().optional().nullable(),
@@ -34,12 +43,18 @@ export async function registerMessageRoutes(app: FastifyInstance) {
 
         try {
             const body = bodySchema.parse(req.body);
+            // Same rule as reading, for writing (#217)
+            if (!(await getChannelAccess(userId, body.channelId)).write) {
+                return reply.status(403).send({success: false, error: 'forbidden'});
+            }
+            body.content = neutralizeHtml(body.content);
             const user = await prisma.user.findUnique({where: {id: userId}});
             if (!user) return reply.status(404).send({success: false, error: 'User not found'});
 
             const ticket = await prisma.ticket.findFirst({
                 where: {channelId: body.channelId}
             });
+            if (!isTicketWritable(ticket)) return reply.status(409).send({success: false, error: 'ticket_closed'});
 
             const message = await prisma.message.create({
                 data: {
@@ -77,7 +92,8 @@ export async function registerMessageRoutes(app: FastifyInstance) {
             if (e instanceof z.ZodError) {
                 return reply.status(400).send({success: false, error: e.flatten()});
             }
-            return reply.status(500).send({success: false, error: String(e)});
+            req.log.error(e);
+            return reply.status(500).send({success: false, error: 'internal_error'});
         }
     });
 
@@ -100,6 +116,7 @@ export async function registerMessageRoutes(app: FastifyInstance) {
         }
 
         if (!authorized) return reply.status(403).send({success: false, error: 'Forbidden'});
+        if (!(await messageWritable(message.ticketId))) return reply.status(409).send({success: false, error: 'ticket_closed'});
 
         await prisma.reaction.deleteMany({where: {messageID: messageIdNum}});
         await prisma.message.delete({where: {id: messageIdNum}});
@@ -120,10 +137,10 @@ export async function registerMessageRoutes(app: FastifyInstance) {
         }
 
         const body = (req.body ?? {}) as { content?: string };
-        const newContent = body.content;
-        if (typeof newContent !== 'string' || newContent.trim().length === 0 || newContent.length > 2000) {
+        if (typeof body.content !== 'string' || body.content.trim().length === 0 || body.content.length > 2000) {
             return reply.status(400).send({success: false, error: 'Invalid content'});
         }
+        const newContent = neutralizeHtml(body.content);
 
         const message = await prisma.message.findUnique({where: {id: messageIdNum}});
         if (!message) return reply.status(404).send({success: false, error: 'Not found'});
@@ -134,6 +151,7 @@ export async function registerMessageRoutes(app: FastifyInstance) {
         }
 
         if (!authorized) return reply.status(403).send({success: false, error: 'Forbidden'});
+        if (!(await messageWritable(message.ticketId))) return reply.status(409).send({success: false, error: 'ticket_closed'});
 
         const updated = await prisma.message.update({
             where: {id: messageIdNum},

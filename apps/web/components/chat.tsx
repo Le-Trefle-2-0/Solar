@@ -6,24 +6,22 @@ import {EmojiPicker, EmojiPickerContent, EmojiPickerFooter, EmojiPickerSearch,} 
 import {
     Check,
     ChevronsUpDown,
-    CircleAlert,
-    Copy,
-    IdCardLanyard,
     Info,
     Laugh,
     MessageCircleOff,
-    MicOff,
     NotebookPen,
-    PhoneCall,
-    ScanFace,
     Send,
+    ShieldAlert,
     TvMinimalPlay,
     UserRoundPlus,
-    UserRoundX,
     X
 } from "lucide-react";
+import * as LucideIcons from "lucide-react";
 import React, {FormEvent, useEffect, useLayoutEffect, useRef, useState} from "react";
-import {EventData, formVolunteer, Msg, MsgWithID, ticketInfo} from "@/lib/interface";
+import {EventData, formVolunteer, Msg, MsgWithID} from "@/lib/interface";
+import {TicketInfoDialog} from "@/components/ticket-info-dialog";
+import {PermanencePresence} from "@/components/permanence-presence";
+import {ObservationBar, SpectatePanel, useSpectate} from "@/components/spectate-panel";
 import {z, ZodError} from "zod";
 import {toast} from "sonner";
 import {saveMessage} from "@/lib/messageManager";
@@ -40,6 +38,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
+    Label,
     Skeleton,
     Textarea,
     useSidebar
@@ -62,22 +61,33 @@ import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandL
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form"
 import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover"
 import {ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger} from "@/components/ui/context-menu"
-import type {Reaction, Ticket} from "@prisma/client"
+import type {Reaction, Ticket} from "../../../generated/prisma"
 import {useRouter} from "next/navigation";
 import {Message} from "@/components/message";
 import {useSocket} from "@/context/Socket";
-import {usePeer} from "@/context/VoicePeer";
-import {VisuallyHidden} from "@radix-ui/react-visually-hidden";
+import {PermanenceVoiceControls, TicketVoiceControls} from "@/components/voice/chat-voice-controls";
 import {apiFetch} from "@/lib/api";
+import {markChannelAsRead} from "@/app/actions/chat";
 
 export function Chat(props: { channelID: string, statusID: number }) {
     const {channelID, statusID} = props;
     const [status, setStatus] = useState(statusID);
+    // Dialogs closed by hand once their request succeeded (a closing button must not be the
+    // submit button: it removes the form before the browser submits it)
+    const [assignOpen, setAssignOpen] = useState(false);
+    const [transmissionOpen, setTransmissionOpen] = useState(false);
+    const [assigning, setAssigning] = useState(false);
+    const [closeReason, setCloseReason] = useState("");
+    // Managers (tickets.attribute) may close an écoute nobody was assigned to without a transmission
+    const [canAttribute, setCanAttribute] = useState(false);
+    // Volunteers in training observing this écoute: read-only, no écoute toolbar
+    const {state: spectate, reload: reloadSpectate} = useSpectate();
+    const observation = status !== 0 && spectate?.me.request?.status === "approved"
+    && spectate.me.request.ticket?.channelId === channelID ? spectate.me.request : null;
     const {data: session} = useSession();
     const {socket, setChannelID} = useSocket();
     const router = useRouter();
     const [emojiOpen, setEmojiOpen] = useState(false);
-    const [ticketInfo, setTicketInfo] = useState<ticketInfo>();
     const [gifOpen, setGifOpen] = useState(false);
     const [showTyping, setShowTyping] = useState(false);
     const [typingUsers, setTypingUsers] = useState<{ id: string; name: string; image: string | null }[]>([]);
@@ -112,13 +122,14 @@ export function Chat(props: { channelID: string, statusID: number }) {
     const [idToCall, setIdToCall] = useState('');
     const [localStream, setLocalStream] = useState<MediaStream | null>(null);
     const [available, setAvailable] = useState<formVolunteer[]>([]);
-    const [ineligibleText, setIneligibleText] = useState<string[]>([]);
-    const [ineligibleVoice, setIneligibleVoice] = useState<string[]>([]);
     const {toggleSidebar} = useSidebar();
     const [canManageMessages, setCanManageMessages] = useState(false);
     const [eventInfo, setEventInfo] = useState<EventData | null>(null);
     const [loadingEvent, setLoadingEvent] = useState(false);
     const [eventDialogOpen, setEventDialogOpen] = useState(false);
+    const [lastReadTimestamp, setLastReadTimestamp] = useState<number | null>(null);
+    const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
+    const lastReadFetched = useRef<string | null>(null);
 
     const fetchEventInfo = async () => {
         setLoadingEvent(true);
@@ -137,8 +148,6 @@ export function Chat(props: { channelID: string, statusID: number }) {
         }
     };
 
-    const myAudioRef = useRef<HTMLAudioElement>(null);
-
     // LanguageTool (French) spellcheck state for chat input
     const [ltMatches, setLtMatches] = useState<{
         offset: number;
@@ -155,7 +164,6 @@ export function Chat(props: { channelID: string, statusID: number }) {
         length: 0,
         suggestions: []
     });
-    const remoteAudioRef = useRef<HTMLAudioElement>(null);
     const initialAutoScrollPending = useRef(false);
     const isAtBottomRef = useRef(true);
 
@@ -206,76 +214,8 @@ export function Chat(props: { channelID: string, statusID: number }) {
         return result;
     };
 
-    // Throttled + debounced scheduling for LanguageTool checks
-    const [ltQuery, setLtQuery] = useState<string>("");
-    const lastCheckAtRef = useRef<number>(0);
-    const lastCheckedTextRef = useRef<string>("");
-    useEffect(() => {
-        // Clear on empty or very short inputs
-        if (!currentMsg || currentMsg.trim().length < 4) {
-            setLtMatches([]);
-            setHighlightHtml("");
-            setLtQuery("");
-            return;
-        }
-        const now = Date.now();
-        const minInterval = 1200; // throttle: at most ~1.2s
-        const idleDelay = 800; // debounce after pause
-        const prev = lastCheckedTextRef.current;
-        const delta = Math.abs(currentMsg.length - prev.length);
-        const significantChange = delta >= 5 || /[\s\.,;:!?]$/.test(currentMsg);
-
-        // Immediate check if throttled interval passed and change significant
-        if (now - lastCheckAtRef.current > minInterval && significantChange) {
-            lastCheckAtRef.current = now;
-            lastCheckedTextRef.current = currentMsg;
-            setLtQuery(currentMsg);
-            return;
-        }
-        // Debounced check after user pauses typing
-        const t = setTimeout(() => {
-            lastCheckAtRef.current = Date.now();
-            lastCheckedTextRef.current = currentMsg;
-            setLtQuery(currentMsg);
-        }, idleDelay);
-        return () => clearTimeout(t);
-    }, [currentMsg]);
-
-    // LanguageTool API call driven by ltQuery (not every keystroke)
-    useEffect(() => {
-        if (!ltQuery) return;
-        (async () => {
-            try {
-                if (ltAbortRef.current) ltAbortRef.current.abort();
-                const controller = new AbortController();
-                ltAbortRef.current = controller;
-                const params = new URLSearchParams();
-                params.set("language", "fr");
-                params.set("text", ltQuery);
-                const res = await fetch("https://api.languagetool.org/v2/check", {
-                    method: "POST",
-                    headers: {"Content-Type": "application/x-www-form-urlencoded"},
-                    body: params.toString(),
-                    signal: controller.signal,
-                });
-                if (!res.ok) throw new Error("LanguageTool API error");
-                const data = await res.json();
-                const matches = (data.matches || []).map((m: any) => ({
-                    offset: m.offset as number,
-                    length: m.length as number,
-                    message: typeof m.message === "string" ? m.message : "Erreur détectée",
-                    replacements: Array.isArray(m.replacements) ? m.replacements.map((r: any) => r.value).filter(Boolean) : [],
-                }));
-                // Avoid applying stale results to newer text
-                if (ltQuery === currentMsg) {
-                    setLtMatches(matches);
-                }
-            } catch (e) {
-                if ((e as any)?.name === "AbortError") return;
-                setLtMatches([]);
-            }
-        })();
-    }, [ltQuery, currentMsg]);
+    // No third-party spell checker: écoute drafts never leave Solar (#260). The browser's own
+    // checker (spellCheck on the textarea) underlines mistakes locally.
 
     // Rebuild highlight HTML when text or matches change
     useEffect(() => {
@@ -308,7 +248,6 @@ export function Chat(props: { channelID: string, statusID: number }) {
                 "tabSize",
             ] as const;
             props.forEach((p) => {
-                // @ts-ignore - dynamic style copy
                 ov.style[p] = (cs as any)[p] || "";
             });
             // Ensure wrapping behavior matches textarea
@@ -353,9 +292,11 @@ export function Chat(props: { channelID: string, statusID: number }) {
         };
 
         try {
-            const savedMessage = await saveMessage(msg);
+            // The server takes the author from the session and returns the stored (sanitised) content
+            const savedMessage = await saveMessage({channelId: channelID, content, replyID: msg.replyID ?? null});
             const msgWithID: MsgWithID = {
                 ...msg,
+                content: savedMessage.content,
                 id: savedMessage.id,
                 replyID: msg.replyID ?? null,
             };
@@ -378,7 +319,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
             messageSchema.parse(currentMsg);
         } catch (error) {
             if (error instanceof ZodError) {
-                return toast.error(error.errors[0].message);
+                return toast.error(error.issues[0].message);
             }
         }
         if (currentMsg !== "") {
@@ -402,16 +343,6 @@ export function Chat(props: { channelID: string, statusID: number }) {
         });
     }
 
-    const {peerInstance, callColor, startCall, stopCall} = usePeer();
-
-    const handleCall = () => {
-        if (peerInstance) {
-            stopCall();
-        } else {
-            startCall(myAudioRef, remoteAudioRef);
-        }
-    };
-
     type UserFromList = {
         id: string;
         username: string;
@@ -421,26 +352,26 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
     const [onlineUsers, setOnlineUsers] = useState<UserFromList[]>([]);
     const [allMembers, setAllMembers] = useState<UserFromList[]>([]);
+    const onlineIds = new Set(onlineUsers.map(u => u.id));
+    const onlineMemberCount = allMembers.filter(m => onlineIds.has(m.id)).length;
 
-    const roleOrder = ['admin', 'bot', 'manager', 'volunteer', 'training'] as const;
-    const getHighestRole = (role: string | string[] | undefined | null): string => {
-        const toKey = (r: string) => (r || '').toLowerCase();
-        if (!role) return 'training';
-        if (Array.isArray(role)) {
-            // pick the role with the LOWEST index (admin highest rank)
-            const normalized = role.map(r => toKey(r as any)).filter(r => (roleOrder as readonly string[]).includes(r));
-            if (normalized.length === 0) return 'training';
-            let best = normalized[0];
-            for (const r of normalized) {
-                if ((roleOrder as readonly string[]).indexOf(r) < (roleOrder as readonly string[]).indexOf(best)) {
-                    best = r;
-                }
-            }
-            return best;
-        }
-        const r = toKey(role as string);
-        return (roleOrder as readonly string[]).includes(r) ? r : 'training';
-    };
+    // Roles as configured on the roles page (name, order, icon); refreshed when they change.
+    const [configuredRoles, setConfiguredRoles] = useState<{ name: string; weight: number; icon?: string | null }[]>([]);
+    useEffect(() => {
+        const load = () => apiFetch('/v1/admin/roles')
+            .then((res: any) => setConfiguredRoles(Array.isArray(res?.roles) ? res.roles : []))
+            .catch(() => undefined);
+        load();
+        if (!socket) return;
+        socket.on('permissionsUpdate', load);
+        return () => {
+            socket.off('permissionsUpdate', load);
+        };
+    }, [socket]);
+
+    // Members keep their whole role list (comma-joined); grouping happens at display time.
+    const getHighestRole = (role: string | string[] | undefined | null): string =>
+        (Array.isArray(role) ? role.join(',') : role || '');
 
 
     useEffect(() => {
@@ -491,32 +422,36 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
         socket.on("userList", handleUserList);
 
-        const handleJoined = (payload: { channelId: string; user: UserFromList }) => {
-            if (payload?.channelId === channelID && payload.user) {
-                const normalizedUser = {...payload.user, role: getHighestRole(payload.user.role as any)};
-                setOnlineUsers(prev => {
-                    const exists = prev.some(u => u.id === normalizedUser.id);
-                    return exists ? prev : [...prev, normalizedUser];
-                });
-            }
+        // Online = connected to Solar, whatever the page they are on
+        const handleOnline = (payload: { user: UserFromList }) => {
+            if (!payload?.user) return;
+            const normalizedUser = {...payload.user, role: getHighestRole(payload.user.role as any)};
+            setOnlineUsers(prev => prev.some(u => u.id === normalizedUser.id) ? prev : [...prev, normalizedUser]);
         };
-        const handleLeft = (payload: { channelId: string; user: UserFromList }) => {
-            if (payload?.channelId === channelID && payload.user) {
-                setOnlineUsers(prev => prev.filter(u => u.id !== payload.user.id));
-            }
+        const handleOffline = (payload: { user: UserFromList }) => {
+            if (payload?.user) setOnlineUsers(prev => prev.filter(u => u.id !== payload.user.id));
         };
 
-        socket.on("userJoined", handleJoined);
-        socket.on("userLeft", handleLeft);
+        socket.on("userOnline", handleOnline);
+        socket.on("userOffline", handleOffline);
 
         const onMessage = (data: Msg) => {
             if (data.channel.id === channelID) {
+                const isMe = data.author.id === session?.user.id;
                 setChat((pre) => {
                     const exists = (data as MsgWithID).id && pre.some(m => m.id === (data as MsgWithID).id);
                     if (exists) return pre;
                     return [...pre, data as MsgWithID];
                 })
                 if (timer) clearTimeout(timer)
+                
+                // Mark as read if at bottom or if it's my own message
+                if (isAtBottomRef.current || isMe) {
+                    markChannelAsRead(channelID);
+                    setLastReadTimestamp(Date.now());
+                } else if (document.hasFocus()) {
+                    markChannelAsRead(channelID);
+                }
             }
         };
 
@@ -615,8 +550,10 @@ export function Chat(props: { channelID: string, statusID: number }) {
             setChat(prev => prev.filter(m => m.id !== data.messageID));
         };
 
-        socket.on('joined', handleJoined);
-        socket.on('left', handleLeft);
+        // Discord écoutes: the bot could not deliver a message to the user (#298)
+        const onMessageUndelivered = (data: { id: number }) => {
+            setChat(prev => prev.map(m => m.id === data.id ? {...m, undelivered: true} : m));
+        };
 
         socket.on('connect', handleConnect);
         socket.on('reconnect', handleConnect as any);
@@ -632,11 +569,12 @@ export function Chat(props: { channelID: string, statusID: number }) {
         socket.on('ticketStatusUpdate', onStatusUpdate);
         socket.on('reactionRemove', onReactionRemove);
         socket.on('messageDelete', onMessageDelete);
+        socket.on('messageUndelivered', onMessageUndelivered);
 
         return () => {
             socket.off('userList', handleUserList);
-            socket.off('userJoined', handleJoined);
-            socket.off('userLeft', handleLeft);
+            socket.off('userOnline', handleOnline);
+            socket.off('userOffline', handleOffline);
             socket.off('connect', handleConnect);
             socket.off('reconnect', handleConnect as any);
             socket.off('reconnect_attempt', requestSnapshot as any);
@@ -646,10 +584,19 @@ export function Chat(props: { channelID: string, statusID: number }) {
             socket.off('reactionRemove', onReactionRemove);
             socket.off('typingIndicator', onTyping);
             socket.off('messageDelete', onMessageDelete);
+            socket.off('messageUndelivered', onMessageUndelivered);
             socket.off('messageEdit', onMessageEdit);
             socket.off('ticketStatusUpdate', onStatusUpdate);
         };
     }, [socket, channelID, session?.user]);
+
+    useEffect(() => {
+        markChannelAsRead(channelID);
+
+        const onFocus = () => markChannelAsRead(channelID);
+        window.addEventListener('focus', onFocus);
+        return () => window.removeEventListener('focus', onFocus);
+    }, [channelID]);
 
     useEffect(() => {
         let cancelled = false;
@@ -694,45 +641,15 @@ export function Chat(props: { channelID: string, statusID: number }) {
                     });
                 }
 
-                apiFetch(`/v1/admin/settings`)
-                    .then((data: { settings: { key: string, value: string }[] }) => {
-                        const catSetting = data.settings?.find(s => s.key === "monitoring_categories");
-                        if (catSetting && !cancelled) {
-                            try {
-                                setAvailableCategories(JSON.parse(catSetting.value));
-                            } catch (e) {
-                                console.error("Failed to parse categories", e);
-                            }
-                        }
+                apiFetch(`/v1/settings/ticket-categories`)
+                    .then((data: { categories?: any[] }) => {
+                        if (!cancelled && Array.isArray(data.categories)) setAvailableCategories(data.categories);
                     })
                     .catch(() => {
                     });
 
-                apiFetch(`/v1/events/getAvailable?channelID=${channelID}`)
-                    .then((d) => {
-                        if (cancelled) return;
-                        setAvailable([
-                            ...d.map((user: { name: any; id: any; }) => ({
-                                label: user.name,
-                                value: {id: user.id, name: user.name},
-                            }))
-                        ]);
-                    }).catch(() => {
-                });
+                loadAvailable();
 
-                apiFetch(`/v1/events/getAvailable?channelID=${channelID}&lists=ineligible`)
-                    .then((d) => {
-                        if (cancelled) return;
-                        const textNames = Array.isArray(d?.ineligibleText) ? d.ineligibleText.map((u: any) => u.name).filter(Boolean) : [];
-                        const voiceNames = Array.isArray(d?.ineligibleVoice) ? d.ineligibleVoice.map((u: any) => u.name).filter(Boolean) : [];
-                        setIneligibleText(textNames);
-                        setIneligibleVoice(voiceNames);
-                    })
-                    .catch(() => {
-                        if (cancelled) return;
-                        setIneligibleText([]);
-                        setIneligibleVoice([]);
-                    });
             } catch (e) {
                 if (cancelled) return;
                 // Keep skeleton visible and retry with exponential backoff
@@ -746,6 +663,17 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
         load();
 
+        if (lastReadFetched.current !== channelID) {
+            lastReadFetched.current = channelID;
+            apiFetch(`/v1/channel/${channelID}/read`).then((res: any) => {
+                if (res.lastRead) {
+                    setLastReadTimestamp(new Date(res.lastRead).getTime());
+                } else {
+                    setLastReadTimestamp(null);
+                }
+            }).catch(() => setLastReadTimestamp(null));
+        }
+
         return () => {
             cancelled = true;
             if (timer) clearTimeout(timer);
@@ -758,6 +686,15 @@ export function Chat(props: { channelID: string, statusID: number }) {
         } catch {
         }
     }, [channelID, setChannelID]);
+
+    useEffect(() => {
+        apiFetch('/v1/auth/permissions')
+            .then((d: { permissions?: string[] }) => {
+                const perms = d.permissions ?? [];
+                setCanAttribute(perms.includes('admin.sudo') || perms.includes('tickets.attribute'));
+            })
+            .catch(() => setCanAttribute(false));
+    }, []);
 
     useEffect(() => {
         apiFetch('/v1/permissions/messages/manage')
@@ -836,7 +773,14 @@ export function Chat(props: { channelID: string, statusID: number }) {
                 if (initialAutoScrollPending.current) return;
                 // update bottom state
                 const distanceFromBottom = el.scrollHeight - (el.scrollTop + el.clientHeight);
+                const wasAtBottom = isAtBottomRef.current;
                 isAtBottomRef.current = distanceFromBottom <= 100;
+                
+                if (isAtBottomRef.current && !wasAtBottom) {
+                    markChannelAsRead(channelID);
+                    setLastReadTimestamp(null);
+                }
+
                 if (el.scrollTop < 250) {
                     loadOlder();
                 }
@@ -849,7 +793,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
         return () => {
             el.removeEventListener('scroll', onScroll);
         };
-    }, [messagesContainerRef.current, hasMore, loadingOlder, loadingMessages, chat, channelID]);
+    }, [hasMore, loadingOlder, loadingMessages, chat, channelID]);
 
     useEffect(() => {
         function generateSkeletons() {
@@ -913,8 +857,9 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
     const FormSchema = z.object({
         volunteer: z.object({
+            // `message` works with zod 3 and 4
             id: z.string({
-                required_error: "Merci de sélectionner un Bénévole Écoutant",
+                message: "Merci de sélectionner un Bénévole Écoutant",
             }),
             name: z.string(),
         }),
@@ -924,28 +869,46 @@ export function Chat(props: { channelID: string, statusID: number }) {
         resolver: zodResolver(FormSchema),
     });
 
+    /** Volunteers who may take this écoute now: present in the permanence, free, eligible. */
+    function loadAvailable() {
+        if (channelID === "1") return;
+        apiFetch(`/v1/events/getAvailable?channelID=${channelID}`)
+            .then((d: { id: string; name: string }[]) => {
+                if (Array.isArray(d)) setAvailable(d.map(user => ({label: user.name, value: {id: user.id, name: user.name}})));
+            })
+            .catch(() => setAvailable([]));
+    }
+
     function assign(data: z.infer<typeof FormSchema>) {
+        if (!ticket?.id) {
+            toast.error("L'écoute n'est pas encore chargée, réessayez dans un instant");
+            return;
+        }
+        setAssigning(true);
         apiFetch(`/v1/tickets/assign`, {
             method: "POST",
             body: JSON.stringify({
-                ticketID: ticket?.id,
+                ticketID: ticket.id,
                 assignmentID: data.volunteer.id
             }),
         }).then(res => {
-            if (res.success) {
-                toast.success(`L'écoute à été attribuée à ${data.volunteer.name}`)
-                setStatus(2)
-                socket?.emit('update')
-            } else {
-                return toast("Erreur lors de l'attribution", {
-                    description: (
-                        <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
-                          <code className="text-white">{JSON.stringify(res.error, null, 2)}</code>
-                        </pre>
-                    ),
-                })
-            }
-        })
+            if (!res.success) throw new Error(res.error || "refused");
+            toast.success(`L'écoute a été attribuée à ${data.volunteer.name}`);
+            setTicket(prev => prev ? {...prev, assignedUserId: data.volunteer.id, statusName: "started"} : prev);
+            setStatus(2);
+            setAssignOpen(false);
+            form.reset();
+            socket?.emit('update');
+        }).catch((e: Error) => {
+            toast.error("L'écoute n'a pas été attribuée", {
+                description: ({
+                    "User cannot handle tickets": "Ce bénévole n'a pas les droits pour prendre une écoute.",
+                    forbidden: "Vous n'avez pas le droit d'attribuer les écoutes.",
+                    not_present: "Ce bénévole n'a pas rejoint la permanence.",
+                    busy: "Ce bénévole est déjà en écoute : une seule à la fois.",
+                } as Record<string, string>)[e.message] ?? e.message,
+            });
+        }).finally(() => setAssigning(false));
     }
 
     const transmissionSchema = z.object({
@@ -973,21 +936,15 @@ export function Chat(props: { channelID: string, statusID: number }) {
                 categories: data.categories,
             })
         }).then(res => {
-            if (res.success) {
-                toast("Transmission envoyée")
-                setTimeout(() => {
-                    router.push("/app/chat")
-                    socket?.emit('update')
-                }, 2000)
-            } else {
-                return toast("Erreur lors de la transmission", {
-                    description: (
-                        <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
-                  <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-                </pre>
-                    ),
-                })
-            }
+            if (!res.success) throw new Error(res.error || "refused");
+            toast.success("Transmission envoyée");
+            setTransmissionOpen(false);
+            setTimeout(() => {
+                router.push("/app/chat")
+                socket?.emit('update')
+            }, 2000)
+        }).catch((e: Error) => {
+            toast.error("La transmission n'a pas été envoyée", {description: e.message === "forbidden" ? "Vous n'avez pas accès à cette écoute." : e.message});
         })
     }
 
@@ -998,7 +955,22 @@ export function Chat(props: { channelID: string, statusID: number }) {
         volunteer: "Bénévole Écoutant",
         training: "Bénévole en formation"
     };
-    const displayRoleOrder = ['admin', 'bot', 'manager', 'volunteer', 'training'] as const;
+    // Member list: each member sits under their highest configured role. The labels above are kept
+    // for the default role names; any other (custom or renamed) role shows its own name.
+    const NO_ROLE_GROUP = '';
+    const roleWeight = new Map(configuredRoles.map(r => [r.name, r.weight]));
+    const memberGroup = (role: string | string[]): string => {
+        const names = (Array.isArray(role) ? role : String(role || '').split(','))
+            .map(r => r.trim())
+            .filter(r => roleWeight.has(r) && r !== 'none');
+        if (!names.length) return NO_ROLE_GROUP;
+        return names.reduce((best, r) => (roleWeight.get(r)! > roleWeight.get(best)! ? r : best));
+    };
+    const groupLabel = (group: string) => group === NO_ROLE_GROUP ? 'Membres' : (roleOrderAndLabels[group] || group);
+    const groupIcon = (group: string) => {
+        const name = configuredRoles.find(r => r.name === group)?.icon;
+        return name ? (LucideIcons as any)[name] as React.ComponentType<{ className?: string }> | undefined : undefined;
+    };
 
     return (
         <div className="flex flex-row items-center justify-center w-full">
@@ -1026,7 +998,22 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                     <Skeleton className="h-4 w-1/3"/>
                                 </div>
                             )}
-                            {chat.map(({author, content, timestamp, reactions, id, replyID, edited}, key) => {
+                            {chat.map(({author, content, timestamp, reactions, id, replyID, edited, undelivered, internal}, key) => {
+                                // Team note (identity revealed…): apart from the conversation, never seen by the person
+                                if (internal) {
+                                    return (
+                                        <div key={id} role="note"
+                                             className="mx-auto my-3 flex max-w-xl items-start gap-2 rounded-md border border-dashed border-destructive/40 px-3 py-2 text-sm">
+                                            <ShieldAlert className="mt-0.5 size-4 shrink-0 text-destructive" aria-hidden/>
+                                            <div className="min-w-0">
+                                                <p className="break-words">{content}</p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    Note de l&apos;équipe, invisible pour la personne, le {new Date(timestamp).toLocaleString("fr-FR", {dateStyle: "short", timeStyle: "short"})}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    );
+                                }
                                 const prevMessage = key > 0 ? chat[key - 1] : null
                                 const nextMessage = key < chat.length - 1 ? chat[key + 1] : null
                                 const currentDate = new Date(timestamp).getTime()
@@ -1042,38 +1029,71 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                 const isLastInBlock = !isSameAuthorAsNext || !isWithin10MinOfNext
 
                                 const ref = replyID ? chat.find(m => m.id === replyID) : undefined;
+
+                                const showUnreadBar = lastReadTimestamp && 
+                                    currentDate > lastReadTimestamp && 
+                                    (!prevDate || prevDate <= lastReadTimestamp) &&
+                                    author.id !== session?.user.id;
+
                                 return (
-                                    <Message
-                                        prevDate={prevDate as number}
-                                        currentDate={currentDate}
-                                        timestamp={timestamp}
-                                        reactions={reactions as Reaction[]}
-                                        key={id}
-                                        isLastInBlock={isLastInBlock}
-                                        showAuthorInfo={showAuthorInfo}
-                                        isAuthor={author.id === session?.user.id}
-                                        profilePicture={author.image}
-                                        authorRole={author.role}
-                                        authorName={author.name}
-                                        content={content}
-                                        userID={session?.user.id as string}
-                                        id={id as number}
-                                        channelId={channelID}
-                                        canManageMessages={canManageMessages}
-                                        edited={edited}
-                                        onReply={({id, authorName, content, timestamp}) => {
-                                            setReplyTo({id, authorName, content, timestamp});
-                                            setTimeout(() => textRef.current?.focus(), 0);
-                                        }}
-                                        replyTargetId={replyTo?.id}
-                                        replyOf={ref ? {
-                                            id: ref.id,
-                                            authorName: ref.author.name,
-                                            content: ref.content,
-                                            image: ref.author.image
-                                        } : undefined}
-                                        readOnly={status === 3 || status === 4}
-                                    />
+                                    <React.Fragment key={id}>
+                                        {showUnreadBar && (
+                                            <div 
+                                                className="flex items-center my-4 unread-separator"
+                                                ref={(el) => {
+                                                    if (el && lastReadTimestamp) {
+                                                        const observer = new IntersectionObserver(
+                                                            ([entry]) => {
+                                                                if (entry.isIntersecting) {
+                                                                    setLastReadTimestamp(null);
+                                                                    observer.disconnect();
+                                                                }
+                                                            },
+                                                            { threshold: 1.0 }
+                                                        );
+                                                        observer.observe(el);
+                                                    }
+                                                }}
+                                            >
+                                                <div className="flex-grow h-px bg-red-500/50" />
+                                                <span className="mx-4 text-xs font-bold text-red-500 uppercase tracking-wider bg-background px-2">
+                                                    Nouveaux messages
+                                                </span>
+                                                <div className="flex-grow h-px bg-red-500/50" />
+                                            </div>
+                                        )}
+                                        <Message
+                                            prevDate={prevDate as number}
+                                            currentDate={currentDate}
+                                            timestamp={timestamp}
+                                            reactions={reactions as Reaction[]}
+                                            isLastInBlock={isLastInBlock}
+                                            showAuthorInfo={showAuthorInfo}
+                                            isAuthor={author.id === session?.user.id}
+                                            profilePicture={author.image}
+                                            authorRole={author.role}
+                                            authorName={author.name}
+                                            content={content}
+                                            userID={session?.user.id as string}
+                                            id={id as number}
+                                            channelId={channelID}
+                                            canManageMessages={canManageMessages}
+                                            edited={edited}
+                                            undelivered={undelivered}
+                                            onReply={({id, authorName, content, timestamp}) => {
+                                                setReplyTo({id, authorName, content, timestamp});
+                                                setTimeout(() => textRef.current?.focus(), 0);
+                                            }}
+                                            replyTargetId={replyTo?.id}
+                                            replyOf={ref ? {
+                                                id: ref.id,
+                                                authorName: ref.author.name,
+                                                content: ref.content,
+                                                image: ref.author.image
+                                            } : undefined}
+                                            readOnly={!!observation || status === 3 || status === 4}
+                                        />
+                                    </React.Fragment>
                                 );
                             })}
                         </React.Fragment>
@@ -1084,9 +1104,24 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
 
                 {
-                    status === 0 ? null :
+                    // Permanence chat (status 0): only its voice channel. Other channels: the écoute toolbar.
+                    status === 0 ? (channelID !== "1" && (
                         <div className="absolute top-6 right-6 flex flex-row gap-2 z-20">
-                            <AlertDialog>
+                            <SpectatePanel channelId={channelID} state={spectate} reload={reloadSpectate}/>
+                            <PermanencePresence/>
+                            <PermanenceVoiceControls channelId={channelID}/>
+                        </div>
+                    )) : observation ? (
+                        <div className="absolute top-6 right-6 flex flex-row gap-2 z-20">
+                            <ObservationBar request={observation} onEnded={reloadSpectate}/>
+                        </div>
+                    ) :
+                        <div className="absolute top-6 right-6 flex flex-row gap-2 z-20">
+                            <AlertDialog open={assignOpen} onOpenChange={(open) => {
+                                setAssignOpen(open);
+                                // Who joined or finished an écoute since the page was opened
+                                if (open) loadAvailable();
+                            }}>
                                 <AlertDialogTrigger asChild>
                                     <Button
                                         className={channelID == "1" || status == 3 || status == 4 ? "hidden" : "flex"}
@@ -1134,8 +1169,11 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                                                         className="h-9"
                                                                     />
                                                                     <CommandList>
-                                                                        <CommandEmpty>Aucun bénévole
-                                                                            trouvé</CommandEmpty>
+                                                                        <CommandEmpty>
+                                                                            {available.length === 0
+                                                                                ? "Aucun bénévole disponible : les bénévoles doivent rejoindre la permanence et ne pas être déjà en écoute."
+                                                                                : "Aucun bénévole trouvé"}
+                                                                        </CommandEmpty>
                                                                         <CommandGroup>
                                                                             {available.map((available) => (
                                                                                 <CommandItem
@@ -1162,7 +1200,8 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                                             </PopoverContent>
                                                         </Popover>
                                                         <FormDescription>
-                                                            Le bénévole aura ensuite accès à l'écoute
+                                                            Seuls les bénévoles présents à la permanence et libres sont proposés.
+                                                            Le bénévole aura ensuite accès à l'écoute.
                                                         </FormDescription>
                                                         <FormMessage/>
                                                     </FormItem>
@@ -1171,28 +1210,24 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
                                             <AlertDialogFooter>
                                                 <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                                <AlertDialogAction asChild>
-                                                    <Button type="submit">Valider</Button>
-                                                </AlertDialogAction>
+                                                <Button type="submit" disabled={assigning}>Valider</Button>
                                             </AlertDialogFooter>
                                         </form>
                                     </Form>
                                 </AlertDialogContent>
                             </AlertDialog>
 
-                            <Button
-                                className={channelID == "1" || status !== 2 ? "hidden" : "flex"}
-                                variant='outline'
-                                color={callColor}
-                                onClick={handleCall}
-                                disabled={status !== 2}
-                            >
-                                <PhoneCall color={callColor}/> Démarrer un vocal
-                                <audio ref={myAudioRef} autoPlay
-                                       muted/>  {/* my own voice (muted so I don't hear myself) */}
-                                <audio ref={remoteAudioRef} autoPlay/>
-                                {/* the other user's audio */}
-                            </Button>
+                            {/* Voice: the écoute's one-to-one call */}
+                            {channelID !== "1" && ticket && (
+                                <TicketVoiceControls
+                                    channelId={channelID}
+                                    status={status}
+                                    voice={!!ticket.voice}
+                                    assignedUserId={ticket.assignedUserId}
+                                    currentUserId={session?.user?.id}
+                                    label={`Écoute ${String(ticket.id).padStart(5, "0")}`}
+                                />
+                            )}
 
                             <AlertDialog>
                                 <AlertDialogTrigger asChild>
@@ -1211,21 +1246,37 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                             permanence merci d'utiliser l'onglet latéral.
                                         </AlertDialogDescription>
                                     </AlertDialogHeader>
+                                    {canAttribute && ticket && !ticket.assignedUserId && (
+                                        <div className="space-y-2 rounded-md border p-3 text-sm">
+                                            <p>
+                                                Personne n&apos;a été attribué à cette écoute : elle sera archivée directement,
+                                                sans transmission, avec votre nom.
+                                            </p>
+                                            <Label htmlFor="close-reason">Motif (facultatif)</Label>
+                                            <Textarea id="close-reason" rows={2} maxLength={500} value={closeReason}
+                                                      placeholder="Ex. : la personne est partie avant la prise en charge"
+                                                      onChange={(e) => setCloseReason(e.target.value)}/>
+                                        </div>
+                                    )}
                                     <AlertDialogFooter>
                                         <AlertDialogCancel>Annuler</AlertDialogCancel>
                                         <AlertDialogAction asChild>
                                             <Button variant="destructive" onClick={() => {
+                                                const archive = canAttribute && !!ticket && !ticket.assignedUserId;
                                                 apiFetch('/v1/tickets/close', {
                                                     method: 'POST',
                                                     body: JSON.stringify({
-                                                        channelID: channelID
+                                                        channelID: channelID,
+                                                        ...(archive ? {withoutTransmission: true, reason: closeReason.trim() || undefined} : {}),
                                                     })
                                                 }).then(res => {
-                                                    if (res.success) {
-                                                        setStatus(3)
-                                                        socket?.emit('update')
-                                                    }
-                                                })
+                                                    if (!res.success) throw new Error(res.error || "refused");
+                                                    // Archived: no transmission to write
+                                                    setStatus(archive ? 4 : 3)
+                                                    setCloseReason("")
+                                                    if (archive) toast.success("Écoute fermée et archivée");
+                                                    socket?.emit('update')
+                                                }).catch(() => toast.error("L'écoute n'a pas été fermée"))
                                             }}>
                                                 Fermer l'écoute
                                             </Button>
@@ -1234,7 +1285,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                 </AlertDialogContent>
                             </AlertDialog>
 
-                            <AlertDialog>
+                            <AlertDialog open={transmissionOpen} onOpenChange={setTransmissionOpen}>
                                 <AlertDialogTrigger asChild>
                                     <Button className={channelID == "1" || status !== 3 ? "hidden" : "flex"}
                                             variant="outline" disabled={status !== 3}>
@@ -1381,81 +1432,14 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
                                             <AlertDialogFooter>
                                                 <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                                <AlertDialogAction asChild>
-                                                    <Button type="submit">Envoyer</Button>
-                                                </AlertDialogAction>
+                                                <Button type="submit" disabled={transmissionForm.formState.isSubmitting}>Envoyer</Button>
                                             </AlertDialogFooter>
                                         </form>
                                     </Form>
                                 </AlertDialogContent>
                             </AlertDialog>
 
-                            <Dialog>
-                                <DialogTrigger asChild>
-                                    <Button variant="outline">
-                                        <Info/>
-                                    </Button>
-                                </DialogTrigger>
-                                <DialogContent className="w-[1000px]">
-                                    <DialogHeader>
-                                        <VisuallyHidden>
-                                            <DialogTitle>Informations de l'écoute</DialogTitle>
-                                        </VisuallyHidden>
-                                        {/*<DialogDescription>*/}
-                                        <h4 className="scroll-m-20 text-xl font-semibold tracking-tight flex flex-row gap-3">
-                                            <CircleAlert/> Vigilances
-                                        </h4>
-                                        <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
-                                            {
-                                                ticketInfo?.vigis.length && ticketInfo.vigis.length > 0 ?
-                                                    ticketInfo?.vigis.map((item, index) => (
-                                                        <li key={index}>{item.date.toLocaleDateString()} - {item.motive}</li>
-                                                    )) : <li>Aucune vigilance en cours</li>
-                                            }
-                                        </ul>
-
-                                        <h4 className="scroll-m-20 text-xl font-semibold tracking-tight flex flex-row gap-3">
-                                            <UserRoundX/> Bénévoles Inéligibles
-                                        </h4>
-                                        <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
-                                            {ineligibleText.length > 0 ? (
-                                                ineligibleText.map((name, index) => (
-                                                    <li key={index}>{name}</li>
-                                                ))
-                                            ) : (
-                                                <li>Aucun bénévole inéligible</li>
-                                            )}
-                                        </ul>
-
-                                        <h4 className="scroll-m-20 text-xl font-semibold tracking-tight flex flex-row gap-3">
-                                            <MicOff/> Bénévoles Inéligibles Vocal
-                                        </h4>
-                                        <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
-                                            {ineligibleVoice.length > 0 ? (
-                                                ineligibleVoice.map((name, index) => (
-                                                    <li key={index}>{name}</li>
-                                                ))
-                                            ) : (
-                                                <li>Aucun bénévole inéligible</li>
-                                            )}
-                                        </ul>
-
-                                        <h4 className="scroll-m-20 text-xl font-semibold tracking-tight flex flex-row gap-3">
-                                            <IdCardLanyard/> Identifiant
-                                        </h4>
-                                        <p className="leading-7 [&:not(:first-child)]:mt-6">
-                                            Numéro d'anonymat : 277dd0... <Button variant="secondary">
-                                            <Copy/> Copier</Button>
-                                        </p>
-                                        <p className="leading-7 [&:not(:first-child)]:mt-6">
-                                            Identifiant Discord : <Button variant="secondary">
-                                            <ScanFace/> Révéler</Button>
-                                        </p>
-
-                                        {/*</DialogDescription>*/}
-                                    </DialogHeader>
-                                </DialogContent>
-                            </Dialog>
+                            <TicketInfoDialog channelId={channelID}/>
                         </div>
                 }
 
@@ -1510,6 +1494,11 @@ export function Chat(props: { channelID: string, statusID: number }) {
                         </div>
                     )}
 
+                    {observation ? (
+                        <p className="w-full rounded-md border border-dashed px-4 py-3 text-center text-sm text-muted-foreground">
+                            Vous observez cette écoute en lecture seule : vous ne pouvez pas écrire ni réagir.
+                        </p>
+                    ) : (
                     <form ref={formRef} onSubmit={(e) => sendForm(e)}
                           className='flex flex-row w-full gap-2 items-center'>
                         <ContextMenu>
@@ -1567,7 +1556,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                                 formRef.current?.requestSubmit();
                                             }
                                         }}
-                                        spellCheck={false}
+                                        spellCheck
                                         lang="fr"
                                         data-ms-editor="false"
                                         value={currentMsg}
@@ -1663,6 +1652,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                         </Button>
                         {/*<button className='cursor-pointer'><Send width={42}/></button>*/}
                     </form>
+                    )}
                 </div>
             </div>
 
@@ -1766,26 +1756,20 @@ export function Chat(props: { channelID: string, statusID: number }) {
                         </Dialog>
                     </div>
                     <small className="text-sm leading-none font-medium">
-                        {onlineUsers.length} utilisateur{onlineUsers.length >= 2 ? "s" : ""} connecté{onlineUsers.length >= 2 ? "s" : ""}
+                        {onlineMemberCount} membre{onlineMemberCount >= 2 ? "s" : ""} connecté{onlineMemberCount >= 2 ? "s" : ""}
                     </small>
                 </div>
                 <div className="flex flex-col overflow-y-auto">
                     {Object.entries(
                         (() => {
-                            // Merge allMembers and onlineUsers
-                            const memberMap = new Map<string, UserFromList & { isOnline: boolean }>();
-                            allMembers.forEach(m => memberMap.set(m.id, {...m, isOnline: false}));
-                            onlineUsers.forEach(u => {
-                                memberMap.set(u.id, {...(memberMap.get(u.id) || u), isOnline: true});
-                            });
-
-                            const merged = Array.from(memberMap.values());
+                            // Only those who may see this channel; online if connected to Solar
+                            const merged = allMembers.map(m => ({...m, isOnline: onlineIds.has(m.id)}));
 
                             const online = merged.filter(m => m.isOnline);
                             const offline = merged.filter(m => !m.isOnline);
 
                             const grouped = online.reduce((acc, user) => {
-                                const roleKey = Array.isArray(user.role) ? (user.role[0] as string) : (user.role as string);
+                                const roleKey = memberGroup(user.role);
                                 (acc[roleKey] ||= []).push(user);
                                 return acc;
                             }, {} as Record<string, (UserFromList & { isOnline?: boolean })[]>);
@@ -1798,18 +1782,22 @@ export function Chat(props: { channelID: string, statusID: number }) {
                         })()
                     ).sort(
                         ([roleA], [roleB]) => {
+                            // Highest role first, then members without a role, then offline
                             if (roleA === 'offline') return 1;
                             if (roleB === 'offline') return -1;
-                            return (displayRoleOrder as readonly string[]).indexOf(roleA) -
-                                (displayRoleOrder as readonly string[]).indexOf(roleB);
+                            const wA = roleWeight.get(roleA) ?? -Infinity;
+                            const wB = roleWeight.get(roleB) ?? -Infinity;
+                            return wA === wB ? 0 : wB > wA ? 1 : -1;
                         }
                     ).map(([role, users]) => {
                         const sortedUsers = [...users].sort((a, b) => a.username.localeCompare(b.username));
+                        const GroupIcon = role === 'offline' ? undefined : groupIcon(role);
 
                         return (
                             <div key={role} className="mb-4">
-                                <h4 className="text-md font-semibold text-gray-700 mb-2 capitalize">
-                                    {role === 'offline' ? 'Hors ligne' : (roleOrderAndLabels[role] || role)} — {users.length}
+                                <h4 className="flex items-center gap-1.5 text-md font-semibold text-gray-700 mb-2 capitalize">
+                                    {GroupIcon && <GroupIcon className="h-4 w-4 text-muted-foreground"/>}
+                                    {role === 'offline' ? 'Hors ligne' : groupLabel(role)} — {users.length}
                                 </h4>
                                 <div className="flex flex-col gap-2">
                                     {sortedUsers.map(user => (

@@ -2,8 +2,11 @@
 
 import prisma from "@/lib/prisma";
 import {revalidatePath} from "next/cache";
+import {allowPublicAction, TOO_MANY_REQUESTS} from "@/lib/security/actionRateLimit";
+import {isValidUnsubscribe} from "@/lib/security/unsubscribeToken";
 
 export async function subscribeToNewsletter(email: string) {
+    if (!await allowPublicAction("newsletter")) return {success: false, error: TOO_MANY_REQUESTS};
     if (!email || !email.includes("@")) {
         return {success: false, error: "Email invalide"};
     }
@@ -23,66 +26,21 @@ export async function subscribeToNewsletter(email: string) {
     }
 }
 
-export async function unsubscribeFromNewsletter(email: string) {
-    if (!email || !email.includes("@")) {
-        return {success: false, error: "Email invalide"};
+// No unsubscription by e-mail address: anyone could unsubscribe anyone (#223). The links of the
+// newsletters carry the recipient's id and its signature (#264); the address is never returned.
+
+export async function unsubscribeById(id: string, signature: string) {
+    if (!isValidUnsubscribe(id, signature)) {
+        return {success: false, error: "Ce lien de désinscription n'est pas valide. Utilisez le lien du dernier e-mail reçu."};
     }
 
     try {
-        await prisma.newsletterSubscriber.deleteMany({
-            where: {email},
-        });
-
-        // Also check if it's a user and update their preference if applicable
-        await prisma.user.updateMany({
-            where: {email},
-            data: {newsletterSubscription: false}
-        });
-
+        const removed = await prisma.newsletterSubscriber.deleteMany({where: {id}});
+        if (removed.count === 0) {
+            await prisma.user.updateMany({where: {id}, data: {newsletterSubscription: false}});
+        }
         revalidatePath("/");
         return {success: true};
-    } catch (error) {
-        console.error("Newsletter unsubscription error:", error);
-        return {success: false, error: "Une erreur est survenue lors de la désinscription"};
-    }
-}
-
-export async function unsubscribeById(id: string) {
-    if (!id) {
-        return {success: false, error: "ID invalide"};
-    }
-
-    try {
-        // Try to find and delete in NewsletterSubscriber
-        const subscriber = await prisma.newsletterSubscriber.findUnique({
-            where: {id},
-        });
-
-        if (subscriber) {
-            await prisma.newsletterSubscriber.delete({
-                where: {id},
-            });
-            revalidatePath("/");
-            return {success: true, email: subscriber.email};
-        }
-
-        // If not found, try to find in User
-        const user = await prisma.user.findUnique({
-            where: {id},
-        });
-
-        if (user) {
-            await prisma.user.update({
-                where: {id},
-                data: {newsletterSubscription: false}
-            });
-            revalidatePath("/");
-            return {success: true, email: user.email};
-        }
-
-        // If neither found, it might have been already deleted/updated
-        // We still return success: true but without an email to avoid "Abonné non trouvé" error
-        return {success: true, alreadyUnsubscribed: true};
     } catch (error) {
         console.error("Newsletter unsubscription by ID error:", error);
         return {success: false, error: "Une erreur est survenue lors de la désinscription"};

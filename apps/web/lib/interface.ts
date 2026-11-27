@@ -1,4 +1,4 @@
-import type {Reaction, User} from "@prisma/client"
+import type {Reaction, User} from "../../../generated/prisma"
 
 export interface Msg {
     author: {
@@ -16,6 +16,10 @@ export interface Msg {
     reactions: Reaction[] | null;
     replyID?: number | null;
     edited?: boolean;
+    /** Discord écoutes: the bot could not deliver this message to the user. */
+    undelivered?: boolean;
+    /** Team note in the transcript (identity revealed…), never shown to the person. */
+    internal?: boolean;
 }
 
 export interface MsgWithID extends Msg {
@@ -121,14 +125,9 @@ export type EventData = {
     description?: string;
     start: string;
     end: string;
+    /** Monday 12:00 (Paris time) of the event week: later registrations need approval. */
+    registrationDeadline?: string;
     roleSlots: EventRoleSlot[];
-};
-
-export type EventModalProps = {
-    isOpen: boolean;
-    onClose: () => void;
-    event: EventData | null;
-    onUpdate?: (updated: EventData) => void;
 };
 
 export type vigi = {

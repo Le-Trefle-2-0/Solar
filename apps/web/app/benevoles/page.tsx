@@ -62,7 +62,7 @@ export default async function BenevolesPage() {
                                                     "p-6 rounded-2xl",
                                                     recruitment.enabled ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
                                                 )}>
-                                                    <Icon className="h-12 w-12"/>
+                                                    <Icon className="h-16 w-16"/>
                                                 </div>
                                             </div>
                                             <div className="flex-1 flex flex-col p-6 md:p-10">
@@ -71,7 +71,7 @@ export default async function BenevolesPage() {
                                                 <div
                                                     className="text-muted-foreground line-clamp-3 mb-8 text-lg prose prose-snippet dark:prose-invert max-w-none">
                                                     <ReactMarkdown>
-                                                        {recruitment.description}
+                                                        {recruitment.shortDescription || recruitment.description}
                                                     </ReactMarkdown>
                                                 </div>
                                                 <div className="mt-auto">

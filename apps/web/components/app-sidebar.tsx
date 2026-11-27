@@ -7,20 +7,22 @@ import {
     ChevronRight,
     Ear,
     History,
+    Eye,
+    Hourglass,
     House,
+    type LucideIcon,
     Mail,
     MessageSquareMore,
     MessagesSquare,
-    Mic,
-    MicOff,
-    PhoneOff,
+    NotebookPen,
+    Phone,
     Settings,
     Shield,
     ShieldUser,
-    Signal,
     Users,
 } from "lucide-react"
 import {NavProjects} from "@/components/nav-projects"
+import {useParams} from "next/navigation";
 import {
     Sidebar,
     SidebarContent,
@@ -40,11 +42,117 @@ import {apiFetch} from "@/lib/api";
 import logo from "@/public/logo.svg";
 import {Socket} from "socket.io-client";
 import {useSocket} from "@/context/Socket";
-import {usePeer} from "@/context/VoicePeer";
+import {VoiceDock} from "@/components/voice/voice-dock";
+import {isTicketCallLive, useVoiceStatus} from "@/hooks/use-voice-status";
 import {UserButton} from "@/components/user-button";
 
-export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
-    const {peerInstance, isMuted, toggleMute, stopCall, connectedUsers, netQuality, rttMs, lossPct} = usePeer();
+/**
+ * Where an open écoute stands, from the viewer's side: waiting for a volunteer, assigned to
+ * the viewer, in progress with someone else (supervisors), observed read-only (volunteers in
+ * training), or waiting for its transmission.
+ */
+type TicketState = "waiting" | "mine" | "in_progress" | "observing" | "report";
+
+function ticketState(ticket: { statusName?: string; assignedUserId?: string | null; spectating?: boolean }, userId?: string): TicketState {
+    if (ticket.spectating) return "observing";
+    if (ticket.statusName === "waiting") return "waiting";
+    if (ticket.statusName === "closed") return "report";
+    return userId && ticket.assignedUserId === userId ? "mine" : "in_progress";
+}
+
+const TICKET_STATES: Record<TicketState, { label: string; icon: LucideIcon; className: string; voiceIcon: boolean }> = {
+    waiting: {label: "en attente d'attribution", icon: Hourglass, className: "text-amber-600 dark:text-amber-400", voiceIcon: false},
+    mine: {label: "attribuée à vous", icon: Ear, className: "text-primary", voiceIcon: true},
+    in_progress: {label: "en cours avec un autre bénévole", icon: Ear, className: "text-muted-foreground", voiceIcon: true},
+    observing: {label: "observée en lecture seule", icon: Eye, className: "text-violet-600 dark:text-violet-400", voiceIcon: false},
+    report: {label: "transmission à rédiger", icon: NotebookPen, className: "text-sky-600 dark:text-sky-400", voiceIcon: false},
+};
+
+export function AppSidebar({pendingDocsCount = 0, unreadChannelIds = [], pendingDocsIds = [], ...props}: React.ComponentProps<typeof Sidebar> & { pendingDocsCount?: number, unreadChannelIds?: string[], pendingDocsIds?: string[] }) {
+    const {rooms: voiceRooms} = useVoiceStatus();
+    const {socket} = useSocket();
+    const [session, setSession] = useState<any>(null);
+    const params = useParams();
+    const [activeChannelId, setActiveChannelId] = useState<string | null>(null);
+
+    useEffect(() => {
+        const path = window.location.pathname;
+        if (path.startsWith('/app/ticket/')) {
+            setActiveChannelId(path.split('/').pop() || null);
+        } else if (path === '/app/be') {
+            setActiveChannelId('1');
+        } else if (path === '/app/chat') {
+            setActiveChannelId('chat');
+        } else {
+            setActiveChannelId(null);
+        }
+    }, [params]);
+
+    const [unreadIds, setUnreadIds] = useState<Set<string>>(new Set(unreadChannelIds));
+    const [pendingIds, setPendingIds] = useState<Set<string>>(new Set(pendingDocsIds));
+
+    useEffect(() => {
+        setUnreadIds(new Set(unreadChannelIds));
+    }, [unreadChannelIds]);
+
+    useEffect(() => {
+        setPendingIds(new Set(pendingDocsIds));
+    }, [pendingDocsIds]);
+
+    useEffect(() => {
+        if (!socket) return;
+
+        const handleMessage = (data: any) => {
+            const channelId = data.channel?.id;
+            const authorId = data.author?.id;
+            const currentUserId = session?.user?.id;
+            console.log('[AppSidebar] Received message for channel:', channelId, 'Active channel:', activeChannelId, 'Author:', authorId, 'Me:', currentUserId);
+            if (channelId && channelId !== activeChannelId && authorId !== currentUserId) {
+                setUnreadIds(prev => {
+                    const next = new Set(prev);
+                    next.add(channelId);
+                    console.log('[AppSidebar] Updated unreadIds:', Array.from(next));
+                    return next;
+                });
+            }
+        };
+
+        const handleChannelRead = (data: any) => {
+            console.log('[AppSidebar] Received channelRead event:', data);
+            if (data.userId === session?.user?.id) {
+                setUnreadIds(prev => {
+                    const next = new Set(prev);
+                    next.delete(data.channelId);
+                    console.log('[AppSidebar] Cleared unreadId:', data.channelId, 'Remaining:', Array.from(next));
+                    return next;
+                });
+            }
+        };
+
+        socket.on('message', handleMessage);
+        socket.on('channelRead', handleChannelRead);
+
+        const handleDocumentsUpdate = (data: any) => {
+            console.log('[AppSidebar] Received documentsUpdate event:', data);
+            setPendingIds(prev => {
+                const next = new Set(prev);
+                if (data.status === 'submitted') {
+                    next.add(data.userId);
+                } else {
+                    next.delete(data.userId);
+                }
+                return next;
+            });
+        };
+        socket.on('documentsUpdate', handleDocumentsUpdate);
+
+        return () => {
+            socket.off('message', handleMessage);
+            socket.off('channelRead', handleChannelRead);
+            socket.off('documentsUpdate', handleDocumentsUpdate);
+        };
+    }, [socket, activeChannelId, session]);
+
     const baseData = [
         {
             name: "Accueil",
@@ -55,11 +163,13 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
             name: "Discussion BE libre",
             url: "/app/be",
             icon: MessageSquareMore,
+            hasNotification: unreadIds.has('1') && activeChannelId !== '1'
         },
         {
             name: "Chat Permanence",
             url: "/app/chat",
             icon: MessagesSquare,
+            hasNotification: Array.from(unreadIds).some(id => id !== '1' && !id.startsWith('ticket-')) && activeChannelId !== 'chat'
         },
         {
             name: "Planning",
@@ -70,50 +180,47 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
             name: "Recrutement",
             url: "/app/recruitments",
             icon: Users,
-            adminOnly: true,
+            permission: "recruitments.manage",
         },
         {
             name: "Historique",
             url: "/app/admin/history",
             icon: History,
-            adminOnly: true,
+            permission: "management.ticket_history",
         },
         {
-            name: "Utilisateurs",
+            name: "Bénévoles",
             url: "/app/admin/users",
             icon: ShieldUser,
-            adminOnly: true,
+            permission: "management.manage_accounts",
+            hasNotification: pendingDocsCount > 0
         },
         {
             name: "Statistiques",
             url: "/app/admin/stats",
             icon: ChartLine,
-            adminOnly: true,
+            permission: "management.view_stats",
         },
         {
             name: "Rôles",
             url: "/app/admin/roles",
             icon: Shield,
-            adminOnly: true,
+            permission: "roles.manage",
         },
         {
             name: "Paramètres",
             url: "/app/admin/settings",
             icon: Settings,
-            adminOnly: true,
+            permission: "settings.manage",
         },
         {
             name: "Newsletter",
             url: "/app/newsletters",
             icon: Mail,
-            newsletterOnly: true,
+            permission: "newsletters.manage",
         },
     ]
     const [tickets, setTickets] = useState<any[]>([]);
-    const socketRef = useRef<Socket | null>(null);
-    const {socket} = useSocket();
-
-    const [session, setSession] = useState<any>(null);
 
     useEffect(() => {
         const updateSession = () => apiFetch('/v1/auth/get-session').then(res => setSession(res));
@@ -127,33 +234,62 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
     }, [socket]);
 
     const filteredBaseData = React.useMemo(() => {
-        if (!session) return baseData.filter(item => !(item as any).adminOnly);
-        const roles = (session.user.role || "").split(",").map((r: string) => r.trim());
-        const permissions = (session.user as any).permissions || [];
-
-        const isAdmin = roles.includes("admin") || permissions.includes("admin.sudo");
-        const isManager = roles.includes("manager");
-        const isNewsletterManager = roles.includes("newsletterManager") || permissions.includes("newsletters.manage");
+        // Each restricted link names the permission its page requires (the owner holds them all)
+        const permissions: string[] = (session?.user as any)?.permissions || [];
+        const can = (p: string) => permissions.includes("admin.sudo") || permissions.includes(p);
 
         return baseData.filter(item => {
-            if (!(item as any).adminOnly && !(item as any).newsletterOnly) return true;
-            if (isAdmin) return true;
-
-            if (item.name === "Utilisateurs") {
-                return permissions.includes("management.manage_accounts") || isManager;
+            const required = (item as any).permission as string | undefined;
+            return !required || can(required);
+        }).map(item => {
+            if (item.name === "Discussion BE libre") {
+                return { ...item, hasNotification: unreadIds.has('1') && activeChannelId !== '1' };
             }
-
-            if (isManager && (item.name === "Historique" || item.name === "Recrutement" || item.name === "Paramètres" || item.name === "Statistiques")) return true;
-            if (isNewsletterManager && (item as any).newsletterOnly) return true;
-
-            // Allow access to Roles if the user has a manager role (limited to lower weights)
-            if (isManager && item.name === "Rôles") return true;
-
-            return false;
+            if (item.name === "Chat Permanence") {
+                return { ...item, hasNotification: Array.from(unreadIds).some(id => id !== '1' && !id.startsWith('ticket-')) && activeChannelId !== 'chat' };
+            }
+            if (item.name === "Bénévoles") {
+                return { ...item, hasNotification: pendingIds.size > 0 };
+            }
+            return item;
         });
-    }, [session]);
+    }, [session, unreadIds, activeChannelId, pendingIds]);
+
+    // Mark tickets whose call is going on (visible to supervisors and the assigned volunteer)
+    const ticketsWithVoice = React.useMemo(
+        () => tickets.map((t: any) => ({...t, live: isTicketCallLive(voiceRooms[t.channelId])})),
+        [tickets, voiceRooms],
+    );
 
     const MAX_TICKETS_BEFORE_COLLAPSE = 5;
+
+    const updateTickets = () => {
+        apiFetch(`/v1/tickets`)
+            .then((res) => {
+                if (res.success) {
+                    const ticketList = res.tickets;
+                    const items = ticketList.map((ticket: any) => {
+                        const idStr = String(ticket.id).padStart(5, '0');
+                        const displayName = `Écoute ${idStr}`;
+                        const state = TICKET_STATES[ticketState(ticket, session?.user?.id)];
+                        return {
+                            name: displayName,
+                            url: '/app/ticket/' + ticket.channelId,
+                            channelId: ticket.channelId,
+                            // The icon tells the status; voice écoutes show a phone while in progress,
+                            // and a green dot while the call is going on
+                            icon: ticket.voice && state.voiceIcon ? Phone : state.icon,
+                            iconClassName: state.className,
+                            status: state.label,
+                            live: false,
+                            hasNotification: unreadIds.has(ticket.channelId) && activeChannelId !== ticket.channelId
+                        };
+                    });
+                    setTickets(items);
+                }
+            })
+            .catch(err => console.error('Failed to load tickets:', err));
+    }
 
     useEffect(() => {
         if (!socket) return;
@@ -164,29 +300,9 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
         };
     }, [socket]);
 
-    const updateTickets = () => {
-        apiFetch(`/v1/tickets`)
-            .then((res) => {
-                if (res.success) {
-                    const ticketList = res.tickets;
-                    const items = ticketList.map((ticket: any) => {
-                        let idStr = String(ticket.id).padStart(5, '0');
-                        let displayName = `Ticket-${idStr}`;
-                        return {
-                            name: displayName,
-                            url: '/app/ticket/' + ticket.channelId,
-                            icon: Ear
-                        };
-                    });
-                    setTickets(items);
-                }
-            })
-            .catch(err => console.error('Failed to load tickets:', err));
-    }
-
     useEffect(() => {
         updateTickets()
-    }, [session]);
+    }, [session, unreadIds, activeChannelId]);
 
     return (
         <Sidebar variant="inset" {...props}>
@@ -209,7 +325,8 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarHeader>
-            <SidebarContent>
+            {/* Vertical scroll only: nothing in the list may push the sidebar sideways */}
+            <SidebarContent className="overflow-x-hidden overflow-y-auto">
                 <NavProjects projects={filteredBaseData}/>
                 {tickets.length > 0 && (
                     <>
@@ -219,20 +336,31 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
                                 <Collapsible asChild className="group/collapsible">
                                     <SidebarMenuItem>
                                         <CollapsibleTrigger asChild>
-                                            <SidebarMenuButton tooltip="Tickets">
+                                            <SidebarMenuButton tooltip="Écoutes" className="relative">
                                                 <Ear/>
-                                                <span>Tickets ({tickets.length})</span>
+                                                <span>Écoutes ({tickets.length})</span>
+                                                {tickets.some(t => t.hasNotification) && (
+                                                    <span className="absolute top-2 left-5 flex h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                                                )}
                                                 <ChevronRight
                                                     className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"/>
                                             </SidebarMenuButton>
                                         </CollapsibleTrigger>
                                         <CollapsibleContent>
                                             <SidebarMenuSub>
-                                                {tickets.map((ticket) => (
+                                                {ticketsWithVoice.map((ticket: any) => (
                                                     <SidebarMenuSubItem key={ticket.name}>
-                                                        <SidebarMenuSubButton asChild>
-                                                            <a href={ticket.url}>
-                                                                <span>{ticket.name}</span>
+                                                        <SidebarMenuSubButton asChild className="relative pr-6">
+                                                            <a href={ticket.url} title={`${ticket.name} : ${ticket.status}`}>
+                                                                <ticket.icon className={ticket.iconClassName} aria-hidden/>
+                                                                <span className="truncate">{ticket.name}</span>
+                                                                <span className="sr-only">, {ticket.status}</span>
+                                                                {ticket.live && (
+                                                                    <Phone className="size-3 text-emerald-600" aria-label="Appel en cours"/>
+                                                                )}
+                                                                {ticket.hasNotification && (
+                                                                    <span className="absolute top-1/2 -translate-y-1/2 right-2 flex h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                                                                )}
                                                             </a>
                                                         </SidebarMenuSubButton>
                                                     </SidebarMenuSubItem>
@@ -243,71 +371,14 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
                                 </Collapsible>
                             </SidebarMenu>
                         ) : (
-                            <NavProjects projects={tickets}/>
+                            <NavProjects projects={ticketsWithVoice}/>
                         )}
                     </>
                 )}
             </SidebarContent>
             <SidebarFooter>
-                {/* Reserved area for voice controls to avoid flex layout shifts */}
-                <div className="relative mb-2 h-12 w-full">
-                    {peerInstance ? (
-                        <div
-                            className="flex h-full items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-2 shadow-none">
-                            {/* Network indicator based on real network metrics */}
-                            <div className="flex items-center gap-2">
-                                {(() => {
-                                    const qualityColor = netQuality === 3 ? 'text-green-500' : netQuality === 2 ? 'text-amber-500' : netQuality === 1 ? 'text-red-500' : 'text-gray-400';
-                                    const hint = `RTT: ${rttMs ?? '—'} ms, Loss: ${lossPct ?? '—'}%`;
-                                    return (
-                                        <div className={`flex items-center rounded p-1 ${qualityColor}`} title={hint}>
-                                            <Signal size={18}/>
-                                        </div>
-                                    );
-                                })()}
-                                {/* Connected users count with hover dropdown (anchored to the count) */}
-                                <div className="relative group">
-                                    <span className="select-none text-xs text-gray-700"
-                                          aria-label="Connected users count">{connectedUsers?.length ?? 0}</span>
-                                    <div
-                                        className="pointer-events-none absolute left-0 right-auto bottom-full mb-2 hidden min-w-40 rounded-md border border-gray-200 bg-white p-2 text-xs text-gray-700 shadow-sm group-hover:block group-hover:pointer-events-auto">
-                                        <div className="mb-1 font-medium text-gray-900">Participants</div>
-                                        {connectedUsers && connectedUsers.length > 0 ? (
-                                            <ul className="list-disc pl-4">
-                                                {connectedUsers.map((name, idx) => (
-                                                    <li key={idx}>{name}</li>
-                                                ))}
-                                            </ul>
-                                        ) : (
-                                            <div className="text-gray-500">Aucun participant</div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-1">
-                                <button
-                                    onClick={toggleMute}
-                                    className={`rounded p-2 text-gray-700 transition-colors hover:bg-gray-100 ${isMuted ? 'text-red-600' : ''}`}
-                                    title={isMuted ? 'Unmute' : 'Mute'}
-                                    aria-label={isMuted ? 'Unmute microphone' : 'Mute microphone'}
-                                >
-                                    {isMuted ? <MicOff size={18}/> : <Mic size={18}/>}
-                                </button>
-                                <button
-                                    onClick={stopCall}
-                                    className="rounded p-2 text-red-600 transition-colors hover:bg-red-50"
-                                    title="Disconnect"
-                                    aria-label="Disconnect call"
-                                >
-                                    <PhoneOff size={18}/>
-                                </button>
-                            </div>
-                        </div>
-                    ) : (
-                        // Blank placeholder to preserve layout when not connected
-                        <div className="h-full rounded-md border border-transparent bg-transparent"/>
-                    )}
-                </div>
+                {/* Voice connection (permanence voice channel or a voice ticket) */}
+                <VoiceDock/>
                 <UserButton/>
             </SidebarFooter>
         </Sidebar>

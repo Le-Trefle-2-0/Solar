@@ -48,7 +48,7 @@ export function clearJwtCache() {
 export async function apiFetch(path: string, init: RequestInit = {}) {
     const base = getApiBase();
     const url = `${base}${path.startsWith('/') ? '' : '/'}${path}`;
-    let jwt = await getJwt();
+    const jwt = await getJwt();
     const headers = new Headers(init.headers as any);
     if (jwt) headers.set('Authorization', `Bearer ${jwt}`);
     if (!headers.has('Content-Type') && init.body && !(init.body instanceof FormData)) {
@@ -74,8 +74,9 @@ export async function apiFetch(path: string, init: RequestInit = {}) {
 
     const ct = res.headers.get('content-type') || '';
     if (!ct.includes('application/json')) {
-        // Return raw text for debugging if needed
         const txt = await res.text();
+        // Many API refusals (401/403/400) are plain text: surface them as they are
+        if (!res.ok) throw new Error(txt.slice(0, 200) || `HTTP ${res.status}`);
         throw new Error(`API responded with non-JSON (${res.status}): ${txt.slice(0, 200)}`);
     }
     const data = await res.json();

@@ -1,7 +1,8 @@
 'use client';
 
-import React, {useEffect, useState} from 'react';
-import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
+import React, {useCallback, useState} from 'react';
+import {usePermissions} from "@/hooks/use-permissions";
+import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -15,209 +16,147 @@ import {
 } from "@/components/ui/alert-dialog";
 import {Badge} from "@/components/ui/badge";
 import {Button} from "@/components/ui/button";
-import {format, isAfter, setHours, setMinutes, setSeconds, startOfWeek} from 'date-fns';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {format, setHours, setMinutes, setSeconds, startOfWeek} from 'date-fns';
 import {fr} from 'date-fns/locale/fr';
-import type {EventData} from "@/lib/interface";
+import type {EventData, EventRoleSlot} from "@/lib/interface";
 import {useSession} from "@/lib/auth-client";
 import {toast} from "sonner";
 import {apiFetch} from "@/lib/api";
-import {useRouter} from "next/navigation";
 import {Check, Trash2, X} from "lucide-react";
+import {canActOnOthers, partHours, splitRoles} from "@/lib/planning";
+import {EditEventDialog} from "@/components/planning/edit-event-dialog";
 
 interface EventProps {
     event: EventData;
+    /** Roles that can be chosen for a slot when editing the permanence. */
+    roles?: { id: string, name: string }[];
+    /** Reloads the calendar after a change (registration counts, edit, deletion). */
+    onChanged?: () => void;
 }
 
-export default function Event({event}: EventProps) {
+type Registration = EventRoleSlot['registrations'][number];
+
+/** Puts another member on a slot: members holding the slot's role who are not on it yet (#285). */
+function AddMember({eventId, slotId, disabled, onAdd}: {
+    eventId: string;
+    slotId: string;
+    disabled: boolean;
+    onAdd: (userId: string) => void;
+}) {
+    const [candidates, setCandidates] = useState<{ id: string, name: string }[] | null>(null);
+    const load = () => apiFetch(`/v1/events/${eventId}/slots/${slotId}/candidates`)
+        .then(res => setCandidates(res.users ?? []))
+        .catch(() => setCandidates([]));
+
+    return (
+        <Select value="" disabled={disabled} onOpenChange={(open) => { if (open) load(); }} onValueChange={onAdd}>
+            <SelectTrigger className="h-8 w-full text-xs sm:w-56" aria-label="Inscrire un bénévole sur ce créneau">
+                <SelectValue placeholder="Inscrire un bénévole…"/>
+            </SelectTrigger>
+            <SelectContent>
+                {candidates === null && <div className="px-2 py-1.5 text-xs text-muted-foreground">Chargement…</div>}
+                {candidates?.length === 0 && (
+                    <div className="px-2 py-1.5 text-xs text-muted-foreground">Personne d&apos;autre ne peut prendre ce créneau.</div>
+                )}
+                {candidates?.map(u => <SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>)}
+            </SelectContent>
+        </Select>
+    );
+}
+
+export default function Event({event, roles = [], onChanged}: EventProps) {
     const time = `${format(new Date(event.start), 'HH:mm', {locale: fr})} - ${format(new Date(event.end), 'HH:mm', {locale: fr})}`;
     const {data: session} = useSession();
-    const router = useRouter();
+    const {can} = usePermissions();
 
     const [open, setOpen] = useState(false);
     const [eventDetails, setEventDetails] = useState<EventData | null>(null);
     const [loading, setLoading] = useState(false);
-    const [selectedPart, setSelectedPart] = useState<'part1' | 'part2' | null>(null);
     const [deleteConfirm, setDeleteConfirm] = useState(false);
-    const [removeUserConfirm, setRemoveUserConfirm] = useState<{userId: string, userName: string, slotId?: string} | null>(null);
+    const [removeConfirm, setRemoveConfirm] = useState<{ userId: string, userName: string, slotId: string } | null>(null);
 
-    const eventDate = new Date(event.start);
-    const deadline = setSeconds(setMinutes(setHours(startOfWeek(eventDate, {weekStartsOn: 1}), 12), 0), 0);
-    const isAfterDeadline = isAfter(new Date(), deadline);
+    // Given by the API (Monday 12:00 Paris time); computed locally only for older responses
+    const deadline = event.registrationDeadline
+        ? new Date(event.registrationDeadline)
+        : setSeconds(setMinutes(setHours(startOfWeek(new Date(event.start), {weekStartsOn: 1}), 12), 0), 0);
+    const isAfterDeadline = new Date() > deadline;
 
-    useEffect(() => {
-        if (open) {
-            apiFetch(`/v1/events/${event.id}`)
-                .then(res => {
-                    if (res.success && res.event) {
-                        setEventDetails(res.event);
-                    }
-                })
-                .catch(err => {
-                    console.error("Failed to fetch event details", err);
-                });
-        }
-    }, [event.id, open]);
-
-    async function handleRegister(part?: 'first' | 'second', roleSlotId?: string, useBypass?: boolean) {
-        if (!session?.user?.id) {
-            toast.error("Cette action requiert d'être connecté");
-            return;
-        }
-
+    const reloadDetails = useCallback(async () => {
         try {
-            setLoading(true);
-            const payload: any = {};
-            if (part) payload.part = part;
-            if (roleSlotId) payload.roleSlotId = roleSlotId;
-            if (useBypass) payload.adminBypass = true;
+            const res = await apiFetch(`/v1/events/${event.id}`);
+            if (res.success && res.event) setEventDetails(res.event);
+        } catch (err) {
+            console.error("Failed to fetch event details", err);
+        }
+    }, [event.id]);
 
-            const res = await apiFetch(`/v1/events/${event.id}/register`, {
-                method: 'POST',
-                body: payload,
-            });
-
-            if (res.success) {
-                // Refresh event details
-                const updated = await apiFetch(`/v1/events/${event.id}`);
-                if (updated.success && updated.event) {
-                    setEventDetails(updated.event);
-                }
-                const message = useBypass ? "Inscription validée par administrateur" : (res.registration.status === 'pending' ? "Demande d'inscription envoyée" : "Inscription validée");
-                toast.success(message);
-            }
+    /** Runs a change, then reloads the details and the calendar. */
+    async function run(action: () => Promise<any>, success: string | ((res: any) => string)) {
+        setLoading(true);
+        try {
+            const res = await action();
+            toast.success(typeof success === 'function' ? success(res) : success);
+            await reloadDetails();
+            onChanged?.();
+            return true;
         } catch (e: any) {
-            console.error("Registration failed", e);
-            toast.error(e.message || 'Erreur inconnue');
+            toast.error(e?.message || 'Erreur inconnue');
+            return false;
         } finally {
             setLoading(false);
         }
     }
 
-    async function handleUnregister(part?: 'first' | 'second', roleSlotId?: string) {
-        if (!session?.user?.id) {
-            toast.error("Cette action requiert d'être connecté");
-            return;
-        }
+    const post = (url: string, body: object) => apiFetch(url, {method: 'POST', body: JSON.stringify(body)});
 
-        try {
-            setLoading(true);
-            const payload: any = {};
-            if (part) payload.part = part;
-            if (roleSlotId) payload.roleSlotId = roleSlotId;
+    const register = (slot: EventRoleSlot, userId?: string) => run(
+        () => post(`/v1/events/${event.id}/register`, {roleSlotId: slot.id, ...(userId ? {userId} : {})}),
+        res => userId ? "Bénévole inscrit"
+            : res.registration?.status === 'pending' ? "Demande d'inscription envoyée" : "Inscription validée",
+    );
 
-            const res = await apiFetch(`/v1/events/${event.id}/unregister`, {
-                method: 'POST',
-                body: payload,
-            });
+    const unregister = (slot: EventRoleSlot, userId?: string) => run(
+        () => post(`/v1/events/${event.id}/unregister`, {roleSlotId: slot.id, ...(userId ? {userId} : {})}),
+        userId ? "Bénévole retiré de la permanence" : "Désinscription réussie",
+    );
 
-            if (res.success) {
-                // Refresh event details
-                const updated = await apiFetch(`/v1/events/${event.id}`);
-                if (updated.success && updated.event) {
-                    setEventDetails(updated.event);
-                }
-                toast.success("Désinscription réussie");
-            }
-        } catch (e: any) {
-            console.error("Unregistration failed", e);
-            toast.error(e.message || 'Erreur inconnue');
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    async function handleRemoveUser(targetUserId: string, roleSlotId?: string) {
-        if (!isManagerOrAdmin) {
-            toast.error("Permissions insuffisantes");
-            return;
-        }
-
-        try {
-            setLoading(true);
-            const payload: any = { userId: targetUserId };
-            if (roleSlotId) payload.roleSlotId = roleSlotId;
-
-            const res = await apiFetch(`/v1/events/${event.id}/remove-user`, {
-                method: 'POST',
-                body: payload,
-            });
-
-            if (res.success) {
-                // Refresh event details
-                const updated = await apiFetch(`/v1/events/${event.id}`);
-                if (updated.success && updated.event) {
-                    setEventDetails(updated.event);
-                }
-                toast.success("Utilisateur retiré de l'événement");
-                setRemoveUserConfirm(null);
-            }
-        } catch (e: any) {
-            console.error("Remove user failed", e);
-            toast.error(e.message || 'Erreur inconnue');
-        } finally {
-            setLoading(false);
-        }
-    }
+    const setStatus = (registrationId: string, status: 'confirmed' | 'rejected') => run(
+        () => post(`/v1/events/registrations/${registrationId}/status`, {status}),
+        status === 'confirmed' ? "Inscription approuvée" : "Demande refusée",
+    );
 
     async function handleDelete() {
+        setLoading(true);
         try {
-            setLoading(true);
-            const res = await apiFetch(`/v1/events/${event.id}`, {
-                method: 'DELETE'
-            });
-
-            if (res.success) {
-                toast.success("Permanence supprimée");
-                setOpen(false);
-                setDeleteConfirm(false);
-                router.refresh();
-            }
+            await apiFetch(`/v1/events/${event.id}`, {method: 'DELETE'});
+            toast.success("Permanence supprimée");
+            setDeleteConfirm(false);
+            setOpen(false);
+            // The calendar loads its events in the browser: reload them, a router refresh would not (#287)
+            onChanged?.();
         } catch (e: any) {
-            toast.error(e.message || "Erreur lors de la suppression");
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    async function handleUpdateRegistrationStatus(registrationId: string, status: 'confirmed' | 'rejected') {
-        try {
-            setLoading(true);
-            const res = await apiFetch(`/v1/events/registrations/${registrationId}/status`, {
-                method: 'POST',
-                body: JSON.stringify({status})
-            });
-
-            if (res.success) {
-                toast.success(status === 'confirmed' ? "Inscription approuvée" : "Inscription rejetée");
-                // Refresh event details
-                const updated = await apiFetch(`/v1/events/${event.id}`);
-                if (updated.success && updated.event) {
-                    setEventDetails(updated.event);
-                }
-            }
-        } catch (e: any) {
-            toast.error(e.message || "Erreur lors de la mise à jour");
+            toast.error(e?.message || "Erreur lors de la suppression");
         } finally {
             setLoading(false);
         }
     }
 
     const userId = session?.user?.id;
-    const userRoles: string[] = (session?.user?.role || '')
-        .split(',')
-        .map((r: string) => r.trim())
-        .filter(Boolean);
-
-    const isManagerOrAdmin = userRoles.includes('manager') || userRoles.includes('admin');
-    const isAdmin = userRoles.includes('admin');
+    // Slot eligibility: a slot is for members holding the role it names
+    const userRoles = splitRoles((session?.user as any)?.role);
+    const canEdit = can('permanence.open');
+    const canDelete = can('permanence.close');
 
     let badgeColor = 'bg-gray-300 text-gray-800';
     const slotsToUse = eventDetails?.roleSlots || event.roleSlots;
 
     if (slotsToUse) {
-        const managerSlot = slotsToUse.find(slot => slot.role === 'manager');
-        const part1Slot = slotsToUse.find(slot => slot.role === 'volunteer' && slot.part === 'first');
-        const part2Slot = slotsToUse.find(slot => slot.role === 'volunteer' && slot.part === 'second');
+        // Role names are configurable: the whole-evening slot (no part) is the manager's,
+        // the split slots (first/second part) are the volunteers'
+        const managerSlot = slotsToUse.find(slot => !slot.part);
+        const part1Slot = slotsToUse.find(slot => slot.part === 'first');
+        const part2Slot = slotsToUse.find(slot => slot.part === 'second');
 
         const hasManager = managerSlot && managerSlot.registrationsCount >= 1;
         const part1Count = part1Slot?.registrationsCount ?? 0;
@@ -232,91 +171,142 @@ export default function Event({event}: EventProps) {
         }
     }
 
+    const start = new Date(event.start);
+    const end = new Date(event.end);
+
+    const removeButton = (reg: Registration, slot: EventRoleSlot) => (
+        <AlertDialog open={removeConfirm?.userId === reg.userId && removeConfirm?.slotId === slot.id}
+                     onOpenChange={(o) => { if (!o) setRemoveConfirm(null); }}>
+            <AlertDialogTrigger asChild>
+                <Button size="icon" variant="ghost" className="h-6 w-6 text-red-600 hover:bg-red-50"
+                        onClick={() => setRemoveConfirm({userId: reg.userId, userName: reg.user?.name || 'cette personne', slotId: slot.id})}
+                        disabled={loading} aria-label={`Retirer ${reg.user?.name || 'cette personne'}`} title="Retirer de la permanence">
+                    <X className="h-4 w-4"/>
+                </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Retirer {removeConfirm?.userName} ?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Son inscription à ce créneau sera supprimée.
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel>Annuler</AlertDialogCancel>
+                    <AlertDialogAction disabled={loading} className="bg-red-500 hover:bg-red-600"
+                                       onClick={() => { if (removeConfirm) unregister(slot, removeConfirm.userId); setRemoveConfirm(null); }}>
+                        Retirer
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+    );
+
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={(next) => {
+            setOpen(next);
+            if (next) reloadDetails();
+        }}>
             <DialogTrigger asChild>
                 <Badge className={`cursor-pointer truncate max-w-full ${badgeColor}`}>{event.title}</Badge>
             </DialogTrigger>
-            <DialogContent className="max-w-md">
+            <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[85vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle className="flex justify-between items-center">
-                        <span>{event.title} du {format(new Date(event.start), "EEEE d MMMM yyyy", {locale: fr})}</span>
-                        {isAdmin && (
-                            <AlertDialog open={deleteConfirm} onOpenChange={setDeleteConfirm}>
-                                <AlertDialogTrigger asChild>
-                                    <Button variant="ghost" size="icon" disabled={loading}
-                                            className="text-red-500 hover:text-red-700 hover:bg-red-50">
-                                        <Trash2 className="h-4 w-4"/>
-                                    </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>Supprimer cet événement ?</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            Cette action est irréversible. L'événement et tous ses détails seront supprimés.
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                        <AlertDialogAction onClick={handleDelete} disabled={loading} className="bg-red-500 hover:bg-red-600">
-                                            Supprimer
-                                        </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
-                        )}
+                    <DialogTitle className="flex items-center justify-between gap-2 pr-6">
+                        <span>{event.title} du {format(start, "EEEE d MMMM yyyy", {locale: fr})}</span>
+                        <span className="flex shrink-0 items-center">
+                            {canEdit && eventDetails && (
+                                <EditEventDialog event={eventDetails} roles={roles}
+                                                 onSaved={() => { reloadDetails(); onChanged?.(); }}/>
+                            )}
+                            {canDelete && (
+                                <AlertDialog open={deleteConfirm} onOpenChange={setDeleteConfirm}>
+                                    <AlertDialogTrigger asChild>
+                                        <Button variant="ghost" size="icon" disabled={loading} aria-label="Supprimer la permanence"
+                                                title="Supprimer la permanence" className="text-red-500 hover:text-red-700 hover:bg-red-50">
+                                            <Trash2 className="h-4 w-4"/>
+                                        </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                            <AlertDialogTitle>Supprimer cette permanence ?</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                                Cette action est irréversible. La permanence et ses inscriptions seront supprimées.
+                                            </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                            <AlertDialogAction onClick={handleDelete} disabled={loading} className="bg-red-500 hover:bg-red-600">
+                                                Supprimer
+                                            </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
+                            )}
+                        </span>
                     </DialogTitle>
-                    <p className="text-sm text-muted-foreground">{time}</p>
+                    <DialogDescription>
+                        {time}
+                        {isAfterDeadline
+                            ? " · Les inscriptions sont désormais soumises à validation."
+                            : ` · Inscriptions libres jusqu'au ${format(deadline, "EEEE d MMMM 'à' HH'h'mm", {locale: fr})}.`}
+                    </DialogDescription>
                 </DialogHeader>
 
-                {eventDetails && eventDetails.roleSlots && (
+                {eventDetails?.roleSlots && (
                     <div className="space-y-4 mb-4">
                         {eventDetails.roleSlots.map(slot => {
                             const registeredCount = slot.registrationsCount;
-
                             const roleDisplayNames: Record<string, string> = {
                                 manager: "Référent Bénévoles Écoutants",
                                 volunteer: "Bénévole Écoutant"
                             };
-
                             const displayRole = roleDisplayNames[slot.role] ?? slot.role;
 
                             const userRegistration = slot.registrations.find(r => r.userId === userId);
                             const isRegistered = !!userRegistration;
                             const isEligible = userRoles.includes(slot.role);
                             const isFull = registeredCount >= slot.goalCount;
-                            const labelPart = slot.part ? (slot.part === 'first' ? '1 : 20h00-21h30' : '2 : 21h30-23h00') : '';
-                            const partValue = slot.part ? (slot.part as 'first' | 'second') : undefined;
+                            const canRegisterOthers = canActOnOthers(can, userRoles, slot.role, 'register');
+                            const canRemoveOthers = canActOnOthers(can, userRoles, slot.role, 'unregister');
+                            // After the deadline only a pending request can be withdrawn, unless you manage this slot
+                            const canLeave = can('permanence.unregister')
+                                && (!isAfterDeadline || userRegistration?.status === 'pending' || canRemoveOthers);
 
-                            const pendingRegistrations = slot.registrations.filter(r => r.status === 'pending');
+                            const pending = slot.registrations.filter(r => r.status === 'pending');
+                            const confirmed = slot.registrations.filter(r => r.status === 'confirmed');
+
+                            let selfLabel: string;
+                            if (isRegistered) selfLabel = canLeave ? 'Se désinscrire' : 'Inscrit';
+                            else if (!can('permanence.register') || !isEligible) selfLabel = 'Non admissible';
+                            else if (isFull) selfLabel = 'Complet';
+                            else selfLabel = isAfterDeadline ? "Demander l'inscription" : "S'inscrire";
 
                             return (
                                 <div key={slot.id} className="text-xs flex flex-col gap-2 p-2 border rounded-md">
-                                    <div className="flex justify-between items-center font-semibold">
-                                    <span>
-                                      {displayRole} {slot.part ? `(partie ${labelPart})` : ''}
-                                    </span>
-                                        <span>{registeredCount} / {slot.goalCount} inscrits</span>
+                                    <div className="flex justify-between items-center gap-2 font-semibold">
+                                        <span>
+                                            {displayRole}{slot.part ? ` (partie ${slot.part === 'first' ? 1 : 2} : ${partHours(start, end, slot.part)})` : ''}
+                                        </span>
+                                        <span className="shrink-0">{registeredCount} / {slot.goalCount} inscrits</span>
                                     </div>
 
-                                    {isManagerOrAdmin && pendingRegistrations.length > 0 && (
-                                        <div className="bg-orange-50 p-2 rounded-sm space-y-2">
-                                            <p className="font-bold text-orange-800">Demandes en attente :</p>
-                                            {pendingRegistrations.map(reg => (
+                                    {canRegisterOthers && pending.length > 0 && (
+                                        <div className="bg-orange-50 p-2 rounded-sm space-y-2 dark:bg-orange-950/40">
+                                            <p className="font-bold text-orange-800 dark:text-orange-300">Demandes en attente :</p>
+                                            {pending.map(reg => (
                                                 <div key={reg.id}
-                                                     className="flex justify-between items-center bg-white p-1 rounded border border-orange-200">
+                                                     className="flex justify-between items-center bg-background p-1 rounded border border-orange-200">
                                                     <span>{reg.user?.name || reg.userId}</span>
                                                     <div className="flex gap-1">
-                                                        <Button size="icon" variant="ghost"
-                                                                className="h-6 w-6 text-green-600"
-                                                                onClick={() => handleUpdateRegistrationStatus(reg.id, 'confirmed')}
-                                                                disabled={loading}>
+                                                        <Button size="icon" variant="ghost" className="h-6 w-6 text-green-600"
+                                                                aria-label={`Approuver ${reg.user?.name ?? ''}`} title="Approuver"
+                                                                onClick={() => setStatus(reg.id, 'confirmed')} disabled={loading}>
                                                             <Check className="h-4 w-4"/>
                                                         </Button>
-                                                        <Button size="icon" variant="ghost"
-                                                                className="h-6 w-6 text-red-600"
-                                                                onClick={() => handleUpdateRegistrationStatus(reg.id, 'rejected')}
-                                                                disabled={loading}>
+                                                        <Button size="icon" variant="ghost" className="h-6 w-6 text-red-600"
+                                                                aria-label={`Refuser ${reg.user?.name ?? ''}`} title="Refuser"
+                                                                onClick={() => setStatus(reg.id, 'rejected')} disabled={loading}>
                                                             <X className="h-4 w-4"/>
                                                         </Button>
                                                     </div>
@@ -325,58 +315,39 @@ export default function Event({event}: EventProps) {
                                         </div>
                                     )}
 
-                                    {isManagerOrAdmin && slot.registrations.filter(r => r.status === 'confirmed').length > 0 && (
-                                        <div className="bg-blue-50 p-2 rounded-sm space-y-2">
-                                            <p className="font-bold text-blue-800">Inscrits confirmés :</p>
-                                            {slot.registrations.filter(r => r.status === 'confirmed').map(reg => (
+                                    {(canRemoveOthers || canRegisterOthers) && confirmed.length > 0 && (
+                                        <div className="bg-blue-50 p-2 rounded-sm space-y-2 dark:bg-blue-950/40">
+                                            <p className="font-bold text-blue-800 dark:text-blue-300">Inscrits confirmés :</p>
+                                            {confirmed.map(reg => (
                                                 <div key={reg.id}
-                                                     className="flex justify-between items-center bg-white p-1 rounded border border-blue-200">
+                                                     className="flex justify-between items-center bg-background p-1 rounded border border-blue-200">
                                                     <span>{reg.user?.name || reg.userId}</span>
-                                                    <AlertDialog open={removeUserConfirm?.userId === reg.userId} onOpenChange={(open) => { if (!open) setRemoveUserConfirm(null); }}>
-                                                        <AlertDialogTrigger asChild>
-                                                            <Button size="icon" variant="ghost"
-                                                                    className="h-6 w-6 text-red-600 hover:bg-red-50"
-                                                                    onClick={() => setRemoveUserConfirm({userId: reg.userId, userName: reg.user?.name || 'cet utilisateur', slotId: slot.id})}
-                                                                    disabled={loading}
-                                                                    title="Retirer cet utilisateur">
-                                                                <X className="h-4 w-4"/>
-                                                            </Button>
-                                                        </AlertDialogTrigger>
-                                                        <AlertDialogContent>
-                                                            <AlertDialogHeader>
-                                                                <AlertDialogTitle>Retirer cet utilisateur ?</AlertDialogTitle>
-                                                                <AlertDialogDescription>
-                                                                    Êtes-vous sûr de vouloir retirer {removeUserConfirm?.userName} de cet événement ?
-                                                                </AlertDialogDescription>
-                                                            </AlertDialogHeader>
-                                                            <AlertDialogFooter>
-                                                                <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                                                <AlertDialogAction onClick={() => { if (removeUserConfirm) handleRemoveUser(removeUserConfirm.userId, removeUserConfirm.slotId); }} disabled={loading} className="bg-red-500 hover:bg-red-600">
-                                                                    Retirer
-                                                                </AlertDialogAction>
-                                                            </AlertDialogFooter>
-                                                        </AlertDialogContent>
-                                                    </AlertDialog>
+                                                    {canRemoveOthers && reg.userId !== userId && removeButton(reg, slot)}
                                                 </div>
                                             ))}
                                         </div>
                                     )}
 
-                                    <div className="flex justify-end items-center gap-2">
+                                    <div className="flex flex-col-reverse items-stretch gap-2 sm:flex-row sm:items-center sm:justify-end">
+                                        {canRegisterOthers && (!isFull || can('permanence.register_other_all')) && (
+                                            <AddMember eventId={event.id} slotId={slot.id} disabled={loading}
+                                                       onAdd={(id) => register(slot, id)}/>
+                                        )}
                                         {isRegistered && userRegistration?.status === 'pending' && (
-                                            <Badge variant="outline" className="text-orange-600 border-orange-600">En
-                                                attente de validation</Badge>
+                                            <Badge variant="outline" className="text-orange-600 border-orange-600">
+                                                En attente de validation
+                                            </Badge>
                                         )}
                                         <Button
                                             size="sm"
                                             variant={isRegistered ? 'destructive' : 'default'}
-                                            disabled={loading || (!isRegistered && (isFull || !isEligible))}
-                                            onClick={() => isRegistered
-                                                ? handleUnregister(partValue, slot.id)
-                                                : handleRegister(partValue, slot.id)
-                                            }
+                                            disabled={loading || (isRegistered
+                                                ? !canLeave
+                                                : (isFull || !isEligible || !can('permanence.register')))}
+                                            title={isRegistered && !canLeave ? "Après le lundi 12h, contactez un référent pour vous désinscrire." : undefined}
+                                            onClick={() => isRegistered ? unregister(slot) : register(slot)}
                                         >
-                                            {isRegistered ? 'Se désinscrire' : isEligible ? (isFull ? 'Complet' : (isAfterDeadline ? "Demander l'inscription" : "S'inscrire")) : 'Non admissible'}
+                                            {selfLabel}
                                         </Button>
                                     </div>
                                 </div>
@@ -384,8 +355,6 @@ export default function Event({event}: EventProps) {
                         })}
                     </div>
                 )}
-
-
             </DialogContent>
         </Dialog>
     );

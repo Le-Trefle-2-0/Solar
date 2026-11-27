@@ -1,5 +1,5 @@
 "use client";
-import type {Reaction} from "@prisma/client";
+import type {Reaction} from "../../../generated/prisma";
 import {apiFetch} from "@/lib/api";
 import React, {useEffect, useState} from "react";
 import {
@@ -56,6 +56,7 @@ export function Message(props: {
     replyTargetId?: number,
     replyOf?: { id: number; authorName: string; content: string; image?: string | null } | undefined,
     edited?: boolean,
+    undelivered?: boolean,
     readOnly?: boolean,
 }) {
     const {
@@ -78,6 +79,7 @@ export function Message(props: {
         replyOf,
         canManageMessages,
         edited: wasEdited,
+        undelivered,
         readOnly,
     } = props;
     const {socket} = useSocket();
@@ -147,9 +149,11 @@ export function Message(props: {
     const [reactionMap, setReactionMap] = useState<{ [emoji: string]: Reaction[] }>();
 
     useEffect(() => {
-        const map: { [emoji: string]: Reaction[] } = {};
+        // No prototype: an "emoji" named "__proto__" or "constructor" is just a key (#257)
+        const map: { [emoji: string]: Reaction[] } = Object.create(null);
         (reactionList ?? []).forEach(r => {
-            if (!map[r.emoji]) map[r.emoji] = [];
+            if (typeof r?.emoji !== "string") return;
+            if (!Object.hasOwn(map, r.emoji)) map[r.emoji] = [];
             map[r.emoji].push(r);
         });
         setReactionMap(map);
@@ -228,7 +232,7 @@ export function Message(props: {
             });
     }
 
-    const MessageContent = () => (
+    const messageContent = (
         <div
             id={`message-${id}`}
             className={cn(
@@ -457,6 +461,11 @@ export function Message(props: {
                         )}
                         {wasEdited ? (
                             <span className="ml-2 text-xs text-gray-500 italic">Modifié</span>) : null}
+                        {undelivered ? (
+                            <span className="ml-2 text-xs font-medium text-destructive"
+                                  title="La personne a fermé ses messages privés Discord ou quitté Discord">
+                                Non remis
+                            </span>) : null}
                     </h3>
                 )}
 
@@ -505,7 +514,7 @@ export function Message(props: {
                 <ContextMenu>
                     <ContextMenuTrigger asChild>
                         <div>
-                            <MessageContent/>
+                            {messageContent}
                         </div>
                     </ContextMenuTrigger>
                     <ContextMenuContent>
@@ -540,9 +549,7 @@ export function Message(props: {
                         </ContextMenuItem>
                     </ContextMenuContent>
                 </ContextMenu>
-            ) : (
-                <MessageContent/>
-            )}
+            ) : messageContent}
 
             <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
                 <DialogContent>

@@ -2,13 +2,15 @@
 
 import {createHelloAssoCheckoutIntent} from "@/lib/helloasso";
 import {z} from "zod";
+import {allowPublicAction, TOO_MANY_REQUESTS} from "@/lib/security/actionRateLimit";
 
 const donationSchema = z.object({
-    amount: z.number().min(1, "Le montant doit être d'au moins 1€"),
+    amount: z.number().min(1, "Le montant doit être d'au moins 1€").max(100_000),
     isRecurring: z.boolean(),
 });
 
 export async function initiateDonation(data: z.infer<typeof donationSchema>) {
+    if (!await allowPublicAction("donation")) return {error: TOO_MANY_REQUESTS};
     const validated = donationSchema.safeParse(data);
 
     if (!validated.success) {
@@ -43,6 +45,7 @@ export async function initiateDonation(data: z.infer<typeof donationSchema>) {
         return {redirectUrl: intent.redirectUrl};
     } catch (error: any) {
         console.error("Failed to initiate donation:", error);
-        return {error: error.message || "Une erreur est survenue lors de l'initialisation du don."};
+        // Technical details stay in the server logs (#275)
+        return {error: "Une erreur est survenue lors de l'initialisation du don."};
     }
 }

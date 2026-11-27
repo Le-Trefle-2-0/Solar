@@ -9,7 +9,11 @@ export interface HelloAssoCheckoutIntentResponse {
     redirectUrl: string;
 }
 
+/** The access token is reused until shortly before it expires: one per hour, not one per visitor (#280). */
+let cachedToken: { value: string; expiresAt: number } | null = null;
+
 export async function getHelloAssoToken(): Promise<string> {
+    if (cachedToken && cachedToken.expiresAt > Date.now()) return cachedToken.value;
     const clientId = process.env.HELLOASSO_CLIENT_ID;
     const clientSecret = process.env.HELLOASSO_CLIENT_SECRET;
 
@@ -36,6 +40,8 @@ export async function getHelloAssoToken(): Promise<string> {
     }
 
     const data: HelloAssoTokenResponse = await response.json();
+    const lifetimeMs = Math.max(0, (Number(data.expires_in) || 0) - 60) * 1000;
+    cachedToken = lifetimeMs > 0 ? {value: data.access_token, expiresAt: Date.now() + lifetimeMs} : null;
     return data.access_token;
 }
 

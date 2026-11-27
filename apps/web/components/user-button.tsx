@@ -11,7 +11,8 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar} from "@/components/ui/sidebar";
-import {authClient, useSession} from "@/lib/auth-client";
+import {useSession} from "@/lib/auth-client";
+import {signOutEverywhere} from "@/lib/sign-out";
 import {ChevronsUpDown, LogOut, Settings} from "lucide-react";
 import {useRouter} from "next/navigation";
 import {toast} from "sonner";
@@ -26,13 +27,9 @@ export function UserButton({className}: { className?: string }) {
     const user = session.user;
 
     const handleSignOut = async () => {
-        await authClient.signOut({
-            fetchOptions: {
-                onSuccess: () => {
-                    toast.success("Déconnecté avec succès");
-                    router.push("/auth/sign-in");
-                },
-            },
+        await signOutEverywhere(() => {
+            toast.success("Déconnecté avec succès");
+            router.push("/auth/sign-in");
         });
     };
 

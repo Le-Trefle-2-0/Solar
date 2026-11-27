@@ -1,4 +1,6 @@
 import {auth} from "@/lib/auth";
+import {DEFAULT_ROLE} from "@/lib/permissions";
+import {can, getAccess} from "@/lib/userPermissions";
 import {headers} from "next/headers";
 import {redirect} from "next/navigation";
 import prisma from "@/lib/prisma";
@@ -18,13 +20,13 @@ export default async function AdminSettingsPage() {
 
     if (!session) redirect('/auth/sign-in');
 
-    const userRoles = ((session.user as any).role || "").split(",").map((r: string) => r.trim());
-    const userPermissions = (session.user as any).permissions || [];
-    if (!userRoles.includes("admin") && !userRoles.includes("manager") && !userPermissions.includes("admin.sudo")) {
+    // Permission-based: role names grant nothing by themselves
+    const access = await getAccess();
+    if (!access || !can(access.permissions, 'settings.manage')) {
         redirect("/app");
     }
 
-    let initialSettings = {
+    const initialSettings = {
         widget_enabled: true,
         monitoring_categories: [] as string[],
         planning_default_slots: [] as any[]
@@ -34,6 +36,7 @@ export default async function AdminSettingsPage() {
 
     try {
         roles = await prisma.role.findMany({
+            where: {name: {not: DEFAULT_ROLE}},
             orderBy: {
                 weight: 'desc'
             }
@@ -67,7 +70,8 @@ export default async function AdminSettingsPage() {
 
     return (
         <Page title="Paramètres globaux" description="Configurez les options générales de l'application">
-            <AdminSettingsView initialSettings={initialSettings} roles={roles}/>
+            <AdminSettingsView initialSettings={initialSettings} roles={roles}
+                               canManageNewsletters={can(access!.permissions, 'newsletters.manage')}/>
         </Page>
     );
 }

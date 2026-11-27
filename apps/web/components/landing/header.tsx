@@ -14,7 +14,7 @@ export function PublicHeader({session: initialSession}: { session: any }) {
     const session = sessionData?.user ? sessionData : initialSession;
     const [contactOpen, setContactOpen] = useState(false);
 
-    const NavItems = ({className = ""}: { className?: string }) => {
+    const renderNavItems = (className = "") => {
         const isMobile = className.includes("flex-col");
         const linkBase = isMobile
             ? "block w-full py-3 px-4 rounded-md transition-colors text-foreground text-left bg-transparent hover:bg-muted/50"
@@ -70,7 +70,7 @@ export function PublicHeader({session: initialSession}: { session: any }) {
 
                 {/* Desktop Navigation */}
                 <nav className="hidden lg:flex items-center gap-6 text-sm font-medium">
-                    <NavItems className="flex items-center gap-6"/>
+                    {renderNavItems("flex items-center gap-6")}
                 </nav>
 
                 {/* Mobile Navigation */}
@@ -90,7 +90,7 @@ export function PublicHeader({session: initialSession}: { session: any }) {
                                 </SheetTitle>
                             </SheetHeader>
                             <nav className="mt-8">
-                                <NavItems className="flex flex-col gap-6 text-lg font-medium"/>
+                                {renderNavItems("flex flex-col gap-6 text-lg font-medium")}
                             </nav>
                         </SheetContent>
                     </Sheet>

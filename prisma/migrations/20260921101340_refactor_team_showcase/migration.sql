@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE `team_category` ADD COLUMN `color` VARCHAR(191) NULL,
+    ADD COLUMN `type` VARCHAR(191) NOT NULL DEFAULT 'DEFAULT';
+
+-- AlterTable
+ALTER TABLE `team_member` ADD COLUMN `isLead` BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN `teamName` VARCHAR(191) NULL;

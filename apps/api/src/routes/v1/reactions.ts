@@ -3,6 +3,8 @@ import {z} from 'zod';
 import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
 import {broadcast} from '../../lib/broadcast.js';
+import {getChannelAccess} from '../../lib/channelAccess.js';
+import {isTicketWritable} from '../../lib/ticketWrites.js';
 
 export async function registerReactionsRoutes(app: FastifyInstance) {
     app.post('/v1/reaction', async (req, reply) => {
@@ -10,15 +12,31 @@ export async function registerReactionsRoutes(app: FastifyInstance) {
         if (!userId) return reply.status(401).send('unauthorized');
 
         const reactionSchema = z.object({
-            id: z.string().optional(),
-            messageID: z.number(),
-            emoji: z.string(),
-            option: z.string(),
+            id: z.string().max(64).optional(),
+            messageID: z.number().int().positive(),
+            emoji: z.string().min(1).max(32),
+            option: z.enum(['add', 'remove']),
         });
 
         try {
             const body = reactionSchema.parse(req.body);
+            // Reacting writes to the message's channel: same rule as posting (#217)
+            const target = await prisma.message.findUnique({
+                where: {id: body.messageID},
+                select: {channelId: true, ticket: {select: {statusName: true}}},
+            });
+            if (!target?.channelId) return reply.status(404).send({success: false, error: 'not_found'});
+            if (!(await getChannelAccess(userId, target.channelId)).write) {
+                return reply.status(403).send({success: false, error: 'forbidden'});
+            }
+            // A closed écoute's transcript is final (#266)
+            if (!isTicketWritable(target.ticket)) return reply.status(409).send({success: false, error: 'ticket_closed'});
             if (body.option === "add") {
+                // One reaction per person, emoji and message (#167)
+                const existing = await prisma.reaction.findFirst({
+                    where: {messageID: body.messageID, userID: userId, emoji: body.emoji},
+                });
+                if (existing) return reply.send({success: true, reaction: existing, duplicate: true});
                 const reaction = await prisma.reaction.create({
                     data: {
                         messageID: body.messageID,
@@ -61,7 +79,8 @@ export async function registerReactionsRoutes(app: FastifyInstance) {
             if (e instanceof z.ZodError) {
                 return reply.status(400).send({success: false, error: e.flatten()});
             }
-            return reply.status(500).send({success: false, error: String(e)});
+            req.log.error(e);
+            return reply.status(500).send({success: false, error: 'internal_error'});
         }
     });
 }

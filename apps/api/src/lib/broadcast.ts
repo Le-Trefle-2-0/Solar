@@ -1,9 +1,19 @@
-export async function broadcast(room: string | null, event: string, data: any) {
+/**
+ * Sends an event through the WebSocket service. `room` targets a channel (its members and
+ * those who may read every ticket); null targets every volunteer. `audience: 'bots'` targets
+ * the sockets authenticated with a bot API key instead; `audience: 'staff'` the volunteers of the
+ * room and those who may read every ticket, never the visitor's widget nor the bot (team notes).
+ */
+export async function broadcast(room: string | null, event: string, data: any, options: {audience?: 'bots' | 'staff'} = {}) {
     try {
         let base = process.env.WS_INTERNAL_URL || process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:5000';
         if (base.startsWith('ws://')) base = 'http://' + base.slice('ws://'.length);
         if (base.startsWith('wss://')) base = 'https://' + base.slice('wss://'.length);
-        const secret = process.env.WS_BROADCAST_SECRET || 'fallback_broadcast_secret_for_dev_only';
+        const secret = process.env.WS_BROADCAST_SECRET;
+        if (!secret) {
+            console.error('[api] WS_BROADCAST_SECRET is not set, broadcast skipped');
+            return;
+        }
 
         console.log(`[api] Broadcasting event "${event}" to room "${room}"`);
 
@@ -16,7 +26,8 @@ export async function broadcast(room: string | null, event: string, data: any) {
             body: JSON.stringify({
                 room,
                 event,
-                data
+                data,
+                ...(options.audience ? {audience: options.audience} : {}),
             }),
         });
 

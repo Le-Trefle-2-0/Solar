@@ -14,6 +14,13 @@ import {registerWidgetRoutes} from './widget.js';
 import {registerWsRoutes} from './ws.js';
 import {registerAuthRoutes} from './auth.js';
 import {registerNewslettersRoutes} from './newsletters.js';
+import {registerInternalRoutes} from './internal.js';
+import {registerVoiceRoutes} from './voice.js';
+import {registerInternalVoiceRoutes} from './internalVoice.js';
+import {registerBotBridgeRoutes} from './botBridge.js';
+import {registerTicketInfoRoutes} from './ticketInfo.js';
+import {registerPresenceRoutes} from './presence.js';
+import {registerSpectateRoutes} from './spectate.js';
 
 export async function registerV1Routes(app: FastifyInstance) {
     await registerUsersRoutes(app);
@@ -31,4 +38,11 @@ export async function registerV1Routes(app: FastifyInstance) {
     await registerWsRoutes(app);
     await registerAuthRoutes(app);
     await registerNewslettersRoutes(app);
+    await registerInternalRoutes(app);
+    await registerVoiceRoutes(app);
+    await registerInternalVoiceRoutes(app);
+    await registerBotBridgeRoutes(app);
+    await registerTicketInfoRoutes(app);
+    await registerPresenceRoutes(app);
+    await registerSpectateRoutes(app);
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import {useState} from "react";
-import {Recruitment} from "@prisma/client";
+import type {Recruitment} from "../../../../generated/prisma";
 import {Button} from "@/components/ui/button";
 import * as Icons from "lucide-react";
 import {Edit, Plus, Trash2, Users} from "lucide-react";

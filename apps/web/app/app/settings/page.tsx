@@ -1,5 +1,6 @@
 "use client";
 
+import QRCode from "react-qr-code";
 import {
     Dialog,
     DialogContent,
@@ -64,15 +65,6 @@ export default function SettingsPage() {
     const [sessions, setSessions] = useState<any[]>([]);
     const [accounts, setAccounts] = useState<any[]>([]);
 
-    useEffect(() => {
-        if (session?.user) {
-            setIsTwoFactorEnabled(!!session.user.twoFactorEnabled);
-            fetchPasskeys();
-            fetchSessions();
-            fetchAccounts();
-        }
-    }, [session]);
-
     const fetchSessions = async () => {
         const {data, error} = await authClient.listSessions();
         if (data && !error) {
@@ -93,6 +85,15 @@ export default function SettingsPage() {
             setPasskeys(data);
         }
     };
+
+    useEffect(() => {
+        if (session?.user) {
+            setIsTwoFactorEnabled(!!session.user.twoFactorEnabled);
+            fetchPasskeys();
+            fetchSessions();
+            fetchAccounts();
+        }
+    }, [session]);
 
     if (isPending) return null;
     if (!session) return null;
@@ -222,7 +223,7 @@ export default function SettingsPage() {
                 setConfirmPassword("");
                 setTwoFactorStep("password");
             }
-        } else if (data) {
+        } else if (data && "totpURI" in data) {
             setQrCode(data.totpURI);
             setTwoFactorStep("qr");
             setLoading(false);
@@ -240,12 +241,10 @@ export default function SettingsPage() {
             toast.error(error.message || "Code invalide");
         } else if (data) {
             // Generate backup codes after enabling
-            console.log("[A2F] TOTP Verified, generating backup codes...");
             const {data: codesData, error: codesError} = await authClient.twoFactor.generateBackupCodes({
                 password: confirmPassword,
             });
 
-            console.log("[A2F] generateBackupCodes result:", {codesData, codesError});
 
             if (codesError) {
                 console.error("[A2F] Error generating backup codes:", codesError);
@@ -256,10 +255,9 @@ export default function SettingsPage() {
                 // Better Auth typical response for generateBackupCodes is either the array or { backupCodes: string[] }
                 const codes = Array.isArray(codesData) ? codesData : (codesData as any).backupCodes;
                 if (Array.isArray(codes)) {
-                    console.log("[A2F] Backup codes set:", codes.length);
                     setBackupCodes(codes);
                 } else {
-                    console.warn("[A2F] Unexpected backup codes format:", codesData);
+                    console.warn("[A2F] Unexpected backup codes format");
                 }
             }
 
@@ -390,8 +388,15 @@ export default function SettingsPage() {
 
     const handleUnlinkDiscord = async () => {
         setLoading(true);
+        // better-auth 1.7 unlinks by account id
+        const discord = accounts.find((a) => a.providerId === "discord");
+        if (!discord) {
+            setLoading(false);
+            toast.error("Aucun compte Discord associé");
+            return;
+        }
         const {error} = await authClient.unlinkAccount({
-            providerId: "discord",
+            accountId: discord.accountId,
         });
         setLoading(false);
 
@@ -772,11 +777,8 @@ export default function SettingsPage() {
                         {twoFactorStep === "qr" && (
                             <div className="space-y-6 flex flex-col items-center">
                                 <div className="bg-white p-4 rounded-xl border-2 border-primary/20 shadow-inner">
-                                    <img
-                                        src={`https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrCode)}&size=160x160`}
-                                        alt="QR Code A2F"
-                                        className="h-40 w-40"
-                                    />
+                                    {/* Drawn in the browser: the secret is never sent to a QR code service (#251) */}
+                                    <div role="img" aria-label="QR Code A2F"><QRCode value={qrCode} size={160}/></div>
                                 </div>
                                 <div className="text-center space-y-2 w-full">
                                     <p className="text-xs font-mono break-all text-muted-foreground select-all bg-muted p-2 rounded">

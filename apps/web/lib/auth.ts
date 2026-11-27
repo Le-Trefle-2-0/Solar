@@ -3,12 +3,11 @@ import {prismaAdapter} from "better-auth/adapters/prisma";
 import prisma from "@/lib/prisma";
 import {getResendClient} from "@/lib/resend";
 import {renderEmailTemplate} from "@/lib/email-template";
-import {ac, admin, bot, manager, newsletterManager, training, volunteer} from "./permissions";
+import {ac, admin, bot, manager, newsletterManager, none, training, volunteer} from "./permissions";
 // Namespace import to access optional plugins that may not exist in older versions
 import {
     admin as adminPlugin,
     bearer,
-    emailOTP,
     jwt,
     openAPI,
     organization,
@@ -16,41 +15,29 @@ import {
     username
 } from "better-auth/plugins";
 import {apiKey} from "@better-auth/api-key";
+import {userAdditionalFields} from "./security/userFields";
+import {APIError} from "better-auth/api";
+import {allowResetEmail} from "./security/resetEmailLimit";
+import {escapeHtml} from "./security/escape";
+
+/** A profile photo (data URL) of about 300 KB at most; the WebSocket service drops larger ones. */
+const MAX_AVATAR_LENGTH = 400_000;
+
+/** Same key as OWNER_SETTING_KEY in lib/userPermissions.ts and the API. */
+const OWNER_SETTING_KEY = "owner_user_id";
 import {passkey} from "@better-auth/passkey";
 
+// No sign-in by e-mail code: the app never offered it, and it bypassed the second factor and
+// could send codes to any address (#251, #252).
 const pluginList: any[] = [
-    emailOTP({
-        async sendVerificationOTP({email, otp, type}) {
-            const resend = getResendClient();
-            const {html} = renderEmailTemplate({
-                title: "Code de vérification",
-                content: `
-                    <p>Bonjour,</p>
-                    <p>Voici votre code de vérification pour vous connecter au Trèfle 2.0 :</p>
-                    <div style="font-size: 32px; font-weight: 700; letter-spacing: 5px; text-align: center; margin: 30px 0; padding: 20px; background-color: #f9f9f9; border-radius: 8px; color: #8cc088; border: 1px dashed #8cc088;">
-                        ${otp}
-                    </div>
-                    <p>Ce code expirera dans 10 minutes.</p>
-                    <p>Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet e-mail.</p>
-                `,
-            });
-            const {error} = await resend.emails.send({
-                from: "Le Trèfle 2.0 <noreply@solar.letrefle.org>",
-                to: email,
-                subject: "Le Trèfle 2.0 - Votre code de vérification",
-                html,
-            });
-            if (error) {
-                console.error("Resend error sending OTP:", error);
-            }
-        }
-    }),
     adminPlugin({
         ac, roles: {
-            training, volunteer, manager, bot, admin, newsletterManager
+            training, volunteer, manager, bot, admin, newsletterManager, none
         },
-        adminRoles: ['admin', 'manager'],
-        defaultRole: 'admin',
+        // Its endpoints are blocked in hooks.before; kept for the role/ban columns it manages
+        adminRoles: ['admin'],
+        // Also applied when a stored role is empty, so it must grant nothing
+        defaultRole: 'none',
     }),
     organization(),
     twoFactor(),
@@ -58,15 +45,25 @@ const pluginList: any[] = [
     apiKey({
         rateLimit: {
             enabled: false
-        }
+        },
+        // better-auth 1.7 calls the owner column `referenceId`; keep the existing `userId`
+        // column, which the API reads (#244)
+        schema: {apikey: {fields: {referenceId: "userId"}}},
     }),
-    jwt(),
+    jwt({
+        jwt: {
+            expirationTime: "15m",
+            // The API, the realtime and the voice services check that this session is still
+            // open: signing out or resetting the password ends their access at once (#276)
+            definePayload: ({user, session}) => ({...user, sid: session.id}),
+        },
+    }),
     bearer(),
     passkey(),
 ];
 
-// Always add OpenAPI at the end
-pluginList.push(openAPI());
+// The OpenAPI reference loads a third-party script: development only (#282)
+if (process.env.NODE_ENV !== "production") pluginList.push(openAPI());
 
 // Development-friendly base URL and trusted origins
 const IS_DEV = process.env.NODE_ENV !== "production";
@@ -87,88 +84,7 @@ export const auth = betterAuth({
         trustProxy: true,
     },
     user: {
-        additionalFields: {
-            documentsStatus: {
-                type: "string",
-                required: false,
-                defaultValue: "missing",
-            },
-            documentsSentAt: {
-                type: "date",
-                required: false,
-            },
-            documentsValidatedAt: {
-                type: "date",
-                required: false,
-            },
-            documentsRenewalAt: {
-                type: "date",
-                required: false,
-            },
-            documentsText: {
-                type: "string",
-                required: false,
-            },
-            firstName: {
-                type: "string",
-                required: false,
-            },
-            lastName: {
-                type: "string",
-                required: false,
-            },
-            birthDate: {
-                type: "date",
-                required: false,
-            },
-            addressStreet: {
-                type: "string",
-                required: false,
-            },
-            addressNumber: {
-                type: "string",
-                required: false,
-            },
-            addressPostalCode: {
-                type: "string",
-                required: false,
-            },
-            addressCity: {
-                type: "string",
-                required: false,
-            },
-            idCardFileId: {
-                type: "string",
-                required: false,
-            },
-            idCardStatus: {
-                type: "string",
-                required: false,
-                defaultValue: "missing",
-            },
-            idCardRejectReason: {
-                type: "string",
-                required: false,
-            },
-            casierFileId: {
-                type: "string",
-                required: false,
-            },
-            casierStatus: {
-                type: "string",
-                required: false,
-                defaultValue: "missing",
-            },
-            casierRejectReason: {
-                type: "string",
-                required: false,
-            },
-            newsletterSubscription: {
-                type: "boolean",
-                required: false,
-                defaultValue: false,
-            },
-        }
+        additionalFields: userAdditionalFields,
     },
     database: prismaAdapter(prisma, {
         provider: "mysql", // or "mysql", "postgresql", ...etc
@@ -176,6 +92,11 @@ export const auth = betterAuth({
     emailAndPassword: {
         enabled: true,
         async sendResetPassword(data, request) {
+            // At most a few reset e-mails per address and per hour, whoever asks (#252)
+            if (!allowResetEmail(data.user.email)) {
+                console.warn("[auth] reset e-mail skipped: too many requests for this address");
+                return;
+            }
             console.log(`[auth] sendResetPassword triggered for ${data.user.email}`);
             const resend = getResendClient();
 
@@ -184,7 +105,7 @@ export const auth = betterAuth({
             const buttonText = "Réinitialiser mon mot de passe";
 
             const content = `
-                <p>Bonjour ${data.user.name || ""},</p>
+                <p>Bonjour ${escapeHtml(data.user.name || "")},</p>
                 <p>Une demande de réinitialisation de mot de passe a été effectuée pour votre compte Le Trèfle 2.0.</p>
                 <p>Cliquez sur le bouton ci-dessous pour choisir un nouveau mot de passe :</p>
                 <div style="text-align: center; margin: 30px 0;">
@@ -211,10 +132,46 @@ export const auth = betterAuth({
             }
         },
         autoSignIn: true,
+        // A new password closes every open session, including the one that may have leaked (#276)
+        revokeSessionsOnPasswordReset: true,
+    },
+    // Better Auth's limiter (in memory: one web instance). Server-side auth.api calls are not
+    // counted, so password changes go through the client endpoints (#252).
+    rateLimit: {
+        enabled: true,
+        window: 60,
+        max: 100,
+        customRules: {
+            "/sign-in/email": {window: 60, max: 5},
+            "/sign-in/username": {window: 60, max: 5},
+            "/change-password": {window: 300, max: 5},
+            "/request-password-reset": {window: 300, max: 3},
+            "/reset-password": {window: 300, max: 5},
+            "/two-factor/verify-totp": {window: 60, max: 5},
+            "/two-factor/verify-backup-code": {window: 60, max: 5},
+        },
     },
     hooks: {
         before: async (context) => {
             const path = (context as any)?.request?.url || (context as any)?.path || "";
+            // Better Auth's admin endpoints (set-role, ban, remove-user, impersonate...) only know
+            // role names and would bypass the owner and the role hierarchy. Users and roles are
+            // managed through the API and server actions instead.
+            const endpoint = (context as any)?.path || "";
+            if (endpoint.startsWith("/admin/") || path.includes("/api/auth/admin/")) {
+                throw new APIError("FORBIDDEN", {message: "Not available"});
+            }
+            // Profile fields: bounded, an avatar is a small image (#262)
+            if (endpoint === "/update-user") {
+                const body = ((context as any)?.body ?? {}) as { name?: unknown; image?: unknown };
+                if (body.name !== undefined && (typeof body.name !== "string" || body.name.length > 100)) {
+                    throw new APIError("BAD_REQUEST", {message: "Nom trop long (100 caractères au plus)."});
+                }
+                if (body.image !== undefined && body.image !== null
+                    && (typeof body.image !== "string" || body.image.length > MAX_AVATAR_LENGTH)) {
+                    throw new APIError("BAD_REQUEST", {message: "Image de profil trop lourde."});
+                }
+            }
             if (path.includes("sign-up")) {
                 const userCount = await prisma.user.count();
                 if (userCount > 0) {
@@ -223,6 +180,38 @@ export const auth = betterAuth({
             }
             return context;
         }
+    },
+    databaseHooks: {
+        session: {
+            create: {
+                // Discord sign-in has no second factor: accounts that enabled it sign in with
+                // their password (then the code) or a passkey (#251)
+                before: async (session, ctx) => {
+                    const path = (ctx as any)?.path || "";
+                    if (!path.startsWith("/callback/") && !path.startsWith("/oauth2/callback/")) return;
+                    const user = await prisma.user.findUnique({where: {id: session.userId}, select: {twoFactorEnabled: true}});
+                    if (user?.twoFactorEnabled) {
+                        throw new APIError("FORBIDDEN", {
+                            message: "La double authentification est activée sur ce compte : connectez-vous avec votre mot de passe ou une clé de sécurité.",
+                        });
+                    }
+                },
+            },
+        },
+        user: {
+            create: {
+                // The very first account (created at setup, sign-up is closed afterwards) owns the app
+                after: async (user) => {
+                    const owner = await prisma.settings.findUnique({where: {key: OWNER_SETTING_KEY}});
+                    if (owner?.value) return;
+                    const topRole = await prisma.role.findFirst({orderBy: {weight: "desc"}, select: {name: true}});
+                    await prisma.$transaction([
+                        prisma.settings.create({data: {key: OWNER_SETTING_KEY, value: user.id}}),
+                        prisma.user.update({where: {id: user.id}, data: {role: topRole?.name ?? "none"}}),
+                    ]);
+                },
+            },
+        },
     },
     plugins: pluginList as any,
     account: {
@@ -235,6 +224,8 @@ export const auth = betterAuth({
         discord: {
             clientId: process.env.DISCORD_CLIENT_ID as string,
             clientSecret: process.env.DISCORD_CLIENT_SECRET as string,
+            // Discord can only be linked to an existing (invited) account
+            disableSignUp: true,
         }
     }
 });

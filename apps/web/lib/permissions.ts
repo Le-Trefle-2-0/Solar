@@ -3,11 +3,15 @@ import {adminAc, defaultStatements} from "better-auth/plugins/admin/access";
 
 export const statement = {
     ...defaultStatements,
-    tickets: ['open', 'close', 'read_all', 'attribute', 'launch_voice', 'send_message_all', 'send_message', 'transmission'],
+    tickets: ['open', 'close', 'read_all', 'attribute', 'launch_voice', 'send_message_all', 'send_message', 'transmission', 'reveal_identity', 'spectate'],
     management: ['manage_accounts', 'ticket_history', 'view_transmission', 'view_stats'],
     permanence: ['open', 'close', 'register', 'unregister', 'unregister_other_all', 'unregister_other_user', 'register_other_all', 'register_other_user'],
     messages: ['manage'],
     newsletters: ['manage'],
+    users: ['read_all'],
+    roles: ['manage'],
+    settings: ['manage'],
+    recruitments: ['manage'],
     admin: ['sudo']
 } as const;
 
@@ -22,51 +26,63 @@ export const PERMISSION_METADATA: Record<string, PermissionInfo> = {
     // Tickets
     'tickets.open': {
         id: 'tickets.open',
-        label: 'Ouvrir des tickets',
-        description: 'Permet de créer de nouveaux tickets d\'écoute',
-        category: 'Tickets'
+        label: 'Ouvrir des écoutes',
+        description: 'Permet de créer de nouvelles écoutes',
+        category: 'Écoutes'
     },
     'tickets.close': {
         id: 'tickets.close',
-        label: 'Fermer des tickets',
+        label: 'Fermer des écoutes',
         description: 'Permet de clôturer une session d\'écoute terminée',
-        category: 'Tickets'
+        category: 'Écoutes'
     },
     'tickets.read_all': {
         id: 'tickets.read_all',
-        label: 'Voir tous les tickets',
-        description: 'Accès en lecture à l\'ensemble des tickets de l\'organisation',
-        category: 'Tickets'
+        label: 'Voir toutes les écoutes',
+        description: 'Accès en lecture à l\'ensemble des écoutes de l\'association',
+        category: 'Écoutes'
     },
     'tickets.attribute': {
         id: 'tickets.attribute',
-        label: 'Attribuer des tickets',
-        description: 'Permet d\'assigner un ticket à un membre spécifique',
-        category: 'Tickets'
+        label: 'Attribuer des écoutes',
+        description: 'Permet d\'assigner une écoute à un bénévole',
+        category: 'Écoutes'
     },
     'tickets.launch_voice': {
         id: 'tickets.launch_voice',
         label: 'Lancer des appels voix',
-        description: 'Permet d\'initier une communication vocale via le widget',
-        category: 'Tickets'
+        description: 'Permet de passer une écoute en vocal et de rejoindre l\'appel',
+        category: 'Écoutes'
     },
     'tickets.send_message_all': {
         id: 'tickets.send_message_all',
         label: 'Envoyer messages à tous',
         description: 'Permet d\'écrire dans toutes les écoutes',
-        category: 'Tickets'
+        category: 'Écoutes'
     },
     'tickets.send_message': {
         id: 'tickets.send_message',
         label: 'Envoyer des messages',
         description: 'Permet d\'écrire dans une écoute',
-        category: 'Tickets'
+        category: 'Écoutes'
     },
     'tickets.transmission': {
         id: 'tickets.transmission',
         label: 'Faire des transmissions',
         description: 'Permet de rédiger le compte-rendu final de l\'écoute',
-        category: 'Tickets'
+        category: 'Écoutes'
+    },
+    'tickets.reveal_identity': {
+        id: 'tickets.reveal_identity',
+        label: "Révéler l'identifiant Discord",
+        description: "En cas d'urgence, permet de voir l'identifiant Discord de la personne pendant l'écoute ; c'est noté dans la transcription",
+        category: 'Écoutes'
+    },
+    'tickets.spectate': {
+        id: 'tickets.spectate',
+        label: 'Observer des écoutes',
+        description: "Pour les bénévoles en formation : permet de demander, depuis le salon de la permanence, à suivre en lecture seule une écoute en cours ; un responsable valide la demande",
+        category: 'Écoutes'
     },
 
     // Management
@@ -78,7 +94,7 @@ export const PERMISSION_METADATA: Record<string, PermissionInfo> = {
     },
     'management.ticket_history': {
         id: 'management.ticket_history',
-        label: 'Historique des tickets',
+        label: 'Historique des écoutes',
         description: 'Accès aux archives et transcriptions des anciennes écoutes',
         category: 'Gestion'
     },
@@ -95,11 +111,18 @@ export const PERMISSION_METADATA: Record<string, PermissionInfo> = {
         category: 'Gestion'
     },
 
+    'users.read_all': {
+        id: 'users.read_all',
+        label: 'Consulter tous les profils',
+        description: 'Permet de consulter le profil public de n\'importe quel membre',
+        category: 'Gestion'
+    },
+
     // Permanence
     'permanence.open': {
         id: 'permanence.open',
         label: 'Ouvrir la permanence',
-        description: 'Permet d\'activer la réception de nouveaux tickets',
+        description: 'Permet d\'activer la réception de nouvelles écoutes',
         category: 'Permanence'
     },
     'permanence.close': {
@@ -159,14 +182,41 @@ export const PERMISSION_METADATA: Record<string, PermissionInfo> = {
         category: 'Communication'
     },
 
-    // Admin
+    // Administration
+    'roles.manage': {
+        id: 'roles.manage',
+        label: 'Gérer les rôles',
+        description: "Créer, renommer, réordonner et supprimer les rôles placés sous son propre rôle le plus haut, et les attribuer aux membres. Ne permet de donner que des permissions que l'on possède.",
+        category: 'Administration'
+    },
+    'settings.manage': {
+        id: 'settings.manage',
+        label: 'Gérer les paramètres',
+        description: "Accès aux paramètres de l'application et à la page équipe du site",
+        category: 'Administration'
+    },
+    'recruitments.manage': {
+        id: 'recruitments.manage',
+        label: 'Gérer les recrutements',
+        description: 'Consulter et traiter les candidatures',
+        category: 'Administration'
+    },
     'admin.sudo': {
         id: 'admin.sudo',
         label: 'Super-administrateur (Sudo)',
-        description: 'Outrepasse toutes les restrictions de permissions',
+        description: 'Donne toutes les permissions. Reste soumis à la hiérarchie des rôles.',
         category: 'Administration'
     },
 };
+
+/**
+ * Default role of members without any other role: no permission. Never shown in role lists,
+ * pickers or badges; choosing no role stores it.
+ */
+export const DEFAULT_ROLE = "none";
+
+/** Every permission a role can hold (Better Auth's own user/session statements are not role permissions). */
+export const ALL_PERMISSIONS = Object.keys(PERMISSION_METADATA);
 
 export const ac = createAccessControl(statement);
 
@@ -177,6 +227,12 @@ export function hasPermission(userPermissions: string[], permission: string): bo
     if (userPermissions.includes('admin.sudo')) return true;
     return userPermissions.includes(permission);
 }
+
+/**
+ * Role with no permission. Better Auth falls back to the default role when a
+ * user's role is empty, so the default must not grant anything.
+ */
+export const none = ac.newRole({tickets: []});
 
 export const newsletterManager = ac.newRole({
     newsletters: ['manage']
@@ -198,7 +254,8 @@ export const manager = ac.newRole({
     tickets: ['close', 'read_all', 'attribute', 'launch_voice', 'send_message_all'],
     management: ['manage_accounts', 'ticket_history', 'view_transmission', 'view_stats'],
     permanence: ['open', 'close', 'register', 'unregister', 'register_other_user', 'unregister_other_user'],
-    messages: ['manage']
+    messages: ['manage'],
+    users: ['read_all']
 });
 
 export const bot = ac.newRole({
@@ -207,9 +264,13 @@ export const bot = ac.newRole({
 
 export const admin = ac.newRole({
     ...adminAc.statements,
-    tickets: ['open', 'close', 'read_all', 'attribute', 'launch_voice', 'send_message_all', 'send_message', 'transmission'],
+    tickets: ['open', 'close', 'read_all', 'attribute', 'launch_voice', 'send_message_all', 'send_message', 'transmission', 'reveal_identity', 'spectate'],
     management: ['manage_accounts', 'ticket_history', 'view_transmission', 'view_stats'],
     permanence: ['open', 'close', 'register', 'unregister', 'unregister_other_all', 'unregister_other_user', 'register_other_all', 'register_other_user'],
     messages: ['manage'],
+    users: ['read_all'],
+    roles: ['manage'],
+    settings: ['manage'],
+    recruitments: ['manage'],
     admin: ['sudo']
 });
