@@ -8,10 +8,26 @@ import {prisma} from '../prisma.js';
 
 export const WIDGET_ENABLED_KEY = 'widget_enabled';
 
+/**
+ * The switch is read at most once per CACHE_MS: it is checked before the per-IP rate limits, on
+ * every widget path (unknown ones included), so it must not cost a query per request. Turning it
+ * off takes effect within that delay.
+ */
+const CACHE_MS = 5_000;
+let cached: {value: Promise<boolean>; at: number} | null = null;
+
 /** On unless explicitly turned off, as in the settings page. */
-export async function isWidgetEnabled(): Promise<boolean> {
-    const setting = await prisma.settings.findUnique({where: {key: WIDGET_ENABLED_KEY}});
-    return setting?.value !== 'false';
+export function isWidgetEnabled(now = Date.now()): Promise<boolean> {
+    if (!cached || now - cached.at >= CACHE_MS) {
+        const value = prisma.settings.findUnique({where: {key: WIDGET_ENABLED_KEY}})
+            .then(setting => setting?.value !== 'false');
+        cached = {value, at: now};
+        // A failed read is not kept: the next request tries again
+        value.catch(() => {
+            if (cached?.value === value) cached = null;
+        });
+    }
+    return cached.value;
 }
 
 /** The routes a visitor of the website uses: opening, resuming, writing, closing, voice and realtime access. */
