@@ -1,7 +1,7 @@
 "use client";
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {createPortal} from 'react-dom';
-import {EyeOff, Heart, Lock, LogOut, MessageCircle, Send, X} from 'lucide-react';
+import {CalendarClock, EyeOff, Heart, Lock, LogOut, MessageCircle, Send, X} from 'lucide-react';
 import {apiFetch} from '@/lib/api';
 import {io, Socket} from 'socket.io-client';
 import {usePathname} from "next/navigation";
@@ -27,6 +27,13 @@ function statusLine(status: string): {text: string; tone: 'wait' | 'live' | 'don
     return {text: "En attente d'un bénévole", tone: 'wait'};
 }
 
+type Availability = {open: true; closesAt: string} | {open: false; nextOpening: {start: string; end: string} | null};
+
+/** "jeudi 27 novembre à 20:00" */
+const formatOpening = (iso: string) => new Date(iso).toLocaleString('fr-FR', {
+    weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit',
+});
+
 export default function ChatWidget() {
     const pathname = usePathname();
     const [open, setOpen] = useState(false);
@@ -45,6 +52,8 @@ export default function ChatWidget() {
     const [ticketId, setTicketId] = useState<number | null>(null);
     /** The volunteer switched this ticket to voice. */
     const [voice, setVoice] = useState(false);
+    /** New écoutes can only be opened while a permanence is running. */
+    const [availability, setAvailability] = useState<Availability | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const clearLocalStorage = useCallback(() => {
@@ -133,6 +142,22 @@ export default function ChatWidget() {
         }
     }, []);
 
+    const loadAvailability = useCallback(async () => {
+        try {
+            setAvailability(await apiFetch('/v1/widget/availability'));
+        } catch {
+            setAvailability(null);
+        }
+    }, []);
+
+    // While the window shows the consent (or closed) step, keep the opening state current
+    useEffect(() => {
+        if (!open || consented) return;
+        loadAvailability();
+        const id = setInterval(loadAvailability, 60_000);
+        return () => clearInterval(id);
+    }, [open, consented, loadAvailability]);
+
     // Public chat session: ensures a ticket, sets cookies, returns WS guest credentials
     const initSession = useCallback(async (name?: string, forceNew = false): Promise<{
         channelId: string,
@@ -164,6 +189,7 @@ export default function ChatWidget() {
                 : {channelId: '', ticketId: 0, creds: null};
         } catch (err: any) {
             if (err.message === 'session_expired') return {channelId: '', ticketId: 0, creds: null, error: 'session_expired'};
+            if (err.message === 'permanence_closed') return {channelId: '', ticketId: 0, creds: null, error: 'permanence_closed'};
             return null;
         }
     }, [loadMessages, loadTicketStatus]);
@@ -206,9 +232,11 @@ export default function ChatWidget() {
                 setLoading(false);
                 return;
             }
-            if (session.error === 'session_expired') {
+            if (session.error === 'session_expired' || session.error === 'permanence_closed') {
+                // No écoute to resume; when the service is closed the closed step is shown
                 clearLocalStorage();
                 resetState();
+                if (session.error === 'permanence_closed') await loadAvailability();
                 setLoading(false);
                 return;
             }
@@ -297,7 +325,7 @@ export default function ChatWidget() {
             setLoading(false);
         })();
         return () => stopPolling();
-    }, [open, consented, initSession, loadMessages, loadTicketStatus, startPolling, stopPolling, socket, wsConnected, clearLocalStorage, resetState, visitorUserId]);
+    }, [open, consented, initSession, loadMessages, loadTicketStatus, startPolling, stopPolling, socket, wsConnected, clearLocalStorage, resetState, visitorUserId, loadAvailability]);
 
     const handleCloseTicket = useCallback(async () => {
         if (!channelId) return;
@@ -347,6 +375,7 @@ export default function ChatWidget() {
         clearLocalStorage();
         resetState();
         const session = await initSession("Utilisateur", true);
+        if (session?.error === 'permanence_closed') await loadAvailability();
         if (session?.channelId) {
             setConsented(true);
             setChannelId(session.channelId);
@@ -356,7 +385,7 @@ export default function ChatWidget() {
             await loadMessages(session.channelId);
         }
         setLoading(false);
-    }, [clearLocalStorage, resetState, initSession, loadMessages]);
+    }, [clearLocalStorage, resetState, initSession, loadMessages, loadAvailability]);
 
     const getVoiceToken = useCallback(async () => {
         const res = await apiFetch('/v1/widget/voice', {method: 'POST'});
@@ -385,12 +414,18 @@ export default function ChatWidget() {
 
             {!open && (
                 <button
-                    aria-label="Parler à un bénévole"
+                    aria-label="Parler à un bénévole écoutant"
                     onClick={() => setOpen(true)}
-                    className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full bg-primary py-3 pl-4 pr-5 text-primary-foreground shadow-lg transition-transform duration-200 hover:scale-[1.03] pointer-events-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                    // At rest only the icon; hovering or focusing it reveals the label
+                    className="group fixed bottom-5 right-5 z-50 flex h-14 cursor-pointer items-center rounded-full bg-primary px-4 text-primary-foreground shadow-lg pointer-events-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                 >
-                    <MessageCircle className="size-5"/>
-                    <span className="text-sm font-medium">Parler à quelqu&apos;un</span>
+                    <MessageCircle className="size-6 shrink-0"/>
+                    <span
+                        aria-hidden="true"
+                        className="max-w-0 overflow-hidden whitespace-nowrap text-sm font-medium opacity-0 transition-all duration-300 ease-out group-hover:ml-2 group-hover:max-w-56 group-hover:opacity-100 group-focus-visible:ml-2 group-focus-visible:max-w-56 group-focus-visible:opacity-100 motion-reduce:transition-none"
+                    >
+                        Parler à un bénévole écoutant
+                    </span>
                 </button>
             )}
 
@@ -416,7 +451,9 @@ export default function ChatWidget() {
                                     {line.text}
                                 </p>
                             ) : (
-                                <p className="mt-0.5 text-sm text-muted-foreground">Confidentiel et anonyme</p>
+                                <p className="mt-0.5 text-sm text-muted-foreground">
+                                    {availability && !availability.open ? "Fermé pour le moment" : "Confidentiel et anonyme"}
+                                </p>
                             )}
                         </div>
                         <div className="flex items-center gap-1">
@@ -442,7 +479,41 @@ export default function ChatWidget() {
                         </div>
                     </header>
 
-                    {!consented ? (
+                    {!consented && availability && !availability.open ? (
+                        /* No permanence running: nobody can answer, so no écoute is opened */
+                        <div className="flex flex-1 flex-col overflow-y-auto px-6 py-6">
+                            <CalendarClock className="size-8 text-primary" aria-hidden="true"/>
+                            <h3 className="mt-4 text-xl font-semibold leading-snug">
+                                Aucun bénévole n&apos;est disponible pour le moment.
+                            </h3>
+                            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                                Les bénévoles vous écoutent pendant les permanences. Vous pourrez écrire ici
+                                dès le début de la prochaine.
+                            </p>
+                            <div className="mt-6 rounded-2xl border border-primary/30 bg-primary/10 px-4 py-3">
+                                {availability.nextOpening ? (
+                                    <>
+                                        <p className="text-sm text-muted-foreground">Prochaine permanence</p>
+                                        <p className="mt-0.5 font-semibold first-letter:uppercase">
+                                            {formatOpening(availability.nextOpening.start)}
+                                        </p>
+                                    </>
+                                ) : (
+                                    <p className="text-sm">Aucune permanence n&apos;est programmée pour l&apos;instant.</p>
+                                )}
+                            </div>
+                            <p className="mt-6 text-sm leading-relaxed text-muted-foreground">
+                                En cas de danger immédiat, appelez le 112. Pour parler à quelqu&apos;un tout de suite,
+                                le 3114 (prévention du suicide) répond jour et nuit, gratuitement.
+                            </p>
+                            <button
+                                onClick={() => setOpen(false)}
+                                className="mt-auto rounded-xl px-6 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                            >
+                                Fermer
+                            </button>
+                        </div>
+                    ) : !consented ? (
                         /* Consent: three reassurances, then one clear choice */
                         <div className="flex flex-1 flex-col overflow-y-auto px-6 py-6">
                             <h3 className="text-xl font-semibold leading-snug">

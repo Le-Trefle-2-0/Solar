@@ -7,6 +7,7 @@ import {signWidgetSession, verifyWidgetSession} from '../../lib/widgetSession.js
 import {neutralizeHtml} from '../../lib/sanitize.js';
 import {createChallenge, verifyPow} from '../../lib/pow.js';
 import {limitPerMinute} from '../../lib/rateLimit.js';
+import {getPermanenceStatus} from '../../lib/permanenceStatus.js';
 import {endVoiceCall} from '../../lib/voiceControl.js';
 
 const WIDGET_COOKIES = ['widget_channel', 'widget_uid', 'widget_exp', 'widget_sig', 'widget_public'];
@@ -34,6 +35,9 @@ function clearWidgetCookies(reply: any) {
 
 export async function registerWidgetRoutes(app: FastifyInstance) {
     app.get('/v1/widget/challenge', limitPerMinute(20), async () => createChallenge());
+
+    // Is the listening service open right now (a permanence is running), and when does it reopen?
+    app.get('/v1/widget/availability', limitPerMinute(60), async () => getPermanenceStatus());
 
     app.post('/v1/widget/session', limitPerMinute(20), async (req, reply) => {
         try {
@@ -66,6 +70,12 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
                         status: ticket.statusName
                     });
                 }
+            }
+
+            // New écoutes only while a permanence is running (an open écoute can still be resumed above)
+            const availability = await getPermanenceStatus();
+            if (!availability.open) {
+                return reply.status(403).send({success: false, error: 'permanence_closed', nextOpening: availability.nextOpening});
             }
 
             // Resuming a session is free; opening a new ticket requires a proof of work.
