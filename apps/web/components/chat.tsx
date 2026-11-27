@@ -21,6 +21,7 @@ import React, {FormEvent, useEffect, useLayoutEffect, useRef, useState} from "re
 import {EventData, formVolunteer, Msg, MsgWithID} from "@/lib/interface";
 import {TicketInfoDialog} from "@/components/ticket-info-dialog";
 import {PermanencePresence} from "@/components/permanence-presence";
+import {ObservationBar, SpectatePanel, useSpectate} from "@/components/spectate-panel";
 import {z, ZodError} from "zod";
 import {toast} from "sonner";
 import {saveMessage} from "@/lib/messageManager";
@@ -79,6 +80,10 @@ export function Chat(props: { channelID: string, statusID: number }) {
     const [closeReason, setCloseReason] = useState("");
     // Managers (tickets.attribute) may close an écoute nobody was assigned to without a transmission
     const [canAttribute, setCanAttribute] = useState(false);
+    // Volunteers in training observing this écoute: read-only, no écoute toolbar
+    const {state: spectate, reload: reloadSpectate} = useSpectate();
+    const observation = status !== 0 && spectate?.me.request?.status === "approved"
+    && spectate.me.request.ticket?.channelId === channelID ? spectate.me.request : null;
     const {data: session} = useSession();
     const {socket, setChannelID} = useSocket();
     const router = useRouter();
@@ -1154,7 +1159,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                                                 content: ref.content,
                                                 image: ref.author.image
                                             } : undefined}
-                                            readOnly={status === 3 || status === 4}
+                                            readOnly={!!observation || status === 3 || status === 4}
                                         />
                                     </React.Fragment>
                                 );
@@ -1170,10 +1175,15 @@ export function Chat(props: { channelID: string, statusID: number }) {
                     // Permanence chat (status 0): only its voice channel. Other channels: the écoute toolbar.
                     status === 0 ? (channelID !== "1" && (
                         <div className="absolute top-6 right-6 flex flex-row gap-2 z-20">
+                            <SpectatePanel channelId={channelID} state={spectate} reload={reloadSpectate}/>
                             <PermanencePresence/>
                             <PermanenceVoiceControls channelId={channelID}/>
                         </div>
-                    )) :
+                    )) : observation ? (
+                        <div className="absolute top-6 right-6 flex flex-row gap-2 z-20">
+                            <ObservationBar request={observation} onEnded={reloadSpectate}/>
+                        </div>
+                    ) :
                         <div className="absolute top-6 right-6 flex flex-row gap-2 z-20">
                             <AlertDialog open={assignOpen} onOpenChange={(open) => {
                                 setAssignOpen(open);
@@ -1552,6 +1562,11 @@ export function Chat(props: { channelID: string, statusID: number }) {
                         </div>
                     )}
 
+                    {observation ? (
+                        <p className="w-full rounded-md border border-dashed px-4 py-3 text-center text-sm text-muted-foreground">
+                            Vous observez cette écoute en lecture seule : vous ne pouvez pas écrire ni réagir.
+                        </p>
+                    ) : (
                     <form ref={formRef} onSubmit={(e) => sendForm(e)}
                           className='flex flex-row w-full gap-2 items-center'>
                         <ContextMenu>
@@ -1705,6 +1720,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
                         </Button>
                         {/*<button className='cursor-pointer'><Send width={42}/></button>*/}
                     </form>
+                    )}
                 </div>
             </div>
 

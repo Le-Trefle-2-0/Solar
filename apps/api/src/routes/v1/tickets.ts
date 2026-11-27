@@ -45,13 +45,22 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
         const canReadAll = await canReadTicketsAll(userId);
 
         if (!canReadAll) {
-            const tickets = await prisma.ticket.findMany({
-                where: {
-                    assignedUserId: userId,
-                    statusName: {in: ['started', 'closed']},
-                },
-            });
-            return reply.send({success: true, tickets});
+            const [tickets, observed] = await Promise.all([
+                prisma.ticket.findMany({
+                    where: {
+                        assignedUserId: userId,
+                        statusName: {in: ['started', 'closed']},
+                    },
+                }),
+                // Écoutes observed, read-only, by a volunteer in training: only what the list shows
+                hasPermission(await getUserPermissions(userId), 'tickets.spectate')
+                    ? prisma.ticket.findMany({
+                        where: {statusName: 'started', spectators: {some: {userId, status: 'approved'}}},
+                        select: {id: true, channelId: true, statusName: true, voice: true},
+                    })
+                    : Promise.resolve([]),
+            ]);
+            return reply.send({success: true, tickets: [...tickets, ...observed.map(t => ({...t, spectating: true}))]});
         }
 
         const tickets = await prisma.ticket.findMany({

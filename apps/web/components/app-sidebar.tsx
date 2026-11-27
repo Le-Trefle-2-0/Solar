@@ -7,6 +7,7 @@ import {
     ChevronRight,
     Ear,
     History,
+    Eye,
     Hourglass,
     House,
     type LucideIcon,
@@ -47,11 +48,13 @@ import {UserButton} from "@/components/user-button";
 
 /**
  * Where an open écoute stands, from the viewer's side: waiting for a volunteer, assigned to
- * the viewer, in progress with someone else (supervisors), or waiting for its transmission.
+ * the viewer, in progress with someone else (supervisors), observed read-only (volunteers in
+ * training), or waiting for its transmission.
  */
-type TicketState = "waiting" | "mine" | "in_progress" | "report";
+type TicketState = "waiting" | "mine" | "in_progress" | "observing" | "report";
 
-function ticketState(ticket: { statusName?: string; assignedUserId?: string | null }, userId?: string): TicketState {
+function ticketState(ticket: { statusName?: string; assignedUserId?: string | null; spectating?: boolean }, userId?: string): TicketState {
+    if (ticket.spectating) return "observing";
     if (ticket.statusName === "waiting") return "waiting";
     if (ticket.statusName === "closed") return "report";
     return userId && ticket.assignedUserId === userId ? "mine" : "in_progress";
@@ -61,6 +64,7 @@ const TICKET_STATES: Record<TicketState, { label: string; icon: LucideIcon; clas
     waiting: {label: "en attente d'attribution", icon: Hourglass, className: "text-amber-600 dark:text-amber-400", voiceIcon: false},
     mine: {label: "attribuée à vous", icon: Ear, className: "text-primary", voiceIcon: true},
     in_progress: {label: "en cours avec un autre bénévole", icon: Ear, className: "text-muted-foreground", voiceIcon: true},
+    observing: {label: "observée en lecture seule", icon: Eye, className: "text-violet-600 dark:text-violet-400", voiceIcon: false},
     report: {label: "transmission à rédiger", icon: NotebookPen, className: "text-sky-600 dark:text-sky-400", voiceIcon: false},
 };
 

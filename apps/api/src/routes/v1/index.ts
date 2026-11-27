@@ -20,6 +20,7 @@ import {registerInternalVoiceRoutes} from './internalVoice.js';
 import {registerBotBridgeRoutes} from './botBridge.js';
 import {registerTicketInfoRoutes} from './ticketInfo.js';
 import {registerPresenceRoutes} from './presence.js';
+import {registerSpectateRoutes} from './spectate.js';
 
 export async function registerV1Routes(app: FastifyInstance) {
     await registerUsersRoutes(app);
@@ -43,4 +44,5 @@ export async function registerV1Routes(app: FastifyInstance) {
     await registerBotBridgeRoutes(app);
     await registerTicketInfoRoutes(app);
     await registerPresenceRoutes(app);
+    await registerSpectateRoutes(app);
 }

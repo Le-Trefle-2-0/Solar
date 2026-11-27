@@ -85,6 +85,7 @@ model User {
   channelReads           UserChannelRead[]
   vigilances             Vigilance[]
   permanencePresences    PermanencePresence[]
+  spectateRequests       SpectateRequest[]
 
   @@map("user")
 }
@@ -318,6 +319,7 @@ model Event {
   registrations EventRegistration[]
   roleSlots     RoleSlot[]
   presences     PermanencePresence[]
+  spectateRequests SpectateRequest[]
 
   @@index([channelID], map: "event_channelID_fkey")
   @@index([userId], map: "event_userId_fkey")
@@ -338,6 +340,29 @@ model PermanencePresence {
   @@index([eventId, leftAt])
   @@index([userId])
   @@map("permanence_presence")
+}
+
+/// A volunteer in training asking, from a permanence's channel, to observe an écoute. A manager
+/// approves it by choosing an ongoing écoute, read-only for the trainee until it ends, or refuses it.
+/// status: pending | approved | refused | ended (cancelled, stopped, or the écoute ended).
+model SpectateRequest {
+  id          String    @id @default(cuid())
+  eventId     String
+  userId      String
+  status      String    @default("pending")
+  ticketId    Int?
+  decidedById String?
+  createdAt   DateTime  @default(now())
+  decidedAt   DateTime?
+  endedAt     DateTime?
+  event       Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ticket      Ticket?   @relation(fields: [ticketId], references: [id], onDelete: SetNull)
+
+  @@index([eventId, status])
+  @@index([userId, status])
+  @@index([ticketId, status])
+  @@map("spectate_request")
 }
 
 model RoleSlot {
@@ -389,6 +414,7 @@ model Ticket {
   categories     Json?
   feedback       Json?
   messages       Message[]
+  spectators     SpectateRequest[]
   user           User?        @relation(fields: [assignedUserId], references: [id])
   channel        Channel?     @relation(fields: [channelId, channelName], references: [id, name], onDelete: Cascade)
   status         TicketStatus @relation(fields: [statusName, statusLabel], references: [name, label])

@@ -3,7 +3,7 @@ import {adminAc, defaultStatements} from "better-auth/plugins/admin/access";
 
 export const statement = {
     ...defaultStatements,
-    tickets: ['open', 'close', 'read_all', 'attribute', 'launch_voice', 'send_message_all', 'send_message', 'transmission', 'reveal_identity'],
+    tickets: ['open', 'close', 'read_all', 'attribute', 'launch_voice', 'send_message_all', 'send_message', 'transmission', 'reveal_identity', 'spectate'],
     management: ['manage_accounts', 'ticket_history', 'view_transmission', 'view_stats'],
     permanence: ['open', 'close', 'register', 'unregister', 'unregister_other_all', 'unregister_other_user', 'register_other_all', 'register_other_user'],
     messages: ['manage'],
@@ -76,6 +76,12 @@ export const PERMISSION_METADATA: Record<string, PermissionInfo> = {
         id: 'tickets.reveal_identity',
         label: "Révéler l'identifiant Discord",
         description: "En cas d'urgence, permet de voir l'identifiant Discord de la personne pendant l'écoute ; c'est noté dans la transcription",
+        category: 'Écoutes'
+    },
+    'tickets.spectate': {
+        id: 'tickets.spectate',
+        label: 'Observer des écoutes',
+        description: "Pour les bénévoles en formation : permet de demander, depuis le salon de la permanence, à suivre en lecture seule une écoute en cours ; un responsable valide la demande",
         category: 'Écoutes'
     },
 
@@ -258,7 +264,7 @@ export const bot = ac.newRole({
 
 export const admin = ac.newRole({
     ...adminAc.statements,
-    tickets: ['open', 'close', 'read_all', 'attribute', 'launch_voice', 'send_message_all', 'send_message', 'transmission', 'reveal_identity'],
+    tickets: ['open', 'close', 'read_all', 'attribute', 'launch_voice', 'send_message_all', 'send_message', 'transmission', 'reveal_identity', 'spectate'],
     management: ['manage_accounts', 'ticket_history', 'view_transmission', 'view_stats'],
     permanence: ['open', 'close', 'register', 'unregister', 'unregister_other_all', 'unregister_other_user', 'register_other_all', 'register_other_user'],
     messages: ['manage'],

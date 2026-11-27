@@ -25,7 +25,7 @@ test('default roles: valid unique names, distinct weights, known permissions', (
 test('default roles: hierarchy, highest first', () => {
     assert.deepEqual(DEFAULT_ROLES.map(r => r.name), [
         "Conseil d'Administration", 'Responsable pôle écoutes', 'Administrateur Système',
-        'Référent Bénévole Écoutant', 'Rédacteur', 'bot', 'Bénévole Écoutant', DEFAULT_ROLE,
+        'Référent Bénévole Écoutant', 'Rédacteur', 'bot', 'Bénévole Écoutant', 'Bénévole en formation', DEFAULT_ROLE,
     ]);
     const weights = DEFAULT_ROLES.map(r => r.weight);
     assert.deepEqual(weights, [...weights].sort((a, b) => b - a));
@@ -63,6 +63,15 @@ test('listening volunteer: assigned tickets and own planning sign-up only', () =
     for (const p of ['tickets.read_all', 'tickets.send_message_all', 'tickets.attribute', 'permanence.open']) {
         assert.equal(vol.includes(p as any), false, p);
     }
+});
+
+test('volunteer in training: observes écoutes, never takes or writes in one', () => {
+    const trainee = role('Bénévole en formation').permissions;
+    for (const p of ['tickets.spectate', 'permanence.register', 'permanence.unregister']) assert.ok(trainee.includes(p as any), p);
+    for (const p of ['tickets.send_message', 'tickets.close', 'tickets.read_all', 'tickets.send_message_all', 'tickets.attribute']) {
+        assert.equal(trainee.includes(p as any), false, p);
+    }
+    assert.equal(role('Bénévole Écoutant').permissions.includes('tickets.spectate'), false);
 });
 
 test('writer: newsletters only; default role: nothing', () => {

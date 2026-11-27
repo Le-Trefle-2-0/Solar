@@ -6,7 +6,7 @@ import {authenticate} from '../../auth.js';
 import {getUserPermissions, hasPermission} from '../../lib/permissions.js';
 
 import {broadcast} from '../../lib/broadcast.js';
-import {canReadChannel, describeChannel, isPermanenceChannel} from '../../lib/channelAccess.js';
+import {canReadChannel, describeChannel, findTicketAccess, isPermanenceChannel, type TicketAccessRow} from '../../lib/channelAccess.js';
 import {channelMembers} from '../../lib/channelMembers.js';
 
 async function canReadTicketsAll(userId: string): Promise<boolean> {
@@ -18,7 +18,7 @@ export interface ChannelsRouteDeps {
     authenticate: (req: any) => Promise<string | null | undefined>;
     getPermissions: (userId: string) => Promise<string[]>;
     findChannel: (id: string) => Promise<{id: string; name: string} | null>;
-    findTicketByChannelId: (channelId: string) => Promise<{assignedUserId: string | null} | null>;
+    findTicketByChannelId: (channelId: string) => Promise<TicketAccessRow | null>;
     isPermanenceChannel: (channelId: string) => Promise<boolean>;
 }
 
@@ -26,7 +26,7 @@ const defaultDeps: ChannelsRouteDeps = {
     authenticate,
     getPermissions: getUserPermissions,
     findChannel: (id) => prisma.channel.findUnique({where: {id}}),
-    findTicketByChannelId: (channelId) => prisma.ticket.findUnique({where: {channelId}}),
+    findTicketByChannelId: findTicketAccess,
     isPermanenceChannel,
 };
 
@@ -64,7 +64,8 @@ export async function registerChannelsRoutes(app: FastifyInstance, deps: Channel
                 // In original code: if status.id !== 4 (magic constant). We keep same behavior.
                 if (ticket.status && (ticket.status as any).id !== 4) {
                     if (canReadAll) accessed.push(channel);
-                    else if (ticket.assignedUserId === userId && await canRead(userId, channel.id)) accessed.push(channel);
+                    // Assigned, or observing it read-only (volunteers in training)
+                    else if (await canRead(userId, channel.id)) accessed.push(channel);
                 }
             }
             return reply.send({success: true, accessedChannels: accessed});
@@ -104,11 +105,7 @@ export async function registerChannelsRoutes(app: FastifyInstance, deps: Channel
             const channel = await prisma.channel.findUnique({where: {id: channelID}});
             if (!channel) return reply.status(404).send({error: 'not_found'});
 
-            const described = await describeChannel(
-                channelID,
-                (id) => prisma.ticket.findUnique({where: {channelId: id}, select: {assignedUserId: true}}),
-                isPermanenceChannel,
-            );
+            const described = await describeChannel(channelID, findTicketAccess, isPermanenceChannel);
             const access = {channelId: channelID, ...described};
             if (!canReadChannel({...access, userId, permissions: await getUserPermissions(userId)})) {
                 return reply.status(403).send('forbidden');

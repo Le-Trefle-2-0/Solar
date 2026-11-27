@@ -2,13 +2,13 @@ import type {FastifyInstance} from 'fastify';
 import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
 import {getUserPermissions} from '../../lib/permissions.js';
-import {canReadChannel, describeChannel, isPermanenceChannel} from '../../lib/channelAccess.js';
+import {canReadChannel, describeChannel, findTicketAccess, isPermanenceChannel, type TicketAccessRow} from '../../lib/channelAccess.js';
 import {neutralizeHtml} from '../../lib/sanitize.js';
 
 export interface MessagesRouteDeps {
     authenticate: (req: any) => Promise<string | null | undefined>;
     getPermissions: (userId: string) => Promise<string[]>;
-    findTicketByChannelId: (channelId: string) => Promise<{assignedUserId: string | null} | null>;
+    findTicketByChannelId: (channelId: string) => Promise<TicketAccessRow | null>;
     isPermanenceChannel: (channelId: string) => Promise<boolean>;
     findMessages: (where: {channelId: string; createdAt?: {lt: Date}}, take: number) => Promise<any[]>;
 }
@@ -16,7 +16,7 @@ export interface MessagesRouteDeps {
 const defaultDeps: MessagesRouteDeps = {
     authenticate,
     getPermissions: getUserPermissions,
-    findTicketByChannelId: (channelId) => prisma.ticket.findUnique({where: {channelId}}),
+    findTicketByChannelId: findTicketAccess,
     isPermanenceChannel,
     findMessages: (where, take) => prisma.message.findMany({where, orderBy: {createdAt: 'desc'}, take}),
 };

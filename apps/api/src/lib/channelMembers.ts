@@ -22,7 +22,7 @@ export type Member = {id: string; username: string; image: string | null; role: 
 
 export function membersWhoCanRead(
     users: MemberRow[],
-    channel: {channelId: string; assignedUserId: string | null; isPermanence: boolean},
+    channel: {channelId: string; assignedUserId: string | null; isPermanence: boolean; spectatorIds?: string[]},
     ownerId: string | null,
     roleRows: {name: string; permissions: string}[],
 ): Member[] {
@@ -34,7 +34,7 @@ export function membersWhoCanRead(
     });
 }
 
-export async function channelMembers(channel: {channelId: string; assignedUserId: string | null; isPermanence: boolean}): Promise<Member[]> {
+export async function channelMembers(channel: {channelId: string; assignedUserId: string | null; isPermanence: boolean; spectatorIds?: string[]}): Promise<Member[]> {
     const [users, roleRows, ownerId] = await Promise.all([
         prisma.user.findMany({
             select: {id: true, name: true, username: true, displayUsername: true, image: true, role: true, ...STANDING_SELECT},

@@ -43,6 +43,13 @@ export const DEFAULT_ROLES: {name: string; weight: number; icon: string; permiss
             'permanence.register', 'permanence.unregister',
         ],
     },
+    // Volunteers in training: observe, read-only, an ongoing écoute a manager chose for them
+    // (asked from the permanence's channel), and sign up for planning events. No écoute of their own.
+    {
+        name: 'Bénévole en formation', weight: 5, icon: 'GraduationCap', permissions: [
+            'tickets.spectate', 'permanence.register', 'permanence.unregister',
+        ],
+    },
     // Default role: no permission. Hidden, cannot be renamed, deleted or given permissions.
     {name: 'none', weight: 0, icon: 'Ban', permissions: []},
 ];
