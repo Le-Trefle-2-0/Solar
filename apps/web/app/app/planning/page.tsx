@@ -3,13 +3,11 @@
 import {useEffect, useState} from 'react';
 import type {EventData} from "@/lib/interface";
 import PlanningCalendar from "@/components/calendar";
-import {useSession} from "@/lib/auth-client"; // adjust if needed
 import {apiFetch} from "@/lib/api";
 import {Page} from "@/components/ui";
 
 export default function PlanningPage() {
     const [events, setEvents] = useState<EventData[]>([]);
-    const {data: session} = useSession();
 
     const fetchEvents = async () => {
         try {
@@ -29,7 +27,6 @@ export default function PlanningPage() {
               containerClassName="overflow-y-hidden">
             <PlanningCalendar
                 events={events}
-                userId={session?.user?.id}
                 onRefresh={fetchEvents}
             />
         </Page>

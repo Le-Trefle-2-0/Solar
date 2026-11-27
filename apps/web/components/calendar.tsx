@@ -71,9 +71,8 @@ const permSchema = z.object({
     message: "La date de fin de série doit être après la date de début",
     path: ["bulkUntil"]
 })
-export default function PlanningCalendar({events, userId, onRefresh}: {
+export default function PlanningCalendar({events, onRefresh}: {
     events: EventData[],
-    userId?: string,
     onRefresh?: () => void
 }) {
     type RoleSlotForm = { role: string; goalCount: number; part?: 'first' | 'second' };
@@ -101,6 +100,7 @@ export default function PlanningCalendar({events, userId, onRefresh}: {
     });
 
     const router = useRouter();
+    const refresh = () => (onRefresh ? onRefresh() : router.refresh());
     const [roleSlots, setRoleSlots] = useState<RoleSlotForm[]>([]);
     const [currentMonth, setCurrentMonth] = useState(new Date());
     // Same permission as POST /v1/events
@@ -154,7 +154,7 @@ export default function PlanningCalendar({events, userId, onRefresh}: {
                         <div className="flex flex-col w-full text-[10px] text-gray-500 space-y-1 overflow-y-auto">
                             {dayEvents.length > 0 ? (
                                 dayEvents.map(event => (
-                                    <Event key={event.id} event={event}/>
+                                    <Event key={event.id} event={event} roles={availableRoles} onChanged={refresh}/>
                                 ))
                             ) : (
                                 <span className="text-gray-300">Aucun</span>
@@ -177,11 +177,57 @@ export default function PlanningCalendar({events, userId, onRefresh}: {
 
         return (
             <div
-                className="grid gap-2 h-full"
+                className="hidden md:grid gap-2 h-full"
                 style={{gridTemplateRows: `repeat(${weeksCount}, 1fr)`}}
             >
                 {rows}
             </div>
+        );
+    };
+
+    // On phones seven columns are too narrow: list the days of the month that have permanences (#290)
+    const renderAgenda = () => {
+        const monthEvents = events
+            .filter(event => isSameMonth(new Date(event.start), monthStart))
+            .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+        const days = new Map<string, EventData[]>();
+        for (const event of monthEvents) {
+            const key = format(new Date(event.start), 'yyyy-MM-dd');
+            days.set(key, [...(days.get(key) ?? []), event]);
+        }
+        const today = format(new Date(), 'yyyy-MM-dd');
+
+        return (
+            <ul className="md:hidden flex flex-col gap-2 overflow-y-auto pb-2">
+                {days.size === 0 && (
+                    <li className="rounded-lg border p-4 text-center text-sm text-muted-foreground">
+                        Aucune permanence ce mois-ci.
+                    </li>
+                )}
+                {[...days.entries()].map(([key, dayEvents]) => (
+                    <li key={key} className="flex items-start gap-3 rounded-lg border p-3">
+                        <div className={cn(
+                            "flex w-12 shrink-0 flex-col items-center rounded-md py-1",
+                            key === today ? "bg-red-500 text-white" : "bg-muted"
+                        )}>
+                            <span className="text-[11px] capitalize">{format(new Date(dayEvents[0].start), 'EEE', {locale: fr})}</span>
+                            <span className="text-lg font-semibold leading-tight">{format(new Date(dayEvents[0].start), 'd')}</span>
+                        </div>
+                        <div className="flex min-w-0 flex-1 flex-col gap-2">
+                            {dayEvents.map(event => (
+                                <div key={event.id} className="flex items-center justify-between gap-2 text-sm">
+                                    <span className="text-muted-foreground tabular-nums">
+                                        {format(new Date(event.start), 'HH:mm')}-{format(new Date(event.end), 'HH:mm')}
+                                    </span>
+                                    <div className="min-w-0 max-w-[60%]">
+                                        <Event event={event} roles={availableRoles} onChanged={refresh}/>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </li>
+                ))}
+            </ul>
         );
     };
 
@@ -233,7 +279,6 @@ export default function PlanningCalendar({events, userId, onRefresh}: {
                         description: "Permanence",
                         start,
                         end,
-                        userId,
                         roleSlots: sanitizedSlots
                     });
 
@@ -261,7 +306,6 @@ export default function PlanningCalendar({events, userId, onRefresh}: {
                     description: "Permanence",
                     start,
                     end,
-                    userId,
                     roleSlots: sanitizedSlots
                 });
             }
@@ -276,19 +320,10 @@ export default function PlanningCalendar({events, userId, onRefresh}: {
             toast.success(`${eventsToCreate.length} permanence(s) créée(s) !`)
 
             setIsOpen(false)
-            if (onRefresh) {
-                onRefresh()
-            } else {
-                router.refresh()
-            }
-        } catch (error) {
-            toast.error("Erreur lors de la création", {
-                description: (
-                    <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
-                        <code className="text-white">{JSON.stringify(error)}</code>
-                    </pre>
-                )
-            })
+            refresh()
+        } catch (error: any) {
+            toast.error("Erreur lors de la création", {description: error?.message || "La permanence n'a pas pu être créée."})
+            refresh()
         }
     }
 
@@ -644,13 +679,14 @@ export default function PlanningCalendar({events, userId, onRefresh}: {
                     )}
                 </div>
             </div>
-            <div className="grid grid-cols-7 gap-2 text-center text-xs font-medium text-gray-700 mb-2 flex-shrink-0">
+            <div className="hidden md:grid grid-cols-7 gap-2 text-center text-xs font-medium text-gray-700 mb-2 flex-shrink-0">
                 {daysOfWeek.map(day => (
                     <div key={day}>{day}</div>
                 ))}
             </div>
             <div className="flex flex-col flex-grow min-h-0">
                 {renderCells()}
+                {renderAgenda()}
             </div>
         </div>
     );

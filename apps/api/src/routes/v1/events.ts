@@ -1,54 +1,96 @@
-import type {FastifyInstance} from 'fastify';
+import type {FastifyInstance, FastifyReply, FastifyRequest} from 'fastify';
 import {z} from 'zod';
 import {prisma} from '../../prisma.js';
 import {authenticate} from '../../auth.js';
-import {getUserPermissions, hasPermission} from '../../lib/permissions.js';
+import {getActor, hasPermission} from '../../lib/permissions.js';
 import {
     findEvent,
     findEventByChannel,
+    findSlotCandidates,
     getEvents,
     registerUserToEvent,
-    removeUserFromEvent,
     saveEvent,
     unregisterUserToEvent,
-    updateRegistrationStatus
+    updateEvent,
+    updateRegistrationStatus,
 } from '../../lib/eventManager.js';
 import {publicMessage} from '../../lib/errors.js';
+import type {PlanningActor} from '../../lib/planningRules.js';
 import {registerAvailableUsersRoutes} from './availableUsers.js';
 
-const EventSchema = z.object({
-    title: z.string().min(1),
-    description: z.string().optional(),
-    start: z.coerce.date(),
-    end: z.coerce.date(),
-    userId: z.string().min(1),
-    roleSlots: z.array(
-        z.object({
-            role: z.string().min(1),
-            goalCount: z.number().int().nonnegative(),
-            part: z.enum(["first", "second"]).optional()
-        })
-    ).min(1, "Au moins un créneau est requis"),
+const SlotSchema = z.object({
+    role: z.string().min(1).max(191),
+    goalCount: z.number().int().min(1).max(100),
+    part: z.enum(["first", "second"]).nullish(),
 });
 
-async function checkAuth(req: any, reply: any) {
-    const userId = await authenticate(req);
-    if (!userId) {
-        reply.status(401).send('unauthorized');
-        return null;
-    }
-    return userId;
+const EventSchema = z.object({
+    title: z.string().min(1).max(191),
+    description: z.string().max(2000).optional(),
+    start: z.coerce.date(),
+    end: z.coerce.date(),
+    roleSlots: z.array(SlotSchema).min(1, "Au moins un créneau est requis").max(20),
+}).refine(e => e.start < e.end, {message: "Le début de la permanence doit précéder sa fin.", path: ['end']});
+
+const EventUpdateSchema = z.object({
+    title: z.string().min(1).max(191).optional(),
+    description: z.string().max(2000).optional(),
+    start: z.coerce.date().optional(),
+    end: z.coerce.date().optional(),
+    roleSlots: z.array(SlotSchema.extend({id: z.string().min(1).max(191).optional()})).min(1).max(20).optional(),
+});
+
+const SlotTargetSchema = z.object({
+    part: z.enum(['first', 'second']).optional(),
+    roleSlotId: z.string().min(1).max(191).optional(),
+    /** Someone else than the person signed in (register_other_* / unregister_other_*). */
+    userId: z.string().min(1).max(191).optional(),
+    /** Over the number of places (register_other_all). */
+    adminBypass: z.boolean().optional(),
+});
+
+export interface EventsDeps {
+    authenticate: (req: FastifyRequest) => Promise<string | null | undefined>;
+    getActor: (userId: string) => Promise<PlanningActor | null>;
 }
 
-export async function registerEventsRoutes(app: FastifyInstance) {
+const defaultDeps: EventsDeps = {authenticate, getActor};
+
+export async function registerEventsRoutes(app: FastifyInstance, deps: EventsDeps = defaultDeps) {
+    /** The signed-in person with their roles and permissions, or null once a 401 is sent. */
+    async function actorOf(req: FastifyRequest, reply: FastifyReply): Promise<PlanningActor | null> {
+        const userId = await deps.authenticate(req);
+        const actor = userId ? await deps.getActor(userId) : null;
+        if (!actor) {
+            reply.status(401).send('unauthorized');
+            return null;
+        }
+        return actor;
+    }
+
+    async function requirePermission(req: FastifyRequest, reply: FastifyReply, permission: string) {
+        const actor = await actorOf(req, reply);
+        if (!actor) return null;
+        if (!hasPermission(actor.permissions, permission)) {
+            reply.status(403).send({success: false, message: `Accès refusé : permission ${permission} requise`});
+            return null;
+        }
+        return actor;
+    }
+
+    const fail = (req: FastifyRequest, reply: FastifyReply, err: unknown) => {
+        if (err instanceof z.ZodError) {
+            return reply.status(400).send({success: false, message: err.issues[0]?.message, errors: err.flatten()});
+        }
+        req.log.error(err);
+        const message = publicMessage(err);
+        return reply.status(message === 'internal_error' ? 500 : 400).send({success: false, message});
+    };
+
     // Default slots pre-filled when creating an event. Only what the planning needs, for those who
     // can create events: the rest of the settings stays behind settings.manage.
     app.get('/v1/events/default-slots', async (req, reply) => {
-        const userId = await checkAuth(req, reply);
-        if (!userId) return;
-        if (!hasPermission(await getUserPermissions(userId), 'permanence.open')) {
-            return reply.status(403).send({success: false, message: "Accès refusé : permission permanence.open requise"});
-        }
+        if (!await requirePermission(req, reply, 'permanence.open')) return;
         const setting = await prisma.settings.findUnique({where: {key: 'planning_default_slots'}});
         let slots: unknown = [];
         try {
@@ -60,42 +102,28 @@ export async function registerEventsRoutes(app: FastifyInstance) {
     });
 
     app.get('/v1/events', async (req, reply) => {
-        const userId = await checkAuth(req, reply);
-        if (!userId) return;
-
+        if (!await actorOf(req, reply)) return;
         try {
-            const events = await getEvents();
-            return reply.send({success: true, events});
+            return reply.send({success: true, events: await getEvents()});
         } catch (err) {
-            console.error("Failed to fetch events:", err);
-            return reply.status(500).send({success: false, message: "Failed to load events"});
+            return fail(req, reply, err);
         }
     });
 
     app.post('/v1/events', async (req, reply) => {
-        const userId = await checkAuth(req, reply);
-        if (!userId) return;
-
-        // Only allow users with permanence.open permission to create events (sessions)
-        const perms = await getUserPermissions(userId);
-        if (!hasPermission(perms, 'permanence.open')) {
-            return reply.status(403).send({
-                success: false,
-                message: "Accès refusé : permission permanence.open requise"
-            });
-        }
-
+        const actor = await requirePermission(req, reply, 'permanence.open');
+        if (!actor) return;
         try {
-            const body = req.body;
-            const validated = EventSchema.parse(body);
-            const event = await saveEvent(validated);
+            const validated = EventSchema.parse(req.body);
+            // The author is the person signed in, never a value sent by the browser (#269)
+            const event = await saveEvent({
+                ...validated,
+                userId: actor.id,
+                roleSlots: validated.roleSlots.map(s => ({...s, part: s.part ?? undefined})),
+            });
             return reply.status(201).send({success: true, event});
         } catch (err) {
-            console.error("Event creation failed:", err);
-            if (err instanceof z.ZodError) {
-                return reply.status(400).send({success: false, errors: err.flatten()});
-            }
-            return reply.status(500).send({success: false, message: "Internal server error"});
+            return fail(req, reply, err);
         }
     });
 
@@ -103,163 +131,124 @@ export async function registerEventsRoutes(app: FastifyInstance) {
     await registerAvailableUsersRoutes(app);
 
     app.get('/v1/events/channel/:channelId', async (req, reply) => {
-        const userId = await checkAuth(req, reply);
-        if (!userId) return;
-
+        if (!await actorOf(req, reply)) return;
         const {channelId} = req.params as { channelId: string };
         try {
             const event = await findEventByChannel(channelId);
-
             if (!event) return reply.status(404).send({success: false, message: "Event not found for this channel"});
-
             return reply.send({success: true, event});
         } catch (err) {
-            console.error("Failed to fetch event by channel:", err);
-            return reply.status(500).send({success: false, message: "Internal server error"});
+            return fail(req, reply, err);
         }
     });
 
     app.get('/v1/events/:id', async (req, reply) => {
-        const userId = await checkAuth(req, reply);
-        if (!userId) return;
-
+        if (!await actorOf(req, reply)) return;
         const {id} = req.params as { id: string };
         try {
             const event = await findEvent(id);
             if (!event) return reply.status(404).send({success: false, message: "Event not found"});
             return reply.send({success: true, event});
         } catch (err) {
-            return reply.status(500).send({success: false, message: "Internal server error"});
+            return fail(req, reply, err);
         }
     });
 
+    // Editing a permanence needs the same permission as creating one (#221)
     app.put('/v1/events/:id', async (req, reply) => {
-        const userId = await checkAuth(req, reply);
-        if (!userId) return;
-
+        if (!await requirePermission(req, reply, 'permanence.open')) return;
         const {id} = req.params as { id: string };
         try {
-            const body = req.body;
-            const validated = EventSchema.partial().parse(body);
-
-            // Basic update logic, might need more refinement if we want to update roleSlots specifically
-            const event = await prisma.event.update({
-                where: {id},
-                data: {
-                    title: validated.title,
-                    description: validated.description,
-                    start: validated.start,
-                    end: validated.end,
-                }
-            });
+            const changes = EventUpdateSchema.parse(req.body);
+            const event = await updateEvent(id, changes);
             return reply.send({success: true, event});
         } catch (err) {
-            if (err instanceof z.ZodError) return reply.status(400).send({success: false, errors: err.flatten()});
-            return reply.status(500).send({success: false, message: "Internal server error"});
+            return fail(req, reply, err);
         }
     });
 
     app.delete('/v1/events/:id', async (req, reply) => {
-        const userId = await checkAuth(req, reply);
-        if (!userId) return;
-
-        // Check if user has permission to close/delete sessions
-        const perms = await getUserPermissions(userId);
-        if (!hasPermission(perms, 'permanence.close')) {
-            return reply.status(403).send({
-                success: false,
-                message: "Accès refusé : permission permanence.close requise"
-            });
-        }
-
+        if (!await requirePermission(req, reply, 'permanence.close')) return;
         const {id} = req.params as { id: string };
         try {
-            await prisma.event.delete({where: {id}});
+            const {count} = await prisma.event.deleteMany({where: {id}});
+            if (!count) return reply.status(404).send({success: false, message: "Event not found"});
             return reply.send({success: true});
         } catch (err) {
-            return reply.status(500).send({success: false, message: "Internal server error"});
+            return fail(req, reply, err);
+        }
+    });
+
+    // Members who can be put on a slot by someone else (#285)
+    app.get('/v1/events/:id/slots/:slotId/candidates', async (req, reply) => {
+        const actor = await actorOf(req, reply);
+        if (!actor) return;
+        const {id, slotId} = req.params as { id: string, slotId: string };
+        try {
+            return reply.send({success: true, users: await findSlotCandidates(id, slotId, actor)});
+        } catch (err) {
+            return fail(req, reply, err);
         }
     });
 
     app.post('/v1/events/:id/register', async (req, reply) => {
-        const userId = await checkAuth(req, reply);
-        if (!userId) return;
-
+        const actor = await actorOf(req, reply);
+        if (!actor) return;
         const {id} = req.params as { id: string };
-        const {part, roleSlotId, adminBypass} = (req.body ?? {}) as { part?: 'first' | 'second', roleSlotId?: string, adminBypass?: boolean };
-
-        // If admin bypass is requested, verify user has permission
-        if (adminBypass) {
-            const perms = await getUserPermissions(userId);
-            if (!hasPermission(perms, 'permanence.register_other_user')) {
-                return reply.status(403).send({success: false, message: "Permissions insuffisantes pour utiliser le bypass administrateur"});
-            }
-        }
-
         try {
-            const registration = await registerUserToEvent(id, userId, part, roleSlotId, adminBypass);
+            const {part, roleSlotId, userId, adminBypass} = SlotTargetSchema.parse(req.body ?? {});
+            const registration = await registerUserToEvent(
+                {eventId: id, part, roleSlotId, targetUserId: userId ?? actor.id},
+                actor,
+                {bypassCapacity: !!adminBypass},
+            );
             return reply.send({success: true, registration});
-        } catch (err: any) {
-            req.log.error(err);
-            return reply.status(400).send({success: false, message: publicMessage(err)});
+        } catch (err) {
+            return fail(req, reply, err);
         }
     });
 
     app.post('/v1/events/:id/unregister', async (req, reply) => {
-        const userId = await checkAuth(req, reply);
-        if (!userId) return;
-
+        const actor = await actorOf(req, reply);
+        if (!actor) return;
         const {id} = req.params as { id: string };
-        const {part, roleSlotId} = (req.body ?? {}) as { part?: 'first' | 'second', roleSlotId?: string };
-
         try {
-            const registration = await unregisterUserToEvent(id, userId, part, roleSlotId);
+            const {part, roleSlotId, userId} = SlotTargetSchema.parse(req.body ?? {});
+            const registration = await unregisterUserToEvent(
+                {eventId: id, part, roleSlotId, targetUserId: userId ?? actor.id},
+                actor,
+            );
             return reply.send({success: true, registration});
-        } catch (err: any) {
-            req.log.error(err);
-            return reply.status(400).send({success: false, message: publicMessage(err)});
+        } catch (err) {
+            return fail(req, reply, err);
+        }
+    });
+
+    // Same as /unregister with a userId, kept for existing clients
+    app.post('/v1/events/:id/remove-user', async (req, reply) => {
+        const actor = await actorOf(req, reply);
+        if (!actor) return;
+        const {id} = req.params as { id: string };
+        try {
+            const {userId, roleSlotId} = SlotTargetSchema.parse(req.body ?? {});
+            if (!userId) return reply.status(400).send({success: false, message: "userId is required"});
+            const registration = await unregisterUserToEvent({eventId: id, roleSlotId, targetUserId: userId}, actor);
+            return reply.send({success: true, registration});
+        } catch (err) {
+            return fail(req, reply, err);
         }
     });
 
     app.post('/v1/events/registrations/:registrationId/status', async (req, reply) => {
-        const userId = await checkAuth(req, reply);
-        if (!userId) return;
-
-        // Check if user has management permissions
-        const perms = await getUserPermissions(userId);
-        if (!hasPermission(perms, 'permanence.register_other_user')) {
-            return reply.status(403).send({success: false, message: "Forbidden"});
-        }
-
+        const actor = await actorOf(req, reply);
+        if (!actor) return;
         const {registrationId} = req.params as { registrationId: string };
-        const {status} = (req.body ?? {}) as { status: 'confirmed' | 'rejected' };
-
         try {
-            await updateRegistrationStatus(registrationId, status);
+            const {status} = z.object({status: z.enum(['confirmed', 'rejected'])}).parse(req.body ?? {});
+            await updateRegistrationStatus(registrationId, status, actor);
             return reply.send({success: true});
-        } catch (err: any) {
-            req.log.error(err);
-            return reply.status(400).send({success: false, message: publicMessage(err)});
-        }
-    });
-
-    app.post('/v1/events/:id/remove-user', async (req, reply) => {
-        const adminUserId = await checkAuth(req, reply);
-        if (!adminUserId) return;
-
-        const {id} = req.params as { id: string };
-        const {userId, roleSlotId} = (req.body ?? {}) as { userId: string, roleSlotId?: string };
-
-        if (!userId) {
-            return reply.status(400).send({success: false, message: "userId is required"});
-        }
-
-        try {
-            const registration = await removeUserFromEvent(id, userId, adminUserId, roleSlotId);
-            return reply.send({success: true, registration});
-        } catch (err: any) {
-            req.log.error(err);
-            return reply.status(400).send({success: false, message: publicMessage(err)});
+        } catch (err) {
+            return fail(req, reply, err);
         }
     });
 }

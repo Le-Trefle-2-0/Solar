@@ -121,14 +121,9 @@ export type EventData = {
     description?: string;
     start: string;
     end: string;
+    /** Monday 12:00 (Paris time) of the event week: later registrations need approval. */
+    registrationDeadline?: string;
     roleSlots: EventRoleSlot[];
-};
-
-export type EventModalProps = {
-    isOpen: boolean;
-    onClose: () => void;
-    event: EventData | null;
-    onUpdate?: (updated: EventData) => void;
 };
 
 export type vigi = {
