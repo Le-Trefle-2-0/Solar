@@ -6,6 +6,9 @@ import {broadcast} from '../../lib/broadcast.js';
 import {getActor, hasPermission, OWNER_SETTING_KEY} from '../../lib/permissions.js';
 import {registerRolesRoutes} from './roles.js';
 import {parseStatsRange} from '../../lib/statsRange.js';
+import {z} from 'zod';
+import {DISCORD_ID, DiscordProfileError, downloadAvatar, fetchDiscordProfile} from '../../lib/discordProfiles.js';
+import {syncTeamPerson} from '../../lib/teamDiscordSync.js';
 
 /** Authenticated user holding `permission` (admin.sudo and the owner hold every permission). */
 async function requirePermission(req: any, reply: any, permission: string) {
@@ -229,17 +232,24 @@ export async function registerAdminRoutes(app: FastifyInstance) {
         const admin = await requirePermission(req, reply, 'settings.manage');
         if (!admin) return;
 
-        const {id, name, image, bio} = req.body as {
+        const {id, name, image, bio, syncName, syncImage} = req.body as {
             id?: string,
             name: string,
             image?: string,
-            bio?: string
+            bio?: string,
+            // People linked to Discord: whether the name / photo keep following it
+            syncName?: boolean,
+            syncImage?: boolean,
+        };
+        const sync = {
+            ...(typeof syncName === 'boolean' ? {syncName} : {}),
+            ...(typeof syncImage === 'boolean' ? {syncImage} : {}),
         };
 
         try {
             const person = await prisma.teamPerson.upsert({
                 where: {id: id || 'new'},
-                update: {name, image, bio},
+                update: {name, image, bio, ...sync},
                 create: {name, image, bio}
             });
             return reply.send({person});
@@ -247,6 +257,89 @@ export async function registerAdminRoutes(app: FastifyInstance) {
             console.error("[Team] Failed to upsert person:", e);
             return reply.status(500).send('failed to update person');
         }
+    });
+
+    const discordFailure = (reply: any, e: unknown) => {
+        if (e instanceof DiscordProfileError) {
+            return reply.status(e.code === 'not_found' ? 404 : e.code === 'no_token' ? 503 : 502).send({error: e.code, message: e.message});
+        }
+        console.error('[Team] Discord import failed:', (e as Error).message);
+        return reply.status(500).send({error: 'internal_error', message: 'Import impossible'});
+    };
+
+    // Import from Discord: a new person, or an existing one (personId) linked to the account
+    app.post('/v1/admin/team/people/discord', async (req, reply) => {
+        const admin = await requirePermission(req, reply, 'settings.manage');
+        if (!admin) return;
+        const parsed = z.object({discordId: z.string().trim().regex(DISCORD_ID), personId: z.string().min(1).max(191).optional()})
+            .safeParse(req.body ?? {});
+        if (!parsed.success) return reply.status(400).send({error: 'invalid_body', message: 'Identifiant Discord invalide (17 à 20 chiffres)'});
+        const {discordId, personId} = parsed.data;
+
+        const linked = await prisma.teamPerson.findUnique({where: {discordId}, select: {id: true, name: true}});
+        if (linked && linked.id !== personId) {
+            return reply.status(409).send({error: 'already_linked', message: `Ce compte Discord est déjà lié à ${linked.name}`});
+        }
+
+        try {
+            if (personId) {
+                const existing = await prisma.teamPerson.findUnique({where: {id: personId}, select: {id: true}});
+                if (!existing) return reply.status(404).send({error: 'not_found', message: 'Personne introuvable'});
+                await prisma.teamPerson.update({
+                    where: {id: personId},
+                    data: {discordId, syncName: true, syncImage: true, discordAvatarHash: null},
+                });
+                return reply.send({person: await syncTeamPerson(personId, {forceImage: true})});
+            }
+
+            const profile = await fetchDiscordProfile(discordId);
+            if (await prisma.teamPerson.count({where: {name: profile.displayName}})) {
+                return reply.status(409).send({
+                    error: 'name_taken',
+                    message: `Une personne s'appelle déjà « ${profile.displayName} » : liez plutôt son profil à ce compte Discord`,
+                });
+            }
+            const person = await prisma.teamPerson.create({
+                data: {
+                    name: profile.displayName,
+                    image: await downloadAvatar(profile.avatarUrl),
+                    discordId,
+                    discordAvatarHash: profile.avatarHash,
+                    discordSyncedAt: new Date(),
+                },
+            });
+            return reply.status(201).send({person});
+        } catch (e) {
+            return discordFailure(reply, e);
+        }
+    });
+
+    // "Resynchroniser": name and photo follow Discord again and are imported now
+    app.post('/v1/admin/team/people/:id/resync', async (req, reply) => {
+        const admin = await requirePermission(req, reply, 'settings.manage');
+        if (!admin) return;
+        const {id} = req.params as {id: string};
+        const person = await prisma.teamPerson.findUnique({where: {id}, select: {discordId: true}});
+        if (!person?.discordId) return reply.status(404).send({error: 'not_linked', message: "Cette personne n'est pas liée à Discord"});
+        try {
+            await prisma.teamPerson.update({where: {id}, data: {syncName: true, syncImage: true}});
+            return reply.send({person: await syncTeamPerson(id, {forceImage: true})});
+        } catch (e) {
+            return discordFailure(reply, e);
+        }
+    });
+
+    // Unlink from Discord: the current name and photo stay, and no longer change
+    app.post('/v1/admin/team/people/:id/unlink', async (req, reply) => {
+        const admin = await requirePermission(req, reply, 'settings.manage');
+        if (!admin) return;
+        const {id} = req.params as {id: string};
+        const {count} = await prisma.teamPerson.updateMany({
+            where: {id},
+            data: {discordId: null, discordAvatarHash: null, discordSyncedAt: null, discordSyncError: null},
+        });
+        if (!count) return reply.status(404).send({error: 'not_found'});
+        return reply.send({success: true});
     });
 
     app.delete('/v1/admin/team/people/:id', async (req, reply) => {

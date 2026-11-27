@@ -27,8 +27,14 @@ import {
     Loader2, 
     UserPlus,
     Search,
-    Crown
+    Crown,
+    RefreshCw,
+    Unlink,
+    Download
 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { formatDistanceToNow } from "date-fns";
+import { fr } from "date-fns/locale";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import Image from "next/image";
@@ -48,7 +54,16 @@ interface TeamPerson {
     name: string;
     image?: string;
     bio?: string;
+    /** Linked Discord account: name and photo can follow it */
+    discordId?: string | null;
+    syncName?: boolean;
+    syncImage?: boolean;
+    discordSyncedAt?: string | null;
+    discordSyncError?: string | null;
 }
+
+/** Discord user ids: 17 to 20 digits (Developer mode, right click > Copy user ID). */
+const DISCORD_ID_RE = /^\d{15,22}$/;
 
 interface TeamMember {
     id: string;
@@ -87,6 +102,12 @@ export function TeamSettings() {
     // Person Modal
     const [isPersonModalOpen, setIsPersonModalOpen] = useState(false);
     const [editingPerson, setEditingPerson] = useState<Partial<TeamPerson> | null>(null);
+
+    // Discord import / link
+    const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+    const [importId, setImportId] = useState("");
+    const [linkId, setLinkId] = useState("");
+    const [syncingId, setSyncingId] = useState<string | null>(null);
 
     const fetchData = async () => {
         setLoading(true);
@@ -195,6 +216,61 @@ export function TeamSettings() {
         }
     };
 
+    /** Import a new person, or link `personId` to the Discord account. */
+    const importFromDiscord = async (discordId: string, personId?: string) => {
+        if (!DISCORD_ID_RE.test(discordId.trim())) {
+            toast.error("Identifiant Discord invalide", {description: "Un identifiant Discord compte 17 à 20 chiffres."});
+            return null;
+        }
+        setSaving(true);
+        try {
+            const res = await apiFetch("/v1/admin/team/people/discord", {
+                method: "POST",
+                body: JSON.stringify({discordId: discordId.trim(), personId}),
+            });
+            toast.success(personId ? "Profil lié à Discord" : `${res.person.name} importé depuis Discord`);
+            fetchData();
+            return res.person as TeamPerson;
+        } catch (error: any) {
+            toast.error("Import impossible", {description: error?.message});
+            return null;
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    /** Name and photo follow Discord again, imported now. */
+    const resyncPerson = async (id: string) => {
+        setSyncingId(id);
+        try {
+            const res = await apiFetch(`/v1/admin/team/people/${id}/resync`, {method: "POST"});
+            const person = res.person as TeamPerson;
+            if (person.discordSyncError) toast.warning("Synchronisation partielle", {description: person.discordSyncError});
+            else toast.success("Profil synchronisé avec Discord");
+            if (editingPerson?.id === id) setEditingPerson(person);
+            fetchData();
+        } catch (error: any) {
+            toast.error("Synchronisation impossible", {description: error?.message});
+        } finally {
+            setSyncingId(null);
+        }
+    };
+
+    const unlinkPerson = async (id: string) => {
+        if (!confirm("Délier ce profil de Discord ? Le nom et la photo actuels seront conservés et ne changeront plus.")) return;
+        setSaving(true);
+        try {
+            await apiFetch(`/v1/admin/team/people/${id}/unlink`, {method: "POST"});
+            toast.success("Profil délié de Discord");
+            if (editingPerson?.id === id) setEditingPerson({...editingPerson, discordId: null, discordSyncedAt: null, discordSyncError: null});
+            fetchData();
+        } catch (error: any) {
+            toast.error("Erreur", {description: error?.message});
+        } finally {
+            setSaving(false);
+        }
+    };
+
     const handleDeletePerson = async (id: string) => {
         if (!confirm("Supprimer cette personne ? Toutes ses assignations seront également supprimées.")) return;
         setSaving(true);
@@ -258,12 +334,21 @@ export function TeamSettings() {
                         <h3 className="text-lg font-medium">Personnes</h3>
                         <p className="text-sm text-muted-foreground">Gérez les membres de l'équipe globalement (Bios, Photos).</p>
                     </div>
-                    <Button variant="outline" onClick={() => {
-                        setEditingPerson({ name: "" });
-                        setIsPersonModalOpen(true);
-                    }}>
-                        <UserPlus className="h-4 w-4 mr-2" /> Ajouter une personne
-                    </Button>
+                    <div className="flex flex-wrap gap-2">
+                        <Button variant="outline" onClick={() => {
+                            setImportId("");
+                            setIsImportModalOpen(true);
+                        }}>
+                            <Download className="h-4 w-4 mr-2" /> Importer depuis Discord
+                        </Button>
+                        <Button variant="outline" onClick={() => {
+                            setEditingPerson({ name: "" });
+                            setLinkId("");
+                            setIsPersonModalOpen(true);
+                        }}>
+                            <UserPlus className="h-4 w-4 mr-2" /> Ajouter une personne
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -281,10 +366,29 @@ export function TeamSettings() {
                             <div className="flex-1 min-w-0">
                                 <p className="text-sm font-medium truncate">{person.name}</p>
                                 <p className="text-[10px] text-muted-foreground truncate">{person.bio || "Pas de bio"}</p>
+                                {person.discordId && (
+                                    <p className={`text-[10px] truncate ${person.discordSyncError ? "text-destructive" : "text-muted-foreground"}`}
+                                       title={person.discordSyncError || undefined}>
+                                        {person.discordSyncError
+                                            ? `Discord : ${person.discordSyncError}`
+                                            : person.discordSyncedAt
+                                                ? `Discord · synchronisé ${formatDistanceToNow(new Date(person.discordSyncedAt), {addSuffix: true, locale: fr})}`
+                                                : "Discord · en attente de synchronisation"}
+                                        {!person.discordSyncError && person.syncName === false && person.syncImage === false && " (personnalisé)"}
+                                    </p>
+                                )}
                             </div>
                             <div className="flex gap-1">
+                                {person.discordId && (
+                                    <Button variant="ghost" size="icon" className="h-8 w-8" title="Resynchroniser avec Discord"
+                                            aria-label={`Resynchroniser ${person.name} avec Discord`}
+                                            disabled={syncingId === person.id} onClick={() => resyncPerson(person.id)}>
+                                        <RefreshCw className={`h-3 w-3 ${syncingId === person.id ? "animate-spin" : ""}`} />
+                                    </Button>
+                                )}
                                 <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => {
                                     setEditingPerson(person);
+                                    setLinkId("");
                                     setIsPersonModalOpen(true);
                                 }}>
                                     <Edit className="h-3 w-3" />
@@ -491,21 +595,76 @@ export function TeamSettings() {
                         <DialogTitle>{editingPerson?.id ? "Modifier" : "Nouvelle"} personne</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
+                        {editingPerson?.id && (editingPerson.discordId ? (
+                            <div className="space-y-3 rounded-md border p-3">
+                                <div className="flex items-center justify-between gap-2">
+                                    <p className="text-sm">
+                                        Lié au compte Discord <span className="font-mono text-xs">{editingPerson.discordId}</span>
+                                    </p>
+                                    <Button variant="ghost" size="sm" onClick={() => unlinkPerson(editingPerson.id!)} disabled={saving}>
+                                        <Unlink className="h-3 w-3 mr-1" /> Délier
+                                    </Button>
+                                </div>
+                                <div className="flex items-center justify-between gap-2">
+                                    <Label htmlFor="pers-sync-name" className="font-normal">Nom repris de Discord</Label>
+                                    <Switch id="pers-sync-name" checked={editingPerson.syncName !== false}
+                                            onCheckedChange={(syncName) => setEditingPerson({ ...editingPerson, syncName })} />
+                                </div>
+                                <div className="flex items-center justify-between gap-2">
+                                    <Label htmlFor="pers-sync-image" className="font-normal">Photo reprise de Discord</Label>
+                                    <Switch id="pers-sync-image" checked={editingPerson.syncImage !== false}
+                                            onCheckedChange={(syncImage) => setEditingPerson({ ...editingPerson, syncImage })} />
+                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                    Modifier le nom ou la photo ci-dessous les personnalise : ils ne suivent plus Discord jusqu&apos;à la prochaine resynchronisation.
+                                </p>
+                                {editingPerson.discordSyncError && (
+                                    <p className="text-xs text-destructive">{editingPerson.discordSyncError}</p>
+                                )}
+                                <Button variant="outline" size="sm" className="w-full" disabled={syncingId === editingPerson.id}
+                                        onClick={() => resyncPerson(editingPerson.id!)}>
+                                    <RefreshCw className={`h-3 w-3 mr-2 ${syncingId === editingPerson.id ? "animate-spin" : ""}`} />
+                                    Resynchroniser maintenant
+                                </Button>
+                            </div>
+                        ) : (
+                            <div className="space-y-2">
+                                <Label htmlFor="pers-link">Lier à un compte Discord (facultatif)</Label>
+                                <div className="flex gap-2">
+                                    <Input id="pers-link" inputMode="numeric" value={linkId} placeholder="Identifiant Discord"
+                                           onChange={(e) => setLinkId(e.target.value)} />
+                                    <Button variant="outline" disabled={saving || !linkId.trim()} onClick={async () => {
+                                        const person = await importFromDiscord(linkId, editingPerson.id);
+                                        if (person) setEditingPerson(person);
+                                    }}>Lier</Button>
+                                </div>
+                                <p className="text-xs text-muted-foreground">Le nom et la photo seront alors repris de Discord et tenus à jour.</p>
+                            </div>
+                        ))}
                         <div className="space-y-2">
                             <Label htmlFor="pers-name">Nom Complet / Pseudo</Label>
-                            <Input 
-                                id="pers-name" 
-                                value={editingPerson?.name || ""} 
-                                onChange={(e) => setEditingPerson({ ...editingPerson, name: e.target.value })}
+                            <Input
+                                id="pers-name"
+                                value={editingPerson?.name || ""}
+                                onChange={(e) => setEditingPerson({
+                                    ...editingPerson,
+                                    name: e.target.value,
+                                    // A name typed by hand no longer follows Discord
+                                    ...(editingPerson?.discordId ? {syncName: false} : {}),
+                                })}
                             />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="pers-image">URL de la photo</Label>
-                            <Input 
-                                id="pers-image" 
-                                value={editingPerson?.image || ""} 
-                                onChange={(e) => setEditingPerson({ ...editingPerson, image: e.target.value })}
-                                placeholder="https://..."
+                            <Input
+                                id="pers-image"
+                                value={editingPerson?.image?.startsWith("data:") ? "" : editingPerson?.image || ""}
+                                onChange={(e) => setEditingPerson({
+                                    ...editingPerson,
+                                    image: e.target.value,
+                                    ...(editingPerson?.discordId ? {syncImage: false} : {}),
+                                })}
+                                placeholder={editingPerson?.image?.startsWith("data:") ? "Photo importée (collez une URL pour la remplacer)" : "https://..."}
                             />
                         </div>
                         <div className="space-y-2">
@@ -523,6 +682,35 @@ export function TeamSettings() {
                         <Button onClick={handleSavePerson} disabled={saving || !editingPerson?.name}>
                             {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             Enregistrer
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Discord import */}
+            <Dialog open={isImportModalOpen} onOpenChange={setIsImportModalOpen}>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Importer depuis Discord</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="import-discord-id">Identifiant Discord</Label>
+                            <Input id="import-discord-id" inputMode="numeric" value={importId} placeholder="ex : 123456789012345678"
+                                   onChange={(e) => setImportId(e.target.value)} />
+                            <p className="text-xs text-muted-foreground">
+                                Dans Discord : Paramètres &gt; Avancés &gt; Mode développeur, puis clic droit sur le membre &gt; Copier l&apos;identifiant.
+                                Le pseudo du serveur et la photo sont importés puis tenus à jour automatiquement.
+                            </p>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsImportModalOpen(false)}>Annuler</Button>
+                        <Button disabled={saving || !importId.trim()} onClick={async () => {
+                            if (await importFromDiscord(importId)) setIsImportModalOpen(false);
+                        }}>
+                            {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Importer
                         </Button>
                     </DialogFooter>
                 </DialogContent>

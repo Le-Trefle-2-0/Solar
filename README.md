@@ -193,6 +193,13 @@ WS_INTERNAL_URL=http://localhost:5000
 Sur le portail développeurs Discord, le bot n'a besoin d'aucun intent privilégié. Sur le serveur, il doit pouvoir lire
 et écrire dans le salon d'ouverture (et d'annonce), et gérer les permissions du salon vocal s'il est configuré.
 
+**Équipe de la page d'accueil** : dans Administration > Paramètres, section Équipe, une personne peut être importée
+depuis Discord par son identifiant, ou son profil lié à un compte Discord. Son pseudo sur le serveur et sa photo sont
+alors repris et tenus à jour par l'API (toutes les `DISCORD_SYNC_INTERVAL_HOURS` heures, 6 par défaut), avec le même
+`DISCORD_TOKEN` et `DISCORD_GUILD_ID`. Modifier le nom ou la photo à la main les personnalise (ils ne suivent plus
+Discord) ; « Resynchroniser » les reprend de Discord. Les photos sont copiées dans la base : les visiteurs du site ne
+contactent jamais Discord.
+
 ---
 
 ## 🔒 Authentification et Accès

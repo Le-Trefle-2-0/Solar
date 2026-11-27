@@ -7,6 +7,7 @@ import rateLimit from '@fastify/rate-limit';
 import {registerV1Routes} from './routes/v1/index.js';
 import {API_HOST, API_PORT, assertRequiredSecrets} from './env.js';
 import {startNewsletterScheduler} from './lib/scheduler.js';
+import {startTeamDiscordSync} from './lib/teamDiscordSync.js';
 import {seedDefaultRoles} from './lib/seed.js';
 import {ensureBaseData} from './lib/baseData.js';
 import {prisma} from './prisma.js';
@@ -97,6 +98,8 @@ await seedDefaultRoles();
 
 // Start background tasks
 startNewsletterScheduler();
+// Team showcase: names and photos of people linked to Discord
+startTeamDiscordSync();
 
 app
     .listen({port: API_PORT, host: API_HOST})

@@ -72,14 +72,15 @@ export async function registerWidgetRoutes(app: FastifyInstance) {
                 }
             }
 
+            // Resuming a session is free; opening a new ticket requires a proof of work, checked
+            // first so unverified requests never reach the database.
+            if (!verifyPow(body.pow)) return reply.status(403).send({success: false, error: 'pow_required'});
+
             // New écoutes only while a permanence is running (an open écoute can still be resumed above)
             const availability = await getPermanenceStatus();
             if (!availability.open) {
                 return reply.status(403).send({success: false, error: 'permanence_closed', nextOpening: availability.nextOpening});
             }
-
-            // Resuming a session is free; opening a new ticket requires a proof of work.
-            if (!verifyPow(body.pow)) return reply.status(403).send({success: false, error: 'pow_required'});
 
             const syntheticId = `web:${crypto.randomUUID()}`;
             const ua = req.headers['user-agent'] || 'unknown';

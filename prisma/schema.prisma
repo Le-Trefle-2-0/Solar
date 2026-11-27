@@ -490,6 +490,15 @@ model TeamPerson {
   name      String       @unique
   image     String?      @db.LongText
   bio       String?      @db.Text
+  /// Discord account the name and photo are imported from (optional)
+  discordId         String?   @unique @db.VarChar(32)
+  /// Whether the name / photo follow Discord; turned off when customised
+  syncName          Boolean   @default(true)
+  syncImage         Boolean   @default(true)
+  /// Avatar imported last, to download the photo again only when it changed
+  discordAvatarHash String?
+  discordSyncedAt   DateTime?
+  discordSyncError  String?   @db.Text
   members   TeamMember[]
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
