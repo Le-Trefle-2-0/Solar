@@ -98,6 +98,7 @@ const FormSchema = z.object({
     email: z.string(),
     // No role = no access (stored as the hidden default role)
     roles: z.array(z.string()),
+    requestMembership: z.boolean(),
 });
 
 interface DataTableProps {
@@ -580,6 +581,7 @@ export function UsersTable({data, availableRoles}: DataTableProps) {
             name: "",
             email: "",
             roles: [],
+            requestMembership: true,
         },
     });
 
@@ -816,6 +818,28 @@ export function UsersTable({data, availableRoles}: DataTableProps) {
                                             )}
                                         />
                                     </div>
+                                    <FormField
+                                        control={form.control}
+                                        name="requestMembership"
+                                        render={({field}) => (
+                                            <FormItem className="flex flex-row items-start gap-3 rounded-md border p-3">
+                                                <FormControl>
+                                                    <Checkbox
+                                                        checked={field.value}
+                                                        onCheckedChange={(checked) => field.onChange(checked === true)}
+                                                    />
+                                                </FormControl>
+                                                <div className="grid gap-1 leading-snug">
+                                                    <FormLabel>Demander l&apos;adhésion</FormLabel>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        À sa première connexion, le bénévole envoie ses informations, sa pièce
+                                                        d&apos;identité et son casier judiciaire, puis attend leur validation.
+                                                        Décochez si son adhésion est déjà complète.
+                                                    </p>
+                                                </div>
+                                            </FormItem>
+                                        )}
+                                    />
                                     <DialogFooter>
                                         <DialogClose asChild>
                                             <Button variant="outline">Annuler</Button>

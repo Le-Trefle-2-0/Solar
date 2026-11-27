@@ -15,12 +15,15 @@ import {broadcast} from "@/lib/broadcast";
 import {canLinkFile, isFileId} from "@/lib/security/fileAccess";
 import {escapeHtml} from "@/lib/security/escape";
 import {purgeDocuments} from "@/lib/security/documentRetention";
+import {membershipFields} from "@/lib/membership";
 
 const inviteSchema = z.object({
     name: z.string().min(1),
     email: z.string().email(),
     // No role = no access: stored as the hidden default role
     roles: z.array(z.string()),
+    // Ask for the adhésion documents at first sign-in; off for volunteers already validated elsewhere
+    requestMembership: z.boolean().default(true),
 });
 
 const DOCUMENT_CHANGED = "Le document a changé depuis son ouverture : rechargez la page pour voir le nouveau fichier.";
@@ -35,7 +38,7 @@ function documentChanged(
     return kinds.some(kind => (examined[kind] ?? null) !== (kind === 'idCard' ? user.idCardFileId : user.casierFileId));
 }
 
-export async function inviteUserAction(formData: z.infer<typeof inviteSchema>) {
+export async function inviteUserAction(formData: z.input<typeof inviteSchema>) {
     const session = await auth.api.getSession({
         headers: await headers(),
     });
@@ -52,7 +55,7 @@ export async function inviteUserAction(formData: z.infer<typeof inviteSchema>) {
         return {error: "Invalid data"};
     }
 
-    const {name, email} = validated.data;
+    const {name, email, requestMembership} = validated.data;
     const chosen = validated.data.roles.filter((r) => r !== "none");
     const roles = chosen.length ? chosen : ["none"];
 
@@ -94,6 +97,7 @@ export async function inviteUserAction(formData: z.infer<typeof inviteSchema>) {
                     createdAt: new Date(),
                     updatedAt: new Date(),
                     role: roles.join(","),
+                    ...membershipFields(requestMembership),
                 },
             });
 
