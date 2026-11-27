@@ -278,7 +278,8 @@ export async function startBot(cfg: BotConfig): Promise<() => Promise<void>> {
         user: User | PartialUser,
         added: boolean,
     ) {
-        if (user.bot) return;
+        // Only users with an écoute in progress: nobody else makes the bot call Discord
+        if (user.bot || !relay.ticketOf(user.id)) return;
         try {
             const full = reaction.partial ? await reaction.fetch() : reaction;
             if (full.message.channel.type !== ChannelType.DM || full.emoji.id || !full.emoji.name) return;
