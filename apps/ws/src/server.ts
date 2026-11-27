@@ -32,6 +32,11 @@ export interface WsDeps {
     /** Null when the account may not connect, or its Better Auth session `sid` was closed (#276). */
     getSession: (userId: string, sid: unknown) => Promise<WsSession | null>;
     getChannelAccess: (userId: string, channelId: string) => Promise<{read: boolean; write: boolean}>;
+    /**
+     * The message `id` this user saved in the channel a moment ago, while its écoute is open:
+     * only stored messages are relayed, with their stored content. Null: nothing is relayed.
+     */
+    getStoredMessage: (userId: string, channelId: string, id: number) => Promise<{content: string; replyID: number | null} | null>;
     secrets: {guest: string; broadcast: string; internal: string};
     corsOrigin?: string;
     /** How often volunteer sockets are checked again against the API (ms). */
@@ -282,18 +287,21 @@ export function createWsServer(deps: WsDeps): {httpServer: HttpServer; io: Serve
             ack(users);
         });
 
-        // Relay of a message already saved through the API or the web action. The author and
-        // timestamp are set here; content is checked and neutralised like in the API.
+        // Relay of a message already saved through the API or the web action. Only a stored
+        // message is relayed, with its stored content, and only while the écoute is open: the
+        // client's copy is never trusted. The author and timestamp are set here.
         on('sendMessage', async (payload, ack) => {
             if (d.kind !== 'volunteer') return ack(false);
             const room = payload?.channel?.id;
-            const content = payload?.content;
             if (!isChannelId(room) || !socket.rooms.has(room)) return ack(false);
-            if (typeof content !== 'string' || !content.length || content.length > MAX_MESSAGE_LENGTH) return ack(false);
+            const id = typeof payload?.id === 'number' && Number.isInteger(payload.id) && payload.id > 0 ? payload.id : null;
+            if (!id) return ack(false);
             if (!(await accessFor(socket, room)).write) return ack(false);
 
-            const id = typeof payload.id === 'number' && Number.isInteger(payload.id) ? payload.id : null;
-            const replyID = typeof payload.replyID === 'number' && Number.isInteger(payload.replyID) ? payload.replyID : null;
+            const stored = await deps.getStoredMessage(d.userId!, room, id);
+            if (!stored) return ack(false);
+            const {content, replyID} = stored;
+            if (!content.length || content.length > MAX_MESSAGE_LENGTH) return ack(false);
             await emitToRoom(room, 'message', {
                 id,
                 author: d.user,

@@ -21,6 +21,12 @@ const access = (userId: string, channelId: string) => {
     return {read: false, write: false};
 };
 
+/** Messages the fake API holds as saved a moment ago in an open écoute: user:channel:id. */
+const stored: Record<string, {content: string; replyID: number | null}> = {
+    'vol:c1:7': {content: '<img src=x onerror=alert(1)>', replyID: null},
+};
+const getStoredMessage = async (u: string, c: string, id: number) => stored[`${u}:${c}:${id}`] ?? null;
+
 /** Bot keys the fake API still accepts. */
 const validKeys = new Set(['bot-key', 'bot-key-2']);
 
@@ -34,6 +40,7 @@ before(async () => {
         checkApiKey: async (k) => (validKeys.has(k) ? {userId: 'bot-user'} : null),
         getSession: async (id) => sessions[id] ?? null,
         getChannelAccess: async (u, c) => access(u, c),
+        getStoredMessage,
         secrets: SECRETS,
         log: quiet,
     });
@@ -136,14 +143,26 @@ test('ws: the author of a relayed message is the sender, whatever the client cla
     const [vol, reader] = await Promise.all([client({jwt: 'jwt-vol'}), client({jwt: 'jwt-reader'})]);
     const got = collect(reader, 'message');
     const ok = await ack(vol, 'sendMessage', {
-        id: 7, channel: {id: 'c1'}, content: '<img src=x onerror=alert(1)>',
+        id: 7, channel: {id: 'c1'}, content: 'whatever the client says',
         author: {id: 'reader', name: 'Usurped', role: 'admin'},
     });
     assert.equal(ok, true);
     const [msg] = await got;
     assert.equal(msg.author.id, 'vol');
     assert.equal(msg.author.username, 'Vol');
+    // The stored content is relayed, neutralised, never the client's copy
     assert.equal(/<[a-zA-Z]/.test(msg.content), false);
+    assert.match(msg.content, /onerror/);
+});
+
+test('ws: only a stored message of the sender is relayed (unsaved, someone else\'s, closed écoute)', async () => {
+    const [vol, reader] = await Promise.all([client({jwt: 'jwt-vol'}), client({jwt: 'jwt-reader'})]);
+    const got = collect(reader, 'message');
+    // No id, an id the API does not hold for this user and channel (never saved, or the écoute closed)
+    assert.equal(await ack(vol, 'sendMessage', {channel: {id: 'c1'}, content: 'unsaved'}), false);
+    assert.equal(await ack(vol, 'sendMessage', {id: 8, channel: {id: 'c1'}, content: 'unsaved'}), false);
+    assert.equal(await ack(vol, 'sendMessage', {id: 7, channel: {id: '1'}, content: 'elsewhere'}), false);
+    assert.deepEqual(await got, []);
 });
 
 test('ws: no relay to a channel the sender is not in, nor without write access', async () => {
@@ -290,6 +309,7 @@ test('signing out closes the volunteer sockets of that session (#276)', async ()
         checkApiKey: async () => null,
         getSession: async (id, sid) => (open.has(sid as string) ? sessions[id] ?? null : null),
         getChannelAccess: async (u, c) => access(u, c),
+        getStoredMessage,
         secrets: SECRETS,
         sessionCheckMs: 50,
         log: quiet,

@@ -5,6 +5,7 @@ import {getActor} from '../../lib/permissions.js';
 import {hasPermission} from '../../lib/roleAssignment.js';
 import {isSessionActive} from '../../lib/sessions.js';
 import {canReadChannel, canWriteChannel, describeChannel, findTicketAccess, isPermanenceChannel, PUBLIC_CHANNEL_ID, type TicketAccessRow} from '../../lib/channelAccess.js';
+import {isTicketWritable} from '../../lib/ticketWrites.js';
 
 /**
  * Service-to-service routes for the WebSocket service (Authorization: Bearer INTERNAL_API_SECRET).
@@ -25,6 +26,25 @@ export interface InternalWsDeps {
     findSpectatedChannelIds: (userId: string) => Promise<string[]>;
     /** Channels of the permanences running now or starting within a day. */
     findCurrentPermanenceChannelIds: () => Promise<string[]>;
+    /**
+     * A message the user saved in the channel a moment ago, while the channel's écoute (if any)
+     * is still open: the only thing the WebSocket service may relay.
+     */
+    findRelayableMessage?: (userId: string, channelId: string, id: number) => Promise<{content: string; replyID: number | null} | null>;
+}
+
+/** A relay follows the save at once: older messages are not relayed again. */
+const RELAY_WINDOW_MS = 5 * 60_000;
+
+async function findRelayableMessage(userId: string, channelId: string, id: number) {
+    const message = await prisma.message.findFirst({
+        where: {id, channelId, userId, internal: false, createdAt: {gte: new Date(Date.now() - RELAY_WINDOW_MS)}},
+        select: {content: true, replyID: true},
+    });
+    if (!message) return null;
+    const ticket = await prisma.ticket.findUnique({where: {channelId}, select: {statusName: true}});
+    if (!isTicketWritable(ticket)) return null;
+    return {content: Buffer.from(message.content).toString('utf8'), replyID: message.replyID};
 }
 
 const defaultDeps: InternalWsDeps = {
@@ -117,5 +137,20 @@ export async function registerInternalRoutes(app: FastifyInstance, deps: Interna
         const channel = await describeChannel(channelId, deps.findTicketByChannelId, deps.isPermanenceChannel);
         const input = {channelId, userId, permissions: actor.permissions, ...channel};
         return reply.send({read: canReadChannel(input), write: canWriteChannel(input)});
+    });
+
+    // The stored message the WebSocket service may relay: saved by this user in this channel a
+    // moment ago, and the écoute still open. Its content comes from the database, not the client.
+    app.post('/v1/internal/ws/message', async (req, reply) => {
+        if (!deps.isInternal(req)) return reply.status(401).send({error: 'unauthorized'});
+        const userId = readUserId(req.body);
+        const {channelId, id} = (req.body ?? {}) as {channelId?: unknown; id?: unknown};
+        if (!userId || typeof channelId !== 'string' || !channelId || channelId.length > 64
+            || typeof id !== 'number' || !Number.isInteger(id) || id <= 0) {
+            return reply.status(400).send({error: 'invalid_request'});
+        }
+        const message = await (deps.findRelayableMessage ?? findRelayableMessage)(userId, channelId, id);
+        if (!message) return reply.status(404).send({error: 'not_found'});
+        return reply.send(message);
     });
 }

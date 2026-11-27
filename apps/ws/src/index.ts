@@ -80,6 +80,9 @@ const {httpServer, io} = createWsServer({
         return data?.valid && data.user?.id?.startsWith('bot_') ? {userId: data.user.id} : null;
     },
     getSession: (userId, sid) => internalPost<WsSession>('/v1/internal/ws/session', {userId, sid}),
+    // Nothing is relayed when the API cannot answer
+    getStoredMessage: (userId, channelId, id) =>
+        internalPost<{content: string; replyID: number | null}>('/v1/internal/ws/message', {userId, channelId, id}),
     // Fail closed when the API cannot answer
     getChannelAccess: async (userId, channelId) =>
         await internalPost<{read: boolean; write: boolean}>('/v1/internal/ws/channel-access', {userId, channelId})
