@@ -248,6 +248,13 @@ export async function startBot(cfg: BotConfig): Promise<() => Promise<void>> {
     /** People writing outside an écoute get the welcome message, at most every 10 minutes. */
     const welcomed = new Map<string, number>();
 
+    /** Drops the entries older than `windowMs`: these maps would otherwise keep every user for good. */
+    const prune = (map: Map<string, number>, windowMs: number) => {
+        if (map.size < 500) return;
+        const now = Date.now();
+        for (const [key, at] of map) if (now - at >= windowMs) map.delete(key);
+    };
+
     client.on(Events.MessageCreate, async (message) => {
         if (message.author.bot || message.channel.type !== ChannelType.DM) return;
         try {
@@ -262,6 +269,7 @@ export async function startBot(cfg: BotConfig): Promise<() => Promise<void>> {
             if (outcome === 'no_ticket') {
                 const last = welcomed.get(message.author.id) ?? 0;
                 if (Date.now() - last < 10 * 60_000) return;
+                prune(welcomed, 10 * 60_000);
                 welcomed.set(message.author.id, Date.now());
                 const view = watcher.view;
                 await message.channel.send(dm.noTicket(!!view?.open, view?.next ?? null, cfg.links));
@@ -300,6 +308,7 @@ export async function startBot(cfg: BotConfig): Promise<() => Promise<void>> {
         const channelId = relay.userTyping(typing.user.id);
         if (!channelId || !socket.connected) return;
         if (Date.now() - (typingSent.get(channelId) ?? 0) < 5_000) return;
+        prune(typingSent, 5_000);
         typingSent.set(channelId, Date.now());
         socket.emit('typing', {id: channelId});
     });
