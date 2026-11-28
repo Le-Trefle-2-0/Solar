@@ -112,7 +112,7 @@ export async function registerNewslettersRoutes(app: FastifyInstance) {
         const existing = await prisma.newsletter.findUnique({where: {id: params.id}});
         if (!existing) return reply.status(404).send({error: 'not_found'});
 
-        if (existing.status === 'sent') {
+        if (existing.status === 'sent' || existing.status === 'sending') {
             return reply.status(400).send({error: 'already_sent'});
         }
         if (existing.status === 'scheduled' && body.status !== 'draft') {
@@ -168,6 +168,7 @@ export async function registerNewslettersRoutes(app: FastifyInstance) {
         } catch (e: any) {
             if (e.message === 'not_found') return reply.status(404).send({error: 'not_found'});
             if (e.message === 'no_subscribers') return reply.status(400).send({error: 'no_subscribers'});
+            if (e.message === 'already_sent') return reply.status(409).send({error: 'already_sent'});
             req.log.error(e);
             return reply.status(500).send({error: 'internal_error'});
         }

@@ -28,6 +28,11 @@ export const decodeBytes = (bytes: any): string => {
     return String(bytes);
 };
 
+/** Resend takes at most 100 e-mails per batch call, and about two calls a second. */
+const BATCH_SIZE = 100;
+const BATCH_PAUSE_MS = 600;
+const pause = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 export async function sendNewsletter(newsletterId: string) {
     const newsletter = await prisma.newsletter.findUnique({
         where: {id: newsletterId},
@@ -36,14 +41,23 @@ export async function sendNewsletter(newsletterId: string) {
 
     if (!newsletter) throw new Error('not_found');
 
+    // Claimed before anything is sent: a second click, or the scheduler's next tick while this
+    // send still runs, finds it taken and sends nothing (status "sending", then "sent")
+    const previousStatus = newsletter.status;
+    const claimed = await prisma.newsletter.updateMany({
+        where: {id: newsletterId, status: {in: ['draft', 'scheduled']}},
+        data: {status: 'sending'},
+    });
+    if (!claimed.count) throw new Error('already_sent');
+
     // Use the stored HTML content if available, otherwise fallback to a basic wrap of the raw text
     const contentHtml = newsletter.htmlContent
         ? decodeBytes(newsletter.htmlContent)
         : `<div>${decodeBytes(newsletter.content)}</div>`;
 
     const isPublic = newsletter.target === 'public';
-    const authorName = (isPublic) 
-        ? "L'équipe Le Trèfle 2.0" 
+    const authorName = (isPublic)
+        ? "L'équipe Le Trèfle 2.0"
         : (newsletter.author.displayUsername || newsletter.author.name || "L'équipe Solar");
 
     try {
@@ -72,43 +86,50 @@ export async function sendNewsletter(newsletterId: string) {
             throw new Error('no_subscribers');
         }
 
-        // Send individually to personalize unsubscribe link
-        const results = await Promise.allSettled(recipients.map(async (recipient) => {
-            const footerText = isPublic
-                ? `<p>Cet e-mail a été envoyé par <strong>${authorName}</strong>.</p>
-                   <p>Vous recevez cet e-mail car vous vous êtes inscrit à notre newsletter via letrefle.org.</p>`
-                : `<p>Cet e-mail a été envoyé par <strong>${authorName}</strong> via la plateforme Solar.</p>
-                   <p>Vous recevez cet e-mail car vous êtes inscrit à notre newsletter. Vous pouvez gérer vos préférences d'abonnement dans les <a href="${APP_URL}/app/settings" style="color: #8cc088; text-decoration: none;">paramètres de votre compte</a> sur l'application.</p>`;
+        const footerText = isPublic
+            ? `<p>Cet e-mail a été envoyé par <strong>${authorName}</strong>.</p>
+               <p>Vous recevez cet e-mail car vous vous êtes inscrit à notre newsletter via letrefle.org.</p>`
+            : `<p>Cet e-mail a été envoyé par <strong>${authorName}</strong> via la plateforme Solar.</p>
+               <p>Vous recevez cet e-mail car vous êtes inscrit à notre newsletter. Vous pouvez gérer vos préférences d'abonnement dans les <a href="${APP_URL}/app/settings" style="color: #8cc088; text-decoration: none;">paramètres de votre compte</a> sur l'application.</p>`;
 
-            const {html} = renderEmailTemplate({
+        // One e-mail per person, for the personal unsubscribe link
+        const emails = recipients.map(recipient => ({
+            from: "Le Trèfle 2.0 <newsletter@solar.letrefle.org>",
+            to: recipient.email,
+            subject: newsletter.title,
+            html: renderEmailTemplate({
                 title: newsletter.title,
                 content: contentHtml,
                 footer: footerText,
                 showSolarLink: !isPublic,
                 unsubscribeUrl: `${APP_URL}/newsletters/unsubscribe?id=${encodeURIComponent(recipient.id)}&sig=${unsubscribeSignature(recipient.id)}`
-            });
-
-            return resend.emails.send({
-                from: "Le Trèfle 2.0 <newsletter@solar.letrefle.org>",
-                to: recipient.email,
-                subject: newsletter.title,
-                html,
-            });
+            }).html,
         }));
 
-        const errors = results.filter(r => r.status === 'rejected' || (r.status === 'fulfilled' && r.value.error));
-        if (errors.length === recipients.length) {
-            console.error('[newsletters] All emails failed:', errors);
-            throw new Error('failed_to_send_all_emails');
+        // In batches, one after the other: sent all at once, most were refused by Resend's rate limit
+        let sent = 0;
+        for (let i = 0; i < emails.length; i += BATCH_SIZE) {
+            if (i) await pause(BATCH_PAUSE_MS);
+            const batch = emails.slice(i, i + BATCH_SIZE);
+            try {
+                const {error} = await resend.batch.send(batch);
+                if (error) console.error('[newsletters] Batch failed:', error.message);
+                else sent += batch.length;
+            } catch (e: any) {
+                console.error('[newsletters] Batch failed:', e?.message ?? e);
+            }
         }
+        if (!sent) throw new Error('failed_to_send_all_emails');
 
         await prisma.newsletter.update({
             where: {id: newsletterId},
             data: {status: 'sent', sentAt: new Date()}
         });
 
-        return {success: true, count: recipients.length - errors.length};
+        return {success: true, count: sent};
     } catch (e: any) {
+        // Nothing went out: it can be sent again
+        await prisma.newsletter.update({where: {id: newsletterId}, data: {status: previousStatus}}).catch(() => {});
         console.error('[newsletters] Send error:', e);
         throw e;
     }

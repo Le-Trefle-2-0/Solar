@@ -40,16 +40,13 @@ export default function NewsletterEditorInner({id, initialNewsletter, volunteerC
         if (!initialNewsletter?.content) return undefined;
         try {
             let rawContent = initialNewsletter.content;
-            console.log("Raw newsletter content type:", typeof rawContent);
 
             // If it's an array of numbers (bytes), convert to string
             if (Array.isArray(rawContent) && rawContent.length > 0 && typeof rawContent[0] === 'number') {
-                console.log("Content is byte array, converting to string...");
                 rawContent = new TextDecoder().decode(new Uint8Array(rawContent));
             } else if (typeof rawContent === 'object' && rawContent !== null && !Array.isArray(rawContent)) {
                 // Handle case where it might be {type: 'Buffer', data: [...]}
                 if (rawContent.type === 'Buffer' && Array.isArray(rawContent.data)) {
-                    console.log("Content is Buffer object, converting to string...");
                     rawContent = new TextDecoder().decode(new Uint8Array(rawContent.data));
                 }
             }
@@ -57,22 +54,18 @@ export default function NewsletterEditorInner({id, initialNewsletter, volunteerC
             // If it's a string, check if it's a comma-separated list of numbers (ASCII)
             if (typeof rawContent === 'string') {
                 const trimmed = rawContent.trim();
-                console.log("Content string (first 100 chars):", trimmed.substring(0, 100));
 
                 // New check: Is it a comma-separated list of numbers?
                 // Example: "91,123,34,..."
                 if (/^(\d+,)+\d+$/.test(trimmed) || /^\d+$/.test(trimmed)) {
-                    console.log("Content is a string of comma-separated numbers, converting...");
                     const numbers = trimmed.split(',').map(Number);
                     const uint8Array = new Uint8Array(numbers);
                     rawContent = new TextDecoder().decode(uint8Array);
-                    console.log("Converted number-string to:", rawContent.substring(0, 100));
                 }
 
                 if (rawContent.startsWith('[') || rawContent.startsWith('{')) {
                     const parsed = JSON.parse(rawContent);
                     const blocks = Array.isArray(parsed) ? parsed : (parsed.blocks || undefined);
-                    console.log("Parsed blocks:", blocks);
                     return blocks;
                 }
             } else if (Array.isArray(rawContent)) {
@@ -119,7 +112,6 @@ export default function NewsletterEditorInner({id, initialNewsletter, volunteerC
                 editor.document[0].content.length === 0;
 
             if (isDefaultEmpty) {
-                console.log("Editor is empty, applying initial content fallback");
                 editor.replaceBlocks(editor.document, initialContent);
             }
         }
@@ -234,7 +226,7 @@ export default function NewsletterEditorInner({id, initialNewsletter, volunteerC
         }
     };
 
-    const isReadOnly = newsletter?.status === 'sent' || newsletter?.status === 'scheduled';
+    const isReadOnly = newsletter?.status === 'sent' || newsletter?.status === 'sending' || newsletter?.status === 'scheduled';
 
     return (
         <div className="h-full flex flex-col overflow-hidden bg-muted/10">
@@ -294,7 +286,7 @@ export default function NewsletterEditorInner({id, initialNewsletter, volunteerC
                         Programmer
                     </Button>
                     <Button onClick={() => setSendDialogOpen(true)}
-                            disabled={saving || sending || newsletter?.status === 'sent' || newsletter?.status === 'scheduled'}
+                            disabled={saving || sending || isReadOnly}
                             className="gap-2 bg-green-600 hover:bg-green-700">
                         {sending ? <Loader2 className="h-4 w-4 animate-spin"/> : <Send className="h-4 w-4"/>}
                         Envoyer maintenant
@@ -302,7 +294,7 @@ export default function NewsletterEditorInner({id, initialNewsletter, volunteerC
                 </div>
             </header>
 
-            <main className="flex-1 overflow-y-auto p-8">
+            <div className="flex-1 overflow-y-auto p-8">
                 <div className="max-w-7xl mx-auto space-y-6">
                     {isReadOnly && (
                         <div
@@ -312,7 +304,9 @@ export default function NewsletterEditorInner({id, initialNewsletter, volunteerC
                                 <p className="font-medium">
                                     {newsletter?.status === 'sent'
                                         ? "Cette newsletter a déjà été envoyée et ne peut plus être modifiée."
-                                        : `Cette newsletter est programmée pour le ${new Date(newsletter.scheduledAt).toLocaleString()} and est en lecture seule.`}
+                                        : newsletter?.status === 'sending'
+                                            ? "Cette newsletter est en cours d'envoi et ne peut plus être modifiée."
+                                            : `Cette newsletter est programmée pour le ${new Date(newsletter.scheduledAt).toLocaleString('fr-FR')} et est en lecture seule.`}
                                 </p>
                             </div>
                         </div>
@@ -345,7 +339,7 @@ export default function NewsletterEditorInner({id, initialNewsletter, volunteerC
                         <span>Dernière modification par {newsletter?.author?.name || "Utilisateur"}</span>
                     </div>
                 </div>
-            </main>
+            </div>
 
             <SendConfirmationDialog
                 open={sendDialogOpen}

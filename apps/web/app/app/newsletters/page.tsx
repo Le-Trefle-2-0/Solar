@@ -88,9 +88,9 @@ export default function NewslettersPage() {
                                     <div
                                         className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider ${
                                             nl.status === 'sent' ? 'bg-green-100 text-green-700' :
-                                                nl.status === 'scheduled' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'
+                                                nl.status === 'scheduled' || nl.status === 'sending' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'
                                         }`}>
-                                        {nl.status === 'sent' ? 'Envoyée' : nl.status === 'scheduled' ? 'Programmée' : 'Brouillon'}
+                                        {nl.status === 'sent' ? 'Envoyée' : nl.status === 'sending' ? "En cours d'envoi" : nl.status === 'scheduled' ? 'Programmée' : 'Brouillon'}
                                     </div>
                                     {/* Shown on hover, and whenever the keyboard focus is inside the card */}
                                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">

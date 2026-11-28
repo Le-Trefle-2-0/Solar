@@ -52,7 +52,7 @@ export default function NewsletterEditor({newsletterId, initialContent, onSave}:
         }
     }, [editor, onSave]);
 
-    if (loading) return <div className="flex justify-center p-12"><Loader2 className="animate-spin"/></div>;
+    if (loading) return <div className="flex justify-center p-12" role="status"><Loader2 className="animate-spin"/><span className="sr-only">Chargement…</span></div>;
 
     // We'll use the proper hook-based approach in the actual page component for better performance
     return null;
