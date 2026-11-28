@@ -117,7 +117,7 @@ export function VisitorCall({getToken, compact = false}: {
                         onClick={join}
                         className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                     >
-                        <Phone className="size-4"/>
+                        <Phone className="size-4" aria-hidden="true"/>
                         {status === "idle" ? "Rejoindre l'appel" : "Revenir dans l'appel"}
                     </button>
                 )}
@@ -126,17 +126,16 @@ export function VisitorCall({getToken, compact = false}: {
                         <button
                             onClick={toggleMute}
                             disabled={!inCall}
-                            aria-pressed={muted}
                             className="inline-flex items-center gap-2 rounded-xl border bg-background px-4 py-2.5 text-sm font-medium transition-colors hover:bg-muted disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                         >
-                            {muted ? <MicOff className="size-4 text-red-600"/> : <Mic className="size-4"/>}
+                            {muted ? <MicOff className="size-4 text-red-600" aria-hidden="true"/> : <Mic className="size-4" aria-hidden="true"/>}
                             {muted ? "Réactiver le micro" : "Couper le micro"}
                         </button>
                         <button
                             onClick={hangUp}
                             className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2"
                         >
-                            <PhoneOff className="size-4"/> Raccrocher
+                            <PhoneOff className="size-4" aria-hidden="true"/> Raccrocher
                         </button>
                     </>
                 )}

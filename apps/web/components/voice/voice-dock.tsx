@@ -30,7 +30,6 @@ export function VoiceDock() {
                         className={cn("rounded-md p-1.5 transition-colors hover:bg-background", muted && "text-red-600")}
                         title={muted ? "Réactiver le micro" : "Couper le micro"}
                         aria-label={muted ? "Réactiver le micro" : "Couper le micro"}
-                        aria-pressed={muted}
                     >
                         {muted ? <MicOff className="size-4"/> : <Mic className="size-4"/>}
                     </button>
@@ -48,12 +47,19 @@ export function VoiceDock() {
                 <ul className="mt-2 space-y-1 border-t pt-2" aria-label="Participants">
                     {participants.map(p => (
                         <li key={p.peerId} className="flex items-center gap-2">
-                            <span className={cn(
+                            <span aria-hidden="true" className={cn(
                                 "size-2 shrink-0 rounded-full",
                                 p.speaking ? "bg-emerald-500 ring-2 ring-emerald-500/30" : "bg-muted-foreground/30",
                             )}/>
-                            <span className={cn("truncate", p.self && "font-medium")}>{p.name}</span>
-                            {p.muted && <MicOff className="ml-auto size-3 shrink-0 text-muted-foreground" aria-label="Micro coupé"/>}
+                            <span className={cn("truncate", p.self && "font-medium")}>
+                                {p.name}{p.self && <span className="sr-only"> (vous)</span>}
+                            </span>
+                            {p.muted && (
+                                <span className="ml-auto shrink-0">
+                                    <MicOff className="size-3 text-muted-foreground" aria-hidden="true"/>
+                                    <span className="sr-only">micro coupé</span>
+                                </span>
+                            )}
                         </li>
                     ))}
                 </ul>

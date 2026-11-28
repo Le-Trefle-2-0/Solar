@@ -55,6 +55,9 @@ export class VoiceSession {
     private producer: Producer | null = null;
     private stream: MediaStream | null = null;
     private consumers = new Map<string, {consumer: Consumer; audio: HTMLAudioElement; peerId: string}>();
+    /** Producers announced before the receiving transport existed, and those already consumed. */
+    private pendingProducers: string[] = [];
+    private consumedProducers = new Set<string>();
     private participants = new Map<string, VoiceParticipant>();
     private selfId: string | null = null;
     private closed = false;
@@ -140,6 +143,8 @@ export class VoiceSession {
             this.producer = await this.sendTransport.produce({track, codecOptions: {opusStereo: false, opusDtx: true}});
 
             for (const p of joined.peers) if (p.producerId) await this.consume(p.producerId);
+            // Someone who started speaking while the transports were being set up: heard too
+            for (const producerId of this.pendingProducers.splice(0)) await this.consume(producerId).catch(() => undefined);
             if (!this.closed) this.status("connected");
         } catch (e: any) {
             const code = e?.message || "connection";
@@ -176,7 +181,14 @@ export class VoiceSession {
     }
 
     private async consume(producerId: string) {
-        if (!this.recvTransport || !this.device) return;
+        if (!this.recvTransport || !this.device) {
+            // Not ready yet: consumed once start() has set up the transports
+            if (!this.pendingProducers.includes(producerId)) this.pendingProducers.push(producerId);
+            return;
+        }
+        // Announced twice (in the join answer and as an event): one consumer only
+        if (this.consumedProducers.has(producerId)) return;
+        this.consumedProducers.add(producerId);
         const params = await this.request<{id: string; producerId: string; peerId: string; kind: "audio"; rtpParameters: any}>(
             "consume", {transportId: this.recvTransport.id, producerId, rtpCapabilities: this.device.rtpCapabilities},
         );
@@ -262,6 +274,8 @@ export class VoiceSession {
         // Also when leaving while start() still waits: whatever it opened is closed here or by
         // start() itself as soon as it resumes
         for (const id of [...this.consumers.keys()]) this.dropConsumer(id);
+        this.pendingProducers = [];
+        this.consumedProducers.clear();
         try {
             this.producer?.close();
             this.sendTransport?.close();

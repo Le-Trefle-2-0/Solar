@@ -53,7 +53,7 @@ function VoiceCallPage() {
                     Gardez Discord ouvert si vous voulez continuer à écrire en même temps.
                 </p>
 
-                <div className="mt-8">
+                <div className="mt-8" aria-live="polite">
                     {link.state === "checking" && (
                         <p className="flex items-center gap-2 text-sm text-muted-foreground">
                             <Loader2 className="size-4 animate-spin"/> Vérification du lien…

@@ -176,15 +176,16 @@ export function TicketVoiceControls({channelId, status, voice, assignedUserId, c
 
             {canCall && isVoice && (
                 <Button variant="outline" onClick={endVoice} disabled={busy}
-                        className="text-red-600 hover:text-red-700"
+                        className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
                         title="Terminer l'appel pour vous et pour la personne ; l'écoute continue par écrit">
                     <PhoneMissed/> Arrêter le vocal
                 </Button>
             )}
 
             {link && (
-                <Button variant="ghost" size="icon" onClick={copyLink} title="Copier le lien envoyé sur Discord">
-                    <Copy/>
+                <Button variant="ghost" size="icon" onClick={copyLink} title="Copier le lien envoyé sur Discord"
+                        aria-label="Copier le lien d'appel envoyé sur Discord">
+                    <Copy aria-hidden="true"/>
                 </Button>
             )}
         </div>
