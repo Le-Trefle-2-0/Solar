@@ -107,8 +107,9 @@ export async function registerAdminRoutes(app: FastifyInstance) {
         const admin = await requirePermission(req, reply, 'newsletters.manage');
         if (!admin) return;
 
-        const {email} = req.body as { email: string };
-        if (!email) return reply.status(400).send('email is required');
+        const parsed = z.object({email: z.string().trim().toLowerCase().email().max(254)}).safeParse(req.body ?? {});
+        if (!parsed.success) return reply.status(400).send('a valid email is required');
+        const {email} = parsed.data;
 
         try {
             const subscriber = await prisma.newsletterSubscriber.upsert({
@@ -518,24 +519,32 @@ export async function registerAdminRoutes(app: FastifyInstance) {
         // 4. Time-series data
         const timeSeries: Record<string, { date: string, volume: number, duration: number, volunteer: number }> = {};
 
-        // Helper to get group key
+        // Group key, in the server's local time throughout. The day used to come from toISOString
+        // (UTC) while the points started at local midnight: away from UTC, every day and week moved
+        // by one and the last day's écoutes were left out
+        const dayKey = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
         const getGroupKey = (date: Date) => {
             if (interval === 'month') {
                 return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-01`;
             } else if (interval === 'week') {
-                const d = new Date(date);
-                const day = d.getDay();
-                const diff = d.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
-                const firstDay = new Date(d.setDate(diff));
-                return firstDay.toISOString().split('T')[0];
+                const day = date.getDay();
+                // Monday of that week (Sunday belongs to the week before)
+                return dayKey(new Date(date.getFullYear(), date.getMonth(), date.getDate() - day + (day === 0 ? -6 : 1)));
             }
-            return date.toISOString().split('T')[0];
+            return dayKey(date);
         };
 
         // Initialize points
         const current = new Date(startDate);
         // Reset to start of day
         current.setHours(0, 0, 0, 0);
+        // From the start of its week or month: stepping from the 31st skipped February, and from
+        // mid-week the last week was never created, so its écoutes were left out
+        if (interval === 'month') current.setDate(1);
+        else if (interval === 'week') {
+            const day = current.getDay();
+            current.setDate(current.getDate() - day + (day === 0 ? -6 : 1));
+        }
 
         while (current <= endDate) {
             const key = getGroupKey(current);

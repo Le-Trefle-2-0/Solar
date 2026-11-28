@@ -122,24 +122,26 @@ export function StatsView() {
         return "day";
     };
 
-    const fetchStats = async () => {
-        setLoading(true);
-        try {
-            const startStr = date?.from?.toISOString();
-            const endStr = date?.to?.toISOString();
-            const interval = getInterval(date);
-            const query = (startStr && endStr) ? `?start=${startStr}&end=${endStr}&interval=${interval}` : "";
-            const res = await apiFetch(`/v1/admin/stats${query}`);
-            setData(res);
-        } catch (e) {
-            console.error("Failed to fetch stats", e);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
-        fetchStats();
+        // Half-chosen range (first click in the calendar): nothing is fetched yet
+        if (!date?.from || !date?.to) return;
+        let current = true;
+        // Whole days: the end day used to stop at midnight, so its écoutes were left out
+        const start = new Date(date.from);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(date.to);
+        end.setHours(23, 59, 59, 999);
+        const query = `?start=${encodeURIComponent(start.toISOString())}&end=${encodeURIComponent(end.toISOString())}&interval=${getInterval(date)}`;
+        setLoading(true);
+        apiFetch(`/v1/admin/stats${query}`)
+            // An older answer arriving late never replaces the one for the period now shown
+            .then(res => current && setData(res))
+            .catch(e => console.error("Failed to fetch stats", e))
+            .finally(() => current && setLoading(false));
+        return () => {
+            current = false;
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [date, manualInterval]);
 
     const formatSeconds = (seconds: number) => {
@@ -149,12 +151,12 @@ export function StatsView() {
     };
 
     const shortcuts = [
-        {label: "7j", days: 7},
-        {label: "30j", days: 30},
-        {label: "90j", days: 90},
-        {label: "6 mois", days: 182},
-        {label: "1 an", days: 365},
-        {label: "2 ans", days: 730},
+        {label: "7j", days: 7, name: "7 derniers jours"},
+        {label: "30j", days: 30, name: "30 derniers jours"},
+        {label: "90j", days: 90, name: "90 derniers jours"},
+        {label: "6 mois", days: 182, name: "6 derniers mois"},
+        {label: "1 an", days: 365, name: "Dernière année"},
+        {label: "2 ans", days: 730, name: "Deux dernières années"},
     ];
 
     if (loading && !data) {
@@ -202,6 +204,7 @@ export function StatsView() {
         if (entries.length === 0) return null;
 
         const data = entries.map(([name, count]) => ({name, count}));
+        const total = entries.reduce((sum, [, count]) => sum + count, 0);
 
         return (
             <Card className="flex flex-col">
@@ -231,6 +234,19 @@ export function StatsView() {
                             </Pie>
                         </PieChart>
                     </ChartContainer>
+                    {/* The figures in words: the chart alone shows them on hover only */}
+                    <ul className="mt-2 space-y-1 text-xs">
+                        {data.map((entry, index) => (
+                            <li key={entry.name} className="flex items-center gap-2">
+                                <span aria-hidden="true" className="size-2.5 shrink-0 rounded-sm"
+                                      style={{backgroundColor: PIE_COLORS[index % PIE_COLORS.length]}}/>
+                                <span className="min-w-0 flex-1 truncate">{entry.name}</span>
+                                <span className="tabular-nums text-muted-foreground">
+                                    {entry.count} ({Math.round(entry.count / total * 100)} %)
+                                </span>
+                            </li>
+                        ))}
+                    </ul>
                 </CardContent>
             </Card>
         );
@@ -246,9 +262,13 @@ export function StatsView() {
             "oui vraiment": "feeling_5"
         };
 
+        // The form stores "Oui vraiment" with a capital: compared without case, or it never counted
+        const countOf = (label: string) => Object.entries(stats)
+            .filter(([key]) => key.toLowerCase() === label)
+            .reduce((sum, [, count]) => sum + count, 0);
         const data = order.map((label) => ({
             name: label.charAt(0).toUpperCase() + label.slice(1),
-            count: stats[label] || 0,
+            count: countOf(label),
             feeling: keysMap[label]
         }));
 
@@ -310,7 +330,8 @@ export function StatsView() {
                                     !date && "text-muted-foreground"
                                 )}
                             >
-                                <CalendarIcon className="mr-2 h-4 w-4"/>
+                                <CalendarIcon className="mr-2 h-4 w-4" aria-hidden="true"/>
+                                <span className="sr-only">Période : </span>
                                 {date?.from ? (
                                     date.to ? (
                                         <>
@@ -338,12 +359,13 @@ export function StatsView() {
                         </PopoverContent>
                     </Popover>
 
-                    <div className="flex items-center bg-muted rounded-md p-1">
+                    <div className="flex items-center bg-muted rounded-md p-1" role="group" aria-label="Périodes rapides">
                         {shortcuts.map((s) => (
                             <Button
                                 key={s.label}
                                 variant="ghost"
                                 size="sm"
+                                aria-label={s.name}
                                 className="h-7 px-2 text-xs"
                                 onClick={() => {
                                     setManualInterval(null);
@@ -362,7 +384,7 @@ export function StatsView() {
                         value={manualInterval || getInterval(date)}
                         onValueChange={(v) => setManualInterval(v)}
                     >
-                        <SelectTrigger className="w-[120px] h-9">
+                        <SelectTrigger className="w-[120px] h-9" aria-label="Regrouper les données">
                             <SelectValue placeholder="Intervalle"/>
                         </SelectTrigger>
                         <SelectContent>
@@ -378,7 +400,7 @@ export function StatsView() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Volume d'écoutes</CardTitle>
-                        <MessageSquare className="h-4 w-4 text-muted-foreground"/>
+                        <MessageSquare className="h-4 w-4 text-muted-foreground" aria-hidden="true"/>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{data?.volume || 0}</div>
@@ -388,7 +410,7 @@ export function StatsView() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Temps d'écoute</CardTitle>
-                        <Clock className="h-4 w-4 text-muted-foreground"/>
+                        <Clock className="h-4 w-4 text-muted-foreground" aria-hidden="true"/>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{formatSeconds(data?.totalDuration || 0)}</div>
@@ -398,7 +420,7 @@ export function StatsView() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Bénévolat (Planning)</CardTitle>
-                        <Users className="h-4 w-4 text-muted-foreground"/>
+                        <Users className="h-4 w-4 text-muted-foreground" aria-hidden="true"/>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{formatSeconds(data?.totalVolunteerSeconds || 0)}</div>
@@ -408,7 +430,7 @@ export function StatsView() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Moyenne / écoute</CardTitle>
-                        <TrendingUp className="h-4 w-4 text-muted-foreground"/>
+                        <TrendingUp className="h-4 w-4 text-muted-foreground" aria-hidden="true"/>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
@@ -425,7 +447,9 @@ export function StatsView() {
                 <Card>
                     <CardHeader>
                         <CardTitle>Evolution du volume</CardTitle>
-                        <CardDescription>Nombre d'écoutes par jour</CardDescription>
+                        <CardDescription>
+                            Nombre d'écoutes par {interval === "month" ? "mois" : interval === "week" ? "semaine" : "jour"}
+                        </CardDescription>
                     </CardHeader>
                     <CardContent>
                         <ChartContainer config={chartConfig} className="h-[300px] w-full">
