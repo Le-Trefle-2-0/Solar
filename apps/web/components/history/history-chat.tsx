@@ -297,7 +297,7 @@ export function HistoryChat({channelId}: HistoryChatProps) {
                                                             })
                                                         }).then(res => {
                                                             if (res.success) {
-                                                                setTicket(res.update);
+                                                                setTicket((prev: any) => ({...prev, categories: res.update.categories}));
                                                                 toast.success("Catégories mises à jour");
                                                             }
                                                         }).catch(() => toast.error("Erreur lors de la mise à jour"));

@@ -37,8 +37,9 @@ export async function registerMessageRoutes(app: FastifyInstance) {
         const bodySchema = z.object({
             channelId: z.string().min(1).max(64),
             content: z.string().min(1).max(2000),
+            // Accepted for older clients, never stored: only the bot links a message to Discord
             discordID: z.string().optional().nullable(),
-            replyID: z.number().optional().nullable(),
+            replyID: z.number().int().positive().optional().nullable(),
         });
 
         try {
@@ -56,14 +57,18 @@ export async function registerMessageRoutes(app: FastifyInstance) {
             });
             if (!isTicketWritable(ticket)) return reply.status(409).send({success: false, error: 'ticket_closed'});
 
+            // A reply quotes a message of the same channel only
+            const replyID = body.replyID
+                ? (await prisma.message.findFirst({where: {id: body.replyID, channelId: body.channelId}, select: {id: true}}))?.id
+                : undefined;
+
             const message = await prisma.message.create({
                 data: {
                     userId,
                     channelId: body.channelId,
                     ticketId: ticket?.id,
                     content: Buffer.from(body.content, 'utf8'),
-                    discordID: body.discordID || undefined,
-                    replyID: body.replyID || undefined,
+                    replyID,
                     createdAt: new Date(),
                 }
             });

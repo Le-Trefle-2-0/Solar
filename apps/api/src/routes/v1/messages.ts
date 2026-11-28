@@ -43,13 +43,23 @@ export async function registerMessagesRoutes(app: FastifyInstance, deps: Message
         const where: any = before ? {channelId, createdAt: {lt: before}} : {channelId};
         const raw = await deps.findMessages(where, limit);
 
+        // Authors and reactions in two queries, not two per message
+        const userIds = [...new Set(raw.map(m => m.userId).filter((id): id is string => !!id))];
+        const [users, allReactions] = raw.length ? await Promise.all([
+            prisma.user.findMany({
+                where: {id: {in: userIds}},
+                select: {id: true, image: true, name: true, displayUsername: true, role: true},
+            }),
+            prisma.reaction.findMany({where: {messageID: {in: raw.map(m => m.id)}}}),
+        ]) : [[], []];
+        const userById = new Map(users.map(u => [u.id, u]));
+        const reactionsOf = new Map<number, typeof allReactions>();
+        for (const r of allReactions) reactionsOf.set(r.messageID, [...(reactionsOf.get(r.messageID) ?? []), r]);
+
         const out: any[] = [];
         for (const msg of raw) {
-            let user = null;
-            if (msg.userId) {
-                user = await prisma.user.findUnique({where: {id: msg.userId}});
-            }
-            const reactions = await prisma.reaction.findMany({where: {messageID: msg.id}});
+            const user = msg.userId ? userById.get(msg.userId) ?? null : null;
+            const reactions = reactionsOf.get(msg.id) ?? [];
 
             const contentBuffer: any = (msg as any).content as any;
             let content = "";

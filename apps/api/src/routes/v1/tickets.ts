@@ -31,7 +31,9 @@ const defaultDeps: TicketsRouteDeps = {
     getPermissions: getUserPermissions,
     findTicketByChannelId: (channelId) => prisma.ticket.findUnique({where: {channelId}}),
     findTicketById: (id) => prisma.ticket.findUnique({where: {id}}),
-    updateTicket: (id, data) => prisma.ticket.update({where: {id}, data: {...data, updatedAt: new Date()}}),
+    // updatedAt is left alone: the history reads it as the end of the écoute, and editing the
+    // categories or the visitor's feedback later made its duration grow
+    updateTicket: (id, data) => prisma.ticket.update({where: {id}, data}),
 };
 
 
@@ -320,8 +322,8 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
         if (!userId) return reply.status(401).send('unauthorized');
 
         const bodySchema = z.object({
-            ticketID: z.number(),
-            categories: z.array(z.string()),
+            ticketID: z.number().int().positive(),
+            categories: z.array(z.string().max(100)).max(30),
         });
 
         try {
@@ -330,8 +332,9 @@ export async function registerTicketsRoutes(app: FastifyInstance, deps: TicketsR
             if (!canAccessTicket(await deps.getPermissions(userId), ticket?.assignedUserId, userId)) return reply.status(403).send('forbidden');
             if (!ticket) return reply.status(404).send({success: false, error: 'No ticket found'});
 
-            const update = await deps.updateTicket(ticketID, {categories});
-            return reply.send({success: true, update});
+            await deps.updateTicket(ticketID, {categories});
+            // Not the whole ticket: its notes, feedback and requester id stay out of the answer
+            return reply.send({success: true, update: {id: ticketID, categories}});
         } catch (e) {
             if (e instanceof z.ZodError) return reply.status(400).send({success: false, error: e.flatten()});
             req.log.error(e);

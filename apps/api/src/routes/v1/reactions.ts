@@ -56,22 +56,20 @@ export async function registerReactionsRoutes(app: FastifyInstance) {
 
                 return reply.send({success: true, reaction});
             } else if (body.option === "remove") {
-                const reaction = await prisma.reaction.delete({
-                    where: {
-                        id: body.id,
-                        userID: userId
-                    }
+                // Only one's own reaction, on that message: without an id, or for a reaction already
+                // gone, this used to fail with a 500 (and the event named whatever message was sent)
+                if (!body.id) return reply.status(400).send({success: false, error: 'id_required'});
+                const {count} = await prisma.reaction.deleteMany({
+                    where: {id: body.id, userID: userId, messageID: body.messageID},
+                });
+                if (!count) return reply.status(404).send({success: false, error: 'not_found'});
+
+                await broadcast(target.channelId, 'reactionRemove', {
+                    messageID: body.messageID,
+                    reactionID: body.id
                 });
 
-                const message = await prisma.message.findUnique({where: {id: body.messageID}});
-                if (message) {
-                    await broadcast(message.channelId, 'reactionRemove', {
-                        messageID: body.messageID,
-                        reactionID: body.id
-                    });
-                }
-
-                return reply.send({success: true, reaction});
+                return reply.send({success: true, reaction: {id: body.id}});
             } else {
                 return reply.status(400).send({success: false, error: "Bad request"});
             }

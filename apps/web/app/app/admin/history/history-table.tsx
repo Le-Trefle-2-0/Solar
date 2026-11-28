@@ -42,6 +42,7 @@ export function HistoryTable({userId}: { userId?: string }) {
     const [data, setData] = useState<TicketHistory[]>([]);
     const [loading, setLoading] = useState(true);
     const [sorting, setSorting] = React.useState<SortingState>([]);
+    const [failed, setFailed] = useState(false);
 
     useEffect(() => {
         apiFetch("/v1/tickets/history")
@@ -54,6 +55,7 @@ export function HistoryTable({userId}: { userId?: string }) {
                     setData(tickets);
                 }
             })
+            .catch(() => setFailed(true))
             .finally(() => setLoading(false));
     }, [userId]);
 
@@ -70,7 +72,8 @@ export function HistoryTable({userId}: { userId?: string }) {
             accessorKey: "id",
             header: ({column}) => (
                 <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-                    ID <ArrowUpDown className="ml-2 h-4 w-4"/>
+                    ID <ArrowUpDown className="ml-2 h-4 w-4" aria-hidden="true"/>
+                    <span className="sr-only">, trier</span>
                 </Button>
             ),
             cell: ({row}) => <div className="ml-4 font-medium">#{row.getValue("id")}</div>,
@@ -98,8 +101,9 @@ export function HistoryTable({userId}: { userId?: string }) {
             cell: ({row}) => {
                 return (
                     <Button variant="outline" size="sm" asChild>
-                        <Link href={`/app/admin/history/${row.original.channelId}`}>
-                            <ExternalLink className="mr-2 h-4 w-4"/> Voir
+                        <Link href={`/app/admin/history/${row.original.channelId}`}
+                              aria-label={`Voir l'écoute #${row.original.id}`}>
+                            <ExternalLink className="mr-2 h-4 w-4" aria-hidden="true"/> Voir
                         </Link>
                     </Button>
                 );
@@ -135,7 +139,8 @@ export function HistoryTable({userId}: { userId?: string }) {
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => (
-                                    <TableHead key={header.id}>
+                                    <TableHead key={header.id}
+                                               aria-sort={header.column.getIsSorted() === "asc" ? "ascending" : header.column.getIsSorted() === "desc" ? "descending" : undefined}>
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(
@@ -161,7 +166,7 @@ export function HistoryTable({userId}: { userId?: string }) {
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    Aucun résultat.
+                                    {failed ? "L'historique n'a pas pu être chargé. Réessayez dans un instant." : "Aucun résultat."}
                                 </TableCell>
                             </TableRow>
                         )}
@@ -169,6 +174,11 @@ export function HistoryTable({userId}: { userId?: string }) {
                 </Table>
             </div>
             <div className="flex items-center justify-end space-x-2 py-4">
+                {table.getPageCount() > 1 && (
+                    <span className="mr-2 text-sm text-muted-foreground" aria-live="polite">
+                        Page {table.getState().pagination.pageIndex + 1} sur {table.getPageCount()}
+                    </span>
+                )}
                 <Button
                     variant="outline"
                     size="sm"
