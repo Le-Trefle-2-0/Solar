@@ -149,6 +149,8 @@ export default function Event({event, roles = [], onChanged}: EventProps) {
     const canDelete = can('permanence.close');
 
     let badgeColor = 'bg-gray-300 text-gray-800';
+    /** The same as the colour, in words (for screen readers and the tooltip). */
+    let staffing = '';
     const slotsToUse = eventDetails?.roleSlots || event.roleSlots;
 
     if (slotsToUse) {
@@ -162,12 +164,16 @@ export default function Event({event, roles = [], onChanged}: EventProps) {
         const part1Count = part1Slot?.registrationsCount ?? 0;
         const part2Count = part2Slot?.registrationsCount ?? 0;
 
+        // Darker shades than before: white text on them now reads at 4.5:1 or more
         if (hasManager && part1Count >= 3 && part2Count >= 3) {
-            badgeColor = 'bg-green-500 text-white';
+            badgeColor = 'bg-green-700 text-white';
+            staffing = 'équipe complète';
         } else if (!hasManager || part1Count === 0 || part2Count === 0) {
-            badgeColor = 'bg-red-500 text-white';
+            badgeColor = 'bg-red-600 text-white';
+            staffing = !hasManager ? 'sans référent' : 'une partie sans bénévole';
         } else {
-            badgeColor = 'bg-orange-400 text-white';
+            badgeColor = 'bg-orange-700 text-white';
+            staffing = 'équipe incomplète';
         }
     }
 
@@ -193,7 +199,7 @@ export default function Event({event, roles = [], onChanged}: EventProps) {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel>Annuler</AlertDialogCancel>
-                    <AlertDialogAction disabled={loading} className="bg-red-500 hover:bg-red-600"
+                    <AlertDialogAction disabled={loading} className="bg-red-600 hover:bg-red-700"
                                        onClick={() => { if (removeConfirm) unregister(slot, removeConfirm.userId); setRemoveConfirm(null); }}>
                         Retirer
                     </AlertDialogAction>
@@ -208,12 +214,19 @@ export default function Event({event, roles = [], onChanged}: EventProps) {
             if (next) reloadDetails();
         }}>
             <DialogTrigger asChild>
-                <Badge className={`cursor-pointer truncate max-w-full ${badgeColor}`}>{event.title}</Badge>
+                {/* A real button: the badge alone (a span) could not be reached with the keyboard */}
+                <Badge asChild className={`cursor-pointer truncate max-w-full ${badgeColor}`}>
+                    <button type="button" title={staffing ? `${time} · ${staffing}` : time}>
+                        {event.title}
+                        <span className="sr-only">, {time}{staffing ? `, ${staffing}` : ''}</span>
+                    </button>
+                </Badge>
             </DialogTrigger>
             <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[85vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle className="flex items-center justify-between gap-2 pr-6">
-                        <span>{event.title} du {format(start, "EEEE d MMMM yyyy", {locale: fr})}</span>
+                    {/* The buttons sit beside the title, not in it: they were read as part of the dialog's name */}
+                    <div className="flex items-center justify-between gap-2 pr-6">
+                        <DialogTitle>{event.title} du {format(start, "EEEE d MMMM yyyy", {locale: fr})}</DialogTitle>
                         <span className="flex shrink-0 items-center">
                             {canEdit && eventDetails && (
                                 <EditEventDialog event={eventDetails} roles={roles}
@@ -236,7 +249,7 @@ export default function Event({event, roles = [], onChanged}: EventProps) {
                                         </AlertDialogHeader>
                                         <AlertDialogFooter>
                                             <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                            <AlertDialogAction onClick={handleDelete} disabled={loading} className="bg-red-500 hover:bg-red-600">
+                                            <AlertDialogAction onClick={handleDelete} disabled={loading} className="bg-red-600 hover:bg-red-700">
                                                 Supprimer
                                             </AlertDialogAction>
                                         </AlertDialogFooter>
@@ -244,7 +257,7 @@ export default function Event({event, roles = [], onChanged}: EventProps) {
                                 </AlertDialog>
                             )}
                         </span>
-                    </DialogTitle>
+                    </div>
                     <DialogDescription>
                         {time}
                         {isAfterDeadline
@@ -253,6 +266,9 @@ export default function Event({event, roles = [], onChanged}: EventProps) {
                     </DialogDescription>
                 </DialogHeader>
 
+                {!eventDetails && (
+                    <p role="status" className="text-sm text-muted-foreground">Chargement des créneaux…</p>
+                )}
                 {eventDetails?.roleSlots && (
                     <div className="space-y-4 mb-4">
                         {eventDetails.roleSlots.map(slot => {

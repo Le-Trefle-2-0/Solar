@@ -144,9 +144,9 @@ export function EditEventDialog({event, roles, onSaved}: {
                             <div key={slot.id ?? `new-${idx}`}
                                  className="grid grid-cols-2 items-end gap-2 sm:grid-cols-[1fr_1fr_5rem_auto]">
                                 <div className="space-y-1">
-                                    <Label>Rôle</Label>
+                                    <Label htmlFor={`edit-slot-role-${idx}`}>Rôle</Label>
                                     <Select value={slot.role} disabled={locked} onValueChange={role => update(idx, {role})}>
-                                        <SelectTrigger><SelectValue placeholder="Choisir un rôle"/></SelectTrigger>
+                                        <SelectTrigger id={`edit-slot-role-${idx}`}><SelectValue placeholder="Choisir un rôle"/></SelectTrigger>
                                         <SelectContent>
                                             {!roles.some(r => r.name === slot.role) && slot.role && (
                                                 <SelectItem value={slot.role}>{slot.role}</SelectItem>
@@ -156,10 +156,10 @@ export function EditEventDialog({event, roles, onSaved}: {
                                     </Select>
                                 </div>
                                 <div className="space-y-1">
-                                    <Label>Partie</Label>
+                                    <Label htmlFor={`edit-slot-part-${idx}`}>Partie</Label>
                                     <Select value={slot.part} disabled={locked}
                                             onValueChange={part => update(idx, {part: part as SlotRow['part']})}>
-                                        <SelectTrigger><SelectValue/></SelectTrigger>
+                                        <SelectTrigger id={`edit-slot-part-${idx}`}><SelectValue/></SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="none">Toute la permanence</SelectItem>
                                             <SelectItem value="first">Première moitié</SelectItem>
@@ -168,12 +168,12 @@ export function EditEventDialog({event, roles, onSaved}: {
                                     </Select>
                                 </div>
                                 <div className="space-y-1">
-                                    <Label>Places</Label>
-                                    <Input type="number" min={1} max={100} value={slot.goalCount || ''}
+                                    <Label htmlFor={`edit-slot-count-${idx}`}>Places</Label>
+                                    <Input id={`edit-slot-count-${idx}`} type="number" min={1} max={100} value={slot.goalCount || ''}
                                            onChange={e => update(idx, {goalCount: parseInt(e.target.value) || 0})}
                                            onBlur={e => update(idx, {goalCount: Math.max(1, parseInt(e.target.value) || 1)})}/>
                                 </div>
-                                <Button type="button" variant="ghost" size="icon" aria-label="Retirer ce créneau"
+                                <Button type="button" variant="ghost" size="icon" aria-label={`Retirer le créneau ${idx + 1}`}
                                         title="Retirer ce créneau"
                                         onClick={() => setSlots(prev => prev.filter((_, i) => i !== idx))}>
                                     <Trash2 className="h-4 w-4"/>

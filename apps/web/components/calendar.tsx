@@ -31,6 +31,7 @@ import {
     DialogTitle,
     DialogTrigger,
     Input,
+    Label,
     Popover,
     PopoverContent,
     PopoverTrigger,
@@ -141,23 +142,28 @@ export default function PlanningCalendar({events, onRefresh}: {
                     <div
                         key={cloneDay.toString()}
                         className={`flex flex-col border rounded-lg p-1 min-h-[120px] h-full ${
-                            !isSameMonth(cloneDay, monthStart) ? 'bg-gray-50 text-gray-400' : ''
+                            !isSameMonth(cloneDay, monthStart) ? 'bg-muted/50 text-muted-foreground' : ''
                         }`}
                     >
-            <span
-                className={`text-xs font-semibold mb-1 w-6 h-6 flex items-center justify-center rounded-full ${
-                    isToday ? 'bg-red-500 text-white' : ''
-                }`}
-            >
-              {format(cloneDay, 'd')}
-            </span>
-                        <div className="flex flex-col w-full text-[10px] text-gray-500 space-y-1 overflow-y-auto">
+                        {/* The number alone says little to a screen reader: the full date, and "today" */}
+                        <span className="sr-only">
+                            {format(cloneDay, 'EEEE d MMMM', {locale: fr})}{isToday ? ", aujourd'hui" : ''}
+                        </span>
+                        <span
+                            aria-hidden="true"
+                            className={`text-xs font-semibold mb-1 w-6 h-6 flex items-center justify-center rounded-full ${
+                                isToday ? 'bg-red-600 text-white' : ''
+                            }`}
+                        >
+                            {format(cloneDay, 'd')}
+                        </span>
+                        <div className="flex flex-col w-full text-[10px] text-muted-foreground space-y-1 overflow-y-auto">
                             {dayEvents.length > 0 ? (
                                 dayEvents.map(event => (
                                     <Event key={event.id} event={event} roles={availableRoles} onChanged={refresh}/>
                                 ))
                             ) : (
-                                <span className="text-gray-300">Aucun</span>
+                                <span className="text-muted-foreground/70">Aucun</span>
                             )}
                         </div>
                     </div>
@@ -208,7 +214,7 @@ export default function PlanningCalendar({events, onRefresh}: {
                     <li key={key} className="flex items-start gap-3 rounded-lg border p-3">
                         <div className={cn(
                             "flex w-12 shrink-0 flex-col items-center rounded-md py-1",
-                            key === today ? "bg-red-500 text-white" : "bg-muted"
+                            key === today ? "bg-red-600 text-white" : "bg-muted"
                         )}>
                             <span className="text-[11px] capitalize">{format(new Date(dayEvents[0].start), 'EEE', {locale: fr})}</span>
                             <span className="text-lg font-semibold leading-tight">{format(new Date(dayEvents[0].start), 'd')}</span>
@@ -253,6 +259,15 @@ export default function PlanningCalendar({events, onRefresh}: {
             const eventsToCreate = [];
 
             if (data.isBulk && data.bulkUntil) {
+                // Same check as for a single permanence: a series of empty or reversed ones otherwise
+                const firstStart = setSeconds(setMinutes(setHours(new Date(data.startDate), startHour), startMinute), 0);
+                const firstEnd = setSeconds(setMinutes(setHours(new Date(data.endDate), endHour), endMinute), 0);
+                if (firstStart >= firstEnd) {
+                    toast.error("Erreur", {
+                        description: "La date et l'heure de début doivent être avant celles de fin.",
+                    });
+                    return;
+                }
                 let currentDate = new Date(data.startDate);
                 const untilDate = new Date(data.bulkUntil);
 
@@ -356,7 +371,7 @@ export default function PlanningCalendar({events, onRefresh}: {
                                     setRoleSlots([...defaultSlots]);
                                 }}
                                         aria-label="Ajouter une permanence">
-                                    <CalendarPlus/>
+                                    <CalendarPlus aria-hidden="true"/>
                                 </Button>
                             </DialogTrigger>
 
@@ -560,7 +575,7 @@ export default function PlanningCalendar({events, onRefresh}: {
                                             {roleSlots.map((slot, idx) => (
                                                 <div key={idx} className="flex items-end gap-3">
                                                     <div className="flex-1">
-                                                        <FormLabel>Rôle</FormLabel>
+                                                        <Label htmlFor={`slot-role-${idx}`}>Rôle</Label>
                                                         <Select
                                                             value={slot.role}
                                                             onValueChange={(val) => {
@@ -571,7 +586,7 @@ export default function PlanningCalendar({events, onRefresh}: {
                                                                 } : s));
                                                             }}
                                                         >
-                                                            <SelectTrigger>
+                                                            <SelectTrigger id={`slot-role-${idx}`}>
                                                                 <SelectValue placeholder="Choisir un rôle"/>
                                                             </SelectTrigger>
                                                             <SelectContent>
@@ -594,7 +609,7 @@ export default function PlanningCalendar({events, onRefresh}: {
                                                     </div>
                                                     {slot.role && (
                                                         <div className="flex-1">
-                                                            <FormLabel>Partie</FormLabel>
+                                                            <Label htmlFor={`slot-part-${idx}`}>Partie</Label>
                                                             <Select
                                                                 value={(slot.part || 'none')}
                                                                 onValueChange={(val) => {
@@ -605,7 +620,7 @@ export default function PlanningCalendar({events, onRefresh}: {
                                                                     } : s));
                                                                 }}
                                                             >
-                                                                <SelectTrigger>
+                                                                <SelectTrigger id={`slot-part-${idx}`}>
                                                                     <SelectValue placeholder="Choisir une partie"/>
                                                                 </SelectTrigger>
                                                                 <SelectContent>
@@ -620,8 +635,9 @@ export default function PlanningCalendar({events, onRefresh}: {
                                                         </div>
                                                     )}
                                                     <div className="w-32">
-                                                        <FormLabel>Places</FormLabel>
+                                                        <Label htmlFor={`slot-count-${idx}`}>Places</Label>
                                                         <Input
+                                                            id={`slot-count-${idx}`}
                                                             type="number"
                                                             min={1}
                                                             value={slot.goalCount || ""}
@@ -646,6 +662,7 @@ export default function PlanningCalendar({events, onRefresh}: {
                                                             type="button"
                                                             variant="outline"
                                                             onClick={() => setRoleSlots(prev => prev.filter((_, i) => i !== idx))}
+                                                            aria-label={`Supprimer le créneau ${idx + 1}`}
                                                         >
                                                             Supprimer
                                                         </Button>
@@ -670,7 +687,7 @@ export default function PlanningCalendar({events, onRefresh}: {
 
                                     <DialogFooter className="mt-4">
                                         <DialogClose asChild>
-                                            <Button variant="outline">Annuler</Button>
+                                            <Button type="button" variant="outline">Annuler</Button>
                                         </DialogClose>
                                         <Button type="submit">Sauvegarder</Button>
                                     </DialogFooter>
@@ -681,7 +698,7 @@ export default function PlanningCalendar({events, onRefresh}: {
                     )}
                 </div>
             </div>
-            <div className="hidden md:grid grid-cols-7 gap-2 text-center text-xs font-medium text-gray-700 mb-2 flex-shrink-0">
+            <div aria-hidden="true" className="hidden md:grid grid-cols-7 gap-2 text-center text-xs font-medium text-muted-foreground mb-2 flex-shrink-0">
                 {daysOfWeek.map(day => (
                     <div key={day}>{day}</div>
                 ))}
