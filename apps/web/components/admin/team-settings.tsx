@@ -319,8 +319,9 @@ export function TeamSettings() {
 
     if (loading) {
         return (
-            <div className="flex justify-center py-12">
+            <div className="flex justify-center py-12" role="status">
                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                <span className="sr-only">Chargement…</span>
             </div>
         );
     }

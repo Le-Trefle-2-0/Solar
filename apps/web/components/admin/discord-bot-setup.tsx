@@ -445,7 +445,7 @@ function GuildStep({currentGuildId, onBack, onDone}: {
             </p>
 
             {guilds === null && !error ? (
-                <div className="flex justify-center py-4"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground"/></div>
+                <div className="flex justify-center py-4" role="status"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground"/><span className="sr-only">Chargement…</span></div>
             ) : guilds && guilds.length > 0 ? (
                 <div role="radiogroup" aria-label="Serveur Discord" className="grid gap-2 sm:grid-cols-2">
                     {guilds.map(g => (
@@ -475,6 +475,7 @@ function GuildStep({currentGuildId, onBack, onDone}: {
                 <Button variant="outline" asChild className="w-full">
                     <a href={invite} target="_blank" rel="noreferrer">
                         Ajouter le bot à un serveur <ExternalLink className="ml-2 h-4 w-4"/>
+                        <span className="sr-only"> (s&apos;ouvre dans un nouvel onglet)</span>
                     </a>
                 </Button>
             )}
@@ -600,7 +601,7 @@ function ChannelsStep({onBack, onDone, refresh}: {
     if (!channels || !values) {
         return error
             ? <p className="text-sm text-destructive">{error}</p>
-            : <div className="flex justify-center py-6"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground"/></div>;
+            : <div className="flex justify-center py-6" role="status"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground"/><span className="sr-only">Chargement…</span></div>;
     }
 
     const set = (key: keyof ChannelIds) => (v: string | null) => setValues({...values, [key]: v});
@@ -620,7 +621,7 @@ function ChannelsStep({onBack, onDone, refresh}: {
                         messages peuvent être modifiés.
                     </p>
                     {messages === null ? (
-                        <div className="flex justify-center py-2"><Loader2 className="h-4 w-4 animate-spin text-muted-foreground"/></div>
+                        <div className="flex justify-center py-2" role="status"><Loader2 className="h-4 w-4 animate-spin text-muted-foreground"/><span className="sr-only">Chargement…</span></div>
                     ) : (
                         <div className="space-y-1.5">
                             {messages.map(m => (

@@ -1584,7 +1584,7 @@ export function Chat(props: { channelID: string, statusID: number }) {
 
                         return (
                             <div key={role} className="mb-4">
-                                <h4 className="flex items-center gap-1.5 text-md font-semibold text-gray-700 mb-2 capitalize">
+                                <h4 className="flex items-center gap-1.5 text-md font-semibold text-foreground/80 mb-2 capitalize">
                                     {GroupIcon && <GroupIcon className="h-4 w-4 text-muted-foreground"/>}
                                     {role === 'offline' ? 'Hors ligne' : groupLabel(role)} — {users.length}
                                 </h4>

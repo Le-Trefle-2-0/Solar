@@ -130,6 +130,7 @@ function UserActionsCell({account, availableRoles, setUsers, setDialogOpen, setV
     const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
     const [rejectType, setRejectType] = useState<'idCard' | 'casier' | null>(null);
     const [rejectReasonText, setRejectReasonText] = useState("");
+    const [deleting, setDeleting] = useState(false);
 
     async function onSubmit(formData: z.infer<typeof RolesFormSchema>) {
         try {
@@ -150,7 +151,8 @@ function UserActionsCell({account, availableRoles, setUsers, setDialogOpen, setV
 
             setEditDialogOpen(false);
             toast("Rôles modifiés")
-            form.reset();
+            // Reset to the roles just saved: reset() alone went back to the old ones next time
+            form.reset({roles: formData.roles});
         } catch (e: any) {
             return toast("Erreur lors de la modification", {
                 description: (
@@ -174,7 +176,7 @@ function UserActionsCell({account, availableRoles, setUsers, setDialogOpen, setV
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Ouvrir le menu</span>
+                        <span className="sr-only">Actions pour {account.name}</span>
                         <MoreHorizontal/>
                     </Button>
                 </DropdownMenuTrigger>
@@ -200,7 +202,9 @@ function UserActionsCell({account, availableRoles, setUsers, setDialogOpen, setV
                     </DropdownMenuItem>
                     <DropdownMenuSeparator/>
                     <DropdownMenuItem
-                        onClick={() => navigator.clipboard.writeText(account.id)}
+                        onClick={() => navigator.clipboard.writeText(account.id)
+                            .then(() => toast.success("Identifiant copié"))
+                            .catch(() => toast.error("Impossible de copier l'identifiant"))}
                     >
                         <IdCardLanyard/> Copier l'identifiant
                     </DropdownMenuItem>
@@ -227,19 +231,29 @@ function UserActionsCell({account, availableRoles, setUsers, setDialogOpen, setV
                     <AlertDialogFooter>
                         <AlertDialogCancel>Annuler</AlertDialogCancel>
                         <Button
+                            // One deletion per click: a second click used to send it again
+                            disabled={deleting}
                             onClick={async () => {
-                                const res = await deleteUserAction(account.id);
-                                if (res.error) {
-                                    toast.error(res.error);
-                                    return;
+                                setDeleting(true);
+                                try {
+                                    const res = await deleteUserAction(account.id);
+                                    if (res.error) {
+                                        toast.error(res.error);
+                                        return;
+                                    }
+                                    setDeleteDialogOpen(false);
+                                    setUsers(prev => prev.filter(user => user.id !== account.id));
+                                    toast("Utilisateur supprimé");
+                                    setDialogOpen(false);
+                                } catch {
+                                    toast.error("Le compte n'a pas pu être supprimé");
+                                } finally {
+                                    setDeleting(false);
                                 }
-                                setUsers(prev => prev.filter(user => user.id !== account.id));
-                                toast("Utilisateur supprimé");
-                                setDialogOpen(false);
                             }}
                             variant="destructive"
                         >
-                            Supprimer
+                            {deleting ? "Suppression…" : "Supprimer"}
                         </Button>
                     </AlertDialogFooter>
                 </AlertDialogContent>
@@ -419,14 +433,14 @@ export function UsersTable({data, availableRoles}: DataTableProps) {
                         (table.getIsSomePageRowsSelected() && "indeterminate")
                     }
                     onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                    aria-label="Select all"
+                    aria-label="Sélectionner toute la page"
                 />
             ),
             cell: ({row}) => (
                 <Checkbox
                     checked={row.getIsSelected()}
                     onCheckedChange={(value) => row.toggleSelected(!!value)}
-                    aria-label="Select row"
+                    aria-label={`Sélectionner ${row.original.name}`}
                 />
             ),
             enableSorting: false,
@@ -535,7 +549,7 @@ export function UsersTable({data, availableRoles}: DataTableProps) {
                     );
                 }
                 return (
-                    <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200 gap-1">
+                    <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 gap-1">
                         <FileX size={14}/> Manquant
                     </Badge>
                 );

@@ -119,7 +119,7 @@ export function TicketInfoDialog({channelId}: { channelId: string }) {
                 {!info ? (
                     failed
                         ? <p className="text-sm text-destructive">Les informations n&apos;ont pas pu être chargées.</p>
-                        : <div className="flex justify-center py-6"><Loader2 className="size-5 animate-spin text-muted-foreground"/></div>
+                        : <div className="flex justify-center py-6" role="status"><Loader2 className="size-5 animate-spin text-muted-foreground"/><span className="sr-only">Chargement…</span></div>
                 ) : (
                     <div className="space-y-6">
                         <Section icon={CircleAlert} title="Vigilances">

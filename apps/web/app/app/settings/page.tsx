@@ -102,7 +102,13 @@ export default function SettingsPage() {
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
+        // Emptied, so choosing the same photo again (after an error) still triggers a change
+        e.target.value = "";
         if (!file) return;
+        if (!file.type.startsWith("image/")) {
+            toast.error("Choisissez une image (JPEG, PNG, WebP…)");
+            return;
+        }
 
         if (file.size > 2 * 1024 * 1024) {
             toast.error("L'image est trop volumineuse (max 2Mo)");
@@ -719,9 +725,8 @@ export default function SettingsPage() {
                             </CardHeader>
                             <CardContent>
                                 <Button variant="destructive" className="gap-2"
-                                        onClick={() => withPassword(async () => {
-                                            toast.error("La suppression de compte n'est pas encore implémentée.");
-                                        }, true)}>
+                                        // Not built yet: said at once, without asking for the password first
+                                        onClick={() => toast.error("La suppression de compte n'est pas encore disponible : contactez un administrateur.")}>
                                     <Trash2 className="h-4 w-4"/>
                                     Supprimer mon compte
                                 </Button>
